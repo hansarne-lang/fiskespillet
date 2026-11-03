@@ -6,6 +6,8 @@ Codex og Claude Code skal bruke egne worktrees og GitHub Issues som autoritativ 
 
 Eksisterende Broen er identifisert som mulig grunnlag. FISKELAGET skal få eget prosjektrom og egne agentidentiteter uten å endre andre prosjekters aktive instanser. Implementasjon og faktisk samarbeidsdemonstrasjon spores som separate GitHub-issues. Ingen automatisert agentkjøring er aktivert av denne dokumentasjonen.
 
+Prosjekteieren har særskilt valgt lesende Claude-review med SHA-bundet handshake i #24. Denne avgrensede, manuelt startede reviewflyten bruker et isolert FISKELAGET-rom og erstatter ikke produksjonskoordinatoren i #4. [Reviewprotokollen](Docs/Development/BROEN_REVIEW.md) beskriver forespørsel, resultat, ACK, tester og den påkrevde GitHub-statusen `claude-review`.
+
 ## Meldingskontrakt
 
 Alle arbeidsmeldinger skal ha MessageId (UUID), TaskId (GitHub issue-URL), Sender, Recipient, MessageType, Timestamp (RFC3339 UTC), Payload, RelatedFiles, RelatedCommit og Status. Status gjelder leveringen, ikke oppgaven. Tilleggsfelter er SchemaVersion, ProjectId, CorrelationId, RunId, Branch, WorktreeId og PullRequestUrl.

@@ -62,6 +62,8 @@ Ett Project med disse lagrede visningene: oversikt som board etter Status; «Cod
 
 ## GitHub-integrasjon
 
+Prosjekteieren har godkjent Claude Code som reviewer med et [SHA-bundet Broen-handshake](Docs/Development/BROEN_REVIEW.md). Når den testede porten er aktivert, er påkrevd `claude-review` sammen med `repo-contracts` godkjenningsgrunnlaget, uten behov for en annen GitHub-konto. Claude gjennomgår faktisk endring i en separat lesende prosess; koordinatoren kontrollerer avsender, nonce, head/base-SHA, resultat, ACK og testbevis før status publiseres. Dette er ingen egen formell GitHub-Approve fra PR-forfatteren. Ny push krever ny kontroll. Done krever fortsatt faktisk integrasjon.
+
 Issues/PR-er administreres gjennom den godkjente GitHub-koblingen. Projects krever en autentisert API-kobling med Projects-rettighet. Aktive Projects-ID-er og felter leses fra GitHub, ikke fra en separat lokal TODO-liste.
 
 I den første bootstrapfasen, før Project er tilgjengelig, registreres Status, Priority, Module og Agent i den tilhørende GitHub-issuen. Når Project opprettes, flyttes den redigerbare kilden til Project-feltene og gamle bootstrapfelt merkes som historikk. Det skal aldri finnes to aktive statuskilder. Oppgavestart er manuell og koordinert til claim-tjenesten er implementert; automatisk henting forblir deaktivert.

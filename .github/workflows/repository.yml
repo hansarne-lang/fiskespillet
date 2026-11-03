@@ -30,3 +30,6 @@ jobs:
         run: python -m unittest discover -s Tools/Validation -p 'test_*.py' -v
       - name: Test fail-closed Broen review handshake
         run: python -m unittest discover -s Tools/Coordination -p 'test_*.py' -v
+
+      - name: Validate Unreal foundation structure
+        run: python Tools/Validation/check_bootstrap.py

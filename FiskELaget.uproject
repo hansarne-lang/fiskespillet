@@ -1,0 +1,10 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Games",
+  "Description": "FISKELAGET minimal Windows foundation",
+  "Modules": [
+    { "Name": "FiskCore", "Type": "Runtime", "LoadingPhase": "PreDefault" },
+    { "Name": "FiskGame", "Type": "Runtime", "LoadingPhase": "Default" }
+  ]
+}

@@ -1,6 +1,6 @@
 # FISKELAGET minimal Unreal foundation
 
-Kildeforberedelsen i #26 oppretter FiskCore/FiskGame, Game-/Editor-target og en oppstart med FISKELAGET-tittel. Første kompilering, pakking og faktisk Windows-oppstart kvalifiseres i #3/#5. Kilde- og strukturkontroll er ikke bevis på at C++-prosjektet bygger.
+Oppgave #26 oppretter FiskCore/FiskGame, Game-/Editor-target og en oppstart med FISKELAGET-tittel.
 
 ## Innhold og grenser
 
@@ -18,4 +18,4 @@ Pakk med RunUAT BuildCookRun for Win64 Development, prosjektets Engine Entry-kar
 
 Det pakkede Windows-programmet skal starte uten Unreal Editor. Normal oppstart skal vise FISKELAGET og «Teknisk grunnstamme». Loggen skal inneholde FISKCORE_MODULE_LOADED og FISKELAGET_BOOTSTRAP_READY etter at verden er startet. En prøve skal registrere eksakt commit, motor-/kompilator-/SDK-versjon, exitkode og loggresultat før den rapporteres Passed.
 
-Ved denne kildeforberedelsen er C++-bygg, pakking og Windows-oppstart Not Run fordi Microsoft-installasjonen venter på godkjent Windows UAC. Faktisk fremdrift og testbevis følger GitHub Issues #3, #5 og #26.
+Lokal kvalifisering av kildeversjon 9f7678c bestod med Unreal 5.8.4, MSVC 14.44.35229, Windows SDK 10.0.22621.0 og .NET Framework 4.8 SDK. Editor og Game ble bygget i Win64 Development, og BuildCookRun produserte en frittstående Windows-pakke. Oppstartsprøven uten grafikk lastet Engine Entry, registrerte begge loggmarkørene og avsluttet med kode 0. Visuell kontroll av tittelbildet og automatisert Unreal-bygg på Windows er egne kontroller.

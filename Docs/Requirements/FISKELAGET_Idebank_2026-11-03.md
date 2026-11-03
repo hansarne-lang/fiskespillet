@@ -4,7 +4,7 @@ Status per 3. november 2026 · 5 hovedideer
 
 Idébanken utvider designgrunnlaget gjennom v4.1 med sosialt liv i marinaen, levende båtreiser, større risiko offshore, personlige naust og veddemål i strandbaren. Statusene nedenfor gjengir prosjekteierens valg. Valg av hvilke funksjoner som inngår i første prototype, er fortsatt åpent.
 
-Dette er et tillegg til kravspesifikasjonen v1.0. Ved motstrid gjelder den nyeste uttrykkelige brukerbeslutningen. GitHub Issues er fortsatt den autoritative listen over utviklingsoppgaver; idébanken beskriver spilldesign.
+Idébanken beskriver designvalg som er innarbeidet i kravspesifikasjon v1.1. Ved motstrid gjelder den nyeste uttrykkelige brukerbeslutningen. GitHub Issues er fortsatt den autoritative listen over utviklingsoppgaver; idébanken beskriver spilldesign.
 
 Ideene og de senere avklaringene er innarbeidet i [kravspesifikasjon v1.1](FISKELAGET_Kravspesifikasjon_v1.1.md). Ved minutt 17 skjer felles avsløring, automatisk salg og utbetaling av fangstpremier og veddemålsgevinster. Før dette brukes bare tidligere disponible penger til handel og innsatser.
 

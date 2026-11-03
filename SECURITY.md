@@ -6,6 +6,8 @@ Prosjekteieren administrerer tilgang og designbeslutninger. Utviklere bruker ind
 
 Bruk repositoryets minimale GITHUB_TOKEN til lesende kontroller. Projects-skriving krever godkjent Projects-tilgang; ikke legg en personlig token i et offentlig workflow. App-/OAuth-tilgang oppbevares i egnet beskyttet nøkkellager eller som begrenset GitHub-secret etter eksplisitt oppsett.
 
+Prosjekteierens valgte Claude-review-port bruker en separat lesende Claude-prosess og [verifisert Broen-handshake](Docs/Development/BROEN_REVIEW.md). Den lokale koordinatoren publiserer SHA-bundet `claude-review` gjennom eksisterende GitHub-tilgang. Det gir prosessmessig review, men ingen uavhengig GitHub-identitet eller beskyttelse mot en ondsinnet prosess med samme lokale/GitHub-skrivetilgang. Rå brokerlogger, nonce-/konsumlogg og tokenfiler holdes private. Grønn status krever faktiske transportposter, gyldig korrelasjon, vellykket reviewer og grønn CI; bare konvoluttens Sender-felt er ikke identitetsbevis.
+
 Kjør ukjente PR-er på isolerte GitHub-hosted runners uten hemmeligheter. Ikke bruk en personlig utviklermaskin som generell selvhostet PR-runner. Ikke kjør PR-kode med privilegert pull_request_target. Senere UE-bygg krever et egnet isolert Windows-byggmiljø; oppsettet spores som egen issue.
 
 Nye invitasjoner, betalte tjenester, større arkitekturendringer, designendringer og destruktive handlinger krever prosjekteieren. Testere skal kunne få ferdigpakket Windows-bygg uten kildekodetilgang som forutsetning, selv om denne kildekoden er offentlig.

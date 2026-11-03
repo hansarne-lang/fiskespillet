@@ -4,6 +4,14 @@
 #include "GameFramework/GameStateBase.h"
 #include "FiskDayState.generated.h"
 
+enum class EFiskDayPhase : uint8
+{
+    Preparation,
+    FishingAndReturn,
+    Settlement,
+    Finished
+};
+
 UCLASS()
 class AFiskDayState final : public AGameStateBase
 {
@@ -17,6 +25,8 @@ public:
     void StartDay();
     bool HasStarted() const { return StartedAt >= 0.0; }
     int32 GetElapsedSeconds() const;
+    static int32 CalculateElapsedSeconds(double ServerTime, double StartTime);
+    static EFiskDayPhase GetPhase(int32 ElapsedSeconds);
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:

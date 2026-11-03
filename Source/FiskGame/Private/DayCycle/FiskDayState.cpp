@@ -20,7 +20,29 @@ int32 AFiskDayState::GetElapsedSeconds() const
         return 0;
     }
 
-    return FMath::FloorToInt(FMath::Clamp(GetServerWorldTimeSeconds() - StartedAt, 0.0, static_cast<double>(DayEnd)));
+    return CalculateElapsedSeconds(GetServerWorldTimeSeconds(), StartedAt);
+}
+
+int32 AFiskDayState::CalculateElapsedSeconds(double ServerTime, double StartTime)
+{
+    return FMath::FloorToInt(FMath::Clamp(ServerTime - StartTime, 0.0, static_cast<double>(DayEnd)));
+}
+
+EFiskDayPhase AFiskDayState::GetPhase(int32 ElapsedSeconds)
+{
+    if (ElapsedSeconds >= DayEnd)
+    {
+        return EFiskDayPhase::Finished;
+    }
+    if (ElapsedSeconds >= SettlementStart)
+    {
+        return EFiskDayPhase::Settlement;
+    }
+    if (ElapsedSeconds >= PreparationEnd)
+    {
+        return EFiskDayPhase::FishingAndReturn;
+    }
+    return EFiskDayPhase::Preparation;
 }
 
 void AFiskDayState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -33,17 +33,19 @@ void AFiskBootstrapHUD::DrawHUD()
 
     const int32 Elapsed = Day->GetElapsedSeconds();
     const TCHAR* Phase = TEXT("Forberedelser");
-    if (Elapsed >= AFiskDayState::DayEnd)
+    switch (AFiskDayState::GetPhase(Elapsed))
     {
-        Phase = TEXT("Fiskedagen er ferdig");
-    }
-    else if (Elapsed >= AFiskDayState::SettlementStart)
-    {
-        Phase = TEXT("Dagsoppgjør");
-    }
-    else if (Elapsed >= AFiskDayState::PreparationEnd)
-    {
+    case EFiskDayPhase::Preparation:
+        break;
+    case EFiskDayPhase::FishingAndReturn:
         Phase = TEXT("Fiske og retur");
+        break;
+    case EFiskDayPhase::Settlement:
+        Phase = TEXT("Dagsoppgjør");
+        break;
+    case EFiskDayPhase::Finished:
+        Phase = TEXT("Fiskedagen er ferdig");
+        break;
     }
 
     DrawText(FString::Printf(TEXT("%02d:%02d  %s"), Elapsed / 60, Elapsed % 60, Phase),

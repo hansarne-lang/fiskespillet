@@ -10,7 +10,8 @@ Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengel
 
 ## Dokumentasjon
 
-- [Kravspesifikasjon](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.0.md)
+- [Gjeldende kravspesifikasjon v1.1](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.md) og [Word-utgave](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.docx)
+- [Samlet idébank](Docs/Requirements/FISKELAGET_Idebank_2026-11-03.md) og [tidligere krav v1.0](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.0.md)
 - [Arkitektur](ARCHITECTURE.md) og [modulkontrakter](MODULE_CONTRACTS.md)
 - [Utviklingsoppsett](DEVELOPMENT.md), [tester](TESTING.md) og [bidrag](CONTRIBUTING.md)
 - [Felles oppgavesystem](TASK_SYSTEM.md) og [AI-samarbeid](AI_BRIDGE.md)
@@ -18,7 +19,7 @@ Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengel
 
 ## Oppgaver og kvalitet
 
-[GitHub Issues](https://github.com/hansarne-lang/fiskespillet/issues) er den autoritative oppgavelisten. GitHub Projects gir felles oversikt når integrasjonen er aktiv. Statusene er Backlog, Ready, In Progress, Blocked, In Review og Done; Awaiting Approval er en separat godkjenningsmarkering.
+[GitHub Issues](https://github.com/hansarne-lang/fiskespillet/issues) er den autoritative oppgavelisten. [Det private GitHub Project](https://github.com/users/hansarne-lang/projects/1) gir felles oversikt over de samme oppgavene. Statusene er Backlog, Ready, In Progress, Blocked, In Review og Done; Awaiting Approval er en separat godkjenningsmarkering.
 
 Endringer går gjennom pull request og relevante kontroller. En oppgave er ikke Done før tester, godkjenning og integrasjon er bekreftet. CI i bootstrapfasen kontrollerer repositoryet; dette er ikke en Unreal-byggtest.
 

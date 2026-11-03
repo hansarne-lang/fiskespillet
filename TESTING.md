@@ -16,7 +16,7 @@ Definer endringsfiltre og «ikke relevant» eksplisitt. En required kontroll ska
 
 ## Modulkontrakter
 
-Test nødvendige felter/enheter, ugyldige ID-er, ukjent majorversjon, ugyldig enum, avsender uten autoritet, dobbel levering, hendelser i feil rekkefølge og omstart mellom bokføring og kvittering. Landet, solgt og tapt skal ikke forveksles. Klientprojeksjoner skal ikke lekke skjult art/vekt/utholdenhet.
+Test nødvendige felter/enheter, ugyldige ID-er, ukjent majorversjon, ugyldig enum, avsender uten autoritet, dobbel levering, hendelser i feil rekkefølge og omstart mellom bokføring og kvittering. Landet, solgt og tapt skal ikke forveksles. Klientprojeksjoner skal ikke lekke dagens skjulte fangstresultater før minutt 17; dette gjelder også journal, statistikk, rekordvarsler, trofévegg, saldo og underliggende klientpayload. Utholdenhet vises aldri som helsebar.
 
 ## Planlagte spillregeltester
 
@@ -29,8 +29,21 @@ Test nødvendige felter/enheter, ugyldige ID-er, ukjent majorversjon, ugyldig en
 | RULE05 | Absolutt minutt 17 | Før, ved og etter 1 020 000 ms med eiergodkjent definisjon av ankomst; ingen unntak |
 | RULE06 | For sent gir tap av hele dagens fangst | Alle dagens usolgte poster tapes; tidligere penger/utstyr og gyldige rekorder beholdes |
 | RULE07 | Bare kapteinen kan starte frivillig retur | Passasjer avvises; gyldig kaptein godtas; overført kapteinsrolle kontrolleres ved kommando |
-| RULE08 | Ingen dobbeltsalg | Retry, frakobling, restart og dobbelt hendelseslevering gir én utbetaling |
+| RULE08 | Ingen tidlig utbetaling eller dobbeltsalg | Ingen fangstsalg, fangstpremie eller veddemålsgevinst før minutt 17; retry, frakobling, restart og dobbelt hendelseslevering gir én utbetaling |
 | RULE09 | Karriere mellom LAN-servere | Bekreftet profil, journal, utstyr og rekorder overlever bytte; ugyldig eller eldre profil håndteres kontrollert |
+
+## Nye planlagte akseptanseprøver fra krav v1.1
+
+Disse prøvene er ikke kjørt. Prototypeomfanget avgjøres i #14; særregler for veddemål i #15 og ankomstregistrering i #16.
+
+| ID | Regel | Viktigste tilfeller |
+|---|---|---|
+| RULE10 | Felles avsløring ved minutt 17 | Fisker, mannskap og andre spillere; tidlig landing/levering; HUD, journal, statistikk, trofévegg, varsel og nettverkspayload |
+| RULE11 | Reisehopp gir ingen tidsfordel | Full enighet og én uenig; identisk serverstyrt ankomst; observatør ser fysisk reise; kaptein kan starte retur |
+| RULE12 | Sosial strandbar etter tidlig retur | Én spiller i land og én fortsatt ute; resultattavle skjult til minutt 17 |
+| RULE13 | Større offshore-muligheter med større risiko | Startbåt og bedre båt, valgt avstand/habitat, kamp, sleping, returtid og dokumenterte fordelinger |
+| RULE14 | Personlige naust følger karrieren | Navn, besøk, kosmetiske kjøp, omstart, annen LAN-server og utsatte rekordoppdateringer |
+| RULE15 | Serverstyrte veddemål og bevart pott | Bare gyldig deltaker/mål, saldo/innsats én gang, kun fangst levert i tide, godkjente særtilfeller og én utbetaling ved minutt 17 |
 
 For napp måles også fordelinger i spilltest; en kort tilfeldig prøve kan ikke alene bevise lik nappfrekvens. Ingen funksjonsstubber som alltid returnerer true skal brukes som testbevis.
 

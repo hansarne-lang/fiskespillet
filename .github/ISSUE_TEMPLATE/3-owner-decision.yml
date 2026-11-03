@@ -1,0 +1,152 @@
+{
+  "name": "Beslutning fra prosjekteieren",
+  "description": "Design, større arkitektur, tilgang, kostnad eller annen eierbeslutning.",
+  "body": [
+    {
+      "type": "markdown",
+      "attributes": {
+        "value": "Opprett som Blocked, Approval=Awaiting Approval og label approval:awaiting gjennom den godkjente integrasjonen. Ingen handling er godkjent ved innsending av dette skjemaet."
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "proposal",
+      "attributes": {
+        "label": "Konkret beslutningsforslag",
+        "description": "Beskriv handlingen og omfanget som skal godkjennes."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "consequences",
+      "attributes": {
+        "label": "Konsekvenser og alternativer",
+        "description": "Ta med kostnadstak, mottakere, tilganger, data eller synlighet der det er relevant."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "input",
+      "id": "responsible",
+      "attributes": {
+        "label": "Foreslått ansvarlig",
+        "description": "GitHub-brukernavn eller Uavklart. Faktisk ansvarlig settes som issue-assignee før Ready."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "dropdown",
+      "id": "priority_request",
+      "attributes": {
+        "label": "Foreslått prioritet",
+        "description": "Inntaksforslag. Etter triage er Project-feltet Priority autoritativt.",
+        "options": [
+          "P0 Kritisk",
+          "P1 Høy",
+          "P2 Normal",
+          "P3 Lav"
+        ]
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "dropdown",
+      "id": "module_request",
+      "attributes": {
+        "label": "Modul",
+        "description": "Inntaksforslag. Etter triage er Project-feltet Module autoritativt.",
+        "options": [
+          "FiskCore",
+          "Fishing",
+          "Boats",
+          "World",
+          "DayCycle",
+          "Economy",
+          "Career",
+          "Multiplayer",
+          "UI",
+          "Platform",
+          "CrossModule"
+        ]
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "dependencies",
+      "attributes": {
+        "label": "Avhengigheter",
+        "description": "Oppgi issue-URL-er eller Ingen. Bekreft avhengighetene som GitHub Blocked by-relasjoner før Ready."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "allowed_files",
+      "attributes": {
+        "label": "AllowedFiles",
+        "description": "Tillatte repository-relative stier/glober. Skriv Uavklart ved behov; oppgaven kan da ikke bli Ready."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "acceptance",
+      "attributes": {
+        "label": "Akseptansekriterier",
+        "description": "Observerbare vilkår for at oppgaven er fullført."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "tests",
+      "attributes": {
+        "label": "Testkrav",
+        "description": "Relevante tester og forventede bevis. Planlagt test er ikke et bestått resultat."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "input",
+      "id": "decision_owner",
+      "attributes": {
+        "label": "Neste handling eies av",
+        "description": "Prosjekteierens GitHub-brukernavn. Dette er beslutningstakeren, ikke en agent."
+      },
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "type": "textarea",
+      "id": "revision",
+      "attributes": {
+        "label": "Revisjon som godkjenningen skal gjelde",
+        "description": "Commit, dokumentversjon og konkrete parametere. En endring av scope krever ny godkjenning."
+      },
+      "validations": {
+        "required": true
+      }
+    }
+  ]
+}

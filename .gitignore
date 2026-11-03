@@ -1,0 +1,22 @@
+# Unreal generated files
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+.vs/
+*.sln
+*.VC.db
+*.VC.opendb
+*.suo
+*.user
+# Machine-local state and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.pfx
+*.key
+local/
+builds/
+__pycache__/
+*.pyc

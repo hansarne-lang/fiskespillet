@@ -1,0 +1,104 @@
+{
+  "status": "APPROVED_MODEL_RUNTIME_IDS_REQUIRED",
+  "repository": "hansarne-lang/fiskespillet",
+  "project_title": "FISKELAGET Utvikling",
+  "visibility": "PRIVATE",
+  "authoritative_tasks": "GitHub Issues",
+  "fields": {
+    "Status": [
+      "Backlog",
+      "Ready",
+      "In Progress",
+      "Blocked",
+      "In Review",
+      "Done"
+    ],
+    "Priority": [
+      "P0 Kritisk",
+      "P1 Høy",
+      "P2 Normal",
+      "P3 Lav"
+    ],
+    "Module": [
+      "FiskCore",
+      "Fishing",
+      "Boats",
+      "World",
+      "DayCycle",
+      "Economy",
+      "Career",
+      "Multiplayer",
+      "UI",
+      "Platform",
+      "CrossModule"
+    ],
+    "Agent": [
+      "Codex-Integration",
+      "Codex-Fishing",
+      "Claude-BoatsWorld",
+      "Claude-EconomyCareer",
+      "Human",
+      "Unassigned"
+    ],
+    "Approval": [
+      "Not Required",
+      "Awaiting Approval",
+      "Approved"
+    ],
+    "Next Action Owner": {
+      "type": "text"
+    },
+    "Ready At": {
+      "type": "date",
+      "note": "Settes når status blir Ready; sekundpresis sortering leses fra audit-hendelsen i GitHub."
+    }
+  },
+  "views": [
+    {
+      "name": "Oversikt",
+      "layout": "board",
+      "group_by": "Status"
+    },
+    {
+      "name": "Codex",
+      "agent_options": [
+        "Codex-Integration",
+        "Codex-Fishing"
+      ]
+    },
+    {
+      "name": "Claude",
+      "agent_options": [
+        "Claude-BoatsWorld",
+        "Claude-EconomyCareer"
+      ]
+    },
+    {
+      "name": "Blokkert",
+      "status_options": [
+        "Blocked"
+      ]
+    },
+    {
+      "name": "Venter på godkjenning",
+      "approval_options": [
+        "Awaiting Approval"
+      ]
+    },
+    {
+      "name": "Til gjennomgang",
+      "status_options": [
+        "In Review"
+      ]
+    },
+    {
+      "name": "Ferdig",
+      "status_options": [
+        "Done"
+      ]
+    }
+  ],
+  "automatic_closed_issue_to_done": false,
+  "requires_runtime_field_id_discovery": true,
+  "note": "Dette er konfigurasjon for felter og visninger, ingen lokal oppgaveliste. Faktiske oppgaver, ID-er og status leses fra GitHub."
+}

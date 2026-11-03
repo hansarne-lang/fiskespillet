@@ -11,11 +11,16 @@ class AFiskStarterBoat final : public AInfo
 
 public:
     static constexpr int32 Capacity = 2;
+    static constexpr int32 AtDock = -1;
+    static constexpr int32 AtFishingSpot = 100;
 
     AFiskStarterBoat();
     void SetOwnerPlayer(int32 PlayerId);
     void Board(int32 PlayerId);
     void Leave(int32 PlayerId);
+    void StartTrip(int32 PlayerId);
+    virtual void Tick(float DeltaSeconds) override;
+    int32 GetTripProgress() const { return TripProgress; }
     bool IsAboard(int32 PlayerId) const { return Crew.Contains(PlayerId); }
     int32 GetCrewCount() const { return Crew.Num(); }
     int32 GetCaptainId() const;
@@ -30,4 +35,13 @@ private:
 
     UFUNCTION()
     void OnRep_Crew();
+
+    UPROPERTY(ReplicatedUsing = OnRep_TripProgress)
+    int32 TripProgress = AtDock;
+
+    UFUNCTION()
+    void OnRep_TripProgress();
+
+    float TravelSeconds = 0.0f;
+    bool bReportedDeparture = false;
 };

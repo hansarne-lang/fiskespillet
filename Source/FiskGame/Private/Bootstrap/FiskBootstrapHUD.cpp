@@ -33,15 +33,36 @@ void AFiskBootstrapHUD::DrawHUD()
     {
         const APlayerController* PC = GetOwningPlayerController();
         const int32 PlayerId = PC && PC->PlayerState ? PC->PlayerState->GetPlayerId() : INDEX_NONE;
-        const TCHAR* Location = Boat->IsAboard(PlayerId)
+        const int32 Progress = Boat->GetTripProgress();
+        const bool bAboard = Boat->IsAboard(PlayerId);
+        const TCHAR* Location = bAboard
             ? TEXT("Du er om bord")
-            : TEXT("Ved brygga: Trykk E for å gå om bord");
+                        : Progress == AFiskStarterBoat::AtDock
+                ? TEXT("Ved brygga: Trykk E for å gå om bord")
+                : TEXT("Du er ved brygga");
         const int32 CaptainId = Boat->GetCaptainId();
         const TCHAR* Captain = CaptainId == INDEX_NONE ? TEXT("Ingen")
             : CaptainId == PlayerId ? TEXT("Deg") : TEXT("Medspiller");
         DrawText(FString::Printf(TEXT("Startbåt  %d/%d   Kaptein: %s"), Boat->GetCrewCount(),
             AFiskStarterBoat::Capacity, Captain), FLinearColor::White, Left, Top + 135.0f);
         DrawText(Location, FLinearColor::White, Left, Top + 160.0f);
+
+        FString Route;
+        if (Progress == AFiskStarterBoat::AtDock)
+        {
+            Route = CaptainId != INDEX_NONE && CaptainId == PlayerId
+                ? TEXT("Ved brygga. Fra 02:00: Trykk R for å dra til fiskeplassen")
+                : TEXT("Ved brygga. Kapteinen starter turen");
+        }
+        else if (Progress == AFiskStarterBoat::AtFishingSpot)
+        {
+            Route = TEXT("Framme ved fiskeplassen");
+        }
+        else
+        {
+            Route = FString::Printf(TEXT("Underveis til fiskeplassen: %d%%"), Progress);
+        }
+        DrawText(Route, FLinearColor::White, Left, Top + 185.0f);
     }
 
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();

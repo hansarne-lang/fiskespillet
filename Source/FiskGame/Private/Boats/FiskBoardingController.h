@@ -17,4 +17,9 @@ private:
 
     UFUNCTION(Server, Reliable)
     void ServerBoardStarterBoat();
+
+    void RequestDeparture();
+
+    UFUNCTION(Server, Reliable)
+    void ServerStartBoatTrip();
 };

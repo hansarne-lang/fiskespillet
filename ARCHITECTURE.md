@@ -1,6 +1,6 @@
 # FISKELAGET – Arkitektur
 
-Status: arkitektur godkjent av prosjekteieren 3. november 2026. Kravspesifikasjon v1.0 er styrende; UE5 er valgt i masterprompten.
+Status: arkitektur godkjent av prosjekteieren 3. november 2026. [Kravspesifikasjon v1.1](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.md) er styrende; UE5 er valgt i masterprompten.
 
 ## Modulær monolitt
 
@@ -43,7 +43,11 @@ Boats eier lagerposter. Fishing eier kampframdrift, men ingen salgsrett. Economy
 
 Fristen er absolutt ved minutt 17. Eksakt registrering av grenseankomst og marinasone er en åpen designavklaring fra kravspesifikasjonen og skal godkjennes før implementasjon. Ingen tidsbuffer eller «nesten framme»-unntak innføres.
 
-Skjult art, eksakt vekt og utholdenhet skal ikke eksponeres til klientens HUD før godkjent tidspunkt. En full serverhendelse er derfor ikke en offentlig nettverkspakke.
+Dagens bekreftede fangstresultater skal holdes skjult for alle, også fisker og mannskap, til felles avsløring ved minutt 17. Dette gjelder art, eksakt vekt/lengde, antall, verdi, journal, statistikk, plasseringer og nye rekorder. Serveren registrerer landing og levering fortløpende, men salg, fangstpremier og veddemålsgevinster krediteres først ved oppgjøret. Tidligere disponible penger kan brukes før dette.
+
+Først kontrolleres levering og frist mot det autoritative grunnlaget; deretter gjennomføres felles avsløring og økonomisk oppgjør. Tidlig ankomst gir ingen salgsrett før minutt 17. Retry og gjenoppkobling skal ikke utløse ekstra utbetaling. Den samme avsløringsregelen gjelder HUD, journal, rekordvarsler, trofévegg og alle klientlesemodeller. Skjulte data skal ikke sendes i underliggende klientpayload før riktig tidspunkt. Fiskens skjulte utholdenhet skal fortsatt ikke vises som helsebar. En full serverhendelse er derfor ikke en offentlig nettverkspakke.
+
+Reisehopp er et valg av presentasjon etter enighet fra alle om bord. Serverklokke, båtens fysiske reise og ankomsttid fortsetter uendret. Det endrer ikke kapteinens myndighet til å starte retur. Strandbar, naust, offshorebalanse og veddemål bygges innenfor de eksisterende logiske modulene; ingen ny fysisk runtime-modul opprettes av disse designvalgene.
 
 ## Innhold og mulig videre oppdeling
 

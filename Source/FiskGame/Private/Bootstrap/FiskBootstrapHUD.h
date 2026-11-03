@@ -4,6 +4,8 @@
 #include "GameFramework/HUD.h"
 #include "FiskBootstrapHUD.generated.h"
 
+class AFiskStarterBoat;
+
 UCLASS()
 class AFiskBootstrapHUD final : public AHUD
 {
@@ -11,4 +13,7 @@ class AFiskBootstrapHUD final : public AHUD
 
 public:
     virtual void DrawHUD() override;
+
+private:
+    TWeakObjectPtr<AFiskStarterBoat> StarterBoat;
 };

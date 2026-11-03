@@ -27,7 +27,7 @@ def validate(root):
             errors.append('Expected portable UE 5.8 association')
     except (OSError,ValueError,KeyError,TypeError):
         errors.append('Invalid or missing uproject')
-    expected = {'FiskCore':{'Core'}, 'FiskGame':{'Core','CoreUObject','Engine','FiskCore'}}
+    expected = {'FiskCore':{'Core'}, 'FiskGame':{'Core','CoreUObject','Engine','FiskCore','InputCore'}}
     for name, allowed in expected.items():
         path = root/'Source'/name/(name+'.Build.cs')
         if not path.is_file():

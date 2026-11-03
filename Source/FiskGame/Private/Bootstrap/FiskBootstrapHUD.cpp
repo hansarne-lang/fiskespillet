@@ -1,6 +1,10 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
 #include "Engine/Canvas.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
+#include "Boats/FiskStarterBoat.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskDayState.h"
 
 void AFiskBootstrapHUD::DrawHUD()
@@ -15,6 +19,30 @@ void AFiskBootstrapHUD::DrawHUD()
     const float Top = Canvas->ClipY * 0.15f;
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
     DrawText(TEXT("Teknisk grunnstamme"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
+
+    if (!StarterBoat.IsValid())
+    {
+        TActorIterator<AFiskStarterBoat> Boats(GetWorld());
+        if (Boats)
+        {
+            StarterBoat = *Boats;
+        }
+    }
+
+    if (const AFiskStarterBoat* Boat = StarterBoat.Get())
+    {
+        const APlayerController* PC = GetOwningPlayerController();
+        const int32 PlayerId = PC && PC->PlayerState ? PC->PlayerState->GetPlayerId() : INDEX_NONE;
+        const TCHAR* Location = Boat->IsAboard(PlayerId)
+            ? TEXT("Du er om bord")
+            : TEXT("Ved brygga: Trykk E for å gå om bord");
+        const int32 CaptainId = Boat->GetCaptainId();
+        const TCHAR* Captain = CaptainId == INDEX_NONE ? TEXT("Ingen")
+            : CaptainId == PlayerId ? TEXT("Deg") : TEXT("Medspiller");
+        DrawText(FString::Printf(TEXT("Startbåt  %d/%d   Kaptein: %s"), Boat->GetCrewCount(),
+            AFiskStarterBoat::Capacity, Captain), FLinearColor::White, Left, Top + 135.0f);
+        DrawText(Location, FLinearColor::White, Left, Top + 160.0f);
+    }
 
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (Day == nullptr)

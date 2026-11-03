@@ -1,5 +1,7 @@
 #include "Fishing/FiskPrototypeRod.h"
 #include "DayCycle/FiskDayState.h"
+#include "Boats/FiskStarterBoat.h"
+#include "Bootstrap/FiskBootstrapGameMode.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
@@ -75,8 +77,14 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    if (!Day || AFiskDayState::GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
+    const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const AFiskStarterBoat* Boat = Mode ? Mode->GetStarterBoat() : nullptr;
+    if (!Boat || Boat->GetTripProgress() != AFiskStarterBoat::AtFishingSpot
+        || !Day || AFiskDayState::GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
     {
+        LineOut = 0;
+        bRodRaised = false;
+        bCanReel = false;
         SetState(EFiskRodState::Ready);
         SetComponentTickEnabled(false);
     }

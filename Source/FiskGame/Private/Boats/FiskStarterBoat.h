@@ -13,6 +13,7 @@ public:
     static constexpr int32 Capacity = 2;
     static constexpr int32 AtDock = -1;
     static constexpr int32 AtFishingSpot = 100;
+    static constexpr int32 AtMarina = 200;
 
     AFiskStarterBoat();
     void SetOwnerPlayer(int32 PlayerId);
@@ -44,4 +45,5 @@ private:
 
     float TravelSeconds = 0.0f;
     bool bReportedDeparture = false;
+    bool bReportedReturn = false;
 };

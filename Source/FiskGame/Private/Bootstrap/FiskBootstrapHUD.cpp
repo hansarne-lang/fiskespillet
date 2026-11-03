@@ -56,9 +56,19 @@ void AFiskBootstrapHUD::DrawHUD()
                 ? TEXT("Ved brygga. Fra 02:00: Trykk R for å dra til fiskeplassen")
                 : TEXT("Ved brygga. Kapteinen starter turen");
         }
+        else if (Progress == AFiskStarterBoat::AtMarina)
+        {
+            Route = TEXT("Tilbake ved brygga");
+        }
+        else if (Progress > AFiskStarterBoat::AtFishingSpot)
+        {
+            Route = FString::Printf(TEXT("På vei hjem: %d%%"), Progress - AFiskStarterBoat::AtFishingSpot);
+        }
         else if (Progress == AFiskStarterBoat::AtFishingSpot)
         {
-            Route = TEXT("Framme ved fiskeplassen");
+            Route = CaptainId != INDEX_NONE && CaptainId == PlayerId
+                ? TEXT("Framme ved fiskeplassen. Trykk R for å dra hjem")
+                : TEXT("Framme ved fiskeplassen");
         }
         else
         {

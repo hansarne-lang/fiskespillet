@@ -26,6 +26,7 @@ public:
 
 protected:
     virtual void SetupInputComponent() override;
+    virtual void BeginPlay() override;
 
 private:
     void RequestBoarding();
@@ -54,4 +55,12 @@ private:
 
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;
+
+#if WITH_DEV_AUTOMATION_TESTS
+    void RunLanSmoke();
+    FTimerHandle LanSmokeTimer;
+    bool bSmokeTriedEarlyLanding = false;
+    bool bSmokeTriedDuplicateLanding = false;
+    double SmokeReturnAt = 0.0;
+#endif
 };

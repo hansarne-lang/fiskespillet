@@ -7,10 +7,26 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "InputCoreTypes.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "TimerManager.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
     Rod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("PrototypeRod"));
+}
+
+void AFiskBoardingController::BeginPlay()
+{
+    Super::BeginPlay();
+
+#if WITH_DEV_AUTOMATION_TESTS
+    if (IsLocalController() && GetNetMode() != NM_Standalone
+        && FParse::Param(FCommandLine::Get(), TEXT("FiskLanSmoke")))
+    {
+        GetWorldTimerManager().SetTimer(LanSmokeTimer, this, &AFiskBoardingController::RunLanSmoke, 0.5f, true);
+    }
+#endif
 }
 
 void AFiskBoardingController::SetupInputComponent()

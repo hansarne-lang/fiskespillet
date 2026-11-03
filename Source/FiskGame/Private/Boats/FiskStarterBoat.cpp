@@ -73,7 +73,21 @@ void AFiskStarterBoat::OnRep_Crew()
 
 void AFiskStarterBoat::StartTrip(int32 PlayerId)
 {
-    if (!HasAuthority() || TripProgress != AtDock || PlayerId == INDEX_NONE || PlayerId != GetCaptainId())
+    if (!HasAuthority() || PlayerId == INDEX_NONE || PlayerId != GetCaptainId())
+    {
+        return;
+    }
+
+    if (TripProgress == AtFishingSpot)
+    {
+        TravelSeconds = 0.0f;
+        TripProgress = AtFishingSpot + 1;
+        OnRep_TripProgress();
+        SetActorTickEnabled(true);
+        ForceNetUpdate();
+        return;
+    }
+    if (TripProgress != AtDock)
     {
         return;
     }
@@ -95,10 +109,12 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     Super::Tick(DeltaSeconds);
     TravelSeconds = FMath::Min(TravelSeconds + DeltaSeconds, TripDuration);
     const float Fraction = TravelSeconds / TripDuration;
-    SetActorLocation(FishingSpot * Fraction);
-    TripProgress = FMath::FloorToInt(Fraction * AtFishingSpot);
+    const bool bReturning = TripProgress > AtFishingSpot;
+    SetActorLocation(FishingSpot * (bReturning ? 1.0f - Fraction : Fraction));
+    const int32 Percent = FMath::FloorToInt(Fraction * AtFishingSpot);
+    TripProgress = bReturning ? AtFishingSpot + FMath::Max(1, Percent) : Percent;
 
-    if (TripProgress == AtFishingSpot)
+    if (TripProgress == AtFishingSpot || TripProgress == AtMarina)
     {
         SetActorTickEnabled(false);
         OnRep_TripProgress();
@@ -112,6 +128,15 @@ void AFiskStarterBoat::OnRep_TripProgress()
     {
         bReportedDeparture = true;
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TRIP_UNDERWAY crew=%d"), Crew.Num());
+    }
+    else if (TripProgress > AtFishingSpot && TripProgress < AtMarina && !bReportedReturn)
+    {
+        bReportedReturn = true;
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_RETURN_UNDERWAY crew=%d"), Crew.Num());
+    }
+    else if (TripProgress == AtMarina)
+    {
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_MARINA_REACHED crew=%d"), Crew.Num());
     }
     else if (TripProgress == AtFishingSpot)
     {

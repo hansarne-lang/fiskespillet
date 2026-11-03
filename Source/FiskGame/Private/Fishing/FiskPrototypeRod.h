@@ -9,7 +9,10 @@ enum class EFiskRodState : uint8
 {
     Ready,
     Fishing,
-    Bite
+    InitialRun,
+    Fighting,
+    ReadyToLand,
+    Landed
 };
 
 UCLASS()
@@ -20,6 +23,11 @@ class UFiskPrototypeRod final : public UActorComponent
 public:
     UFiskPrototypeRod();
     void Cast();
+    void Lift();
+    void Lower();
+    void Reel();
+    void Land();
+    int32 GetLineOut() const { return LineOut; }
     EFiskRodState GetState() const { return State; }
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -32,5 +40,10 @@ private:
     void OnRep_State();
 
     void SetState(EFiskRodState NewState);
-    double BiteAt = 0.0;
+    UPROPERTY(Replicated)
+    int32 LineOut = 0;
+
+    double NextTransitionAt = 0.0;
+    bool bRodRaised = false;
+    bool bCanReel = false;
 };

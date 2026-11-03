@@ -111,7 +111,7 @@ void AFiskBootstrapHUD::DrawHUD()
         return;
     }
 
-    const TCHAR* RodText = TEXT("Stang 1: Trykk F for å sette ut");
+    FString RodText = TEXT("Stang 1: Trykk F for å sette ut");
     switch (PC->GetRod()->GetState())
     {
     case EFiskRodState::Ready:
@@ -119,8 +119,19 @@ void AFiskBootstrapHUD::DrawHUD()
     case EFiskRodState::Fishing:
         RodText = TEXT("Stang 1: Fisker");
         break;
-    case EFiskRodState::Bite:
-        RodText = TEXT("Stang 1: Napp!");
+    case EFiskRodState::InitialRun:
+        RodText = TEXT("Stang 1: Napp! Fisken tar line");
+        break;
+    case EFiskRodState::Fighting:
+        RodText = FString::Printf(TEXT("Stang 1: Kamp - %d m line ute"), PC->GetRod()->GetLineOut());
+        DrawText(TEXT("Venstreklikk: løft og senk. Høyreklikk: sveiv inn"),
+            FLinearColor::White, Left, Top + 240.0f);
+        break;
+    case EFiskRodState::ReadyToLand:
+        RodText = TEXT("Stang 1: Klar til landing. Trykk mellomrom");
+        break;
+    case EFiskRodState::Landed:
+        RodText = TEXT("Stang 1: Fisk landet");
         break;
     }
     DrawText(RodText, FLinearColor::White, Left, Top + 215.0f);

@@ -6,6 +6,15 @@
 
 class UFiskPrototypeRod;
 
+UENUM()
+enum class EFiskRodAction : uint8
+{
+    Lift,
+    Lower,
+    Reel,
+    Land
+};
+
 UCLASS()
 class AFiskBoardingController final : public APlayerController
 {
@@ -33,6 +42,15 @@ private:
 
     UFUNCTION(Server, Reliable)
     void ServerCastRod();
+
+    void RequestLift();
+    void RequestLower();
+    void RequestReel();
+    void RequestLand();
+    bool CanUseRod() const;
+
+    UFUNCTION(Server, Reliable)
+    void ServerActOnRod(EFiskRodAction Action);
 
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;

@@ -19,9 +19,55 @@ void UFiskPrototypeRod::Cast()
         return;
     }
 
-    BiteAt = GetWorld()->GetTimeSeconds() + FMath::FRandRange(120.0f, 180.0f);
+    NextTransitionAt = GetWorld()->GetTimeSeconds() + FMath::FRandRange(120.0f, 180.0f);
     SetState(EFiskRodState::Fishing);
     SetComponentTickEnabled(true);
+}
+
+void UFiskPrototypeRod::Lift()
+{
+    if (GetOwner()->HasAuthority() && State == EFiskRodState::Fighting)
+    {
+        bRodRaised = true;
+        bCanReel = false;
+    }
+}
+
+void UFiskPrototypeRod::Lower()
+{
+    if (GetOwner()->HasAuthority() && State == EFiskRodState::Fighting && bRodRaised)
+    {
+        bRodRaised = false;
+        bCanReel = true;
+    }
+}
+
+void UFiskPrototypeRod::Reel()
+{
+    if (!GetOwner()->HasAuthority() || State != EFiskRodState::Fighting || !bCanReel)
+    {
+        return;
+    }
+
+    bCanReel = false;
+    LineOut = FMath::Max(0, LineOut - 10);
+    if (LineOut == 0)
+    {
+        SetState(EFiskRodState::ReadyToLand);
+    }
+    else
+    {
+        GetOwner()->ForceNetUpdate();
+    }
+}
+
+void UFiskPrototypeRod::Land()
+{
+    if (GetOwner()->HasAuthority() && State == EFiskRodState::ReadyToLand)
+    {
+        SetState(EFiskRodState::Landed);
+        SetComponentTickEnabled(false);
+    }
 }
 
 void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -34,9 +80,15 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
         SetState(EFiskRodState::Ready);
         SetComponentTickEnabled(false);
     }
-    else if (State == EFiskRodState::Fishing && GetWorld()->GetTimeSeconds() >= BiteAt)
+    else if (State == EFiskRodState::Fishing && GetWorld()->GetTimeSeconds() >= NextTransitionAt)
     {
-        SetState(EFiskRodState::Bite);
+        NextTransitionAt = GetWorld()->GetTimeSeconds() + 3.0;
+        SetState(EFiskRodState::InitialRun);
+    }
+    else if (State == EFiskRodState::InitialRun && GetWorld()->GetTimeSeconds() >= NextTransitionAt)
+    {
+        LineOut = 30;
+        SetState(EFiskRodState::Fighting);
     }
 }
 
@@ -44,6 +96,7 @@ void UFiskPrototypeRod::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME_CONDITION(UFiskPrototypeRod, State, COND_OwnerOnly);
+    DOREPLIFETIME_CONDITION(UFiskPrototypeRod, LineOut, COND_OwnerOnly);
 }
 
 void UFiskPrototypeRod::SetState(EFiskRodState NewState)
@@ -61,8 +114,20 @@ void UFiskPrototypeRod::OnRep_State()
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_FISHING player=%d"), PlayerId);
     }
-    else if (State == EFiskRodState::Bite)
+    else if (State == EFiskRodState::InitialRun)
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_BITE player=%d"), PlayerId);
+    }
+    else if (State == EFiskRodState::Fighting)
+    {
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FIGHT_STARTED player=%d"), PlayerId);
+    }
+    else if (State == EFiskRodState::ReadyToLand)
+    {
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_READY player=%d"), PlayerId);
+    }
+    else if (State == EFiskRodState::Landed)
+    {
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_LANDED player=%d"), PlayerId);
     }
 }

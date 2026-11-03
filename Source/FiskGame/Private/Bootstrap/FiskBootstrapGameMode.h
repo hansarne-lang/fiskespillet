@@ -12,4 +12,5 @@ class AFiskBootstrapGameMode final : public AGameModeBase
 public:
     AFiskBootstrapGameMode();
     virtual void StartPlay() override;
+    virtual void PostLogin(APlayerController* NewPlayer) override;
 };

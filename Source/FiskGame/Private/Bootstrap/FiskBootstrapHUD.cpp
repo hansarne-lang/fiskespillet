@@ -3,6 +3,8 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Boats/FiskStarterBoat.h"
+#include "Boats/FiskBoardingController.h"
+#include "Fishing/FiskPrototypeRod.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskDayState.h"
@@ -99,4 +101,27 @@ void AFiskBootstrapHUD::DrawHUD()
 
     DrawText(FString::Printf(TEXT("%02d:%02d  %s"), Elapsed / 60, Elapsed % 60, Phase),
         FLinearColor::White, Left, Top + 100.0f);
+
+    const AFiskStarterBoat* Boat = StarterBoat.Get();
+    const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController());
+    if (!Boat || !PC || !PC->PlayerState || !Boat->IsAboard(PC->PlayerState->GetPlayerId())
+        || Boat->GetTripProgress() != AFiskStarterBoat::AtFishingSpot
+        || AFiskDayState::GetPhase(Elapsed) != EFiskDayPhase::FishingAndReturn)
+    {
+        return;
+    }
+
+    const TCHAR* RodText = TEXT("Stang 1: Trykk F for å sette ut");
+    switch (PC->GetRod()->GetState())
+    {
+    case EFiskRodState::Ready:
+        break;
+    case EFiskRodState::Fishing:
+        RodText = TEXT("Stang 1: Fisker");
+        break;
+    case EFiskRodState::Bite:
+        RodText = TEXT("Stang 1: Napp!");
+        break;
+    }
+    DrawText(RodText, FLinearColor::White, Left, Top + 215.0f);
 }

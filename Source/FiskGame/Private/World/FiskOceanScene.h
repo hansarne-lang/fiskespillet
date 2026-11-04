@@ -21,6 +21,5 @@ private:
     UPROPERTY() TObjectPtr<UStaticMesh> Sphere;
     UPROPERTY() TObjectPtr<UStaticMesh> Cylinder;
     UPROPERTY() TObjectPtr<UMaterialInterface> Material;
-    UPROPERTY() TObjectPtr<UMaterialInterface> WaterMaterial;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Ripples;
 };

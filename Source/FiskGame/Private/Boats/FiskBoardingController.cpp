@@ -11,6 +11,7 @@
 #include "Misc/Parse.h"
 #include "TimerManager.h"
 #include "EngineUtils.h"
+#include "World/FiskOceanScene.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -141,12 +142,23 @@ void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Actio
 void AFiskBoardingController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
+
     if (!IsLocalController() || !PlayerState) { return; }
+    for (TActorIterator<AFiskOceanScene> Scene(GetWorld()); Scene; ++Scene)
+    {
+        TActorIterator<AFiskStarterBoat> Boat(GetWorld());
+        if (Boat && !Boat->IsAboard(PlayerState->GetPlayerId()) && GetViewTarget() != *Scene)
+        {
+            SetViewTarget(*Scene);
+        }
+    }
+
     for (TActorIterator<AFiskStarterBoat> Boat(GetWorld()); Boat; ++Boat)
     {
         if (Boat->IsAboard(PlayerState->GetPlayerId()) && GetViewTarget() != *Boat)
         {
             SetViewTarget(*Boat);
+            return;
         }
     }
 }

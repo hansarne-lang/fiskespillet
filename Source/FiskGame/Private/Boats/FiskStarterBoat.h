@@ -31,12 +31,21 @@ public:
 
     bool IsAboard(int32 PlayerId) const { return Crew.Contains(PlayerId); }
     int32 GetCrewCount() const { return Crew.Num(); }
+
     int32 GetCaptainId() const;
+    int32 GetSeatIndex(int32 PlayerId) const { return Crew.IndexOfByKey(PlayerId); }
+    uint8 GetRodActivity(int32 Seat) const { return Seat == 0 ? PortRodActivity : StarboardRodActivity; }
+    void SetRodActivities(uint8 Port, uint8 Starboard);
+
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
     UPROPERTY(Replicated)
+
     int32 OwnerId = INDEX_NONE;
+    UPROPERTY(Replicated) uint8 PortRodActivity = 0;
+    UPROPERTY(Replicated) uint8 StarboardRodActivity = 0;
+
 
     UPROPERTY(ReplicatedUsing = OnRep_Crew)
     TArray<int32> Crew;

@@ -18,10 +18,11 @@ void AFiskBootstrapHUD::DrawHUD()
         return;
     }
 
-    const float Left = Canvas->ClipX * 0.08f;
-    const float Top = Canvas->ClipY * 0.15f;
+    const float Left = 30.0f;
+    const float Top = 24.0f;
+    DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 520.0f, 390.0f);
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
-    DrawText(TEXT("Teknisk grunnstamme"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
+    DrawText(TEXT("LAN-prototype - fiskedag i 3D"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
 
     if (!StarterBoat.IsValid())
     {

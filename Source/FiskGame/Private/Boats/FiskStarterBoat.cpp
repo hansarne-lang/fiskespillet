@@ -1,6 +1,7 @@
 #include "Boats/FiskStarterBoat.h"
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Boats/FiskBoatPresentation.h"
 #include "DayCycle/FiskDayState.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
@@ -18,8 +19,13 @@ AFiskStarterBoat::AFiskStarterBoat()
 
     UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("BoatCamera"));
     Camera->SetupAttachment(RootComponent);
-    Camera->SetRelativeLocation(FVector(0.0, 0.0, 1800.0));
-    Camera->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
+
+    const FVector CameraPosition(-1250, -1200, 800);
+    Camera->SetRelativeLocation(CameraPosition);
+    Camera->SetRelativeRotation((FVector(-100, -600, 70) - CameraPosition).Rotation());
+    Camera->FieldOfView = 75.0f;
+    CreateDefaultSubobject<UFiskBoatPresentation>(TEXT("BoatPresentation"));
+
     SetReplicateMovement(true);
 
     PrimaryActorTick.bCanEverTick = true;
@@ -71,6 +77,8 @@ void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(AFiskStarterBoat, Crew);
     DOREPLIFETIME(AFiskStarterBoat, TripProgress);
     DOREPLIFETIME(AFiskStarterBoat, MarinaArrivalMs);
+    DOREPLIFETIME(AFiskStarterBoat, PortRodActivity);
+    DOREPLIFETIME(AFiskStarterBoat, StarboardRodActivity);
 }
 
 void AFiskStarterBoat::OnRep_Crew()
@@ -92,6 +100,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId)
     {
         LegStartedMs = Day->GetElapsedMilliseconds();
         ReturnStartedMs = LegStartedMs;
+        SetActorRotation(FRotator(0, 180, 0));
 
         TripProgress = AtFishingSpot + 1;
         OnRep_TripProgress();
@@ -182,4 +191,15 @@ int32 AFiskStarterBoat::GetMarinaArrivalMs(int32 NowMs) const
     if (ReturnStartedMs < 0) { return -1; }
     const int32 CrossingMs = CalculateCrossingMs(ReturnStartedMs);
     return NowMs >= CrossingMs ? CrossingMs : -1;
+}
+
+
+void AFiskStarterBoat::SetRodActivities(uint8 Port, uint8 Starboard)
+{
+    if (HasAuthority() && (PortRodActivity != Port || StarboardRodActivity != Starboard))
+    {
+        PortRodActivity = Port;
+        StarboardRodActivity = Starboard;
+        ForceNetUpdate();
+    }
 }

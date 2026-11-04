@@ -23,6 +23,12 @@ void AFiskBoardingController::RunLanSmoke()
     const int32 PlayerId = PlayerState->GetPlayerId();
     const bool bCaptain = Boat.GetCaptainId() == PlayerId;
     const int32 Progress = Boat.GetTripProgress();
+    const int32 Minute = Day->GetElapsedSeconds() / 60;
+    if (SmokeClockMinute != Minute)
+    {
+        SmokeClockMinute = Minute;
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_CLOCK ms=%d"), Day->GetElapsedMilliseconds());
+    }
     if (Progress == AFiskStarterBoat::AtDock)
     {
         if (!Boat.IsAboard(PlayerId))
@@ -38,12 +44,6 @@ void AFiskBoardingController::RunLanSmoke()
     }
 
 
-    const int32 Minute = Day->GetElapsedSeconds() / 60;
-    if (SmokeClockMinute != Minute)
-    {
-        SmokeClockMinute = Minute;
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_CLOCK ms=%d"), Day->GetElapsedMilliseconds());
-    }
     if (Progress == AFiskStarterBoat::AtMarina)
     {
         TActorIterator<AFiskDaySettlement> Settlements(GetWorld());

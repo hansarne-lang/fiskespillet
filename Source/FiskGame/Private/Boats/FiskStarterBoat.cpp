@@ -2,6 +2,7 @@
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Boats/FiskBoatPresentation.h"
+#include "Fishing/FiskFishPresentation.h"
 #include "DayCycle/FiskDayState.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
@@ -26,6 +27,7 @@ AFiskStarterBoat::AFiskStarterBoat()
     Camera->SetRelativeRotation((FVector(-100, -600, 110) - CameraPosition).Rotation());
     Camera->FieldOfView = 75.0f;
     CreateDefaultSubobject<UFiskBoatPresentation>(TEXT("BoatPresentation"));
+    CreateDefaultSubobject<UFiskFishPresentation>(TEXT("FishPresentation"));
 
     SetReplicateMovement(true);
 
@@ -80,6 +82,8 @@ void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(AFiskStarterBoat, MarinaArrivalMs);
     DOREPLIFETIME(AFiskStarterBoat, PortRodActivity);
     DOREPLIFETIME(AFiskStarterBoat, StarboardRodActivity);
+    DOREPLIFETIME(AFiskStarterBoat, PortFish);
+    DOREPLIFETIME(AFiskStarterBoat, StarboardFish);
 }
 
 void AFiskStarterBoat::OnRep_Crew()
@@ -201,6 +205,17 @@ void AFiskStarterBoat::SetRodActivities(uint8 Port, uint8 Starboard)
     {
         PortRodActivity = Port;
         StarboardRodActivity = Starboard;
+        ForceNetUpdate();
+    }
+}
+
+
+void AFiskStarterBoat::SetFishVisuals(const FFiskFishVisualState& Port, const FFiskFishVisualState& Starboard)
+{
+    if (HasAuthority() && (PortFish != Port || StarboardFish != Starboard))
+    {
+        PortFish = Port;
+        StarboardFish = Starboard;
         ForceNetUpdate();
     }
 }

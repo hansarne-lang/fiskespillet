@@ -78,7 +78,11 @@ void UFiskPrototypeRod::Land()
         if (!Mode || !Mode->GetSettlement() || !PC->PlayerState) { return; }
         if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
         if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId())) { return; }
+
+        const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+        LandedAtMs = Day->GetElapsedMilliseconds();
         SetState(EFiskRodState::Landed);
+
 
         SetComponentTickEnabled(false);
     }

@@ -28,6 +28,7 @@ public:
     void Reel();
     void Land();
     int32 GetLineOut() const { return LineOut; }
+    int32 GetLandedAtMs() const { return LandedAtMs; }
     EFiskRodState GetState() const { return State; }
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -45,6 +46,7 @@ private:
 
     double NextTransitionAt = 0.0;
     FGuid CatchId;
+    int32 LandedAtMs = -1;
     bool bRodRaised = false;
     bool bCanReel = false;
 };

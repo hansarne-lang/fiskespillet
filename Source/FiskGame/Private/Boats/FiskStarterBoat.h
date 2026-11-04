@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Info.h"
+#include "Fishing/FiskFishVisualState.h"
 #include "FiskStarterBoat.generated.h"
 
 UCLASS()
@@ -35,7 +36,11 @@ public:
     int32 GetCaptainId() const;
     int32 GetSeatIndex(int32 PlayerId) const { return Crew.IndexOfByKey(PlayerId); }
     uint8 GetRodActivity(int32 Seat) const { return Seat == 0 ? PortRodActivity : StarboardRodActivity; }
+
     void SetRodActivities(uint8 Port, uint8 Starboard);
+    const FFiskFishVisualState& GetFishVisual(int32 Seat) const { return Seat == 0 ? PortFish : StarboardFish; }
+    void SetFishVisuals(const FFiskFishVisualState& Port, const FFiskFishVisualState& Starboard);
+
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -44,7 +49,11 @@ private:
 
     int32 OwnerId = INDEX_NONE;
     UPROPERTY(Replicated) uint8 PortRodActivity = 0;
+
     UPROPERTY(Replicated) uint8 StarboardRodActivity = 0;
+    UPROPERTY(Replicated) FFiskFishVisualState PortFish;
+    UPROPERTY(Replicated) FFiskFishVisualState StarboardFish;
+
 
 
     UPROPERTY(ReplicatedUsing = OnRep_Crew)

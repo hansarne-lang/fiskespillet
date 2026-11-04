@@ -159,6 +159,9 @@ void AFiskBootstrapHUD::DrawHUD()
         DrawText(TEXT("Hold venstre: løft. Slipp: senk. Hold høyre: sveiv"),
             FLinearColor::White, Left, Top + 240.0f);
         break;
+    case EFiskRodState::Cancelled:
+        RodText = TEXT("Stanga er trukket inn. Trykk F for ny utsetting");
+        break;
     case EFiskRodState::Lost:
         RodText = PC->GetRod()->GetLoss() == EFiskRodLoss::LineBreak
             ? TEXT("Lina røk! Trykk F for å fiske igjen") : TEXT("Slakk line - fisken løsnet. Trykk F igjen");
@@ -167,10 +170,13 @@ void AFiskBootstrapHUD::DrawHUD()
         RodText = TEXT("Stang 1: Klar til landing. Trykk mellomrom");
         break;
     case EFiskRodState::Landed:
-        RodText = TEXT("Stang 1: Fisk landet");
+        RodText = Day->GetElapsedMilliseconds() < PC->GetRod()->GetAvailableAtMs()
+            ? TEXT("Fisk landet. Gjør klar stanga ...")
+            : TEXT("Fisk landet. Trykk F for ny utsetting");
         break;
     }
     DrawText(RodText, FLinearColor::White, Left, Top + 215.0f);
+    DrawText(TEXT("X: Trekk inn egen stang / avbryt egen kamp"), FLinearColor::White, Left, Top + 405.0f);
     const UFiskPrototypeRod* Rod = PC->GetRod();
     if (Rod->GetState() == EFiskRodState::Fighting || Rod->GetState() == EFiskRodState::ReadyToLand)
     {

@@ -15,6 +15,7 @@ enum class EFiskRodAction : uint8
     StopReel,
     DragUp,
     DragDown,
+    Withdraw,
     Land
 };
 
@@ -46,7 +47,7 @@ private:
     void RequestCast();
 
     UFUNCTION(Server, Reliable)
-    void ServerCastRod();
+    void ServerCastRod(FGuid ExpectedId);
 
     void RequestLift();
     void RequestLower();
@@ -54,17 +55,24 @@ private:
     void RequestStopReel();
     void RequestDragUp();
     void RequestDragDown();
+    void RequestWithdraw();
     void RequestLand();
     bool CanUseRod() const;
 
     UFUNCTION(Server, Reliable)
-    void ServerActOnRod(EFiskRodAction Action);
+    void ServerActOnRod(EFiskRodAction Action, FGuid ExpectedId);
 
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;
 
 #if WITH_DEV_AUTOMATION_TESTS
     void RunLanSmoke();
+    void RunRepeatedFishingSmoke(const class AFiskStarterBoat& Boat, const class AFiskDayState& Day);
+    int32 RepeatStage = 0, RepeatCatches = 0;
+    FGuid RepeatFirstLandedId, RepeatCountedId, RepeatFightingId, RepeatWithdrawnId;
+    double RepeatFightAt = -1.0, RepeatParallelAt = -1.0;
+    bool bRepeatParallel = false, bRepeatStaleSent = false, bRepeatReadyStaleSent = false;
+    bool bRepeatAttemptedEarlyCast = false;
     FTimerHandle LanSmokeTimer;
     bool bSmokeTriedEarlyLanding = false;
     double SmokeParallelAt = -1.0;

@@ -39,6 +39,7 @@ void AFiskBoardingController::SetupInputComponent()
     InputComponent->BindKey(EKeys::E, IE_Pressed, this, &AFiskBoardingController::RequestBoarding);
     InputComponent->BindKey(EKeys::R, IE_Pressed, this, &AFiskBoardingController::RequestDeparture);
     InputComponent->BindKey(EKeys::F, IE_Pressed, this, &AFiskBoardingController::RequestCast);
+    InputComponent->BindKey(EKeys::X, IE_Pressed, this, &AFiskBoardingController::RequestWithdraw);
     InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AFiskBoardingController::RequestLift);
     InputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AFiskBoardingController::RequestLower);
     InputComponent->BindKey(EKeys::RightMouseButton, IE_Pressed, this, &AFiskBoardingController::RequestReel);
@@ -78,14 +79,18 @@ void AFiskBoardingController::ServerStartBoatTrip_Implementation()
 
 void AFiskBoardingController::RequestCast()
 {
-    ServerCastRod();
+    ServerCastRod(Rod->GetCastId());
 }
 
-void AFiskBoardingController::ServerCastRod_Implementation()
+void AFiskBoardingController::ServerCastRod_Implementation(FGuid ExpectedId)
 {
     if (CanUseRod())
     {
-        Rod->Cast();
+        if (!Rod->Cast(ExpectedId))
+        {
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_CAST_REJECTED player=%d expected=%s current=%s"),
+                PlayerState->GetPlayerId(), *ExpectedId.ToString(EGuidFormats::Digits), *Rod->GetCastId().ToString(EGuidFormats::Digits));
+        }
     }
 }
 
@@ -101,35 +106,44 @@ bool AFiskBoardingController::CanUseRod() const
 
 void AFiskBoardingController::RequestLift()
 {
-    ServerActOnRod(EFiskRodAction::Lift);
+    ServerActOnRod(EFiskRodAction::Lift, Rod->GetCastId());
 }
 
 void AFiskBoardingController::RequestLower()
 {
-    ServerActOnRod(EFiskRodAction::Lower);
+    ServerActOnRod(EFiskRodAction::Lower, Rod->GetCastId());
 }
 
 void AFiskBoardingController::RequestReel()
 {
-    ServerActOnRod(EFiskRodAction::Reel);
+    ServerActOnRod(EFiskRodAction::Reel, Rod->GetCastId());
 }
 
-void AFiskBoardingController::RequestStopReel() { ServerActOnRod(EFiskRodAction::StopReel); }
-void AFiskBoardingController::RequestDragUp() { ServerActOnRod(EFiskRodAction::DragUp); }
-void AFiskBoardingController::RequestDragDown() { ServerActOnRod(EFiskRodAction::DragDown); }
+void AFiskBoardingController::RequestStopReel() { ServerActOnRod(EFiskRodAction::StopReel, Rod->GetCastId()); }
+void AFiskBoardingController::RequestDragUp() { ServerActOnRod(EFiskRodAction::DragUp, Rod->GetCastId()); }
+void AFiskBoardingController::RequestDragDown() { ServerActOnRod(EFiskRodAction::DragDown, Rod->GetCastId()); }
+
+void AFiskBoardingController::RequestWithdraw() { ServerActOnRod(EFiskRodAction::Withdraw, Rod->GetCastId()); }
 
 void AFiskBoardingController::RequestLand()
 {
-    ServerActOnRod(EFiskRodAction::Land);
+    ServerActOnRod(EFiskRodAction::Land, Rod->GetCastId());
 }
 
-void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Action)
+void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Action, FGuid ExpectedId)
 {
     if (!CanUseRod())
     {
         return;
     }
 
+    if (!Rod->IsCurrentCommand(ExpectedId))
+    {
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_COMMAND_REJECTED player=%d action=%d expected=%s current=%s"),
+            PlayerState->GetPlayerId(), static_cast<int32>(Action), *ExpectedId.ToString(EGuidFormats::Digits),
+            *Rod->GetCastId().ToString(EGuidFormats::Digits));
+        return;
+    }
     switch (Action)
     {
     case EFiskRodAction::Lift:
@@ -144,6 +158,7 @@ void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Actio
     case EFiskRodAction::StopReel: Rod->StopReel(); break;
     case EFiskRodAction::DragUp: Rod->AdjustDrag(1); break;
     case EFiskRodAction::DragDown: Rod->AdjustDrag(-1); break;
+    case EFiskRodAction::Withdraw: Rod->Withdraw(); break;
     case EFiskRodAction::Land:
         Rod->Land();
         break;

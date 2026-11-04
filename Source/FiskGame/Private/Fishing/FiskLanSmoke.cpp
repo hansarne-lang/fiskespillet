@@ -51,6 +51,11 @@ void AFiskBoardingController::RunLanSmoke()
         TActorIterator<AFiskDaySettlement> Settlements(GetWorld());
         if (!Settlements) { return; }
         const FFiskSettlementView& View = Settlements->GetView();
+        if (FParse::Param(FCommandLine::Get(), TEXT("FiskRepeatSmoke"))
+            && Day->GetElapsedSeconds() < AFiskDayState::SettlementStart && (View.bRevealed || !View.Results.IsEmpty()))
+        {
+            UE_LOG(LogTemp, Error, TEXT("FISKELAGET_REPEAT_FAILED early_result_exposure"));
+        }
         if (!bSmokeCheckedPrivacy && Day->GetElapsedSeconds() < AFiskDayState::SettlementStart)
         {
             bSmokeCheckedPrivacy = true;
@@ -78,6 +83,11 @@ void AFiskBoardingController::RunLanSmoke()
     }
 
 
+    if (FParse::Param(FCommandLine::Get(), TEXT("FiskRepeatSmoke")))
+    {
+        RunRepeatedFishingSmoke(Boat, *Day);
+        return;
+    }
     FString FightCase;
     FParse::Value(FCommandLine::Get(), TEXT("FiskFightCase="), FightCase);
     switch (Rod->GetState())

@@ -15,17 +15,31 @@ UFiskPrototypeRod::UFiskPrototypeRod()
     PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
-void UFiskPrototypeRod::Cast()
+
+bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
 {
-    if (!GetOwner()->HasAuthority() || (View.State != EFiskRodState::Ready && View.State != EFiskRodState::Lost)) { return; }
+    if (!GetOwner()->HasAuthority()) { return false; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    if (!Day) { return; }
+    if (!Day || !Cycle.TryStart(ExpectedId, Day->GetElapsedMilliseconds())) { return false; }
     View = FFiskRodView();
+    View.CastId = Cycle.GetId();
     CatchId.Invalidate();
     LandedAtMs = -1;
     NextTransitionAt = Day->GetElapsedRealSeconds() + FMath::FRandRange(120.0f, 180.0f);
     SetState(EFiskRodState::Fishing);
     SetComponentTickEnabled(true);
+    return true;
+}
+
+void UFiskPrototypeRod::Withdraw()
+{
+    if (!GetOwner()->HasAuthority() || !Cycle.Withdraw(View.CastId)) { return; }
+    const FGuid Id = View.CastId;
+    View = FFiskRodView();
+    View.CastId = Id;
+    CatchId.Invalidate();
+    SetState(EFiskRodState::Cancelled);
+    SetComponentTickEnabled(false);
 }
 
 void UFiskPrototypeRod::Lift()
@@ -69,7 +83,7 @@ void UFiskPrototypeRod::SyncFight()
 
 void UFiskPrototypeRod::Land()
 {
-    if (!GetOwner()->HasAuthority() || View.State != EFiskRodState::ReadyToLand) { return; }
+    if (!GetOwner()->HasAuthority() || View.State != EFiskRodState::ReadyToLand || !Cycle.CanAct(View.CastId)) { return; }
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const APlayerController* PC = CastChecked<APlayerController>(GetOwner());
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
@@ -77,6 +91,13 @@ void UFiskPrototypeRod::Land()
     if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
     if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId())) { return; }
     LandedAtMs = Day->GetElapsedMilliseconds();
+    Cycle.FinishLanding(View.CastId, LandedAtMs);
+    View.AvailableAtMs = Cycle.GetAvailableAtMs();
+#if WITH_DEV_AUTOMATION_TESTS
+    ++TestLandings;
+#endif
+    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_CATCH_RECORDED player=%d catch=%s cast=%s"),
+        PC->PlayerState->GetPlayerId(), *CatchId.ToString(EGuidFormats::Digits), *View.CastId.ToString(EGuidFormats::Digits));
     SetState(EFiskRodState::Landed);
     SetComponentTickEnabled(false);
 }
@@ -91,7 +112,9 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     if (!Boat || Boat->GetTripProgress() != AFiskStarterBoat::AtFishingSpot
         || !Day || AFiskDayState::GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
     {
+        Cycle.Withdraw(View.CastId);
         View = FFiskRodView();
+        View.CastId = Cycle.GetId();
         SetState(EFiskRodState::Ready);
         SetComponentTickEnabled(false);
         return;
@@ -127,6 +150,7 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
             break;
         case EFiskFightOutcome::LineBreak:
         case EFiskFightOutcome::Slack:
+            Cycle.Withdraw(View.CastId);
             View.Loss = Fight.GetOutcome() == EFiskFightOutcome::LineBreak ? EFiskRodLoss::LineBreak : EFiskRodLoss::Slack;
             View.bSurging = View.bReeling = View.bRaised = false;
             SetState(EFiskRodState::Lost);
@@ -154,10 +178,14 @@ void UFiskPrototypeRod::OnRep_View()
     const int32 Id = PC->PlayerState ? PC->PlayerState->GetPlayerId() : INDEX_NONE;
     if (View.bSurging && !bPreviousSurge) { UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_RUN player=%d"), Id); }
     bPreviousSurge = View.bSurging;
-    if (View.State == PreviousState) { return; }
+    if (View.State == PreviousState && View.CastId == PreviousCastId) { return; }
     PreviousState = View.State;
+    PreviousCastId = View.CastId;
+    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_CYCLE player=%d cast=%s state=%d"),
+        Id, *View.CastId.ToString(EGuidFormats::Digits), static_cast<int32>(View.State));
     switch (View.State)
     {
+    case EFiskRodState::Cancelled: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_CANCELLED player=%d"), Id); break;
     case EFiskRodState::Fishing: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_FISHING player=%d"), Id); break;
     case EFiskRodState::InitialRun: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_BITE player=%d"), Id); break;
     case EFiskRodState::Fighting: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FIGHT_STARTED player=%d"), Id); break;

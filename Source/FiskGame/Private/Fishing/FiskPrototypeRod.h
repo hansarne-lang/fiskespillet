@@ -2,10 +2,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Fishing/FiskFightModel.h"
+#include "Fishing/FiskRodCycle.h"
 #include "FiskPrototypeRod.generated.h"
 
 UENUM()
-enum class EFiskRodState : uint8 { Ready, Fishing, InitialRun, Fighting, ReadyToLand, Landed, Lost };
+enum class EFiskRodState : uint8 { Ready, Fishing, InitialRun, Fighting, ReadyToLand, Landed, Lost, Cancelled };
 UENUM()
 enum class EFiskRodLoss : uint8 { None, LineBreak, Slack };
 
@@ -16,6 +17,8 @@ struct FFiskRodView
     GENERATED_BODY()
     UPROPERTY() EFiskRodState State = EFiskRodState::Ready;
     UPROPERTY() EFiskRodLoss Loss = EFiskRodLoss::None;
+    UPROPERTY() FGuid CastId;
+    UPROPERTY() int32 AvailableAtMs = 0;
     UPROPERTY() int32 Line = 0;
     UPROPERTY() int32 Load = 0;
     UPROPERTY() int32 Drag = 40;
@@ -30,7 +33,14 @@ class UFiskPrototypeRod final : public UActorComponent
     GENERATED_BODY()
 public:
     UFiskPrototypeRod();
-    void Cast();
+    bool Cast(const FGuid& ExpectedId);
+    void Withdraw();
+    bool IsCurrentCommand(const FGuid& ExpectedId) const { return Cycle.CanAct(ExpectedId); }
+    FGuid GetCastId() const { return View.CastId; }
+    int32 GetAvailableAtMs() const { return View.AvailableAtMs; }
+#if WITH_DEV_AUTOMATION_TESTS
+    int32 GetTestLandingCount() const { return TestLandings; }
+#endif
     void Lift();
     void Lower();
     void Reel();
@@ -53,7 +63,12 @@ private:
     UFUNCTION() void OnRep_View();
     void SetState(EFiskRodState NewState);
     void SyncFight();
+    FFiskRodCycle Cycle;
     FFiskFightModel Fight;
+    FGuid PreviousCastId;
+#if WITH_DEV_AUTOMATION_TESTS
+    int32 TestLandings = 0;
+#endif
     EFiskRodState PreviousState = EFiskRodState::Ready;
     bool bPreviousSurge = false;
     double NextTransitionAt = 0.0, LastFightAt = 0.0;

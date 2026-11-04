@@ -16,6 +16,7 @@ struct FFiskFishVisualState
 {
     GENERATED_BODY()
     UPROPERTY() EFiskFishVisualPhase Phase = EFiskFishVisualPhase::Hidden;
+    UPROPERTY() FGuid CastId;
     UPROPERTY() int32 LineMeters = 0;
     UPROPERTY() bool bSurging = false;
     UPROPERTY() bool bRaised = false;
@@ -23,7 +24,7 @@ struct FFiskFishVisualState
 
     bool operator!=(const FFiskFishVisualState& Other) const
     {
-        return Phase != Other.Phase || LineMeters != Other.LineMeters || LandingAtMs != Other.LandingAtMs
+        return CastId != Other.CastId || Phase != Other.Phase || LineMeters != Other.LineMeters || LandingAtMs != Other.LandingAtMs
             || bSurging != Other.bSurging || bRaised != Other.bRaised;
     }
 };

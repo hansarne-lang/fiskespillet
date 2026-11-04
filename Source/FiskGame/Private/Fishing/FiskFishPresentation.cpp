@@ -115,6 +115,18 @@ void UFiskFishPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
     for (int32 Seat = 0; Seat < FishRoots.Num(); ++Seat)
     {
         const FFiskFishVisualState& State = Boat->GetFishVisual(Seat);
+        if (State.CastId.IsValid() && SeenCast[Seat] != State.CastId)
+        {
+            SeenCast[Seat] = State.CastId;
+            SplashReported[Seat] = NearReported[Seat] = LandingReported[Seat] = HiddenReported[Seat] = false;
+#if WITH_DEV_AUTOMATION_TESTS
+            const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
+            if (PC && PC->IsLocalController() && PC->PlayerState && Boat->GetSeatIndex(PC->PlayerState->GetPlayerId()) == Seat)
+            {
+                bCapturedNear = bCapturedLanding = false;
+            }
+#endif
+        }
         const bool bNear = State.Phase == EFiskFishVisualPhase::Fighting && State.LineMeters <= 10;
         const bool bReady = State.Phase == EFiskFishVisualPhase::ReadyToLand;
         const bool bLanding = State.Phase == EFiskFishVisualPhase::Landing && State.LandingAtMs >= 0;
@@ -188,15 +200,17 @@ void UFiskFishPresentation::CaptureTestPhase(int32 Seat, bool bLanding, double L
     const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     if (!PC || !PC->IsLocalController() || !PC->PlayerState || PC->GetViewTarget() != Boat
         || Boat->GetSeatIndex(PC->PlayerState->GetPlayerId()) != Seat) { return; }
+    const FString Suffix = FParse::Param(FCommandLine::Get(), TEXT("FiskRepeatSmoke"))
+        ? TEXT("-") + Boat->GetFishVisual(Seat).CastId.ToString(EGuidFormats::Digits) : FString();
     if (!bLanding && !bCapturedNear)
     {
         bCapturedNear = true;
-        FScreenshotRequest::RequestScreenshot(FPaths::Combine(ScreenshotDirectory, TEXT("fish-near-boat.png")), false, false);
+        FScreenshotRequest::RequestScreenshot(FPaths::Combine(ScreenshotDirectory, FString::Printf(TEXT("fish-near-boat%s.png"), *Suffix)), false, false);
     }
     else if (bLanding && LandingAge >= 0.65 && !bCapturedLanding)
     {
         bCapturedLanding = true;
-        FScreenshotRequest::RequestScreenshot(FPaths::Combine(ScreenshotDirectory, TEXT("fish-landing.png")), false, false);
+        FScreenshotRequest::RequestScreenshot(FPaths::Combine(ScreenshotDirectory, FString::Printf(TEXT("fish-landing%s.png"), *Suffix)), false, false);
     }
 }
 #endif

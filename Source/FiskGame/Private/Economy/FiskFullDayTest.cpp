@@ -50,4 +50,33 @@ bool FFiskArrivalTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Circle crossing one ms late"), AFiskStarterBoat::CalculateCrossingMs(1008301), 1020001);
     return true;
 }
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskMultipleCatchesTest, "Fiskelaget.FullDay.MultipleCatches",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskMultipleCatchesTest::RunTest(const FString& Parameters)
+{
+    FFiskDayLedger Ledger;
+    for (int32 Player : {256, 257})
+    {
+        for (int32 Fish = 0; Fish < 2; ++Fish)
+        {
+            const FGuid Id = FGuid::NewGuid();
+            TestTrue(TEXT("Unique landing"), Ledger.Record(Id, Player, 300000 + Fish * 180000));
+            TestFalse(TEXT("Duplicate cannot change owner or value"), Ledger.Record(Id, Player + 1, 600000));
+        }
+    }
+    TestFalse(TEXT("No early payment"), Ledger.Settle(1019999, 900000));
+    TestEqual(TEXT("No partial result exposure"), Ledger.GetResults().Num(), 0);
+    TestTrue(TEXT("One shared settlement"), Ledger.Settle(1020000, 900000));
+    TestEqual(TEXT("Both players present"), Ledger.GetResults().Num(), 2);
+    for (const FFiskDayResult& Row : Ledger.GetResults())
+    {
+        TestEqual(TEXT("Two fish per player"), Row.DeliveredFish, 2);
+        TestEqual(TEXT("No delivered fish lost"), Row.LostFish, 0);
+        TestEqual(TEXT("One payment per fish"), Row.SessionBalance, 20);
+    }
+    TestFalse(TEXT("No double payout"), Ledger.Settle(1200000, 900000));
+    TestFalse(TEXT("No catches after barrier"), Ledger.Record(FGuid::NewGuid(), 256, 900000));
+    return true;
+}
 #endif

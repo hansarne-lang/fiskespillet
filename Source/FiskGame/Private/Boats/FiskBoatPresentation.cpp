@@ -133,6 +133,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             {
                 Activities[Seat] = Activity;
                 FFiskFishVisualState& Fish = FishStates[Seat];
+                Fish.CastId = PC->GetRod()->GetCastId();
                 Fish.LineMeters = PC->GetRod()->GetLineOut();
                 Fish.bSurging = PC->GetRod()->IsSurging();
                 Fish.bRaised = PC->GetRod()->IsRaised();

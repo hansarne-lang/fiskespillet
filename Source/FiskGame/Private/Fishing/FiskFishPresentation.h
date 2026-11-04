@@ -25,6 +25,7 @@ private:
     UPROPERTY() TArray<TObjectPtr<USceneComponent>> TailRoots;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Droplets;
     bool SplashReported[2] = {false, false};
+    FGuid SeenCast[2];
     bool Visible[2] = {false, false};
     bool NearReported[2] = {false, false};
     bool LandingReported[2] = {false, false};

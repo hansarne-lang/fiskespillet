@@ -8,6 +8,8 @@
 #include "Fishing/FiskPrototypeRod.h"
 #include "GameFramework/PlayerState.h"
 #include "TimerManager.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Economy/FiskDaySettlement.h"
 
 void AFiskBoardingController::RunLanSmoke()
@@ -75,69 +77,85 @@ void AFiskBoardingController::RunLanSmoke()
         return;
     }
 
+
+    FString FightCase;
+    FParse::Value(FCommandLine::Get(), TEXT("FiskFightCase="), FightCase);
     switch (Rod->GetState())
     {
-    case EFiskRodState::Ready:
-        RequestCast();
-        break;
+    case EFiskRodState::Ready: RequestCast(); break;
     case EFiskRodState::Fighting:
+    {
         if (!bSmokeTriedEarlyLanding)
         {
             bSmokeTriedEarlyLanding = true;
             UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_EARLY_LANDING player=%d"), PlayerId);
             RequestLand();
-            break;
         }
-        RequestLift();
-        RequestLower();
-        RequestReel();
+        if (SmokeParallelAt < 0.0)
+        {
+            // Keep tension while waiting for the other independent random bite.
+            RequestLift();
+            RequestStopReel();
+            if (Boat.GetFishVisual(0).Phase != EFiskFishVisualPhase::Fighting
+                || Boat.GetFishVisual(1).Phase != EFiskFishVisualPhase::Fighting) { break; }
+            SmokeParallelAt = Day->GetElapsedRealSeconds();
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_PARALLEL_FIGHTS player=%d"), PlayerId);
+        }
+        const double Age = Day->GetElapsedRealSeconds() - SmokeParallelAt;
+        const bool bBreak = !bCaptain && FightCase == TEXT("break");
+        const bool bSlack = !bCaptain && FightCase == TEXT("slack");
+        if (!bSmokeAdjustedDrag && Age >= 1.0)
+        {
+            bSmokeAdjustedDrag = true;
+            if (bBreak) { for (int32 I = 0; I < 6; ++I) { RequestDragUp(); } }
+            else if (bSlack) { for (int32 I = 0; I < 3; ++I) { RequestDragDown(); } }
+            else { RequestDragDown(); RequestDragUp(); }
+        }
+        if (bBreak && bSmokeAdjustedDrag) { RequestLift(); RequestReel(); }
+        else if (bSlack && bSmokeAdjustedDrag) { RequestLower(); RequestStopReel(); }
+        else if (Rod->IsSurging()) { RequestLower(); RequestStopReel(); }
+        else if ((static_cast<int32>(Age / 2.0) % 2) == 0) { RequestLift(); RequestStopReel(); }
+        else { RequestLower(); RequestReel(); }
         break;
-    case EFiskRodState::ReadyToLand:
-        RequestLand();
-        break;
+    }
+    case EFiskRodState::ReadyToLand: RequestLand(); break;
     case EFiskRodState::Landed:
+    case EFiskRodState::Lost:
         if (!bSmokeTriedDuplicateLanding)
         {
             bSmokeTriedDuplicateLanding = true;
-            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_DUPLICATE_LANDING player=%d"), PlayerId);
-            RequestLand();
-            RequestLand();
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_%s player=%d"),
+                Rod->GetState() == EFiskRodState::Landed ? TEXT("DUPLICATE_LANDING") : TEXT("LOSS_LANDING"), PlayerId);
+            RequestLand(); RequestLand();
             if (!bCaptain)
             {
                 UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_GUEST_RETURN player=%d"), PlayerId);
                 RequestDeparture();
             }
         }
+        break;
+    default: break;
+    }
 
-        if (bCaptain && HasAuthority())
+    if (bCaptain && HasAuthority())
+    {
+        int32 FinishedPlayers = 0;
+        for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
-            int32 LandedPlayers = 0;
-            for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+            const AFiskBoardingController* Other = Cast<AFiskBoardingController>(It->Get());
+            if (!Other || !Other->PlayerState || !Boat.IsAboard(Other->PlayerState->GetPlayerId())) { continue; }
+            const EFiskRodState State = Other->GetRod()->GetState();
+            if (State == EFiskRodState::Landed || State == EFiskRodState::Lost) { ++FinishedPlayers; }
+        }
+        if (FinishedPlayers == AFiskStarterBoat::Capacity)
+        {
+            if (SmokeReturnAt == 0.0) { SmokeReturnAt = Day->GetElapsedRealSeconds() + 5.0; }
+            else if (Day->GetElapsedRealSeconds() >= SmokeReturnAt)
             {
-                const AFiskBoardingController* Other = Cast<AFiskBoardingController>(It->Get());
-                if (Other && Other->PlayerState && Boat.IsAboard(Other->PlayerState->GetPlayerId())
-                    && Other->GetRod()->GetState() == EFiskRodState::Landed)
-                {
-                    ++LandedPlayers;
-                }
-            }
-            if (LandedPlayers == AFiskStarterBoat::Capacity)
-            {
-                if (SmokeReturnAt == 0.0)
-                {
-                    SmokeReturnAt = Day->GetElapsedRealSeconds() + 5.0;
-                }
-                else if (Day->GetElapsedRealSeconds() >= SmokeReturnAt)
-                {
-                    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_CAPTAIN_RETURN player=%d"), PlayerId);
-                    RequestDeparture();
-                }
+                UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_CAPTAIN_RETURN player=%d"), PlayerId);
+                RequestDeparture();
             }
         }
-        break;
-    case EFiskRodState::Fishing:
-    case EFiskRodState::InitialRun:
-        break;
     }
 }
 #endif

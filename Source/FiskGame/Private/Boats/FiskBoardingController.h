@@ -12,6 +12,9 @@ enum class EFiskRodAction : uint8
     Lift,
     Lower,
     Reel,
+    StopReel,
+    DragUp,
+    DragDown,
     Land
 };
 
@@ -48,6 +51,9 @@ private:
     void RequestLift();
     void RequestLower();
     void RequestReel();
+    void RequestStopReel();
+    void RequestDragUp();
+    void RequestDragDown();
     void RequestLand();
     bool CanUseRod() const;
 
@@ -61,6 +67,8 @@ private:
     void RunLanSmoke();
     FTimerHandle LanSmokeTimer;
     bool bSmokeTriedEarlyLanding = false;
+    double SmokeParallelAt = -1.0;
+    bool bSmokeAdjustedDrag = false;
     bool bSmokeTriedDuplicateLanding = false;
 
     double SmokeReturnAt = 0.0;

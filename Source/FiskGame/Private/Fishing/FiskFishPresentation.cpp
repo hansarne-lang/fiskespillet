@@ -86,6 +86,15 @@ void UFiskFishPresentation::BeginPlay()
             TailFin->SetRelativeRotation(FRotator(-Sign * 35, 0, 0));
         }
         Root->SetVisibility(false, true);
+        for (int32 Drop = 0; Drop < 8; ++Drop)
+        {
+            UStaticMeshComponent* Splash = FiskVisual::AddPart(Boat, Boat->GetRootComponent(), Sphere, Material,
+                *FString::Printf(TEXT("Fish%dSplash%d"), Seat, Drop), FVector::ZeroVector, FVector(0.035f),
+                FLinearColor(0.74f, 0.93f, 0.98f), 0.2f);
+            Splash->SetCastShadow(false);
+            Splash->SetVisibility(false);
+            Droplets.Add(Splash);
+        }
     }
 }
 
@@ -122,6 +131,24 @@ void UFiskFishPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
         {
             HiddenReported[Seat] = true;
             UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_VISUAL_FINISHED seat=%d"), Seat);
+        }
+        const bool bSplash = bNear || bReady || (bLanding && LandingAge >= 0.0 && LandingAge < 0.8);
+        const float SplashSign = Seat == 0 ? -1.0f : 1.0f;
+        for (int32 Drop = 0; Drop < 8; ++Drop)
+        {
+            UStaticMeshComponent* Splash = Droplets[Seat * 8 + Drop];
+            Splash->SetVisibility(bSplash);
+            const double Cycle = FMath::Fmod(Time * (State.bSurging ? 2.5 : 1.5) + Drop * 0.125, 1.0);
+            const double Angle = Drop * PI * 0.25;
+            Splash->SetRelativeLocation(FVector(-180 + FMath::Cos(Angle) * Cycle * 55,
+                SplashSign * (300 + FMath::Min(State.LineMeters, 10) * 12) + FMath::Sin(Angle) * Cycle * 45,
+                5 + FMath::Sin(Cycle * PI) * (State.bSurging ? 80 : 45)));
+            Splash->SetRelativeScale3D(FVector(0.025, 0.025, 0.055) * (1.0 - Cycle * 0.5));
+        }
+        if (bSplash && !SplashReported[Seat])
+        {
+            SplashReported[Seat] = true;
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_SPLASH seat=%d"), Seat);
         }
         if (!Visible[Seat]) { continue; }
 

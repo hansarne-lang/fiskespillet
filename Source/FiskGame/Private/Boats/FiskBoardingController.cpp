@@ -4,6 +4,7 @@
 #include "Components/InputComponent.h"
 #include "DayCycle/FiskDayState.h"
 #include "Fishing/FiskPrototypeRod.h"
+#include "Fishing/FiskCombatFeedback.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "InputCoreTypes.h"
@@ -16,6 +17,7 @@
 AFiskBoardingController::AFiskBoardingController()
 {
     Rod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("PrototypeRod"));
+    CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
 }
 
 void AFiskBoardingController::BeginPlay()
@@ -40,6 +42,9 @@ void AFiskBoardingController::SetupInputComponent()
     InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AFiskBoardingController::RequestLift);
     InputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AFiskBoardingController::RequestLower);
     InputComponent->BindKey(EKeys::RightMouseButton, IE_Pressed, this, &AFiskBoardingController::RequestReel);
+    InputComponent->BindKey(EKeys::RightMouseButton, IE_Released, this, &AFiskBoardingController::RequestStopReel);
+    InputComponent->BindKey(EKeys::MouseScrollUp, IE_Pressed, this, &AFiskBoardingController::RequestDragUp);
+    InputComponent->BindKey(EKeys::MouseScrollDown, IE_Pressed, this, &AFiskBoardingController::RequestDragDown);
     InputComponent->BindKey(EKeys::SpaceBar, IE_Pressed, this, &AFiskBoardingController::RequestLand);
 }
 
@@ -109,6 +114,10 @@ void AFiskBoardingController::RequestReel()
     ServerActOnRod(EFiskRodAction::Reel);
 }
 
+void AFiskBoardingController::RequestStopReel() { ServerActOnRod(EFiskRodAction::StopReel); }
+void AFiskBoardingController::RequestDragUp() { ServerActOnRod(EFiskRodAction::DragUp); }
+void AFiskBoardingController::RequestDragDown() { ServerActOnRod(EFiskRodAction::DragDown); }
+
 void AFiskBoardingController::RequestLand()
 {
     ServerActOnRod(EFiskRodAction::Land);
@@ -132,6 +141,9 @@ void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Actio
     case EFiskRodAction::Reel:
         Rod->Reel();
         break;
+    case EFiskRodAction::StopReel: Rod->StopReel(); break;
+    case EFiskRodAction::DragUp: Rod->AdjustDrag(1); break;
+    case EFiskRodAction::DragDown: Rod->AdjustDrag(-1); break;
     case EFiskRodAction::Land:
         Rod->Land();
         break;

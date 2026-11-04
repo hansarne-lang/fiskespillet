@@ -134,6 +134,8 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
                 Activities[Seat] = Activity;
                 FFiskFishVisualState& Fish = FishStates[Seat];
                 Fish.LineMeters = PC->GetRod()->GetLineOut();
+                Fish.bSurging = PC->GetRod()->IsSurging();
+                Fish.bRaised = PC->GetRod()->IsRaised();
                 if (State == EFiskRodState::Fighting) { Fish.Phase = EFiskFishVisualPhase::Fighting; }
                 else if (State == EFiskRodState::ReadyToLand) { Fish.Phase = EFiskFishVisualPhase::ReadyToLand; }
                 else if (State == EFiskRodState::Landed)
@@ -163,7 +165,9 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
         const uint8 Activity = Boat->GetRodActivity(Seat);
         const FVector Start(-230, Sign * 97, 135);
         const float Motion = FMath::Sin(Time * (Activity == 2 ? 3.5 : 1.4) + Seat) * (Activity == 2 ? 22.0f : 4.0f);
-        const FVector End(-540, Sign * 220, Activity == 2 ? 175 + Motion : 270 + Motion);
+        const FFiskFishVisualState& Pose = Boat->GetFishVisual(Seat);
+        const float FightingHeight = Pose.bSurging ? 155.0f : Pose.bRaised ? 240.0f : 175.0f;
+        const FVector End(-540, Sign * 220, Activity == 2 ? FightingHeight + Motion : 270 + Motion);
         const FVector Control(-320, Sign * 145, Activity == 2 ? 310 : 260);
         FVector Previous = Start;
         for (int32 Segment = 0; Segment < 6; ++Segment)

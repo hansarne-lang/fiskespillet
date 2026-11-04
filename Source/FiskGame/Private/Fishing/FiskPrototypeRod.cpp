@@ -17,141 +17,154 @@ UFiskPrototypeRod::UFiskPrototypeRod()
 
 void UFiskPrototypeRod::Cast()
 {
-    if (!GetOwner()->HasAuthority() || State != EFiskRodState::Ready)
-    {
-        return;
-    }
-
-
+    if (!GetOwner()->HasAuthority() || (View.State != EFiskRodState::Ready && View.State != EFiskRodState::Lost)) { return; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (!Day) { return; }
+    View = FFiskRodView();
+    CatchId.Invalidate();
+    LandedAtMs = -1;
     NextTransitionAt = Day->GetElapsedRealSeconds() + FMath::FRandRange(120.0f, 180.0f);
-
     SetState(EFiskRodState::Fishing);
     SetComponentTickEnabled(true);
 }
 
 void UFiskPrototypeRod::Lift()
 {
-    if (GetOwner()->HasAuthority() && State == EFiskRodState::Fighting)
-    {
-        bRodRaised = true;
-        bCanReel = false;
-    }
+    if (GetOwner()->HasAuthority() && View.State == EFiskRodState::Fighting) { Fight.SetRaised(true); }
 }
-
 void UFiskPrototypeRod::Lower()
 {
-    if (GetOwner()->HasAuthority() && State == EFiskRodState::Fighting && bRodRaised)
+    if (GetOwner()->HasAuthority() && View.State == EFiskRodState::Fighting) { Fight.SetRaised(false); }
+}
+void UFiskPrototypeRod::Reel()
+{
+    if (GetOwner()->HasAuthority() && View.State == EFiskRodState::Fighting) { Fight.SetReeling(true); }
+}
+void UFiskPrototypeRod::StopReel()
+{
+    if (GetOwner()->HasAuthority() && View.State == EFiskRodState::Fighting) { Fight.SetReeling(false); }
+}
+void UFiskPrototypeRod::AdjustDrag(int32 Steps)
+{
+    if (GetOwner()->HasAuthority() && View.State == EFiskRodState::Fighting)
     {
-        bRodRaised = false;
-        bCanReel = true;
+        Fight.AdjustDrag(Steps);
+        SyncFight();
+        const APlayerController* PC = CastChecked<APlayerController>(GetOwner());
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_DRAG player=%d percent=%d"),
+            PC->PlayerState ? PC->PlayerState->GetPlayerId() : INDEX_NONE, View.Drag);
     }
 }
 
-void UFiskPrototypeRod::Reel()
+void UFiskPrototypeRod::SyncFight()
 {
-    if (!GetOwner()->HasAuthority() || State != EFiskRodState::Fighting || !bCanReel)
-    {
-        return;
-    }
-
-    bCanReel = false;
-    LineOut = FMath::Max(0, LineOut - 10);
-    if (LineOut == 0)
-    {
-        SetState(EFiskRodState::ReadyToLand);
-    }
-    else
-    {
-        GetOwner()->ForceNetUpdate();
-    }
+    View.Line = FMath::CeilToInt(Fight.GetLine());
+    View.Load = Fight.GetLoadPercent();
+    View.Drag = Fight.GetDragPercent();
+    View.bSurging = Fight.IsSurging();
+    View.bRaised = Fight.IsRaised();
+    View.bReeling = Fight.IsReeling();
+    OnRep_View();
 }
 
 void UFiskPrototypeRod::Land()
 {
-    if (GetOwner()->HasAuthority() && State == EFiskRodState::ReadyToLand)
-    {
-
-        const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-        const APlayerController* PC = CastChecked<APlayerController>(GetOwner());
-        if (!Mode || !Mode->GetSettlement() || !PC->PlayerState) { return; }
-        if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
-        if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId())) { return; }
-
-        const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-        LandedAtMs = Day->GetElapsedMilliseconds();
-        SetState(EFiskRodState::Landed);
-
-
-        SetComponentTickEnabled(false);
-    }
+    if (!GetOwner()->HasAuthority() || View.State != EFiskRodState::ReadyToLand) { return; }
+    const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const APlayerController* PC = CastChecked<APlayerController>(GetOwner());
+    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+    if (!Mode || !Mode->GetSettlement() || !PC->PlayerState || !Day) { return; }
+    if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
+    if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId())) { return; }
+    LandedAtMs = Day->GetElapsedMilliseconds();
+    SetState(EFiskRodState::Landed);
+    SetComponentTickEnabled(false);
 }
 
 void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+    if (!GetOwner()->HasAuthority()) { return; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskStarterBoat* Boat = Mode ? Mode->GetStarterBoat() : nullptr;
     if (!Boat || Boat->GetTripProgress() != AFiskStarterBoat::AtFishingSpot
         || !Day || AFiskDayState::GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
     {
-        LineOut = 0;
-        bRodRaised = false;
-        bCanReel = false;
+        View = FFiskRodView();
         SetState(EFiskRodState::Ready);
         SetComponentTickEnabled(false);
+        return;
     }
-    else if (State == EFiskRodState::Fishing && Day->GetElapsedRealSeconds() >= NextTransitionAt)
+    const double Now = Day->GetElapsedRealSeconds();
+    if (View.State == EFiskRodState::Fishing && Now >= NextTransitionAt)
     {
-        NextTransitionAt = Day->GetElapsedRealSeconds() + 3.0;
+        NextTransitionAt = Now + 3.0;
+        View.Line = 0;
         SetState(EFiskRodState::InitialRun);
     }
-    else if (State == EFiskRodState::InitialRun && Day->GetElapsedRealSeconds() >= NextTransitionAt)
+    else if (View.State == EFiskRodState::InitialRun)
     {
-        LineOut = 30;
-        SetState(EFiskRodState::Fighting);
+        View.Line = FMath::Clamp(FMath::RoundToInt((Now - (NextTransitionAt - 3.0)) * 10), 0, 30);
+        if (Now >= NextTransitionAt)
+        {
+            Fight.Reset(FMath::Rand());
+            LastFightAt = Now;
+            SyncFight();
+            SetState(EFiskRodState::Fighting);
+        }
+    }
+    else if (View.State == EFiskRodState::Fighting)
+    {
+        Fight.Advance(Now - LastFightAt);
+        LastFightAt = Now;
+        SyncFight();
+        switch (Fight.GetOutcome())
+        {
+        case EFiskFightOutcome::ReadyToLand:
+            View.bSurging = View.bReeling = View.bRaised = false;
+            SetState(EFiskRodState::ReadyToLand);
+            break;
+        case EFiskFightOutcome::LineBreak:
+        case EFiskFightOutcome::Slack:
+            View.Loss = Fight.GetOutcome() == EFiskFightOutcome::LineBreak ? EFiskRodLoss::LineBreak : EFiskRodLoss::Slack;
+            View.bSurging = View.bReeling = View.bRaised = false;
+            SetState(EFiskRodState::Lost);
+            SetComponentTickEnabled(false);
+            break;
+        default: break;
+        }
     }
 }
 
 void UFiskPrototypeRod::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    DOREPLIFETIME_CONDITION(UFiskPrototypeRod, State, COND_OwnerOnly);
-    DOREPLIFETIME_CONDITION(UFiskPrototypeRod, LineOut, COND_OwnerOnly);
+    DOREPLIFETIME_CONDITION(UFiskPrototypeRod, View, COND_OwnerOnly);
 }
-
 void UFiskPrototypeRod::SetState(EFiskRodState NewState)
 {
-    State = NewState;
-    OnRep_State();
+    View.State = NewState;
+    OnRep_View();
     GetOwner()->ForceNetUpdate();
 }
-
-void UFiskPrototypeRod::OnRep_State()
+void UFiskPrototypeRod::OnRep_View()
 {
-    const APlayerController* Controller = CastChecked<APlayerController>(GetOwner());
-    const int32 PlayerId = Controller->PlayerState ? Controller->PlayerState->GetPlayerId() : INDEX_NONE;
-    if (State == EFiskRodState::Fishing)
+    const APlayerController* PC = CastChecked<APlayerController>(GetOwner());
+    const int32 Id = PC->PlayerState ? PC->PlayerState->GetPlayerId() : INDEX_NONE;
+    if (View.bSurging && !bPreviousSurge) { UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_RUN player=%d"), Id); }
+    bPreviousSurge = View.bSurging;
+    if (View.State == PreviousState) { return; }
+    PreviousState = View.State;
+    switch (View.State)
     {
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_FISHING player=%d"), PlayerId);
-    }
-    else if (State == EFiskRodState::InitialRun)
-    {
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_BITE player=%d"), PlayerId);
-    }
-    else if (State == EFiskRodState::Fighting)
-    {
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FIGHT_STARTED player=%d"), PlayerId);
-    }
-    else if (State == EFiskRodState::ReadyToLand)
-    {
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_READY player=%d"), PlayerId);
-    }
-    else if (State == EFiskRodState::Landed)
-    {
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_LANDED player=%d"), PlayerId);
+    case EFiskRodState::Fishing: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_FISHING player=%d"), Id); break;
+    case EFiskRodState::InitialRun: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_BITE player=%d"), Id); break;
+    case EFiskRodState::Fighting: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FIGHT_STARTED player=%d"), Id); break;
+    case EFiskRodState::ReadyToLand: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_READY player=%d"), Id); break;
+    case EFiskRodState::Landed: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_LANDED player=%d"), Id); break;
+    case EFiskRodState::Lost: UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_LOST player=%d reason=%s"), Id,
+        View.Loss == EFiskRodLoss::LineBreak ? TEXT("LineBreak") : TEXT("Slack")); break;
+    default: break;
     }
 }

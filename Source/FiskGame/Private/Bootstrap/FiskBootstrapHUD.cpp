@@ -20,7 +20,7 @@ void AFiskBootstrapHUD::DrawHUD()
 
     const float Left = 30.0f;
     const float Top = 24.0f;
-    DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 520.0f, 390.0f);
+    DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 560.0f, 455.0f);
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
     DrawText(TEXT("LAN-prototype - fiskedag i 3D"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
 
@@ -120,11 +120,11 @@ void AFiskBootstrapHUD::DrawHUD()
         const FFiskSettlementView& View = Settlement->GetView();
         if (!View.bRevealed)
         {
-            DrawText(TEXT("Dagsresultat ved 17:00. Saldo (økt): 0"), FLinearColor::White, Left, Top + 275.0f);
+            DrawText(TEXT("Dagsresultat ved 17:00. Saldo (økt): 0"), FLinearColor::White, Left, Top + 355.0f);
         }
         else
         {
-            float RowY = Top + 275.0f;
+            float RowY = Top + 355.0f;
             for (const FFiskDayResult& Row : View.Results)
             {
                 DrawText(FString::Printf(TEXT("Spiller %d: levert %d, tapt %d, saldo (økt) %d"),
@@ -156,8 +156,12 @@ void AFiskBootstrapHUD::DrawHUD()
         break;
     case EFiskRodState::Fighting:
         RodText = FString::Printf(TEXT("Stang 1: Kamp - %d m line ute"), PC->GetRod()->GetLineOut());
-        DrawText(TEXT("Venstreklikk: løft og senk. Høyreklikk: sveiv inn"),
+        DrawText(TEXT("Hold venstre: løft. Slipp: senk. Hold høyre: sveiv"),
             FLinearColor::White, Left, Top + 240.0f);
+        break;
+    case EFiskRodState::Lost:
+        RodText = PC->GetRod()->GetLoss() == EFiskRodLoss::LineBreak
+            ? TEXT("Lina røk! Trykk F for å fiske igjen") : TEXT("Slakk line - fisken løsnet. Trykk F igjen");
         break;
     case EFiskRodState::ReadyToLand:
         RodText = TEXT("Stang 1: Klar til landing. Trykk mellomrom");
@@ -167,4 +171,22 @@ void AFiskBootstrapHUD::DrawHUD()
         break;
     }
     DrawText(RodText, FLinearColor::White, Left, Top + 215.0f);
+    const UFiskPrototypeRod* Rod = PC->GetRod();
+    if (Rod->GetState() == EFiskRodState::Fighting || Rod->GetState() == EFiskRodState::ReadyToLand)
+    {
+        const int32 Load = Rod->GetLoadPercent();
+        const FLinearColor Color = Load > 100 ? FLinearColor::Red : Load < 20 ? FLinearColor::Yellow : FLinearColor(0.2f, 0.85f, 0.65f);
+        DrawText(FString::Printf(TEXT("Musehjul: brems %d%%   Linebelastning %d%%"), Rod->GetDragPercent(), Load),
+            Color, Left, Top + 265.0f);
+        DrawRect(FLinearColor(0.08f, 0.12f, 0.16f), Left, Top + 292.0f, 460.0f, 10.0f);
+        DrawRect(Color, Left, Top + 292.0f, 460.0f * FMath::Clamp(Load / 100.0f, 0.0f, 1.0f), 10.0f);
+        const TCHAR* Hint = Load > 100 ? TEXT("BRUDDFARE - slipp opp eller løsne bremsen")
+            : Load < 20 ? TEXT("SLAKK LINE - løft stanga eller stram bremsen")
+            : Rod->IsSurging() ? TEXT("UTRAS - fisken tar line. Senk stanga og slipp sveiva")
+            : TEXT("Pump: løft uten sveiving, senk og sveiv inn");
+        DrawText(Hint, Color, Left, Top + 312.0f);
+    }
+    DrawText(FString::Printf(TEXT("Returfrist 17:00 - %02d:%02d igjen"),
+        FMath::Max(0, 1020 - Elapsed) / 60, FMath::Max(0, 1020 - Elapsed) % 60),
+        FLinearColor::White, Left, Top + 332.0f);
 }

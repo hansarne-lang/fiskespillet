@@ -6,6 +6,7 @@
 class UStaticMesh;
 class UMaterialInterface;
 class USceneComponent;
+class UStaticMeshComponent;
 
 UCLASS()
 class UFiskFishPresentation final : public UActorComponent
@@ -22,6 +23,8 @@ private:
     UPROPERTY() TObjectPtr<UMaterialInterface> Material;
     UPROPERTY() TArray<TObjectPtr<USceneComponent>> FishRoots;
     UPROPERTY() TArray<TObjectPtr<USceneComponent>> TailRoots;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Droplets;
+    bool SplashReported[2] = {false, false};
     bool Visible[2] = {false, false};
     bool NearReported[2] = {false, false};
     bool LandingReported[2] = {false, false};

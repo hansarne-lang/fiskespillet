@@ -1,8 +1,9 @@
 #include "Fishing/FiskFightModel.h"
 
-void FFiskFightModel::Reset(int32 Seed)
+void FFiskFightModel::Reset(int32 Seed, float InitialLine)
 {
     *this = FFiskFightModel();
+    Line = FMath::IsFinite(InitialLine) ? FMath::Clamp(InitialLine, 2.0f, 1000.0f) : 30.0f;
     Random.Initialize(Seed);
     NextRun = Random.FRandRange(5.0f, 8.0f);
 }

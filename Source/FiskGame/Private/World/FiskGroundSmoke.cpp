@@ -34,6 +34,8 @@ void UFiskSeaChart::Smoke()
     const bool bCaptain=Boat->GetCaptainId()==Id;
     const UFiskPrototypeRod& Rod=*PC->GetRod();const int32 Depth=GetNetMode()==NM_Client?90:80;
     const double Now=Day->GetElapsedRealSeconds();
+    // Observe return immediately, even while the other player's landing animation finishes.
+    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now; }
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_CHART_TEST_FAILED player=%d stage=%d %s"),Id,Stage,Why);};
     TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
     if(Settlement && !Settlement->GetView().Results.IsEmpty() && Day->GetElapsedSeconds()<1020) { Fail(TEXT("early_results"));return; }
@@ -126,14 +128,14 @@ void UFiskSeaChart::Smoke()
             TravelAt=Now;Key(EKeys::R);
         }
         if(Boat->GetTripProgress()<=100) { return; }
-        if(!bCaptain) { TravelAt=Now; }
+        if(ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now; }
         PC->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::M);Capture(TEXT("chart-return"));Stage=12;
     }
     else if(Stage==12)
     {
         if(Boat->GetGroundId()!=1 || Rod.GetRig().Depth!=Depth) { Fail(TEXT("return_route_or_rig_changed"));return; }
         if(Progress!=200 || Boat->GetActorLocation().Size()>5) { return; }
-        const double Duration=Now-TravelAt;
+        const double Duration=Now-ReturnAt;
         if(Duration<39 || Duration>43) { Fail(TEXT("return_time"));return; }
         if(Boat->GetMarinaArrivalMs(Day->GetElapsedMilliseconds())<0) { Fail(TEXT("missing_marina_crossing"));return; }
         Capture(TEXT("chart-home"));

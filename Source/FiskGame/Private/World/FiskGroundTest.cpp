@@ -1,5 +1,6 @@
 #include "FiskFishingGround.h"
 #include "Fishing/FiskRigSettings.h"
+#include "Fishing/FiskFightModel.h"
 #include "Boats/FiskStarterBoat.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
@@ -15,6 +16,9 @@ bool FFiskGroundCatalogTest::RunTest(const FString& Parameters)
         TestTrue(TEXT("Fish signs above bottom"),G->FishDepthMin>=10 && G->FishDepthMax<=G->BottomDepth);
         FFiskRigSettings R;R.Depth=G->FishDepthMin;
         TestEqual(TEXT("Suitable depth and movement"),FFiskRigRules::Quality(R,G),2);
+        FFiskFightModel Fight;Fight.Reset(1,R.Depth+30.0f);
+        TestEqual(TEXT("Fight retains depth plus first run"),Fight.GetLine(),R.Depth+30.0f);
+        TestTrue(TEXT("Line cannot be shorter than fishing depth at bite"),Fight.GetLine()>=R.Depth);
         TestTrue(TEXT("Can apply selected depth"),FFiskRigRules::TryApply(R,0,0,R.Depth,0,G->BottomDepth));
         TestFalse(TEXT("No fishing below bottom"),FFiskRigRules::IsValid(0,G->BottomDepth+10,0,G->BottomDepth));
         FRandomStream Random(55);const double Wait=FFiskRigRules::BiteDelay(R,Random,G);

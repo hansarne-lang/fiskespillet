@@ -31,7 +31,7 @@ private:
     void Capture(const FString& Name);
     FTimerHandle SmokeTimer;
     int32 Stage=0;
-    double MarkAt=0,TravelAt=0;
+    double MarkAt=0,TravelAt=0,ReturnAt=-1;
     FString CaptureDir;
 #endif
 };

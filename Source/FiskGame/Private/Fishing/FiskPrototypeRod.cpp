@@ -152,10 +152,10 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     }
     else if (View.State == EFiskRodState::InitialRun)
     {
-        View.Line = FMath::Clamp(FMath::RoundToInt((Now - (NextTransitionAt - 3.0)) * 10), 0, 30);
+        View.Line = Rig.Depth + FMath::Clamp(FMath::RoundToInt((Now - (NextTransitionAt - 3.0)) * 10), 0, 30);
         if (Now >= NextTransitionAt)
         {
-            Fight.Reset(FMath::Rand());
+            Fight.Reset(FMath::Rand(), Rig.Depth + 30.0f);
             LastFightAt = Now;
             SyncFight();
             SetState(EFiskRodState::Fighting);

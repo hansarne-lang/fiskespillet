@@ -7,7 +7,7 @@ enum class EFiskFightOutcome : uint8 { Fighting, ReadyToLand, LineBreak, Slack }
 class FFiskFightModel
 {
 public:
-    void Reset(int32 Seed);
+    void Reset(int32 Seed, float InitialLine = 30.0f);
     void SetRaised(bool Value) { bRaised = Value; }
     void SetReeling(bool Value) { bReeling = Value; }
     void AdjustDrag(int32 Steps);

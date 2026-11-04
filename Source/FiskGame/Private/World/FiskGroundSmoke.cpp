@@ -100,6 +100,7 @@ void UFiskSeaChart::Smoke()
     else if(Stage==8)
     {
         if(Rod.GetState()!=EFiskRodState::Fighting) { return; }
+        if(Rod.GetLineOut()<Depth) { Fail(TEXT("line_shorter_than_fishing_depth"));return; }
         Capture(TEXT("chart-fight"));MarkAt=Now;Stage=9;
     }
     else if(Stage==9)

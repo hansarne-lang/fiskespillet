@@ -147,7 +147,7 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     if (View.State == EFiskRodState::Fishing && Now >= NextTransitionAt)
     {
         NextTransitionAt = Now + 3.0;
-        View.Line = 0;
+        View.Line = Rig.Depth;
         SetState(EFiskRodState::InitialRun);
     }
     else if (View.State == EFiskRodState::InitialRun)

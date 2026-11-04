@@ -8,6 +8,7 @@ class UFiskPrototypeRod;
 class UFiskFrontEnd;
 class UFiskRigPanel;
 class UFiskSeaChart;
+class UFiskCrewPanel;
 class AFiskStarterBoat;
 
 UENUM()
@@ -36,6 +37,10 @@ public:
     const UFiskPrototypeRod* GetRod() const { return Rod; }
     UFiskRigPanel* GetRigPanel() const { return RigPanel; }
     UFiskSeaChart* GetSeaChart() const { return SeaChart; }
+    UFiskCrewPanel* GetCrewPanel() const { return CrewPanel; }
+    UFUNCTION(Server,Reliable) void ServerTransferCaptain(int32 ExpectedRevision,int32 Target);
+    UFUNCTION(Client,Reliable) void ClientCaptainReply(bool bAccepted);
+    UFUNCTION(Server,Reliable) void ServerStartBoatTrip(int32 ExpectedRevision);
     const AFiskStarterBoat* FindStarterBoat() const;
     UFUNCTION(Server,Reliable) void ServerSelectGround(int32 ExpectedRevision,int32 GroundId);
     UFUNCTION(Client,Reliable) void ClientGroundReply(const FString& Message);
@@ -57,8 +62,6 @@ private:
 
     void RequestDeparture();
 
-    UFUNCTION(Server, Reliable)
-    void ServerStartBoatTrip();
 
     void RequestCast();
 
@@ -83,6 +86,7 @@ private:
     UPROPERTY() TObjectPtr<UFiskFrontEnd> FrontEnd;
     UPROPERTY() TObjectPtr<UFiskRigPanel> RigPanel;
     UPROPERTY() TObjectPtr<UFiskSeaChart> SeaChart;
+    UPROPERTY() TObjectPtr<UFiskCrewPanel> CrewPanel;
 
 #if WITH_DEV_AUTOMATION_TESTS
     void RunLanSmoke();

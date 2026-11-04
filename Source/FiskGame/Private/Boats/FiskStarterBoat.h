@@ -11,6 +11,10 @@ struct FFiskRouteView
     GENERATED_BODY()
     UPROPERTY() int32 GroundId = 0;
     UPROPERTY() int32 Revision = 0;
+    UPROPERTY() int32 CaptainId = INDEX_NONE;
+    bool Authorizes(int32 Requester,int32 ExpectedRevision,const TArray<int32>& Crew) const;
+    bool Transfer(int32 Requester,int32 ExpectedRevision,int32 Target,const TArray<int32>& Crew);
+    bool RefreshCaptain(const TArray<int32>& Crew,int32 OwnerId,bool bPreferOwner);
 };
 
 UCLASS()
@@ -28,7 +32,7 @@ public:
     void SetOwnerPlayer(int32 PlayerId);
     void Board(int32 PlayerId);
     void Leave(int32 PlayerId);
-    void StartTrip(int32 PlayerId);
+    void StartTrip(int32 PlayerId,int32 ExpectedRevision);
     virtual void Tick(float DeltaSeconds) override;
 
     static constexpr int32 TripDurationMs = 12000;
@@ -45,6 +49,9 @@ public:
     int32 GetCrewCount() const { return Crew.Num(); }
 
     int32 GetCaptainId() const;
+    int32 GetCrewMemberId(int32 Seat) const { return Crew.IsValidIndex(Seat)?Crew[Seat]:INDEX_NONE; }
+    bool CanCaptainCommand(int32 Requester,int32 ExpectedRevision) const { return Route.Authorizes(Requester,ExpectedRevision,Crew); }
+    bool TransferCaptain(int32 Requester,int32 ExpectedRevision,int32 Target);
     int32 GetSeatIndex(int32 PlayerId) const { return Crew.IndexOfByKey(PlayerId); }
     uint8 GetRodActivity(int32 Seat) const { return Seat == 0 ? PortRodActivity : StarboardRodActivity; }
 
@@ -87,6 +94,8 @@ private:
     UPROPERTY(Replicated)
     int32 MarinaArrivalMs = -1;
 
+    void RefreshCaptain();
+    bool bManualCaptain = false;
     bool bReportedDeparture = false;
     bool bReportedReturn = false;
 };

@@ -3,6 +3,7 @@
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
 #include "UI/FiskSeaChart.h"
+#include "UI/FiskCrewPanel.h"
 #include "FiskFishingGround.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -24,6 +25,10 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if (PC->GetCrewPanel() && PC->GetCrewPanel()->IsVisible())
+        {
+            PC->GetCrewPanel()->Draw(*this,*Canvas);return;
+        }
         if (PC->GetSeaChart() && PC->GetSeaChart()->IsVisible())
         {
             PC->GetSeaChart()->Draw(*this, *Canvas);
@@ -44,7 +49,7 @@ void AFiskBootstrapHUD::DrawHUD()
     const float Top = 24.0f;
     DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 560.0f, 455.0f);
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
-    DrawText(TEXT("M: Sjøkart / rute og returrisiko"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
+    DrawText(TEXT("M: Sjøkart    K: Mannskap / kapteinsbytte"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
 
     if (!StarterBoat.IsValid())
     {

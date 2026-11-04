@@ -37,6 +37,7 @@ void AFiskStarterBoat::SetOwnerPlayer(int32 PlayerId)
     if (HasAuthority() && OwnerId == INDEX_NONE)
     {
         OwnerId = PlayerId;
+        RefreshCaptain();
     }
 }
 
@@ -48,26 +49,34 @@ void AFiskStarterBoat::Board(int32 PlayerId)
     }
 
     Crew.Add(PlayerId);
+    RefreshCaptain();
     OnRep_Crew();
     ForceNetUpdate();
 }
 
 void AFiskStarterBoat::Leave(int32 PlayerId)
 {
-    if (HasAuthority() && Crew.Remove(PlayerId) > 0)
+    if(!HasAuthority()) { return; }
+    const bool bCaptainLeft=Route.CaptainId==PlayerId;
+    if(Crew.Remove(PlayerId)>0)
     {
-        OnRep_Crew();
-        ForceNetUpdate();
+        if(bCaptainLeft) { bManualCaptain=false; }
+        RefreshCaptain();OnRep_Crew();ForceNetUpdate();
     }
 }
 
 int32 AFiskStarterBoat::GetCaptainId() const
 {
-    if (IsAboard(OwnerId))
-    {
-        return OwnerId;
-    }
-    return Crew.IsEmpty() ? INDEX_NONE : Crew[0];
+    return Crew.Contains(Route.CaptainId)?Route.CaptainId:INDEX_NONE;
+}
+void AFiskStarterBoat::RefreshCaptain()
+{
+    if(HasAuthority() && Route.RefreshCaptain(Crew,OwnerId,!bManualCaptain)) { OnRep_Route();ForceNetUpdate(); }
+}
+bool AFiskStarterBoat::TransferCaptain(int32 Requester,int32 ExpectedRevision,int32 Target)
+{
+    if(!HasAuthority() || !Route.Transfer(Requester,ExpectedRevision,Target,Crew)) { return false; }
+    bManualCaptain=true;OnRep_Route();ForceNetUpdate();return true;
 }
 
 void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -103,10 +112,11 @@ bool AFiskStarterBoat::SelectGround(int32 PlayerId,int32 ExpectedRevision,int32 
 void AFiskStarterBoat::OnRep_Route()
 {
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_ROUTE id=%d revision=%d"),Route.GroundId,Route.Revision);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_STATE player=%d revision=%d"),Route.CaptainId,Route.Revision);
 }
-void AFiskStarterBoat::StartTrip(int32 PlayerId)
+void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
 {
-    if (!HasAuthority() || PlayerId == INDEX_NONE || PlayerId != GetCaptainId())
+    if (!HasAuthority() || !CanCaptainCommand(PlayerId,ExpectedRevision))
     {
         return;
     }

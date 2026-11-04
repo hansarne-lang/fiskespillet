@@ -8,6 +8,7 @@
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
 #include "UI/FiskSeaChart.h"
+#include "UI/FiskCrewPanel.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "InputCoreTypes.h"
@@ -23,11 +24,13 @@ AFiskBoardingController::AFiskBoardingController()
     FrontEnd = CreateDefaultSubobject<UFiskFrontEnd>(TEXT("FrontEnd"));
     RigPanel = CreateDefaultSubobject<UFiskRigPanel>(TEXT("RigPanel"));
     SeaChart = CreateDefaultSubobject<UFiskSeaChart>(TEXT("SeaChart"));
+    CrewPanel = CreateDefaultSubobject<UFiskCrewPanel>(TEXT("CrewPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
+    if (CrewPanel && CrewPanel->HandleKey(Params)) { return true; }
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
@@ -80,18 +83,35 @@ void AFiskBoardingController::ServerBoardStarterBoat_Implementation()
 
 void AFiskBoardingController::RequestDeparture()
 {
-    ServerStartBoatTrip();
+    const AFiskStarterBoat* Boat=FindStarterBoat();
+    if(Boat) { ServerStartBoatTrip(Boat->GetRouteRevision()); }
 }
 
-void AFiskBoardingController::ServerStartBoatTrip_Implementation()
+void AFiskBoardingController::ServerStartBoatTrip_Implementation(int32 ExpectedRevision)
 {
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     if (Mode && Mode->GetStarterBoat() && PlayerState)
     {
-        Mode->GetStarterBoat()->StartTrip(PlayerState->GetPlayerId());
+        AFiskStarterBoat* Boat=Mode->GetStarterBoat();
+        const bool bAuthorized=Boat->CanCaptainCommand(PlayerState->GetPlayerId(),ExpectedRevision);
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRIP_%s player=%d expected=%d current=%d"),
+            bAuthorized?TEXT("AUTHORIZED"):TEXT("REJECTED"),PlayerState->GetPlayerId(),ExpectedRevision,Boat->GetRouteRevision());
+        Boat->StartTrip(PlayerState->GetPlayerId(),ExpectedRevision);
     }
 }
 
+void AFiskBoardingController::ServerTransferCaptain_Implementation(int32 ExpectedRevision,int32 Target)
+{
+    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const bool bAccepted=Mode && Mode->GetStarterBoat() && PlayerState
+        && Mode->GetStarterBoat()->TransferCaptain(PlayerState->GetPlayerId(),ExpectedRevision,Target);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRANSFER_%s player=%d target=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,Target);
+    ClientCaptainReply(bAccepted);
+}
+void AFiskBoardingController::ClientCaptainReply_Implementation(bool bAccepted)
+{
+    CrewPanel->SetMessage(bAccepted?TEXT("Kapteinsrollen er overført."):TEXT("Overføring avvist. Bare gjeldende kaptein kan velge en annen om bord. Prøv igjen med oppdatert status."));
+}
 const AFiskStarterBoat* AFiskBoardingController::FindStarterBoat() const
 {
     TActorIterator<AFiskStarterBoat> Boat(GetWorld());return Boat?*Boat:nullptr;

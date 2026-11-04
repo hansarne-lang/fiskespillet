@@ -2,6 +2,7 @@
 #include "Fishing/FiskFishVisualState.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Boats/FiskBoardingController.h"
+#include "Boats/FiskBoatPresentation.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "DayCycle/FiskDayState.h"
@@ -35,6 +36,10 @@ void UFiskFishPresentation::BeginPlay()
 {
     Super::BeginPlay();
     AActor* Boat = GetOwner();
+    if (UFiskBoatPresentation* Presentation = Boat->FindComponentByClass<UFiskBoatPresentation>())
+    {
+        Presentation->AddTickPrerequisiteComponent(this);
+    }
 #if WITH_DEV_AUTOMATION_TESTS
     FParse::Value(FCommandLine::Get(), TEXT("FiskScreenshotDir="), ScreenshotDirectory);
 #endif

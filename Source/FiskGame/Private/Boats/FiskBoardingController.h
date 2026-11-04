@@ -7,6 +7,8 @@
 class UFiskPrototypeRod;
 class UFiskFrontEnd;
 class UFiskRigPanel;
+class UFiskSeaChart;
+class AFiskStarterBoat;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -33,6 +35,10 @@ public:
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
     const UFiskPrototypeRod* GetRod() const { return Rod; }
     UFiskRigPanel* GetRigPanel() const { return RigPanel; }
+    UFiskSeaChart* GetSeaChart() const { return SeaChart; }
+    const AFiskStarterBoat* FindStarterBoat() const;
+    UFUNCTION(Server,Reliable) void ServerSelectGround(int32 ExpectedRevision,int32 GroundId);
+    UFUNCTION(Client,Reliable) void ClientGroundReply(const FString& Message);
     bool CanOpenRig() const;
     void RequestRig(int32 Bait, int32 Depth, int32 Program);
     UFUNCTION(Server, Reliable)
@@ -76,6 +82,7 @@ private:
     TObjectPtr<UFiskPrototypeRod> Rod;
     UPROPERTY() TObjectPtr<UFiskFrontEnd> FrontEnd;
     UPROPERTY() TObjectPtr<UFiskRigPanel> RigPanel;
+    UPROPERTY() TObjectPtr<UFiskSeaChart> SeaChart;
 
 #if WITH_DEV_AUTOMATION_TESTS
     void RunLanSmoke();

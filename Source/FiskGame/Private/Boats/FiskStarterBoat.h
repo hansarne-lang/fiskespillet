@@ -5,6 +5,14 @@
 #include "Fishing/FiskFishVisualState.h"
 #include "FiskStarterBoat.generated.h"
 
+USTRUCT()
+struct FFiskRouteView
+{
+    GENERATED_BODY()
+    UPROPERTY() int32 GroundId = 0;
+    UPROPERTY() int32 Revision = 0;
+};
+
 UCLASS()
 class AFiskStarterBoat final : public AInfo
 {
@@ -27,8 +35,11 @@ public:
     static constexpr double MarinaRadiusCm = 500.0;
     static constexpr double FishingSpotDistanceCm = 20000.0;
     int32 GetTripProgress() const { return TripProgress; }
+    int32 GetGroundId() const { return Route.GroundId; }
+    int32 GetRouteRevision() const { return Route.Revision; }
+    bool SelectGround(int32 PlayerId, int32 ExpectedRevision, int32 GroundId, FString& Message);
     int32 GetMarinaArrivalMs(int32 NowMs) const;
-    static int32 CalculateCrossingMs(int32 ReturnStartMs);
+    static int32 CalculateCrossingMs(int32 ReturnStartMs, int32 GroundId = 0);
 
     bool IsAboard(int32 PlayerId) const { return Crew.Contains(PlayerId); }
     int32 GetCrewCount() const { return Crew.Num(); }
@@ -48,6 +59,8 @@ private:
     UPROPERTY(Replicated)
 
     int32 OwnerId = INDEX_NONE;
+    UPROPERTY(ReplicatedUsing=OnRep_Route) FFiskRouteView Route;
+    UFUNCTION() void OnRep_Route();
     UPROPERTY(Replicated) uint8 PortRodActivity = 0;
 
     UPROPERTY(Replicated) uint8 StarboardRodActivity = 0;

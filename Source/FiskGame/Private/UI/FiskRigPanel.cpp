@@ -1,4 +1,6 @@
 #include "UI/FiskRigPanel.h"
+#include "Boats/FiskStarterBoat.h"
+#include "FiskFishingGround.h"
 #include "UI/FiskFrontEnd.h"
 #include "Boats/FiskBoardingController.h"
 #include "Fishing/FiskPrototypeRod.h"
@@ -42,7 +44,13 @@ void UFiskRigPanel::Change(int32 Direction)
     const FFiskRigSettings& Rig = PC->GetRod()->GetRig();
     int32 Bait=Rig.Bait, Depth=Rig.Depth, Program=Rig.Program;
     if (Row==0) { Bait=(Bait+Direction+3)%3; }
-    else if (Row==1) { Depth=10+((Depth/10-1+Direction+6)%6)*10; }
+    else if (Row==1)
+    {
+        const AFiskStarterBoat* Boat=PC->FindStarterBoat();
+        const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():0);
+        const int32 Steps=FMath::Min(120,Ground->BottomDepth)/10;
+        Depth=10+((FMath::Clamp(Depth/10-1,0,Steps-1)+Direction+Steps)%Steps)*10;
+    }
     else if (Row==2) { Program=(Program+Direction+3)%3; }
     else { Show(false); return; }
     PC->RequestRig(Bait,Depth,Program);
@@ -85,11 +93,13 @@ void UFiskRigPanel::Draw(AHUD& HUD,UCanvas& Canvas)
 {
     const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
     const FFiskRigSettings& Rig=PC->GetRod()->GetRig();
+    const AFiskStarterBoat* Boat=PC->FindStarterBoat();
+    const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():0);
     const float S=FMath::Min(Canvas.ClipX/1280.f,Canvas.ClipY/720.f), X=52*S, W=460*S;
     HUD.DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,28*S,516*S,642*S);
     HUD.DrawText(TEXT("STANGOPPSETT"),FLinearColor::White,X,70*S,nullptr,2.1f*S);
-    HUD.DrawText(TEXT("Revplassen - bunndybde 60 m"),FLinearColor(0.55f,0.85f,0.8f),X,126*S,nullptr,1.15f*S);
-    HUD.DrawText(TEXT("Fisketegn ved 20-40 m"),FLinearColor::White,X,158*S,nullptr,1.1f*S);
+    HUD.DrawText(FString::Printf(TEXT("%s - bunndybde %d m"),Ground->Name,Ground->BottomDepth),FLinearColor(0.55f,0.85f,0.8f),X,126*S,nullptr,1.15f*S);
+    HUD.DrawText(FString::Printf(TEXT("Fisketegn ved %d-%d m"),Ground->FishDepthMin,Ground->FishDepthMax),FLinearColor::White,X,158*S,nullptr,1.1f*S);
     const FString Labels[] = {FString(TEXT("Agn: "))+FFiskRigRules::BaitName(Rig.Bait),FString::Printf(TEXT("Fiskedybde: %d m"),Rig.Depth),FString(TEXT("Program: "))+FFiskRigRules::ProgramName(Rig.Program),TEXT("Ferdig")};
     Buttons.Reset();
     for (int32 I=0;I<4;++I)
@@ -98,7 +108,7 @@ void UFiskRigPanel::Draw(AHUD& HUD,UCanvas& Canvas)
         HUD.DrawRect(I==Row?FLinearColor(0.18f,0.45f,0.46f):FLinearColor(0.035f,0.13f,0.16f),A.X,A.Y,W,52*S);
         HUD.DrawText(Labels[I],FLinearColor::White,A.X+16*S,A.Y+14*S,nullptr,1.2f*S);
     }
-    HUD.DrawText(FFiskRigRules::QualityName(Rig),FLinearColor(0.65f,0.95f,0.75f),X,510*S,nullptr,1.2f*S);
+    HUD.DrawText(FFiskRigRules::QualityName(Rig, Ground),FLinearColor(0.65f,0.95f,0.75f),X,510*S,nullptr,1.2f*S);
     HUD.DrawText(TEXT("Piler: velg/endre. Klikk eller Enter: neste valg."),FLinearColor::White,X,552*S,nullptr,0.9f*S);
     HUD.DrawText(TEXT("G / Escape: lukk. Klokken fortsetter."),FLinearColor::White,X,580*S,nullptr,0.9f*S);
     HUD.DrawText(TEXT("Valgene bekreftes av verten. Trekk inn før endring."),FLinearColor(0.7f,0.8f,0.8f),X,616*S,nullptr,0.85f*S);

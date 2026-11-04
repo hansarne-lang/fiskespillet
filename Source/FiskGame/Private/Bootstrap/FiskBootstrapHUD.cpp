@@ -2,6 +2,8 @@
 #include "Engine/Canvas.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
+#include "UI/FiskSeaChart.h"
+#include "FiskFishingGround.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Boats/FiskStarterBoat.h"
@@ -22,6 +24,11 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if (PC->GetSeaChart() && PC->GetSeaChart()->IsVisible())
+        {
+            PC->GetSeaChart()->Draw(*this, *Canvas);
+            return;
+        }
         if (PC->GetRigPanel() && PC->GetRigPanel()->IsVisible())
         {
             PC->GetRigPanel()->Draw(*this, *Canvas);
@@ -37,7 +44,7 @@ void AFiskBootstrapHUD::DrawHUD()
     const float Top = 24.0f;
     DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 560.0f, 455.0f);
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
-    DrawText(TEXT("LAN-prototype - fiskedag i 3D"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
+    DrawText(TEXT("M: Sjøkart / rute og returrisiko"), FLinearColor::White, Left, Top + 65.0f, nullptr, 1.0f);
 
     if (!StarterBoat.IsValid())
     {
@@ -92,6 +99,8 @@ void AFiskBootstrapHUD::DrawHUD()
             Route = FString::Printf(TEXT("Underveis til fiskeplassen: %d%%"), Progress);
         }
         DrawText(Route, FLinearColor::White, Left, Top + 185.0f);
+        const FFiskFishingGround* Ground=FiskGrounds::Find(Boat->GetGroundId());
+        if(Ground) { DrawText(Ground->Name,FLinearColor(0.5f,0.9f,0.8f),Left,Top+50.0f,nullptr,0.85f); }
     }
 
     if (const AFiskBoardingController* RigOwner = Cast<AFiskBoardingController>(GetOwningPlayerController()))
@@ -99,6 +108,10 @@ void AFiskBootstrapHUD::DrawHUD()
         const FFiskRigSettings& Rig=RigOwner->GetRod()->GetRig();
         DrawText(FString::Printf(TEXT("%s / %d m / %s"),FFiskRigRules::BaitName(Rig.Bait),Rig.Depth,FFiskRigRules::ProgramName(Rig.Program)),FLinearColor::White,Left,Top+430.0f,nullptr,0.95f);
         if (RigOwner->CanOpenRig()) { DrawText(TEXT("G: Velg agn, dybde og program"),FLinearColor(0.5f,0.95f,0.8f),Left,Top+380.0f); }
+        const AFiskStarterBoat* RigBoat=RigOwner->FindStarterBoat();
+        const FFiskFishingGround* Ground=FiskGrounds::Find(RigBoat?RigBoat->GetGroundId():0);
+        if(Ground && !FFiskRigRules::IsValid(Rig.Bait,Rig.Depth,Rig.Program,Ground->BottomDepth))
+        { DrawText(TEXT("For dyp rigg for plassen. Trykk G før utsetting."),FLinearColor(1,0.7f,0.3f),Left,Top+240.0f); }
     }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (Day == nullptr)

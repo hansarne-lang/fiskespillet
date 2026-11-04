@@ -7,10 +7,7 @@
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 
-namespace
-{
-    const FVector FishingSpot(AFiskStarterBoat::FishingSpotDistanceCm, 0.0, 0.0);
-}
+#include "FiskFishingGround.h"
 
 AFiskStarterBoat::AFiskStarterBoat()
 {
@@ -77,6 +74,7 @@ void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(AFiskStarterBoat, OwnerId);
+    DOREPLIFETIME(AFiskStarterBoat, Route);
     DOREPLIFETIME(AFiskStarterBoat, Crew);
     DOREPLIFETIME(AFiskStarterBoat, TripProgress);
     DOREPLIFETIME(AFiskStarterBoat, MarinaArrivalMs);
@@ -91,6 +89,21 @@ void AFiskStarterBoat::OnRep_Crew()
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_STARTER_BOAT_CREW %d"), Crew.Num());
 }
 
+bool AFiskStarterBoat::SelectGround(int32 PlayerId,int32 ExpectedRevision,int32 GroundId,FString& Message)
+{
+    const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+    if(!HasAuthority() || PlayerId==INDEX_NONE || PlayerId!=GetCaptainId()) { Message=TEXT("Bare kapteinen kan velge plass.");return false; }
+    if(TripProgress!=AtDock || !Day || (Day->HasStarted() && Day->GetElapsedSeconds()>=AFiskDayState::SettlementStart))
+    { Message=TEXT("Velg fiskeplass ved brygga før avreise.");return false; }
+    if(ExpectedRevision!=Route.Revision || Route.Revision==MAX_int32) { Message=TEXT("Kartet ble oppdatert. Velg på nytt.");return false; }
+    if(!FiskGrounds::Find(GroundId)) { Message=TEXT("Ugyldig fiskeplass.");return false; }
+    Route.GroundId=GroundId;++Route.Revision;OnRep_Route();ForceNetUpdate();
+    Message=TEXT("Rute valgt. R starter turen fra 02:00.");return true;
+}
+void AFiskStarterBoat::OnRep_Route()
+{
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_ROUTE id=%d revision=%d"),Route.GroundId,Route.Revision);
+}
 void AFiskStarterBoat::StartTrip(int32 PlayerId)
 {
     if (!HasAuthority() || PlayerId == INDEX_NONE || PlayerId != GetCaptainId())
@@ -105,7 +118,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId)
     {
         LegStartedMs = Day->GetElapsedMilliseconds();
         ReturnStartedMs = LegStartedMs;
-        SetActorRotation(FRotator(0, 180, 0));
+        SetActorRotation((-FiskGrounds::Find(Route.GroundId)->Position).Rotation());
 
         TripProgress = AtFishingSpot + 1;
         OnRep_TripProgress();
@@ -124,6 +137,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId)
     }
 
     LegStartedMs = Day->GetElapsedMilliseconds();
+    SetActorRotation(FiskGrounds::Find(Route.GroundId)->Position.Rotation());
     TripProgress = 0;
     OnRep_TripProgress();
     SetActorTickEnabled(true);
@@ -137,7 +151,9 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (!HasAuthority() || !Day) { return; }
     const int32 NowMs = Day->GetElapsedMilliseconds();
-    const double Fraction = FMath::Clamp((NowMs - LegStartedMs) / static_cast<double>(TripDurationMs), 0.0, 1.0);
+    const FFiskFishingGround* Ground=FiskGrounds::Find(Route.GroundId);
+    if(!Ground) { return; }
+    const double Fraction = FMath::Clamp((NowMs - LegStartedMs) / static_cast<double>(Ground->TravelMs), 0.0, 1.0);
     if (MarinaArrivalMs < 0)
     {
         MarinaArrivalMs = GetMarinaArrivalMs(NowMs);
@@ -148,7 +164,7 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     }
 
     const bool bReturning = TripProgress > AtFishingSpot;
-    SetActorLocation(FishingSpot * (bReturning ? 1.0f - Fraction : Fraction));
+    SetActorLocation(Ground->Position * (bReturning ? 1.0f - Fraction : Fraction));
     const int32 Percent = FMath::FloorToInt(Fraction * AtFishingSpot);
     TripProgress = bReturning ? AtFishingSpot + FMath::Max(1, Percent) : Percent;
 
@@ -183,18 +199,16 @@ void AFiskStarterBoat::OnRep_TripProgress()
 }
 
 
-int32 AFiskStarterBoat::CalculateCrossingMs(int32 ReturnStartMs)
+int32 AFiskStarterBoat::CalculateCrossingMs(int32 ReturnStartMs,int32 GroundId)
 {
-    // The fixed route is linear, so crossing is independent of frame ordering.
-    const double Fraction = 1.0 - MarinaRadiusCm / FishingSpotDistanceCm;
-    return ReturnStartMs + FMath::CeilToInt(TripDurationMs * Fraction);
+    return FiskGrounds::CrossingMs(ReturnStartMs,GroundId);
 }
 
 int32 AFiskStarterBoat::GetMarinaArrivalMs(int32 NowMs) const
 {
     if (MarinaArrivalMs >= 0) { return MarinaArrivalMs; }
     if (ReturnStartedMs < 0) { return -1; }
-    const int32 CrossingMs = CalculateCrossingMs(ReturnStartedMs);
+    const int32 CrossingMs = CalculateCrossingMs(ReturnStartedMs, Route.GroundId);
     return NowMs >= CrossingMs ? CrossingMs : -1;
 }
 

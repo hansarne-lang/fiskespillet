@@ -7,6 +7,7 @@
 #include "Fishing/FiskCombatFeedback.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
+#include "UI/FiskSeaChart.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "InputCoreTypes.h"
@@ -21,11 +22,13 @@ AFiskBoardingController::AFiskBoardingController()
     Rod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("PrototypeRod"));
     FrontEnd = CreateDefaultSubobject<UFiskFrontEnd>(TEXT("FrontEnd"));
     RigPanel = CreateDefaultSubobject<UFiskRigPanel>(TEXT("RigPanel"));
+    SeaChart = CreateDefaultSubobject<UFiskSeaChart>(TEXT("SeaChart"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
+    if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
     return Super::InputKey(Params);
@@ -89,6 +92,20 @@ void AFiskBoardingController::ServerStartBoatTrip_Implementation()
     }
 }
 
+const AFiskStarterBoat* AFiskBoardingController::FindStarterBoat() const
+{
+    TActorIterator<AFiskStarterBoat> Boat(GetWorld());return Boat?*Boat:nullptr;
+}
+void AFiskBoardingController::ServerSelectGround_Implementation(int32 ExpectedRevision,int32 GroundId)
+{
+    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    FString Message=TEXT("Båten er ikke klar.");
+    const bool bAccepted=Mode && Mode->GetStarterBoat() && PlayerState
+        && Mode->GetStarterBoat()->SelectGround(PlayerState->GetPlayerId(),ExpectedRevision,GroundId,Message);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CHART_%s player=%d requested=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,GroundId);
+    ClientGroundReply(Message);
+}
+void AFiskBoardingController::ClientGroundReply_Implementation(const FString& Message) { SeaChart->SetMessage(Message); }
 bool AFiskBoardingController::CanOpenRig() const
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();

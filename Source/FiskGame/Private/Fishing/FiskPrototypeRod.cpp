@@ -1,4 +1,5 @@
 #include "Fishing/FiskPrototypeRod.h"
+#include "FiskFishingGround.h"
 #include "DayCycle/FiskDayState.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Bootstrap/FiskBootstrapGameMode.h"
@@ -20,13 +21,17 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
 {
     if (!GetOwner()->HasAuthority()) { return false; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    if (!Day || !Cycle.TryStart(ExpectedId, Day->GetElapsedMilliseconds())) { return false; }
+    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    const FFiskFishingGround* Ground=Boat?FiskGrounds::Find(Boat->GetGroundId()):nullptr;
+    if (!Day || !Ground || !FFiskRigRules::IsValid(Rig.Bait,Rig.Depth,Rig.Program,Ground->BottomDepth)
+        || !Cycle.TryStart(ExpectedId, Day->GetElapsedMilliseconds())) { return false; }
     View = FFiskRodView();
     View.CastId = Cycle.GetId();
     CatchId.Invalidate();
     LandedAtMs = -1;
     FRandomStream BiteRandom(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().B ^ Cycle.GetId().C ^ Cycle.GetId().D));
-    NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom);
+    NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom, Ground);
     SetState(EFiskRodState::Fishing);
     SetComponentTickEnabled(true);
     return true;
@@ -41,8 +46,11 @@ bool UFiskPrototypeRod::CanConfigure() const
 }
 bool UFiskPrototypeRod::Configure(const FGuid& ExpectedId, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program)
 {
-    if (!GetOwner()->HasAuthority() || !CanConfigure() || ExpectedId != View.CastId
-        || !FFiskRigRules::TryApply(Rig, ExpectedRevision, Bait, Depth, Program)) { return false; }
+    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    const FFiskFishingGround* Ground=Boat?FiskGrounds::Find(Boat->GetGroundId()):nullptr;
+    if (!GetOwner()->HasAuthority() || !Ground || !CanConfigure() || ExpectedId != View.CastId
+        || !FFiskRigRules::TryApply(Rig, ExpectedRevision, Bait, Depth, Program, Ground->BottomDepth)) { return false; }
     GetOwner()->ForceNetUpdate();
     return true;
 }

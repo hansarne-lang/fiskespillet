@@ -27,6 +27,7 @@ public:
 protected:
     virtual void SetupInputComponent() override;
     virtual void BeginPlay() override;
+    virtual void PlayerTick(float DeltaTime) override;
 
 private:
     void RequestBoarding();
@@ -61,6 +62,12 @@ private:
     FTimerHandle LanSmokeTimer;
     bool bSmokeTriedEarlyLanding = false;
     bool bSmokeTriedDuplicateLanding = false;
+
     double SmokeReturnAt = 0.0;
+    bool bSmokeCheckedPrivacy = false;
+    bool bSmokeSawSettlement = false;
+    bool bSmokeSawEnd = false;
+    int32 SmokeClockMinute = -1;
+
 #endif
 };

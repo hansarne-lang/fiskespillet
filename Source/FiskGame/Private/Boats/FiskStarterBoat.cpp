@@ -1,13 +1,13 @@
 #include "Boats/FiskStarterBoat.h"
 #include "Components/SceneComponent.h"
+#include "Camera/CameraComponent.h"
 #include "DayCycle/FiskDayState.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 
 namespace
 {
-    constexpr float TripDuration = 12.0f;
-    const FVector FishingSpot(20000.0, 0.0, 0.0);
+    const FVector FishingSpot(AFiskStarterBoat::FishingSpotDistanceCm, 0.0, 0.0);
 }
 
 AFiskStarterBoat::AFiskStarterBoat()
@@ -15,7 +15,13 @@ AFiskStarterBoat::AFiskStarterBoat()
     bReplicates = true;
     bAlwaysRelevant = true;
     SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("BoatRoot")));
+
+    UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("BoatCamera"));
+    Camera->SetupAttachment(RootComponent);
+    Camera->SetRelativeLocation(FVector(0.0, 0.0, 1800.0));
+    Camera->SetRelativeRotation(FRotator(-90.0, 0.0, 0.0));
     SetReplicateMovement(true);
+
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = false;
 }
@@ -64,6 +70,7 @@ void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(AFiskStarterBoat, OwnerId);
     DOREPLIFETIME(AFiskStarterBoat, Crew);
     DOREPLIFETIME(AFiskStarterBoat, TripProgress);
+    DOREPLIFETIME(AFiskStarterBoat, MarinaArrivalMs);
 }
 
 void AFiskStarterBoat::OnRep_Crew()
@@ -78,9 +85,14 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId)
         return;
     }
 
+
+    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+    if (!Day || !Day->HasStarted()) { return; }
     if (TripProgress == AtFishingSpot)
     {
-        TravelSeconds = 0.0f;
+        LegStartedMs = Day->GetElapsedMilliseconds();
+        ReturnStartedMs = LegStartedMs;
+
         TripProgress = AtFishingSpot + 1;
         OnRep_TripProgress();
         SetActorTickEnabled(true);
@@ -92,12 +104,12 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId)
         return;
     }
 
-    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    if (!Day || !Day->HasStarted() || Day->GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
+    if (Day->GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
     {
         return;
     }
 
+    LegStartedMs = Day->GetElapsedMilliseconds();
     TripProgress = 0;
     OnRep_TripProgress();
     SetActorTickEnabled(true);
@@ -107,8 +119,20 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId)
 void AFiskStarterBoat::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    TravelSeconds = FMath::Min(TravelSeconds + DeltaSeconds, TripDuration);
-    const float Fraction = TravelSeconds / TripDuration;
+
+    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+    if (!HasAuthority() || !Day) { return; }
+    const int32 NowMs = Day->GetElapsedMilliseconds();
+    const double Fraction = FMath::Clamp((NowMs - LegStartedMs) / static_cast<double>(TripDurationMs), 0.0, 1.0);
+    if (MarinaArrivalMs < 0)
+    {
+        MarinaArrivalMs = GetMarinaArrivalMs(NowMs);
+        if (MarinaArrivalMs >= 0)
+        {
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_MARINA_CROSSED ms=%d"), MarinaArrivalMs);
+        }
+    }
+
     const bool bReturning = TripProgress > AtFishingSpot;
     SetActorLocation(FishingSpot * (bReturning ? 1.0f - Fraction : Fraction));
     const int32 Percent = FMath::FloorToInt(Fraction * AtFishingSpot);
@@ -142,4 +166,20 @@ void AFiskStarterBoat::OnRep_TripProgress()
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TRIP_ARRIVED crew=%d"), Crew.Num());
     }
+}
+
+
+int32 AFiskStarterBoat::CalculateCrossingMs(int32 ReturnStartMs)
+{
+    // The fixed route is linear, so crossing is independent of frame ordering.
+    const double Fraction = 1.0 - MarinaRadiusCm / FishingSpotDistanceCm;
+    return ReturnStartMs + FMath::CeilToInt(TripDurationMs * Fraction);
+}
+
+int32 AFiskStarterBoat::GetMarinaArrivalMs(int32 NowMs) const
+{
+    if (MarinaArrivalMs >= 0) { return MarinaArrivalMs; }
+    if (ReturnStartedMs < 0) { return -1; }
+    const int32 CrossingMs = CalculateCrossingMs(ReturnStartedMs);
+    return NowMs >= CrossingMs ? CrossingMs : -1;
 }

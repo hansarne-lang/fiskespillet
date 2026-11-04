@@ -8,6 +8,7 @@
 #include "Fishing/FiskPrototypeRod.h"
 #include "GameFramework/PlayerState.h"
 #include "TimerManager.h"
+#include "Economy/FiskDaySettlement.h"
 
 void AFiskBoardingController::RunLanSmoke()
 {
@@ -36,11 +37,39 @@ void AFiskBoardingController::RunLanSmoke()
         return;
     }
 
+
+    const int32 Minute = Day->GetElapsedSeconds() / 60;
+    if (SmokeClockMinute != Minute)
+    {
+        SmokeClockMinute = Minute;
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_CLOCK ms=%d"), Day->GetElapsedMilliseconds());
+    }
     if (Progress == AFiskStarterBoat::AtMarina)
     {
-        GetWorldTimerManager().ClearTimer(LanSmokeTimer);
+        TActorIterator<AFiskDaySettlement> Settlements(GetWorld());
+        if (!Settlements) { return; }
+        const FFiskSettlementView& View = Settlements->GetView();
+        if (!bSmokeCheckedPrivacy && Day->GetElapsedSeconds() < AFiskDayState::SettlementStart)
+        {
+            bSmokeCheckedPrivacy = true;
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_PRIVATE revealed=%d rows=%d"),
+                View.bRevealed ? 1 : 0, View.Results.Num());
+        }
+        if (View.bRevealed && !bSmokeSawSettlement)
+        {
+            bSmokeSawSettlement = true;
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_REVEAL ms=%d rows=%d"),
+                Day->GetElapsedMilliseconds(), View.Results.Num());
+        }
+        if (Day->GetElapsedSeconds() == AFiskDayState::DayEnd && !bSmokeSawEnd)
+        {
+            bSmokeSawEnd = true;
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_DAY_END ms=%d"), Day->GetElapsedMilliseconds());
+            GetWorldTimerManager().ClearTimer(LanSmokeTimer);
+        }
         return;
     }
+
     if (Progress != AFiskStarterBoat::AtFishingSpot)
     {
         return;
@@ -96,9 +125,9 @@ void AFiskBoardingController::RunLanSmoke()
             {
                 if (SmokeReturnAt == 0.0)
                 {
-                    SmokeReturnAt = GetWorld()->GetTimeSeconds() + 5.0;
+                    SmokeReturnAt = Day->GetElapsedRealSeconds() + 5.0;
                 }
-                else if (GetWorld()->GetTimeSeconds() >= SmokeReturnAt)
+                else if (Day->GetElapsedRealSeconds() >= SmokeReturnAt)
                 {
                     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_CAPTAIN_RETURN player=%d"), PlayerId);
                     RequestDeparture();

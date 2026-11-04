@@ -26,3 +26,8 @@ Disse valgene er uttrykkelig gitt av prosjekteieren 3. november 2026. Detaljene 
 Spilldesign, større arkitektur, nye tilganger, betaling, destruktive handlinger og endringer i publiseringsomfang går til prosjekteieren. Awaiting Approval i GitHub blokkerer utførelsen. Godkjenning skal gjelde konkret issue, scope og revisjon.
 
 Uavklarte forhold og gjennomføringsstatus føres i GitHub Issues, ikke i en lokal konkurrerende oppgaveliste. Åpne spilldesignavklaringer står i kravspesifikasjonen.
+
+
+## 2026-11-04 — Marinasone og returfrist
+
+Prosjekteieren godkjente at serveren registrerer ankomst når båtens midtpunkt krysser en synlig marinasone. Ankomst senest ved 1 020 000 ms teller som i tide. Serveren behandler autoritativ kryssing før oppgjøret, også når begge skjer i samme ramme. En forsinket klientmelding flytter ingen ankomsttid. Testprototypen bruker en sirkel med radius fem meter rundt bryggepunktet. Størrelsen er en foreløpig testverdi.

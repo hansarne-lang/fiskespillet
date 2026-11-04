@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskDayState.h"
+#include "Economy/FiskDaySettlement.h"
 
 void AFiskBootstrapHUD::DrawHUD()
 {
@@ -111,6 +112,26 @@ void AFiskBootstrapHUD::DrawHUD()
 
     DrawText(FString::Printf(TEXT("%02d:%02d  %s"), Elapsed / 60, Elapsed % 60, Phase),
         FLinearColor::White, Left, Top + 100.0f);
+
+
+    for (TActorIterator<AFiskDaySettlement> Settlement(GetWorld()); Settlement; ++Settlement)
+    {
+        const FFiskSettlementView& View = Settlement->GetView();
+        if (!View.bRevealed)
+        {
+            DrawText(TEXT("Dagsresultat ved 17:00. Saldo (økt): 0"), FLinearColor::White, Left, Top + 275.0f);
+        }
+        else
+        {
+            float RowY = Top + 275.0f;
+            for (const FFiskDayResult& Row : View.Results)
+            {
+                DrawText(FString::Printf(TEXT("Spiller %d: levert %d, tapt %d, saldo (økt) %d"),
+                    Row.PlayerId, Row.DeliveredFish, Row.LostFish, Row.SessionBalance), FLinearColor::White, Left, RowY);
+                RowY += 24.0f;
+            }
+        }
+    }
 
     const AFiskStarterBoat* Boat = StarterBoat.Get();
     const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController());

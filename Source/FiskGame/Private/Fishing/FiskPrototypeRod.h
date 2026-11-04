@@ -44,6 +44,7 @@ private:
     int32 LineOut = 0;
 
     double NextTransitionAt = 0.0;
+    FGuid CatchId;
     bool bRodRaised = false;
     bool bCanReel = false;
 };

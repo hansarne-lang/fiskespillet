@@ -10,6 +10,7 @@
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "TimerManager.h"
+#include "EngineUtils.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -133,5 +134,19 @@ void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Actio
     case EFiskRodAction::Land:
         Rod->Land();
         break;
+    }
+}
+
+
+void AFiskBoardingController::PlayerTick(float DeltaTime)
+{
+    Super::PlayerTick(DeltaTime);
+    if (!IsLocalController() || !PlayerState) { return; }
+    for (TActorIterator<AFiskStarterBoat> Boat(GetWorld()); Boat; ++Boat)
+    {
+        if (Boat->IsAboard(PlayerState->GetPlayerId()) && GetViewTarget() != *Boat)
+        {
+            SetViewTarget(*Boat);
+        }
     }
 }

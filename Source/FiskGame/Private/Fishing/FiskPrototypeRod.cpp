@@ -2,6 +2,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Bootstrap/FiskBootstrapGameMode.h"
+#include "Economy/FiskDaySettlement.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
@@ -21,7 +22,11 @@ void UFiskPrototypeRod::Cast()
         return;
     }
 
-    NextTransitionAt = GetWorld()->GetTimeSeconds() + FMath::FRandRange(120.0f, 180.0f);
+
+    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+    if (!Day) { return; }
+    NextTransitionAt = Day->GetElapsedRealSeconds() + FMath::FRandRange(120.0f, 180.0f);
+
     SetState(EFiskRodState::Fishing);
     SetComponentTickEnabled(true);
 }
@@ -67,7 +72,14 @@ void UFiskPrototypeRod::Land()
 {
     if (GetOwner()->HasAuthority() && State == EFiskRodState::ReadyToLand)
     {
+
+        const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+        const APlayerController* PC = CastChecked<APlayerController>(GetOwner());
+        if (!Mode || !Mode->GetSettlement() || !PC->PlayerState) { return; }
+        if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
+        if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId())) { return; }
         SetState(EFiskRodState::Landed);
+
         SetComponentTickEnabled(false);
     }
 }
@@ -88,12 +100,12 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
         SetState(EFiskRodState::Ready);
         SetComponentTickEnabled(false);
     }
-    else if (State == EFiskRodState::Fishing && GetWorld()->GetTimeSeconds() >= NextTransitionAt)
+    else if (State == EFiskRodState::Fishing && Day->GetElapsedRealSeconds() >= NextTransitionAt)
     {
-        NextTransitionAt = GetWorld()->GetTimeSeconds() + 3.0;
+        NextTransitionAt = Day->GetElapsedRealSeconds() + 3.0;
         SetState(EFiskRodState::InitialRun);
     }
-    else if (State == EFiskRodState::InitialRun && GetWorld()->GetTimeSeconds() >= NextTransitionAt)
+    else if (State == EFiskRodState::InitialRun && Day->GetElapsedRealSeconds() >= NextTransitionAt)
     {
         LineOut = 30;
         SetState(EFiskRodState::Fighting);

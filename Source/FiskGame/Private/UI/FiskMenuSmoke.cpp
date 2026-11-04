@@ -56,7 +56,7 @@ void UFiskFrontEnd::RunMenuSmoke()
     int32& Step=GI->MenuSmokeStep;
     const double Now=FPlatformTime::Seconds();
     auto Fail=[&](const TCHAR* Why) { UE_LOG(LogTemp,Error,TEXT("FISKELAGET_MENU_TEST_FAILED %s step=%d"),Why,Step); };
-    if(GetNetMode()==NM_Standalone)
+    if(GetNetMode()==NM_Standalone || Model.Page==EFiskMenuPage::Connecting || SmokeCase==TEXT("failure"))
     {
         if(SmokeCase==TEXT("host"))
         {

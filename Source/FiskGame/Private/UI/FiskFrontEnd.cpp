@@ -19,6 +19,7 @@ void UFiskFrontEnd::BeginPlay()
     Super::BeginPlay();
     AFiskBoardingController* PC = CastChecked<AFiskBoardingController>(GetOwner());
     if (!PC->IsLocalController()) { SetComponentTickEnabled(false); return; }
+    bLocalFrontEnd = true;
     UFiskGameInstance* GI = CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
     Model.bSound = GI->bSound; Model.FrameRate = GI->FrameRate;
     GI->ApplySettings(false);
@@ -85,14 +86,17 @@ void UFiskFrontEnd::Dispatch(EFiskMenuAction Action)
     else if (Action == EFiskMenuAction::Quit)
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_MENU_QUIT"));
-        UKismetSystemLibrary::QuitGame(this, PC, EQuitPreference::Quit, false);
+        // A pending travel may temporarily detach Player from the old controller.
+        // The game engine owns process exit; PIE keeps the editor's usual quit path.
+        if (!GIsEditor && GEngine) { GEngine->Exec(GetWorld(), TEXT("QUIT"), *GLog); }
+        else { UKismetSystemLibrary::QuitGame(this, PC, EQuitPreference::Quit, false); }
     }
     SyncInput();
 }
 bool UFiskFrontEnd::HandleKey(const FInputKeyEventArgs& Args)
 {
     AFiskBoardingController* PC = CastChecked<AFiskBoardingController>(GetOwner());
-    if (!PC->IsLocalController()) { return false; }
+    if (!bLocalFrontEnd) { return false; }
     const FKey Key = Args.Key;
     const bool bPressed = Args.Event == IE_Pressed || Args.Event == IE_Repeat;
     if (Key == EKeys::Escape && Args.Event == IE_Pressed)
@@ -146,7 +150,7 @@ void UFiskFrontEnd::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 {
     Super::TickComponent(DeltaTime, TickType, Tick);
     UFiskGameInstance* GI = CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
-    if (!GI->ConnectionMessage.IsEmpty() && GetNetMode() == NM_Standalone)
+    if (!GI->ConnectionMessage.IsEmpty() && (GetNetMode() == NM_Standalone || Model.Page == EFiskMenuPage::Connecting))
     {
         const bool bConnecting = Model.Page == EFiskMenuPage::Connecting;
         const FString Message = GI->ConnectionMessage; GI->ConnectionMessage.Reset(); CancelConnection(Message);

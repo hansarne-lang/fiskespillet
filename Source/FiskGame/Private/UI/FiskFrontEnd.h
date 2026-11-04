@@ -27,7 +27,7 @@ private:
     TArray<FBox2D> Buttons;
     FVector2D LastMouse = FVector2D(-1, -1);
     double ConnectingAt = 0.0;
-    bool bControl = false, bShift = false, bReadyReported = false;
+    bool bControl = false, bShift = false, bReadyReported = false, bLocalFrontEnd = false;
 #if WITH_DEV_AUTOMATION_TESTS
     void RunMenuSmoke();
     void SmokeKey(FKey Key);

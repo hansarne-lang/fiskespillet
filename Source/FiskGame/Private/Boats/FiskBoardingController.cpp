@@ -5,6 +5,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "Fishing/FiskPrototypeRod.h"
 #include "Fishing/FiskCombatFeedback.h"
+#include "UI/FiskFrontEnd.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "InputCoreTypes.h"
@@ -17,8 +18,16 @@
 AFiskBoardingController::AFiskBoardingController()
 {
     Rod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("PrototypeRod"));
+    FrontEnd = CreateDefaultSubobject<UFiskFrontEnd>(TEXT("FrontEnd"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
 }
+
+bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
+{
+    if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
+    return Super::InputKey(Params);
+}
+void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); RequestStopReel(); }
 
 void AFiskBoardingController::BeginPlay()
 {

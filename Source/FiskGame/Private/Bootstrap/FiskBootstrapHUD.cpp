@@ -1,5 +1,6 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
 #include "Engine/Canvas.h"
+#include "UI/FiskFrontEnd.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Boats/FiskStarterBoat.h"
@@ -18,6 +19,14 @@ void AFiskBootstrapHUD::DrawHUD()
         return;
     }
 
+    if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
+    {
+        if (PC->GetFrontEnd() && PC->GetFrontEnd()->IsVisible())
+        {
+            PC->GetFrontEnd()->Draw(*this, *Canvas);
+            return;
+        }
+    }
     const float Left = 30.0f;
     const float Top = 24.0f;
     DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 560.0f, 455.0f);

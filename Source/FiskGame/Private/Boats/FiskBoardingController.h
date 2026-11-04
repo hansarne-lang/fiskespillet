@@ -5,6 +5,7 @@
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
+class UFiskFrontEnd;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -26,6 +27,9 @@ class AFiskBoardingController final : public APlayerController
 
 public:
     AFiskBoardingController();
+    virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
+    void ReleaseRodInputsForMenu();
+    UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
     const UFiskPrototypeRod* GetRod() const { return Rod; }
 
 protected:
@@ -64,6 +68,7 @@ private:
 
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;
+    UPROPERTY() TObjectPtr<UFiskFrontEnd> FrontEnd;
 
 #if WITH_DEV_AUTOMATION_TESTS
     void RunLanSmoke();

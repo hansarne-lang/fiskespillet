@@ -4,6 +4,7 @@
 #include "Fishing/FiskPrototypeRod.h"
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
 #include "GameFramework/HUD.h"
 #include "Kismet/GameplayStatics.h"
@@ -119,7 +120,7 @@ bool UFiskFrontEnd::HandleKey(const FInputKeyEventArgs& Args)
     else if (Key == EKeys::End) { Model.Selected = FMath::Max(0, Model.Rows() - 1); }
     else if (Key == EKeys::Enter || Key == EKeys::SpaceBar) { Dispatch(Model.Activate()); }
     else if (Key == EKeys::LeftMouseButton)
-    { float X, Y; if (PC->GetMousePosition(X, Y)) { Click(FVector2D(X, Y)); } }
+    { FVector2D Position; if (UGameViewportClient* Viewport = GetWorld()->GetGameViewport()) { if (Viewport->GetMousePosition(Position)) { Click(Position); } } }
     else if (Key == EKeys::BackSpace) { Model.Backspace(); }
     else if (Key == EKeys::A && bControl && Model.Page == EFiskMenuPage::Join && Model.Selected == 0) { Model.Address.Reset(); }
     else
@@ -163,11 +164,10 @@ void UFiskFrontEnd::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
     }
     if (IsVisible())
     {
-        APlayerController* PC = CastChecked<APlayerController>(GetOwner());
-        float X, Y;
-        if (PC->GetMousePosition(X, Y))
+        FVector2D Current;
+        UGameViewportClient* Viewport = GetWorld()->GetGameViewport();
+        if (Viewport && Viewport->GetMousePosition(Current))
         {
-            const FVector2D Current(X, Y);
             if (LastMouse.X >= 0 && FVector2D::Distance(Current, LastMouse) > 1.0f)
             { for (int32 I = 0; I < Buttons.Num(); ++I) { if (Buttons[I].IsInside(Current)) { Model.Selected = I; } } }
             LastMouse = Current;

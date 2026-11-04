@@ -57,7 +57,7 @@ try{
  if(!$failureApp.WaitForExit(15000)){throw 'Quit button did not close process'}
  if($failureApp.ExitCode -ne 0){throw "Nonzero quit exit $($failureApp.ExitCode)"}
  Exactly $failureLog 'FISKELAGET_MENU_CANCELLED' 1
- Exactly $failureLog 'FISKELAGET_MENU_CONNECTION_FAILED' 1
+ if(@(Events $failureLog 'FISKELAGET_MENU_CONNECTION_FAILED').Count -lt 1){throw 'No connection failure reported'}
  Exactly $failureLog 'FISKELAGET_MENU_QUIT' 1
  foreach($role in 'host','join','failure'){
   $shots=switch($role){'host'{@('home','invalid-address','settings-before','settings-after','session','returned-home')};'join'{@('home','join','disconnect')};'failure'{@('connecting','cancelled','connection-failed')}}

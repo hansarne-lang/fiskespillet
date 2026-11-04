@@ -108,12 +108,19 @@ void UFiskFrontEnd::RunMenuSmoke()
         }
         else if(SmokeCase==TEXT("failure"))
         {
-            if(Step==0) { SmokeSelect(1); SmokeAddress(TEXT("127.0.0.1:17784")); Step=1; SmokeSelect(1); }
-            else if(Step==1) { Capture(TEXT("connecting")); Step=11; }
-            else if(Step==11) { SmokeKey(EKeys::Escape); Step=2; }
+            if(Step==0) { SmokeSelect(1); SmokeAddress(TEXT("127.0.0.1:17784")); Step=1; SmokeSelect(1); Capture(TEXT("connecting")); }
+            else if(Step==1)
+            {
+                if (Model.Page == EFiskMenuPage::Home) { SmokeSelect(1); SmokeAddress(TEXT("127.0.0.1:17784")); SmokeSelect(1); }
+                SmokeKey(EKeys::Escape); Step=2;
+            }
             else if(Step==2)
             {
                 if(Model.Page!=EFiskMenuPage::Home || Model.Message.IsEmpty()) { Fail(TEXT("cancel_did_not_recover")); return; }
+                if (const FWorldContext* Context = GEngine->GetWorldContextFromWorld(GetWorld()))
+                {
+                    if (!Context->TravelURL.IsEmpty() || Context->PendingNetGame) { Fail(TEXT("cancel_left_pending_travel")); return; }
+                }
                 Capture(TEXT("cancelled")); Step=21;
             }
             else if(Step==21) { SmokeSelect(1); SmokeAddress(TEXT("127.0.0.1:17784")); Step=3; SmokeSelect(1); }

@@ -44,7 +44,12 @@ void UFiskFrontEnd::SyncInput()
 }
 void UFiskFrontEnd::CancelConnection(const FString& Message)
 {
-    if (GEngine) { GEngine->CancelPending(GetWorld()); }
+    if (GEngine)
+    {
+        // ClientTravel queues a URL before PendingNetGame exists. Cancel both stages.
+        if (FWorldContext* Context = GEngine->GetWorldContextFromWorld(GetWorld())) { Context->TravelURL.Reset(); }
+        GEngine->CancelPending(GetWorld());
+    }
     Model.Show(EFiskMenuPage::Home); Model.Message = Message;
     SyncInput();
 }
@@ -143,7 +148,9 @@ void UFiskFrontEnd::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
     UFiskGameInstance* GI = CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
     if (!GI->ConnectionMessage.IsEmpty() && GetNetMode() == NM_Standalone)
     {
+        const bool bConnecting = Model.Page == EFiskMenuPage::Connecting;
         const FString Message = GI->ConnectionMessage; GI->ConnectionMessage.Reset(); CancelConnection(Message);
+        if (bConnecting) { UE_LOG(LogTemp, Display, TEXT("FISKELAGET_MENU_CONNECTION_FAILED")); }
     }
     if (Model.Page == EFiskMenuPage::Connecting && FPlatformTime::Seconds() - ConnectingAt >= 15.0)
     {

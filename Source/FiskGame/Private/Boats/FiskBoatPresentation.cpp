@@ -132,6 +132,9 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
 
     if (Boat->HasAuthority()) { Boat->SetRodActivities(Activities[0], Activities[1]); }
 
+    const AFiskBoardingController* LocalPC = Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
+    const int32 LocalSeat = LocalPC && LocalPC->IsLocalController() && LocalPC->PlayerState
+        ? Boat->GetSeatIndex(LocalPC->PlayerState->GetPlayerId()) : INDEX_NONE;
     for (int32 Seat = 0; Seat < 2; ++Seat)
     {
         const float Sign = Seat == 0 ? -1.0f : 1.0f;
@@ -148,11 +151,16 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             FiskVisual::SetCylinder(RodSections[Seat * 6 + Segment], Previous, Point, 1.6f - Segment * 0.18f);
             Previous = Point;
         }
+        if (Seat == LocalSeat)
+        {
+            DrawDebugString(GetWorld(), VisualRoot->GetComponentTransform().TransformPosition(Start + FVector(0, 0, 45)),
+                TEXT("DIN STANG"), nullptr, FColor::Yellow, 0.07f, true, 0.8f);
+        }
         if (Activity > 0)
         {
             const FVector Tip = VisualRoot->GetComponentTransform().TransformPosition(End);
             const FVector WaterEnd = Boat->GetActorTransform().TransformPosition(FVector(-1600, Sign * 400, 0));
-            DrawDebugLine(GetWorld(), Tip, WaterEnd, FColor(220, 235, 225), false, 0.07f, 0, 1.0f);
+            DrawDebugLine(GetWorld(), Tip, WaterEnd, Seat == LocalSeat ? FColor(255, 225, 130) : FColor(220, 235, 225), false, 0.07f, 0, 1.0f);
         }
     }
 #if WITH_DEV_AUTOMATION_TESTS

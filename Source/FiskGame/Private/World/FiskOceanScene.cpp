@@ -47,13 +47,11 @@ AFiskOceanScene::AFiskOceanScene()
     ConstructorHelpers::FObjectFinder<UStaticMesh> SphereAsset(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
     ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderAsset(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     ConstructorHelpers::FObjectFinder<UMaterialInterface> BasicAsset(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
-    ConstructorHelpers::FObjectFinder<UMaterialInterface> WaterAsset(TEXT("/Engine/EngineMaterials/WaterMaterial.DefaultWaterMaterial"));
     Plane = PlaneAsset.Object;
     Cube = CubeAsset.Object;
     Sphere = SphereAsset.Object;
     Cylinder = CylinderAsset.Object;
     Material = BasicAsset.Object;
-    WaterMaterial = WaterAsset.Object;
 }
 
 void AFiskOceanScene::BeginPlay()
@@ -63,8 +61,9 @@ void AFiskOceanScene::BeginPlay()
     {
         return FiskVisual::AddPart(this, RootComponent, Mesh, Material, Name, Position, Scale, Color);
     };
-    UStaticMeshComponent* Water = Part(TEXT("Ocean"), Plane, FVector(10000, 0, -10), FVector(10000, 10000, 1), FLinearColor(0.01f, 0.23f, 0.34f));
-    if (WaterMaterial) { Water->SetMaterial(0, WaterMaterial); }
+    UStaticMeshComponent* Water = FiskVisual::AddPart(this, RootComponent, Plane, Material, TEXT("Ocean"),
+        FVector(10000, 0, -10), FVector(10000, 10000, 1), FLinearColor(0.01f, 0.23f, 0.34f), 0.15f);
+
     Water->SetCastShadow(false);
     Part(TEXT("Sand"), Sphere, FVector(-8000, 0, -70), FVector(140, 180, 2), FLinearColor(0.7f, 0.56f, 0.32f));
     Part(TEXT("IslandGreen"), Sphere, FVector(-12000, 0, 40), FVector(100, 140, 3), FLinearColor(0.14f, 0.29f, 0.06f));

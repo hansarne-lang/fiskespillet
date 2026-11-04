@@ -18,8 +18,20 @@ UStaticMeshComponent* FiskVisual::AddPart(AActor* Owner, USceneComponent* Parent
     if (Material)
     {
         UMaterialInstanceDynamic* Tint = UMaterialInstanceDynamic::Create(Material, Part);
-        Tint->SetVectorParameterValue(TEXT("Color"), Color);
-        Tint->SetScalarParameterValue(TEXT("Roughness"), Roughness);
+        TArray<FMaterialParameterInfo> Parameters;
+        TArray<FGuid> ParameterIds;
+        Material->GetAllVectorParameterInfo(Parameters, ParameterIds);
+        for (const FMaterialParameterInfo& Parameter : Parameters)
+        {
+            Tint->SetVectorParameterValue(Parameter.Name, Color);
+        }
+        Parameters.Reset();
+        ParameterIds.Reset();
+        Material->GetAllScalarParameterInfo(Parameters, ParameterIds);
+        for (const FMaterialParameterInfo& Parameter : Parameters)
+        {
+            Tint->SetScalarParameterValue(Parameter.Name, Roughness);
+        }
         Part->SetMaterial(0, Tint);
     }
     Part->RegisterComponent();

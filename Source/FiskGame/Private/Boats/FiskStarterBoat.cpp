@@ -13,6 +13,7 @@ namespace
 
 AFiskStarterBoat::AFiskStarterBoat()
 {
+    SetActorHiddenInGame(false);
     bReplicates = true;
     bAlwaysRelevant = true;
     SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("BoatRoot")));
@@ -20,9 +21,9 @@ AFiskStarterBoat::AFiskStarterBoat()
     UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("BoatCamera"));
     Camera->SetupAttachment(RootComponent);
 
-    const FVector CameraPosition(-1250, -1200, 800);
+    const FVector CameraPosition(-1250, -1200, 550);
     Camera->SetRelativeLocation(CameraPosition);
-    Camera->SetRelativeRotation((FVector(-100, -600, 70) - CameraPosition).Rotation());
+    Camera->SetRelativeRotation((FVector(-100, -600, 110) - CameraPosition).Rotation());
     Camera->FieldOfView = 75.0f;
     CreateDefaultSubobject<UFiskBoatPresentation>(TEXT("BoatPresentation"));
 

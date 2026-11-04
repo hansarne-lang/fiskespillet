@@ -6,6 +6,7 @@
 
 class UFiskPrototypeRod;
 class UFiskFrontEnd;
+class UFiskRigPanel;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -31,6 +32,11 @@ public:
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
     const UFiskPrototypeRod* GetRod() const { return Rod; }
+    UFiskRigPanel* GetRigPanel() const { return RigPanel; }
+    bool CanOpenRig() const;
+    void RequestRig(int32 Bait, int32 Depth, int32 Program);
+    UFUNCTION(Server, Reliable)
+    void ServerConfigureRig(FGuid ExpectedCast, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program);
 
 protected:
     virtual void SetupInputComponent() override;
@@ -69,6 +75,7 @@ private:
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;
     UPROPERTY() TObjectPtr<UFiskFrontEnd> FrontEnd;
+    UPROPERTY() TObjectPtr<UFiskRigPanel> RigPanel;
 
 #if WITH_DEV_AUTOMATION_TESTS
     void RunLanSmoke();

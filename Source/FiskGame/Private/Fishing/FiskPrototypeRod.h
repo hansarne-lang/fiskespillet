@@ -3,6 +3,7 @@
 #include "Components/ActorComponent.h"
 #include "Fishing/FiskFightModel.h"
 #include "Fishing/FiskRodCycle.h"
+#include "Fishing/FiskRigSettings.h"
 #include "FiskPrototypeRod.generated.h"
 
 UENUM()
@@ -35,6 +36,9 @@ public:
     UFiskPrototypeRod();
     bool Cast(const FGuid& ExpectedId);
     void Withdraw();
+    const FFiskRigSettings& GetRig() const { return Rig; }
+    bool CanConfigure() const;
+    bool Configure(const FGuid& ExpectedId, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program);
     bool IsCurrentCommand(const FGuid& ExpectedId) const { return Cycle.CanAct(ExpectedId); }
     FGuid GetCastId() const { return View.CastId; }
     int32 GetAvailableAtMs() const { return View.AvailableAtMs; }
@@ -60,6 +64,7 @@ public:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
     UPROPERTY(ReplicatedUsing = OnRep_View) FFiskRodView View;
+    UPROPERTY(Replicated) FFiskRigSettings Rig;
     UFUNCTION() void OnRep_View();
     void SetState(EFiskRodState NewState);
     void SyncFight();

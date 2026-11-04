@@ -25,9 +25,25 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     View.CastId = Cycle.GetId();
     CatchId.Invalidate();
     LandedAtMs = -1;
-    NextTransitionAt = Day->GetElapsedRealSeconds() + FMath::FRandRange(120.0f, 180.0f);
+    FRandomStream BiteRandom(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().B ^ Cycle.GetId().C ^ Cycle.GetId().D));
+    NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom);
     SetState(EFiskRodState::Fishing);
     SetComponentTickEnabled(true);
+    return true;
+}
+
+bool UFiskPrototypeRod::CanConfigure() const
+{
+    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+    return (View.State == EFiskRodState::Ready || View.State == EFiskRodState::Cancelled
+        || View.State == EFiskRodState::Lost || View.State == EFiskRodState::Landed)
+        && Day && Day->GetElapsedMilliseconds() >= View.AvailableAtMs;
+}
+bool UFiskPrototypeRod::Configure(const FGuid& ExpectedId, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program)
+{
+    if (!GetOwner()->HasAuthority() || !CanConfigure() || ExpectedId != View.CastId
+        || !FFiskRigRules::TryApply(Rig, ExpectedRevision, Bait, Depth, Program)) { return false; }
+    GetOwner()->ForceNetUpdate();
     return true;
 }
 
@@ -165,6 +181,7 @@ void UFiskPrototypeRod::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME_CONDITION(UFiskPrototypeRod, View, COND_OwnerOnly);
+    DOREPLIFETIME_CONDITION(UFiskPrototypeRod, Rig, COND_OwnerOnly);
 }
 void UFiskPrototypeRod::SetState(EFiskRodState NewState)
 {

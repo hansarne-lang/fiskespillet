@@ -6,6 +6,7 @@
 #include "Fishing/FiskPrototypeRod.h"
 #include "Fishing/FiskCombatFeedback.h"
 #include "UI/FiskFrontEnd.h"
+#include "UI/FiskRigPanel.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "InputCoreTypes.h"
@@ -19,11 +20,13 @@ AFiskBoardingController::AFiskBoardingController()
 {
     Rod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("PrototypeRod"));
     FrontEnd = CreateDefaultSubobject<UFiskFrontEnd>(TEXT("FrontEnd"));
+    RigPanel = CreateDefaultSubobject<UFiskRigPanel>(TEXT("RigPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
+    if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
     return Super::InputKey(Params);
 }
@@ -84,6 +87,28 @@ void AFiskBoardingController::ServerStartBoatTrip_Implementation()
     {
         Mode->GetStarterBoat()->StartTrip(PlayerState->GetPlayerId());
     }
+}
+
+bool AFiskBoardingController::CanOpenRig() const
+{
+    const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
+    if (!PlayerState || !Day || !Day->HasStarted() || Day->GetElapsedSeconds() >= AFiskDayState::SettlementStart || !Rod->CanConfigure()) { return false; }
+    for (TActorIterator<AFiskStarterBoat> Boat(GetWorld()); Boat; ++Boat)
+    {
+        if (Boat->IsAboard(PlayerState->GetPlayerId()) && Boat->GetTripProgress() <= AFiskStarterBoat::AtFishingSpot) { return true; }
+    }
+    return false;
+}
+void AFiskBoardingController::RequestRig(int32 Bait, int32 Depth, int32 Program)
+{
+    ServerConfigureRig(Rod->GetCastId(), Rod->GetRig().Revision, Bait, Depth, Program);
+}
+void AFiskBoardingController::ServerConfigureRig_Implementation(FGuid ExpectedCast, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program)
+{
+    const bool bAccepted = CanOpenRig() && Rod->Configure(ExpectedCast, ExpectedRevision, Bait, Depth, Program);
+    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_RIG_%s player=%d revision=%d bait=%d depth=%d program=%d"),
+        bAccepted ? TEXT("ACCEPTED") : TEXT("REJECTED"), PlayerState ? PlayerState->GetPlayerId() : INDEX_NONE,
+        Rod->GetRig().Revision, Rod->GetRig().Bait, Rod->GetRig().Depth, Rod->GetRig().Program);
 }
 
 void AFiskBoardingController::RequestCast()

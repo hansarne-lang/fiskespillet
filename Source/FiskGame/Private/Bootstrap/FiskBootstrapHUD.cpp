@@ -1,6 +1,7 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
 #include "Engine/Canvas.h"
 #include "UI/FiskFrontEnd.h"
+#include "UI/FiskRigPanel.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Boats/FiskStarterBoat.h"
@@ -21,6 +22,11 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if (PC->GetRigPanel() && PC->GetRigPanel()->IsVisible())
+        {
+            PC->GetRigPanel()->Draw(*this, *Canvas);
+            return;
+        }
         if (PC->GetFrontEnd() && PC->GetFrontEnd()->IsVisible())
         {
             PC->GetFrontEnd()->Draw(*this, *Canvas);
@@ -88,6 +94,12 @@ void AFiskBootstrapHUD::DrawHUD()
         DrawText(Route, FLinearColor::White, Left, Top + 185.0f);
     }
 
+    if (const AFiskBoardingController* RigOwner = Cast<AFiskBoardingController>(GetOwningPlayerController()))
+    {
+        const FFiskRigSettings& Rig=RigOwner->GetRod()->GetRig();
+        DrawText(FString::Printf(TEXT("%s / %d m / %s"),FFiskRigRules::BaitName(Rig.Bait),Rig.Depth,FFiskRigRules::ProgramName(Rig.Program)),FLinearColor::White,Left,Top+430.0f,nullptr,0.95f);
+        if (RigOwner->CanOpenRig()) { DrawText(TEXT("G: Velg agn, dybde og program"),FLinearColor(0.5f,0.95f,0.8f),Left,Top+380.0f); }
+    }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (Day == nullptr)
     {

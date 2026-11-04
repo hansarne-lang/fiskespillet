@@ -3,6 +3,13 @@
 #include "Boats/FiskBoardingController.h"
 #include "Camera/CameraComponent.h"
 #include "HAL/PlatformTime.h"
+#if WITH_DEV_AUTOMATION_TESTS
+#include "HAL/FileManager.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "Misc/Paths.h"
+#include "UnrealClient.h"
+#endif
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "DayCycle/FiskDayState.h"
@@ -33,6 +40,13 @@ void UFiskBoatPresentation::BeginPlay()
 {
     Super::BeginPlay();
     AActor* Boat = GetOwner();
+#if WITH_DEV_AUTOMATION_TESTS
+    FParse::Value(FCommandLine::Get(), TEXT("FiskScreenshotDir="), ScreenshotDirectory);
+    if (!ScreenshotDirectory.IsEmpty())
+    {
+        IFileManager::Get().MakeDirectory(*ScreenshotDirectory, true);
+    }
+#endif
     VisualRoot = NewObject<USceneComponent>(Boat, TEXT("BoatVisualRoot"));
     Boat->AddInstanceComponent(VisualRoot);
     VisualRoot->SetupAttachment(Boat->GetRootComponent());
@@ -141,6 +155,9 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             DrawDebugLine(GetWorld(), Tip, WaterEnd, FColor(220, 235, 225), false, 0.07f, 0, 1.0f);
         }
     }
+#if WITH_DEV_AUTOMATION_TESTS
+    CaptureTestStage();
+#endif
     for (int32 Index = 0; Index < Wake.Num(); ++Index)
     {
         const int32 Step = Index / 2;
@@ -150,3 +167,30 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
         Wake[Index]->SetRelativeScale3D(FVector(2.0 + Step * 0.4, 0.25 + Step * 0.12, 0.035));
     }
 }
+
+#if WITH_DEV_AUTOMATION_TESTS
+void UFiskBoatPresentation::CaptureTestStage()
+{
+    if (ScreenshotDirectory.IsEmpty() || FScreenshotRequest::IsScreenshotRequested()) { return; }
+    const AFiskStarterBoat* Boat = CastChecked<AFiskStarterBoat>(GetOwner());
+    const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
+    if (!PC || !PC->IsLocalController() || PC->GetViewTarget() != Boat) { return; }
+    const int32 Progress = Boat->GetTripProgress();
+    int32 Stage = INDEX_NONE;
+    if (Progress == AFiskStarterBoat::AtDock && Boat->GetCrewCount() == 2) { Stage = 0; }
+    else if (Progress >= 0 && Progress < AFiskStarterBoat::AtFishingSpot) { Stage = 1; }
+    else if (Progress == AFiskStarterBoat::AtFishingSpot)
+    {
+        if (PC->GetRod()->GetState() == EFiskRodState::Fishing) { Stage = 2; }
+        else if (PC->GetRod()->GetState() == EFiskRodState::Fighting) { Stage = 3; }
+    }
+    else if (Progress > AFiskStarterBoat::AtFishingSpot && Progress < AFiskStarterBoat::AtMarina) { Stage = 4; }
+    else if (Progress == AFiskStarterBoat::AtMarina) { Stage = 5; }
+    if (Stage != INDEX_NONE && !CapturedStages.Contains(Stage))
+    {
+        CapturedStages.Add(Stage);
+        const FString File = FPaths::Combine(ScreenshotDirectory, FString::Printf(TEXT("stage-%d.png"), Stage));
+        FScreenshotRequest::RequestScreenshot(File, false, false);
+    }
+}
+#endif

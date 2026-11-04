@@ -26,4 +26,9 @@ private:
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> RodSections;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Wake;
     FVector SmoothedWorldPosition = FVector::ZeroVector;
+#if WITH_DEV_AUTOMATION_TESTS
+    FString ScreenshotDirectory;
+    TSet<int32> CapturedStages;
+    void CaptureTestStage();
+#endif
 };

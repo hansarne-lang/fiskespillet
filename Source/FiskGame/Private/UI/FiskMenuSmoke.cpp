@@ -71,7 +71,7 @@ void UFiskFrontEnd::RunMenuSmoke()
             return;
         }
         TActorIterator<AFiskStarterBoat> Boats(GetWorld());
-        const AGameModeBase* Mode=GetWorld()->GetAuthGameMode();
+        AGameModeBase* Mode=GetWorld()->GetAuthGameMode();
         if(!Day || !Boats || !PC->PlayerState || !Mode) { return; }
         if(Mode->GetNumPlayers()!=1) { Fail(TEXT("solo_requires_exactly_one_test_player"));return; }
         AFiskStarterBoat* Boat=*Boats;

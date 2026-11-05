@@ -12,7 +12,7 @@
 #include "GameFramework/HUD.h"
 #include "GameFramework/PlayerState.h"
 
-namespace
+namespace FiskDeckStyle
 {
 const FLinearColor Ink(0.012f,0.045f,0.06f,0.94f),Teal(0.45f,0.94f,0.82f),Muted(0.64f,0.81f,0.85f),Gold(1,0.79f,0.36f);
 FString Who(int32 Player,int32 Self) { return Player==Self?TEXT("Deg"):FString::Printf(TEXT("Spiller %d"),Player); }
@@ -37,6 +37,7 @@ bool UFiskDeckPanel::HandleKey(const FInputKeyEventArgs& Args)
 }
 void UFiskDeckPanel::Draw(AHUD& HUD,UCanvas& Canvas)
 {
+    using namespace FiskDeckStyle;
     const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
     const AFiskStarterBoat* Boat=PC->FindStarterBoat();
@@ -117,6 +118,7 @@ void UFiskDeckPanel::Draw(AHUD& HUD,UCanvas& Canvas)
 }
 void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& PC)
 {
+    using namespace FiskDeckStyle;
     const float S=FMath::Min(Canvas.ClipX/1280.f,Canvas.ClipY/720.f);
     auto Text=[&](const FString& T,float X,float Y,float Size=1.0f,FLinearColor C=FLinearColor::White){HUD.DrawText(T,C,X*S,Y*S,nullptr,Size*S);};
     auto Rect=[&](float X,float Y,float W,float H,FLinearColor C=Ink){HUD.DrawRect(C,X*S,Y*S,W*S,H*S);};

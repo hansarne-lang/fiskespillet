@@ -479,7 +479,7 @@ void AFiskBoardingController::RequestRodSelection(int32 Slot)
 {
     if(PendingRod>=0) { ClientActionFeedback_Implementation(TEXT("Vent på vertens stangbekreftelse."));return; }
     if(Slot<0 || Slot>=GetRodCapacity())
-    { ClientActionFeedback_Implementation(TEXT("Startbåten har to plasser: to stenger alene, én hver med to spillere."));return; }
+    { ClientActionFeedback_Implementation(TEXT("Denne stangen er ikke tilgjengelig. Se dine egne stangplasser i oversikten."));return; }
     ReleaseRodInputsForMenu();PendingRod=Slot;ServerSelectRod(Selection.Revision,Selection.Day,Slot);
 }
 void AFiskBoardingController::ServerSelectRod_Implementation(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot)

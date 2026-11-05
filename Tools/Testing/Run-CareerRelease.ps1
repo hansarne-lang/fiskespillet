@@ -93,6 +93,7 @@ try{
   Check-Shots $role @('career-new','career-owned','offshore-ready','passive-rods','offshore-landed','offshore-home','career-before17','career-after17','career-day2')
  }
  if((($allocations | Sort-Object) -join ',') -ne '1,1,2,2'){throw 'Wrong six-holder distribution'}
+ Check-Shots 'host' @('offshore-crew','free-sea-route')
  $cash=Career-Cash 'guest3-profile';$prior=@(Get-Content -LiteralPath $hostLog).Count
  Stop-Case $apps.guest3
  $until=(Get-Date).AddSeconds(90);$left=$false

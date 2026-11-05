@@ -110,8 +110,11 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     else if(CareerSmokeStage==12 && GetSelectedRod()==0 && !IsRodSelectionPending())
     {
         if(Solo && GetRodAt(2)->GetRig().Depth!=50) { return; }
-        ServerSelectRod(Selection.Revision,Selection.Day,3);Shot(TEXT("offshore-ready"));CareerSmokeStage=13;
+        ServerSelectRod(Selection.Revision,Selection.Day,3);Shot(TEXT("offshore-ready"));CareerSmokeStage=120;
     }
+    else if(CareerSmokeStage==120)
+    { if(Host && !Solo) { Key(EKeys::K);Shot(TEXT("offshore-crew"));CareerSmokeStage=121; }else { CareerSmokeStage=13; } }
+    else if(CareerSmokeStage==121) { Key(EKeys::K);CareerSmokeStage=13; }
     else if(CareerSmokeStage==13)
     { if(Host && Progress==-1 && Now>=120) { Key(EKeys::R); }if(Progress==100) { Key(EKeys::F);CareerSmokeStage=14; } }
     else if(CareerSmokeStage==14 && First->GetState()==EFiskRodState::Fishing)

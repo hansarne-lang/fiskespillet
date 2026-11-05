@@ -101,18 +101,18 @@ void UFiskCrewPanel::Draw(AHUD& HUD,UCanvas& Canvas)
     Buttons.Reset();
     for(int32 I=0;I<=Boat->GetCrewCount();++I)
     {
-        const float Y=(230+82*I)*S;Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(646*S,Y+62*S)));
-        HUD.DrawRect(Row==I?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,594*S,62*S);
+        const float Y=(210+64*I)*S;Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(646*S,Y+54*S)));
+        HUD.DrawRect(Row==I?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,594*S,54*S);
         FString Label=TEXT("Tilbake");
         if(I<Boat->GetCrewCount())
         {
             const int32 Id=Boat->GetCrewMemberId(I);const bool Captain=Id==Boat->GetCaptainId();
-            Label=FString::Printf(TEXT("%s  -  %s"),Id==Self?TEXT("Deg"):TEXT("Medspiller"),Captain?TEXT("KAPTEIN"):TEXT("Fisker"));
+            Label=FString::Printf(TEXT("%s #%d  -  %s"),Id==Self?TEXT("Deg"):TEXT("Medspiller"),Id,Captain?TEXT("KAPTEIN"):TEXT("Fisker"));
             if(!Captain && Boat->GetCaptainId()==Self) { Label+=TEXT("  |  Gi kapteinsrollen"); }
         }
-        HUD.DrawText(Label,FLinearColor::White,70*S,Y+20*S,nullptr,1.15f*S);
+        HUD.DrawText(Label,FLinearColor::White,70*S,Y+17*S,nullptr,1.1f*S);
     }
-    if(!Message.IsEmpty()) { HUD.DrawText(Message,FLinearColor(1,0.85f,0.5f),52*S,520*S,nullptr,0.9f*S); }
-    HUD.DrawText(TEXT("Piler: velg. Klikk eller Enter: overfør rollen."),Muted,52*S,570*S,nullptr,1.0f*S);
-    HUD.DrawText(TEXT("K / Escape: lukk. Reisen fortsetter ved bytte."),Muted,52*S,607*S,nullptr,1.0f*S);
+    if(!Message.IsEmpty()) { HUD.DrawText(Message,FLinearColor(1,0.85f,0.5f),52*S,543*S,nullptr,0.85f*S); }
+    HUD.DrawText(TEXT("Piler: velg. Klikk eller Enter: overfør rollen."),Muted,52*S,584*S,nullptr,1.0f*S);
+    HUD.DrawText(TEXT("K / Escape: lukk. Reisen fortsetter ved bytte."),Muted,52*S,621*S,nullptr,1.0f*S);
 }

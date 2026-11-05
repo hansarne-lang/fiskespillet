@@ -71,7 +71,8 @@ bool FFiskJournalAtomicTest::RunTest(const FString& Parameters)
     Batch.Catches.Add(Bad);Batch.DeliveredFish=2;Batch.DeliveredWeightGrams=4000;Batch.SessionBalance=20;
     TestTrue(TEXT("Invalid member rejects whole batch"),Journal.Apply(FGuid::NewGuid(),1,1020000,true,Batch)==EFiskJournalApply::Rejected);
     TestTrue(TEXT("No partial update"),Journal.GetEntries().IsEmpty());
-    FFiskDayResult Duplicate=Receipt();Duplicate.Catches.Add(Duplicate.Catches[0]);Duplicate.DeliveredFish=2;Duplicate.DeliveredWeightGrams=4000;Duplicate.SessionBalance=20;
+    FFiskDayResult Duplicate=Receipt();const FFiskCatchResult Repeated=Duplicate.Catches[0];Duplicate.Catches.Add(Repeated);
+    Duplicate.DeliveredFish=2;Duplicate.DeliveredWeightGrams=4000;Duplicate.SessionBalance=20;
     TestTrue(TEXT("Duplicate inside receipt rejected"),Journal.Apply(FGuid::NewGuid(),1,1020000,true,Duplicate)==EFiskJournalApply::Rejected);
     TArray<FFiskJournalEntry> Full;Full.Reserve(FFiskJournalModel::Capacity);
     for(int32 I=0;I<FFiskJournalModel::Capacity;++I)

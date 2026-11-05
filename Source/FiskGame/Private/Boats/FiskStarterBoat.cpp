@@ -2,12 +2,26 @@
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Boats/FiskBoatPresentation.h"
+#include "Boats/FiskBoardingController.h"
 #include "Fishing/FiskFishPresentation.h"
 #include "DayCycle/FiskDayState.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 
 #include "FiskFishingGround.h"
+
+void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
+{
+    Super::CalcCamera(DeltaTime,OutResult);
+    const AFiskBoardingController* PC=GetWorld()?Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController()):nullptr;
+    if(!PC || !PC->IsLocalController()) { return; }
+    const int32 View=PC->GetCameraView();
+    const FVector Eye=View==2?FVector(-1500,0,780):FVector(-1250,View==1?1200:-1200,550);
+    const FVector Focus=View==2?FVector(-120,0,100):FVector(-100,View==1?600:-600,110);
+    OutResult.Location=GetActorTransform().TransformPosition(Eye);
+    OutResult.Rotation=(GetActorTransform().TransformPosition(Focus)-OutResult.Location).Rotation();
+    OutResult.FOV=View==2?70.0f:75.0f;
+}
 
 AFiskStarterBoat::AFiskStarterBoat()
 {

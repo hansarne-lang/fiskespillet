@@ -28,6 +28,8 @@
 AFiskBoardingController::AFiskBoardingController()
 {
     Rod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("PrototypeRod"));
+    ExtraRod = CreateDefaultSubobject<UFiskPrototypeRod>(TEXT("ExtraRod"));
+    ExtraRod->SetSlot(1);
     FrontEnd = CreateDefaultSubobject<UFiskFrontEnd>(TEXT("FrontEnd"));
     RigPanel = CreateDefaultSubobject<UFiskRigPanel>(TEXT("RigPanel"));
     SeaChart = CreateDefaultSubobject<UFiskSeaChart>(TEXT("SeaChart"));
@@ -87,6 +89,14 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
+    if(Press && (Params.Key==EKeys::One || Params.Key==EKeys::Two))
+    { RequestRodSelection(Params.Key==EKeys::One?0:1);return true; }
+    if(Press && Params.Key==EKeys::C)
+    {
+        if(PlayerState && FindStarterBoat() && FindStarterBoat()->IsAboard(PlayerState->GetPlayerId()))
+        { CameraView=(CameraView+1)%3;ClientActionFeedback_Implementation(FString::Printf(TEXT("Kamera: %s"),CameraView==0?TEXT("Babord"):CameraView==1?TEXT("Styrbord"):TEXT("Oversikt"))); }
+        return true;
+    }
     return Super::InputKey(Params);
 }
 void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); RequestStopReel(); }
@@ -96,6 +106,11 @@ void AFiskBoardingController::BeginPlay()
     Super::BeginPlay();
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFishingReleaseSmoke="),FishingReleaseMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FishingReleaseCapture);
+        GetWorldTimerManager().SetTimer(FishingReleaseTimer,this,&AFiskBoardingController::RunFishingReleaseSmoke,0.5f,true,2.0f);
+    }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskNavigationSmoke="),NavigationMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),NavigationCaptureDir);
@@ -203,6 +218,9 @@ void AFiskBoardingController::ServerTransferCaptain_Implementation(int32 Expecte
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const bool bAccepted=Mode && Mode->GetStarterBoat() && PlayerState
         && Mode->GetStarterBoat()->TransferCaptain(PlayerState->GetPlayerId(),ExpectedRevision,Target);
+#if WITH_DEV_AUTOMATION_TESTS
+    if(!bAccepted) { ++RejectedCaptainRequests; }
+#endif
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRANSFER_%s player=%d target=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,Target);
     ClientCaptainReply(bAccepted);
 }
@@ -227,7 +245,7 @@ void AFiskBoardingController::ClientGroundReply_Implementation(const FString& Me
 bool AFiskBoardingController::CanOpenRig() const
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    if (!PlayerState || !Day || !Day->HasStarted() || Day->GetElapsedSeconds() >= AFiskDayState::SettlementStart || !Rod->CanConfigure()) { return false; }
+    if (!PlayerState || !Day || !Day->HasStarted() || Day->GetElapsedSeconds() >= AFiskDayState::SettlementStart || Selection.Slot>=GetRodCapacity() || PendingRod>=0 || !MutableRod()->CanConfigure()) { return false; }
     for (TActorIterator<AFiskStarterBoat> Boat(GetWorld()); Boat; ++Boat)
     {
         if (Boat->IsAboard(PlayerState->GetPlayerId()) && Boat->GetTripProgress() <= AFiskStarterBoat::AtFishingSpot) { return true; }
@@ -236,30 +254,35 @@ bool AFiskBoardingController::CanOpenRig() const
 }
 void AFiskBoardingController::RequestRig(int32 Bait, int32 Depth, int32 Program)
 {
-    ServerConfigureRig(Rod->GetCastId(), Rod->GetRig().Revision, Bait, Depth, Program);
+    ServerConfigureRig(MutableRod()->GetCastId(), MutableRod()->GetRig().Revision, Bait, Depth, Program);
 }
-void AFiskBoardingController::ServerConfigureRig_Implementation(FGuid ExpectedCast, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program)
+void AFiskBoardingController::ServerConfigureRig(FGuid ExpectedCast,int32 ExpectedRevision,int32 Bait,int32 Depth,int32 Program)
+{ ServerConfigureSelectedRod(Selection,ExpectedCast,ExpectedRevision,Bait,Depth,Program); }
+void AFiskBoardingController::ServerConfigureSelectedRod_Implementation(FFiskRodSelection Expected,FGuid ExpectedCast,int32 ExpectedRevision,int32 Bait,int32 Depth,int32 Program)
 {
-    const bool bAccepted = CanOpenRig() && Rod->Configure(ExpectedCast, ExpectedRevision, Bait, Depth, Program);
+    const bool bAccepted = Selection.Matches(Expected) && CanOpenRig() && MutableRod()->Configure(ExpectedCast, ExpectedRevision, Bait, Depth, Program);
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_RIG_%s player=%d revision=%d bait=%d depth=%d program=%d"),
         bAccepted ? TEXT("ACCEPTED") : TEXT("REJECTED"), PlayerState ? PlayerState->GetPlayerId() : INDEX_NONE,
-        Rod->GetRig().Revision, Rod->GetRig().Bait, Rod->GetRig().Depth, Rod->GetRig().Program);
+        MutableRod()->GetRig().Revision, MutableRod()->GetRig().Bait, MutableRod()->GetRig().Depth, MutableRod()->GetRig().Program);
     ClientRigReply(bAccepted);
 }
 
 void AFiskBoardingController::RequestCast()
 {
-    ServerCastRod(Rod->GetCastId());
+    ServerCastRod(MutableRod()->GetCastId());
 }
 
-void AFiskBoardingController::ServerCastRod_Implementation(FGuid ExpectedId)
+void AFiskBoardingController::ServerCastRod(FGuid ExpectedId) { ServerCastSelectedRod(Selection,ExpectedId); }
+void AFiskBoardingController::ServerCastSelectedRod_Implementation(FFiskRodSelection Expected,FGuid ExpectedId)
 {
-    if (CanUseRod())
+    if(!Selection.Matches(Expected) || !CanUseRod())
+    { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MULTI_ROD_REJECTED command=cast player=%d"),PlayerState?PlayerState->GetPlayerId():-1);return; }
+    if (Selection.Matches(Expected) && CanUseRod())
     {
-        if (!Rod->Cast(ExpectedId))
+        if (!MutableRod()->Cast(ExpectedId))
         {
             UE_LOG(LogTemp, Display, TEXT("FISKELAGET_CAST_REJECTED player=%d expected=%s current=%s"),
-                PlayerState->GetPlayerId(), *ExpectedId.ToString(EGuidFormats::Digits), *Rod->GetCastId().ToString(EGuidFormats::Digits));
+                PlayerState->GetPlayerId(), *ExpectedId.ToString(EGuidFormats::Digits), *MutableRod()->GetCastId().ToString(EGuidFormats::Digits));
         }
     }
 }
@@ -269,68 +292,71 @@ bool AFiskBoardingController::CanUseRod() const
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskStarterBoat* Boat = Mode ? Mode->GetStarterBoat() : nullptr;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    return Boat && PlayerState && Boat->IsAboard(PlayerState->GetPlayerId())
+    return Selection.Slot<GetRodCapacity() && Boat && PlayerState && Boat->IsAboard(PlayerState->GetPlayerId())
         && Boat->GetTripProgress() == AFiskStarterBoat::AtFishingSpot
         && Day && AFiskDayState::GetPhase(Day->GetElapsedSeconds()) == EFiskDayPhase::FishingAndReturn;
 }
 
 void AFiskBoardingController::RequestLift()
 {
-    ServerActOnRod(EFiskRodAction::Lift, Rod->GetCastId());
+    ServerActOnRod(EFiskRodAction::Lift, MutableRod()->GetCastId());
 }
 
 void AFiskBoardingController::RequestLower()
 {
-    ServerActOnRod(EFiskRodAction::Lower, Rod->GetCastId());
+    ServerActOnRod(EFiskRodAction::Lower, MutableRod()->GetCastId());
 }
 
 void AFiskBoardingController::RequestReel()
 {
-    ServerActOnRod(EFiskRodAction::Reel, Rod->GetCastId());
+    ServerActOnRod(EFiskRodAction::Reel, MutableRod()->GetCastId());
 }
 
-void AFiskBoardingController::RequestStopReel() { ServerActOnRod(EFiskRodAction::StopReel, Rod->GetCastId()); }
-void AFiskBoardingController::RequestDragUp() { ServerActOnRod(EFiskRodAction::DragUp, Rod->GetCastId()); }
-void AFiskBoardingController::RequestDragDown() { ServerActOnRod(EFiskRodAction::DragDown, Rod->GetCastId()); }
+void AFiskBoardingController::RequestStopReel() { ServerActOnRod(EFiskRodAction::StopReel, MutableRod()->GetCastId()); }
+void AFiskBoardingController::RequestDragUp() { ServerActOnRod(EFiskRodAction::DragUp, MutableRod()->GetCastId()); }
+void AFiskBoardingController::RequestDragDown() { ServerActOnRod(EFiskRodAction::DragDown, MutableRod()->GetCastId()); }
 
-void AFiskBoardingController::RequestWithdraw() { ServerActOnRod(EFiskRodAction::Withdraw, Rod->GetCastId()); }
+void AFiskBoardingController::RequestWithdraw() { ServerActOnRod(EFiskRodAction::Withdraw, MutableRod()->GetCastId()); }
 
 void AFiskBoardingController::RequestLand()
 {
-    ServerActOnRod(EFiskRodAction::Land, Rod->GetCastId());
+    ServerActOnRod(EFiskRodAction::Land, MutableRod()->GetCastId());
 }
 
-void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Action, FGuid ExpectedId)
+void AFiskBoardingController::ServerActOnRod(EFiskRodAction Action,FGuid ExpectedId)
+{ ServerActOnSelectedRod(Action,Selection,ExpectedId); }
+void AFiskBoardingController::ServerActOnSelectedRod_Implementation(EFiskRodAction Action,FFiskRodSelection Expected,FGuid ExpectedId)
 {
-    if (!CanUseRod())
+    if (!Selection.Matches(Expected) || !CanUseRod())
     {
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MULTI_ROD_REJECTED command=action player=%d"),PlayerState?PlayerState->GetPlayerId():-1);
         return;
     }
 
-    if (!Rod->IsCurrentCommand(ExpectedId))
+    if (!MutableRod()->IsCurrentCommand(ExpectedId))
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_COMMAND_REJECTED player=%d action=%d expected=%s current=%s"),
             PlayerState->GetPlayerId(), static_cast<int32>(Action), *ExpectedId.ToString(EGuidFormats::Digits),
-            *Rod->GetCastId().ToString(EGuidFormats::Digits));
+            *MutableRod()->GetCastId().ToString(EGuidFormats::Digits));
         return;
     }
     switch (Action)
     {
     case EFiskRodAction::Lift:
-        Rod->Lift();
+        MutableRod()->Lift();
         break;
     case EFiskRodAction::Lower:
-        Rod->Lower();
+        MutableRod()->Lower();
         break;
     case EFiskRodAction::Reel:
-        Rod->Reel();
+        MutableRod()->Reel();
         break;
-    case EFiskRodAction::StopReel: Rod->StopReel(); break;
-    case EFiskRodAction::DragUp: Rod->AdjustDrag(1); break;
-    case EFiskRodAction::DragDown: Rod->AdjustDrag(-1); break;
-    case EFiskRodAction::Withdraw: Rod->Withdraw(); break;
+    case EFiskRodAction::StopReel: MutableRod()->StopReel(); break;
+    case EFiskRodAction::DragUp: MutableRod()->AdjustDrag(1); break;
+    case EFiskRodAction::DragDown: MutableRod()->AdjustDrag(-1); break;
+    case EFiskRodAction::Withdraw: MutableRod()->Withdraw(); break;
     case EFiskRodAction::Land:
-        Rod->Land();
+        MutableRod()->Land();
         break;
     }
 }
@@ -339,6 +365,7 @@ void AFiskBoardingController::ServerActOnRod_Implementation(EFiskRodAction Actio
 void AFiskBoardingController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
+    if(HasAuthority()) { ReconcileRodCapacity(); }
 
     if (!IsLocalController() || !PlayerState) { return; }
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
@@ -401,7 +428,14 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
     }
 }
 
-void AFiskBoardingController::ResetRodForDay() { Rod->ResetForDay(); }
+void AFiskBoardingController::ResetRodForDay(int32 NewDay)
+{
+    if(!HasAuthority()) { return; }
+    Rod->ResetForDay();ExtraRod->ResetForDay();
+    const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+    Selection.Reset(NewDay>0?NewDay:Day?Day->GetDayNumber():1);
+    ClientRodSelection(true,Selection);
+}
 void AFiskBoardingController::ServerNextDay_Implementation(int32 ExpectedDay)
 {
     AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
@@ -409,4 +443,42 @@ void AFiskBoardingController::ServerNextDay_Implementation(int32 ExpectedDay)
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_NEXT_DAY_%s player=%d expected=%d"),Accepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,ExpectedDay);
     ClientActionFeedback(Accepted?TEXT("Ny fiskedag! Mannskap, fiskeplass og oppsett er beholdt. Avreise fra 02:00.")
         :TEXT("Bare verten kan starte neste dag, etter 20:00 og ferdig oppgjør. Oppdaterte dagsdata kreves."));
+}
+
+int32 AFiskBoardingController::GetRodCapacity() const
+{
+    const AFiskStarterBoat* Boat=FindStarterBoat();
+    return Boat && PlayerState && Boat->IsAboard(PlayerState->GetPlayerId())?FFiskRodSelection::Capacity(Boat->GetCrewCount()):0;
+}
+void AFiskBoardingController::RequestRodSelection(int32 Slot)
+{
+    if(PendingRod>=0) { ClientActionFeedback_Implementation(TEXT("Vent på vertens stangbekreftelse."));return; }
+    if(Slot<0 || Slot>=GetRodCapacity())
+    { ClientActionFeedback_Implementation(TEXT("Startbåten har to plasser: to stenger alene, én hver med to spillere."));return; }
+    ReleaseRodInputsForMenu();PendingRod=Slot;ServerSelectRod(Selection.Revision,Selection.Day,Slot);
+}
+void AFiskBoardingController::ServerSelectRod_Implementation(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot)
+{
+    const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+    const bool Allowed=Day && ExpectedDay==Day->GetDayNumber() && Selection.Select(ExpectedRevision,ExpectedDay,Slot,GetRodCapacity());
+    if(Allowed)
+    {
+        Rod->Lower();Rod->StopReel();ExtraRod->Lower();ExtraRod->StopReel();
+    }
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_ROD_SELECTION_%s player=%d slot=%d revision=%d"),Allowed?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():-1,Slot,Selection.Revision);
+    ClientRodSelection(Allowed,Selection);
+}
+void AFiskBoardingController::ClientRodSelection_Implementation(bool bAccepted,FFiskRodSelection Snapshot)
+{
+    if(Snapshot.Revision<Selection.Revision) { return; }
+    Selection=Snapshot;PendingRod=-1;
+    if(!bAccepted) { ClientActionFeedback_Implementation(TEXT("Stangvalget ble avvist. Les oppdatert båtstatus og prøv igjen.")); }
+}
+void AFiskBoardingController::ReconcileRodCapacity()
+{
+    if(Selection.Slot>=GetRodCapacity() && Selection.Slot!=0)
+    {
+        ExtraRod->Lower();ExtraRod->StopReel();ExtraRod->Withdraw();
+        Selection.Reset(Selection.Day);ClientRodSelection(true,Selection);
+    }
 }

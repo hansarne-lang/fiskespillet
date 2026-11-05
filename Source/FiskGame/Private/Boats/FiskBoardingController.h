@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Fishing/FiskRodSelection.h"
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
@@ -36,7 +37,18 @@ public:
     virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
-    const UFiskPrototypeRod* GetRod() const { return Rod; }
+    const UFiskPrototypeRod* GetRod() const { return Selection.Slot==1?ExtraRod:Rod; }
+    const UFiskPrototypeRod* GetRodAt(int32 Slot) const { return Slot==0?Rod.Get():Slot==1?ExtraRod.Get():nullptr; }
+    int32 GetRodCapacity() const;
+    int32 GetSelectedRod() const { return Selection.Slot; }
+    bool IsRodSelectionPending() const { return PendingRod>=0; }
+    int32 GetCameraView() const { return CameraView; }
+#if WITH_DEV_AUTOMATION_TESTS
+    int32 GetRejectedCaptainRequests() const { return RejectedCaptainRequests; }
+#endif
+    void RequestRodSelection(int32 Slot);
+    UFUNCTION(Server,Reliable) void ServerSelectRod(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot);
+    UFUNCTION(Client,Reliable) void ClientRodSelection(bool bAccepted,FFiskRodSelection Snapshot);
     UFiskRigPanel* GetRigPanel() const { return RigPanel; }
     UFiskSeaChart* GetSeaChart() const { return SeaChart; }
     UFiskCrewPanel* GetCrewPanel() const { return CrewPanel; }
@@ -45,7 +57,7 @@ public:
     bool IsHelpVisible() const { return bHelpVisible; }
     bool IsResultsVisible() const { return bResultsVisible; }
     bool IsHistoryVisible() const { return bHistoryVisible; }
-    void ResetRodForDay();
+    void ResetRodForDay(int32 NewDay=0);
     UFUNCTION(Server,Reliable) void ServerNextDay(int32 ExpectedDay);
     int32 GetResultPage() const { return ResultPage; }
     FString GetActionFeedback() const;
@@ -59,8 +71,8 @@ public:
     UFUNCTION(Client,Reliable) void ClientGroundReply(const FString& Message);
     bool CanOpenRig() const;
     void RequestRig(int32 Bait, int32 Depth, int32 Program);
-    UFUNCTION(Server, Reliable)
     void ServerConfigureRig(FGuid ExpectedCast, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program);
+    UFUNCTION(Server,Reliable) void ServerConfigureSelectedRod(FFiskRodSelection Expected,FGuid ExpectedCast,int32 ExpectedRevision,int32 Bait,int32 Depth,int32 Program);
 
 protected:
     virtual void SetupInputComponent() override;
@@ -68,6 +80,10 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    FFiskRodSelection Selection;
+    int32 PendingRod=-1,CameraView=0;
+    void ReconcileRodCapacity();
+    UFiskPrototypeRod* MutableRod() const { return Selection.Slot==1?ExtraRod:Rod; }
     bool bHelpVisible=false,bResultsVisible=false,bHistoryVisible=false,bAutoResultsSeen=false;
     int32 ObservedDay=0, ReturnWarningLevel=0;
     int32 ResultPage=0;
@@ -83,8 +99,8 @@ private:
 
     void RequestCast();
 
-    UFUNCTION(Server, Reliable)
     void ServerCastRod(FGuid ExpectedId);
+    UFUNCTION(Server,Reliable) void ServerCastSelectedRod(FFiskRodSelection Expected,FGuid ExpectedId);
 
     void RequestLift();
     void RequestLower();
@@ -96,11 +112,12 @@ private:
     void RequestLand();
     bool CanUseRod() const;
 
-    UFUNCTION(Server, Reliable)
     void ServerActOnRod(EFiskRodAction Action, FGuid ExpectedId);
+    UFUNCTION(Server,Reliable) void ServerActOnSelectedRod(EFiskRodAction Action,FFiskRodSelection Expected,FGuid ExpectedId);
 
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;
+    UPROPERTY() TObjectPtr<UFiskPrototypeRod> ExtraRod;
     UPROPERTY() TObjectPtr<UFiskFrontEnd> FrontEnd;
     UPROPERTY() TObjectPtr<UFiskRigPanel> RigPanel;
     UPROPERTY() TObjectPtr<UFiskSeaChart> SeaChart;
@@ -109,6 +126,14 @@ private:
     UPROPERTY() TObjectPtr<UFiskDeckPanel> DeckPanel;
 
 #if WITH_DEV_AUTOMATION_TESTS
+    int32 RejectedCaptainRequests=0;
+    void RunFishingReleaseSmoke();
+    FString FishingReleaseMode,FishingReleaseCapture;
+    FTimerHandle FishingReleaseTimer;
+    int32 FishingReleaseStage=0;
+    double FishingReleaseAt=0,FishingReleaseFightAt=0;
+    FGuid FishingReleaseOldCast;
+    FFiskRodSelection FishingReleaseOldSelection;
     void RunNavigationSmoke();
     FString NavigationMode,NavigationCaptureDir;
     FTimerHandle NavigationTimer;

@@ -29,6 +29,7 @@ public:
     static constexpr int32 AtMarina = 200;
 
     AFiskStarterBoat();
+    virtual void CalcCamera(float DeltaTime,struct FMinimalViewInfo& OutResult) override;
     void SetOwnerPlayer(int32 PlayerId);
     void ResetForDay();
     void Board(int32 PlayerId);

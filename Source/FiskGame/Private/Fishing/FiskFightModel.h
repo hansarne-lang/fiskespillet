@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "Fishing/FiskFightProfile.h"
 
 enum class EFiskFightOutcome : uint8 { Fighting, ReadyToLand, LineBreak, Slack };
 
@@ -7,7 +8,7 @@ enum class EFiskFightOutcome : uint8 { Fighting, ReadyToLand, LineBreak, Slack }
 class FFiskFightModel
 {
 public:
-    void Reset(int32 Seed, float InitialLine = 30.0f);
+    void Reset(int32 Seed, float InitialLine = 30.0f,int32 Species=1);
     void SetRaised(bool Value) { bRaised = Value; }
     void SetReeling(bool Value) { bReeling = Value; }
     void AdjustDrag(int32 Steps);
@@ -20,6 +21,7 @@ public:
     bool IsReeling() const { return bReeling; }
     EFiskFightOutcome GetOutcome() const { return Outcome; }
 private:
+    FFiskFightProfile Profile;
     void Step();
     FRandomStream Random;
     double Pending = 0.0, Age = 0.0, NextRun = 0.0, RunLeft = 0.0;

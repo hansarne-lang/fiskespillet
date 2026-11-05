@@ -35,6 +35,8 @@ class UFiskPrototypeRod final : public UActorComponent
     GENERATED_BODY()
 public:
     UFiskPrototypeRod();
+    void SetSlot(int32 Value) { Slot=Value; }
+    int32 GetSlot() const { return Slot; }
     void ResetForDay();
     bool Cast(const FGuid& ExpectedId);
     void Withdraw();
@@ -84,4 +86,6 @@ private:
     FFiskCatchData CatchData;
     int32 LandedAtMs = -1;
     int32 FirstRunAtMs = 0;
+    int32 Slot=0;
+    float InitialRunDuration=3.0f,InitialRunGain=30.0f;
 };

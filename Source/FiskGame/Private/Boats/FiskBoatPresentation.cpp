@@ -124,26 +124,18 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
         const AFiskBoardingController* PC = Cast<AFiskBoardingController>(It->Get());
         if (Boat->HasAuthority() && PC && PC->PlayerState)
         {
-            const EFiskRodState State = PC->GetRod()->GetState();
-            const uint8 Activity = State == EFiskRodState::Fishing ? 1
-                : State == EFiskRodState::InitialRun || State == EFiskRodState::Fighting || State == EFiskRodState::ReadyToLand ? 2 : 0;
-            const int32 Seat = Boat->GetSeatIndex(PC->PlayerState->GetPlayerId());
-
-            if (Seat >= 0 && Seat < 2)
+            const int32 CrewSeat=Boat->GetSeatIndex(PC->PlayerState->GetPlayerId());
+            for(int32 Slot=0;CrewSeat>=0 && Slot<PC->GetRodCapacity();++Slot)
             {
-                Activities[Seat] = Activity;
-                FFiskFishVisualState& Fish = FishStates[Seat];
-                Fish.CastId = PC->GetRod()->GetCastId();
-                Fish.LineMeters = PC->GetRod()->GetLineOut();
-                Fish.bSurging = PC->GetRod()->IsSurging();
-                Fish.bRaised = PC->GetRod()->IsRaised();
-                if (State == EFiskRodState::Fighting) { Fish.Phase = EFiskFishVisualPhase::Fighting; }
-                else if (State == EFiskRodState::ReadyToLand) { Fish.Phase = EFiskFishVisualPhase::ReadyToLand; }
-                else if (State == EFiskRodState::Landed)
-                {
-                    Fish.Phase = EFiskFishVisualPhase::Landing;
-                    Fish.LandingAtMs = PC->GetRod()->GetLandedAtMs();
-                }
+                const UFiskPrototypeRod* Rod=PC->GetRodAt(Slot);
+                const int32 Seat=Boat->GetCrewCount()==1?Slot:CrewSeat;
+                const EFiskRodState State=Rod->GetState();
+                Activities[Seat]=State==EFiskRodState::Fishing?1:State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand?2:0;
+                FFiskFishVisualState& Fish=FishStates[Seat];
+                Fish.CastId=Rod->GetCastId();Fish.LineMeters=Rod->GetLineOut();Fish.bSurging=Rod->IsSurging();Fish.bRaised=Rod->IsRaised();
+                if(State==EFiskRodState::Fighting) { Fish.Phase=EFiskFishVisualPhase::Fighting; }
+                else if(State==EFiskRodState::ReadyToLand) { Fish.Phase=EFiskFishVisualPhase::ReadyToLand; }
+                else if(State==EFiskRodState::Landed) { Fish.Phase=EFiskFishVisualPhase::Landing;Fish.LandingAtMs=Rod->GetLandedAtMs(); }
             }
 
         }
@@ -159,7 +151,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
 
     const AFiskBoardingController* LocalPC = Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     const int32 LocalSeat = LocalPC && LocalPC->IsLocalController() && LocalPC->PlayerState
-        ? Boat->GetSeatIndex(LocalPC->PlayerState->GetPlayerId()) : INDEX_NONE;
+        ? (Boat->GetCrewCount()==1?LocalPC->GetSelectedRod():Boat->GetSeatIndex(LocalPC->PlayerState->GetPlayerId())) : INDEX_NONE;
     for (int32 Seat = 0; Seat < 2; ++Seat)
     {
         const float Sign = Seat == 0 ? -1.0f : 1.0f;
@@ -181,7 +173,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
         if (Seat == LocalSeat)
         {
             DrawDebugString(GetWorld(), VisualRoot->GetComponentTransform().TransformPosition(Start + FVector(0, 0, 45)),
-                TEXT("DIN STANG"), nullptr, FColor::Yellow, 0.07f, true, 0.8f);
+                TEXT("VALGT STANG"), nullptr, FColor::Yellow, 0.07f, true, 0.8f);
         }
         if (Activity > 0)
         {

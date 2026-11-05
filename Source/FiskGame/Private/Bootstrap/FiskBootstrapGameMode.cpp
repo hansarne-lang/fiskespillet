@@ -71,7 +71,7 @@ bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 Ex
         Day->GetElapsedMilliseconds(), Settlement->GetView().bRevealed)) { return false; }
     // All resets run in this one server frame before the fresh clock starts.
     for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    { if (AFiskBoardingController* PC = Cast<AFiskBoardingController>(It->Get())) { PC->ResetRodForDay(); } }
+    { if (AFiskBoardingController* PC = Cast<AFiskBoardingController>(It->Get())) { PC->ResetRodForDay(ExpectedDay+1); } }
     StarterBoat->ResetForDay(); Settlement->ResetForDay(ExpectedDay + 1);
     return Day->AdvanceDay();
 }

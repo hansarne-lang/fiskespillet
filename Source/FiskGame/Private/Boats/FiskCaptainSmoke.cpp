@@ -54,8 +54,23 @@ void UFiskCrewPanel::Smoke()
     {
         if(Now-MarkAt<2) { return; }
         if(!IsVisible() || Progress!=-1 || Rod.GetState()!=EFiskRodState::Ready || PC->GetSeaChart()->IsVisible() || PC->GetRigPanel()->IsVisible()) { Fail(TEXT("menu_input_isolation"));return; }
-        if(Host) { ChooseOther(); }
-        else { ChooseOther();if(!Message.Contains(TEXT("kapteinen"))) { Fail(TEXT("passenger_message"));return; } }
+        if(Host)
+        {
+            // Wait for the passenger's explicit server-observed rejection. A local
+            // timer alone allowed the handoff to race the passenger's menu check.
+            bool PassengerChecked=false;
+            for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
+            {
+                const AFiskBoardingController* OtherPC=Cast<AFiskBoardingController>(It->Get());
+                if(OtherPC && OtherPC!=PC && OtherPC->GetRejectedCaptainRequests()>=2) { PassengerChecked=true; }
+            }
+            if(!PassengerChecked) { return; }ChooseOther();
+        }
+        else
+        {
+            ChooseOther();if(!Message.Contains(TEXT("kapteinen"))) { Fail(TEXT("passenger_message"));return; }
+            PC->ServerTransferCaptain(InitialRevision,999);
+        }
         Stage=2;
     }
     else if(Stage==2)

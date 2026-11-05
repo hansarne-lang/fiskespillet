@@ -1,8 +1,9 @@
 #include "Fishing/FiskFightModel.h"
 
-void FFiskFightModel::Reset(int32 Seed, float InitialLine)
+void FFiskFightModel::Reset(int32 Seed, float InitialLine,int32 Species)
 {
     *this = FFiskFightModel();
+    Profile=FFiskFightProfile::ForSpecies(Species);
     Line = FMath::IsFinite(InitialLine) ? FMath::Clamp(InitialLine, 2.0f, 1000.0f) : 30.0f;
     Random.Initialize(Seed);
     NextRun = Random.FRandRange(5.0f, 8.0f);
@@ -31,7 +32,7 @@ void FFiskFightModel::Step()
     Age += Dt;
     if (RunLeft <= 0.0 && Age >= NextRun && Fatigue > 0.25f)
     {
-        RunLeft = Random.FRandRange(2.0f, 3.0f);
+        RunLeft = Random.FRandRange(2.0f, 3.0f)*Profile.RunDuration;
         NextRun = Age + Random.FRandRange(7.0f, 11.0f);
     }
     const bool bRun = IsSurging();
@@ -45,20 +46,20 @@ void FFiskFightModel::Step()
     if (SlackTime >= 3.0f) { Outcome = EFiskFightOutcome::Slack; return; }
     if (bRun)
     {
-        Line += 5.0f * (1.0f - DragPercent * 0.005f) * Dt;
+        Line += 5.0f * Profile.RunSpeed * (1.0f - DragPercent * 0.005f) * Dt;
         RunLeft = FMath::Max(0.0, RunLeft - Dt);
         PumpCredit = 0.0f;
     }
     else if (bRaised && !bReeling)
     {
-        PumpCredit = FMath::Min(6.0f, PumpCredit + 4.0f * Dt);
+        PumpCredit = FMath::Min(6.0f*Profile.Pump, PumpCredit + 4.0f * Profile.Pump * Dt);
     }
     else if (!bRaised && bReeling)
     {
-        const float Gain = FMath::Min(PumpCredit, 4.0f * Dt);
+        const float Gain = FMath::Min(PumpCredit, 4.0f * Profile.Pump * Dt);
         Line = FMath::Max(0.0f, Line - Gain);
         PumpCredit -= Gain;
     }
-    Fatigue = FMath::Max(0.0f, Fatigue - Dt * (0.02f + (bRaised ? 0.01f : 0.0f) + (bReeling ? 0.012f : 0.0f)));
+    Fatigue = FMath::Max(0.0f, Fatigue - Dt * Profile.FatigueDrain * (0.02f + (bRaised ? 0.01f : 0.0f) + (bReeling ? 0.012f : 0.0f)));
     if (Fatigue <= 0.2f && Line <= 2.0f && !bRun) { Outcome = EFiskFightOutcome::ReadyToLand; }
 }

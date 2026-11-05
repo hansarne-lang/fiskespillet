@@ -56,7 +56,11 @@ void UFiskCombatFeedback::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
     if (!Wave || !Audio) { return; }
-    const UFiskPrototypeRod* Rod = CastChecked<AFiskBoardingController>(GetOwner())->GetRod();
+    const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
+    const UFiskPrototypeRod* Rod=PC->GetRod();
+    // A passive rod's first run must be audible even while the other rod is selected.
+    for(int32 Slot=0;Slot<PC->GetRodCapacity();++Slot)
+    { if(PC->GetRodAt(Slot)->GetState()==EFiskRodState::InitialRun) { Rod=PC->GetRodAt(Slot);break; } }
     const bool bRun = Rod->GetState() == EFiskRodState::InitialRun || Rod->IsSurging();
     const bool bActive = bRun || (Rod->GetState() == EFiskRodState::Fighting && Rod->IsReeling());
     if (bActive && !bReportedPlayback && Audio->IsPlaying()

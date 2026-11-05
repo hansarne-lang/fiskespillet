@@ -132,7 +132,7 @@ void UFiskRigPanel::Draw(AHUD& HUD,UCanvas& Canvas)
     const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():0);
     const float S=FMath::Min(Canvas.ClipX/1280.f,Canvas.ClipY/720.f), X=52*S, W=460*S;
     HUD.DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,28*S,516*S,642*S);
-    HUD.DrawText(TEXT("STANGOPPSETT"),FLinearColor::White,X,70*S,nullptr,2.1f*S);
+    HUD.DrawText(FString::Printf(TEXT("STANG %d - OPPSETT"),PC->GetSelectedRod()+1),FLinearColor::White,X,70*S,nullptr,2.1f*S);
     HUD.DrawText(FString::Printf(TEXT("%s - bunndybde %d m"),Ground->Name,Ground->BottomDepth),FLinearColor(0.55f,0.85f,0.8f),X,126*S,nullptr,1.15f*S);
     HUD.DrawText(FString::Printf(TEXT("Fisketegn ved %d-%d m"),Ground->FishDepthMin,Ground->FishDepthMax),FLinearColor::White,X,158*S,nullptr,1.1f*S);
     const FString Labels[] = {FString(TEXT("Agn: "))+FFiskRigRules::BaitName(Rig.Bait),FString::Printf(TEXT("Fiskedybde: %d m"),Rig.Depth),FString(TEXT("Program: "))+FFiskRigRules::ProgramName(Rig.Program),TEXT("Ferdig")};

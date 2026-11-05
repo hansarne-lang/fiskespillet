@@ -2,6 +2,7 @@
 #include "FiskFishingGround.h"
 #include "DayCycle/FiskDayState.h"
 #include "Boats/FiskStarterBoat.h"
+#include "Boats/FiskBoardingController.h"
 #include "Bootstrap/FiskBootstrapGameMode.h"
 #include "Economy/FiskDaySettlement.h"
 #include "Engine/World.h"
@@ -19,7 +20,8 @@ UFiskPrototypeRod::UFiskPrototypeRod()
 
 bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
 {
-    if (!GetOwner()->HasAuthority()) { return false; }
+    const AFiskBoardingController* RodOwner=::Cast<AFiskBoardingController>(GetOwner());
+    if (!GetOwner()->HasAuthority() || !RodOwner || Slot>=RodOwner->GetRodCapacity() || RodOwner->GetRodAt(Slot)!=this) { return false; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
@@ -168,16 +170,18 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     if (View.State == EFiskRodState::Fishing && Now >= NextTransitionAt)
     {
         FirstRunAtMs=Day->GetElapsedMilliseconds();
-        NextTransitionAt = Now + 3.0;
+        const FFiskFightProfile Profile=FFiskFightProfile::ForSpecies(CatchData.Species);
+        InitialRunDuration=3.0f*Profile.RunDuration;InitialRunGain=10.0f*Profile.RunSpeed*InitialRunDuration;
+        NextTransitionAt = Now + InitialRunDuration;
         View.Line = Rig.Depth;
         SetState(EFiskRodState::InitialRun);
     }
     else if (View.State == EFiskRodState::InitialRun)
     {
-        View.Line = Rig.Depth + FMath::Clamp(FMath::RoundToInt((Now - (NextTransitionAt - 3.0)) * 10), 0, 30);
+        View.Line = Rig.Depth + FMath::Clamp(FMath::RoundToInt((Now-(NextTransitionAt-InitialRunDuration))*InitialRunGain/InitialRunDuration),0,FMath::RoundToInt(InitialRunGain));
         if (Now >= NextTransitionAt)
         {
-            Fight.Reset(FMath::Rand(), Rig.Depth + 30.0f);
+            Fight.Reset(FMath::Rand(), Rig.Depth+InitialRunGain,CatchData.Species);
             LastFightAt = Now;
             SyncFight();
             SetState(EFiskRodState::Fighting);

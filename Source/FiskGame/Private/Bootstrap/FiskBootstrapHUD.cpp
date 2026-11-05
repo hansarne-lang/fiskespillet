@@ -29,10 +29,10 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
     {
         HUD.DrawText(TEXT("HJELP OG KONTROLLER"),FLinearColor::White,52*S,60*S,nullptr,2.1f*S);
         Lines={TEXT("Spill starter dagen alene. Venner kan koble til samme LAN-økt."),
-            TEXT("E: gå om bord. Kapteinen velger plass med M. Fra 02:00 starter R turen."),
+            TEXT("E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
             TEXT("G: agn, dybde og agnprogram. 1/2/3 velger lagringsplass i oppsettspanelet."),
             TEXT("F5 lagrer bekreftet oppsett på PC-en. F9 henter det til servervalidering."),
-            TEXT("F: sett ut stanga ved fiskeplassen. X: trekk inn / avbryt egen kamp."),
+            TEXT("1/2: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
             TEXT("Kamp: løft med venstre mus, slipp for å senke. Sveiv med høyre mus."),
             TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
             TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),

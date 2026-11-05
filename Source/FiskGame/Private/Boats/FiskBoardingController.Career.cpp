@@ -57,6 +57,7 @@ void AFiskBoardingController::ServerCareerAck_Implementation(FGuid Profile,int32
 }
 void AFiskBoardingController::TickCareer()
 {
+    if(HasAuthority()) { ReconcileRodCapacity(); }
     const double Now=GetWorld()->GetRealTimeSeconds();
     if(IsLocalController() && !bCareerHelloSent && GetNetMode()!=NM_Standalone)
     {

@@ -392,7 +392,6 @@ void AFiskBoardingController::ServerActOnSelectedRod_Implementation(EFiskRodActi
 void AFiskBoardingController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
-    if(HasAuthority()) { ReconcileRodCapacity(); }
 
     if (!IsLocalController() || !PlayerState) { return; }
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();

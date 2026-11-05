@@ -13,6 +13,8 @@
 #include "Misc/Paths.h"
 #include "UnrealClient.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/GameModeBase.h"
+#include "TimerManager.h"
 
 void UFiskFrontEnd::SmokeKey(FKey Key)
 {
@@ -56,6 +58,52 @@ void UFiskFrontEnd::RunMenuSmoke()
     int32& Step=GI->MenuSmokeStep;
     const double Now=FPlatformTime::Seconds();
     auto Fail=[&](const TCHAR* Why) { UE_LOG(LogTemp,Error,TEXT("FISKELAGET_MENU_TEST_FAILED %s step=%d"),Why,Step); };
+    if(SmokeCase==TEXT("solo"))
+    {
+        const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+        if(GetNetMode()==NM_Standalone)
+        {
+            if(Step==0)
+            {
+                if(!Day || Day->HasStarted() || Model.Page!=EFiskMenuPage::Home) { Fail(TEXT("solo_menu_started_day"));return; }
+                Capture(TEXT("solo-menu"));Step=1;SmokeSelect(0);
+            }
+            return;
+        }
+        TActorIterator<AFiskStarterBoat> Boats(GetWorld());
+        const AGameModeBase* Mode=GetWorld()->GetAuthGameMode();
+        if(!Day || !Boats || !PC->PlayerState || !Mode) { return; }
+        if(Mode->GetNumPlayers()!=1) { Fail(TEXT("solo_requires_exactly_one_test_player"));return; }
+        AFiskStarterBoat* Boat=*Boats;
+        if(!Day->HasStarted()) { Fail(TEXT("solo_day_did_not_start"));return; }
+        if(Step==1)
+        {
+            SmokeKey(EKeys::E);
+            if(Boat->GetCrewCount()!=1 || Boat->GetCaptainId()!=PC->PlayerState->GetPlayerId()) { Fail(TEXT("solo_boarding"));return; }
+            SmokeKey(EKeys::R);
+            if(Day->GetElapsedSeconds()>=120 || Boat->GetTripProgress()!=AFiskStarterBoat::AtDock) { Fail(TEXT("solo_early_departure"));return; }
+            GI->SmokeClockAt=Day->GetElapsedMilliseconds();GI->SmokeAt=Now;
+            UE_LOG(LogTemp,Display,TEXT("FISKELAGET_SOLO_STARTED players=1"));Step=2;SmokeKey(EKeys::Escape);
+        }
+        else if(Step==2 && Now-GI->SmokeAt>=2.0)
+        {
+            if(Day->GetElapsedMilliseconds()<GI->SmokeClockAt+1000) { Fail(TEXT("solo_menu_paused_day"));return; }
+            SmokeKey(EKeys::Escape);Capture(TEXT("solo-ready"));Step=3;
+        }
+        else if(Step==3 && Day->GetElapsedSeconds()>=120) { SmokeKey(EKeys::R);Step=4; }
+        else if(Step==4 && Boat->GetTripProgress()==AFiskStarterBoat::AtFishingSpot)
+        { SmokeKey(EKeys::F);Step=5; }
+        else if(Step==5 && PC->GetRod()->GetState()==EFiskRodState::Fishing)
+        { Capture(TEXT("solo-fishing"));GI->SmokeAt=Now;Step=6; }
+        else if(Step==6 && Now-GI->SmokeAt>=2.0) { SmokeKey(EKeys::R);Step=7; }
+        else if(Step==7 && Boat->GetTripProgress()==AFiskStarterBoat::AtMarina)
+        {
+            Capture(TEXT("solo-home"));Step=8;
+            UE_LOG(LogTemp,Display,TEXT("FISKELAGET_SOLO_TEST_PASSED players=1 crew=1"));
+            GetWorld()->GetTimerManager().ClearTimer(SmokeTimer);
+        }
+        return;
+    }
     if(GetNetMode()==NM_Standalone || Model.Page==EFiskMenuPage::Connecting || SmokeCase==TEXT("failure"))
     {
         if(SmokeCase==TEXT("host"))

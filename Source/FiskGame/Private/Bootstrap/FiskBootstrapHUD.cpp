@@ -128,7 +128,7 @@ void AFiskBootstrapHUD::DrawHUD()
     {
         const TCHAR* Message = GetNetMode() == NM_Standalone
             ? TEXT("Start en LAN-vert for å spille.")
-            : TEXT("Venter på to spillere ...");
+            : TEXT("Starter fiskedagen ...");
         DrawText(Message, FLinearColor::White, Left, Top + 100.0f);
         return;
     }

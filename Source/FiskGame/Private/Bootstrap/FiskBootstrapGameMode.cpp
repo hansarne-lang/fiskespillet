@@ -41,7 +41,9 @@ void AFiskBootstrapGameMode::PostLogin(APlayerController* NewPlayer)
         StarterBoat->SetOwnerPlayer(NewPlayer->PlayerState->GetPlayerId());
     }
 
-    if (GetNetMode() != NM_Standalone && GetNumPlayers() >= 2)
+    // The main menu is standalone. A playable listen-server session starts
+    // with its first player; StartDay is idempotent when friends join later.
+    if (GetNetMode() != NM_Standalone && GetNumPlayers() >= 1)
     {
         if (AFiskDayState* Day = GetGameState<AFiskDayState>())
         {

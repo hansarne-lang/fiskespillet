@@ -119,8 +119,8 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
         const float Y=(170+96*I)*S;
         Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(550*S,Y+82*S)));
         HUD.DrawRect(I==Row?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,498*S,82*S);
-        HUD.DrawText(FString::Printf(TEXT("%s%s"),G.Name,I==Boat->GetGroundId()?TEXT("  [VALGT]"):TEXT("")),I==Boat->GetGroundId()?Teal:FLinearColor::White,68*S,Y+10*S,nullptr,1.15f*S);
-        HUD.DrawText(FString::Printf(TEXT("Reise %d s  |  Bunn %d m"),G.TravelMs/1000,G.BottomDepth),FLinearColor::White,68*S,Y+37*S,nullptr,1.0f*S);
+        HUD.DrawText(FString::Printf(TEXT("%s%s"),G.Name,I==Boat->GetGroundId()?(Boat->GetDestination().Equals(G.Position,1)?TEXT("  [VALGT]"):TEXT("  [HABITAT]")):TEXT("")),I==Boat->GetGroundId()?Teal:FLinearColor::White,68*S,Y+10*S,nullptr,1.15f*S);
+        HUD.DrawText(FString::Printf(TEXT("Reise %.1f s  |  Bunn %d m"),G.TravelMs/1000.0*(Boat->GetKind()==1?.8:1.0),G.BottomDepth),FLinearColor::White,68*S,Y+37*S,nullptr,1.0f*S);
         HUD.DrawText(FString::Printf(TEXT("Fisketegn omtrent %d-%d m"),G.FishDepthMin,G.FishDepthMax),Muted,68*S,Y+59*S,nullptr,0.9f*S);
     }
     auto Point=[&](FVector Position){return FVector2D((638+Position.X/150000.0*560)*S,(355-Position.Y/100000.0*180)*S);};

@@ -76,7 +76,7 @@ void UFiskSeaChart::DrawFavorites(AHUD& HUD,UCanvas& Canvas)
     auto Text=[&](const FString& T,float X,float Y,float Size=1.0f,FLinearColor C=FLinearColor::White){HUD.DrawText(T,C,X*S,Y*S,nullptr,Size*S);};
     HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,642*S);
     Text(TEXT("MINE FISKEPLASSER"),52,58,2.0f);
-    Text(TEXT("Tab: tilbake til sjøkartet | Seks lokale favoritter fra de tre prototypeplassene"),52,112,1.0f,Muted);
+    Text(TEXT("Tab: tilbake til sjøkartet | Seks navngitte sjøpunkter, lagret lokalt"),52,112,1.0f,Muted);
     Buttons.Reset();
     for(int32 I=0;I<6;++I)
     {
@@ -87,7 +87,8 @@ void UFiskSeaChart::DrawFavorites(AHUD& HUD,UCanvas& Canvas)
         if(Saved)
         {
             const FFiskFishingGround& G=*FiskGrounds::Find(Saved->Ground);
-            Text(FString::Printf(TEXT("%s | %d m | reise %d s"),G.Name,G.BottomDepth,G.TravelMs/1000),600,Y+14,.95f,Muted);
+            int32 Habitat=Saved->Ground,Duration=G.TravelMs;FiskGrounds::MakeSeaPoint(Saved->Point,Habitat,Duration);
+            Text(FString::Printf(TEXT("%s | %d m | %.0f, %.0f m | %.1f s"),G.Name,G.BottomDepth,Saved->Point.X/100,Saved->Point.Y/100,Duration/1000.0*(Boat && Boat->GetKind()==1?.8:1.0)),560,Y+14,.82f,Muted);
         }
     }
     if(bRenaming)

@@ -28,11 +28,12 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
     if(PC.IsHelpVisible())
     {
         HUD.DrawText(TEXT("HJELP OG KONTROLLER"),FLinearColor::White,52*S,60*S,nullptr,2.1f*S);
-        Lines={TEXT("Spill starter dagen alene. Venner kan koble til samme LAN-økt."),
+        Lines={TEXT("Spill starter dagen alene. Opptil fire spillere i samme LAN-økt."),
             TEXT("E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
             TEXT("G: agn, dybde og agnprogram. 1/2/3 velger lagringsplass i oppsettspanelet."),
             TEXT("F5 lagrer bekreftet oppsett på PC-en. F9 henter det til servervalidering."),
-            TEXT("1/2: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
+            TEXT("1/2/3: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
+            TEXT("P: marinabutikk, lagret saldo, utstyr og båtvalg. Kjøp ved brygga."),
             TEXT("Kamp: løft med venstre mus, slipp for å senke. Sveiv med høyre mus."),
             TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
             TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),
@@ -73,7 +74,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
         for(int32 I=0;I<9 && Page*9+I<Lines.Num();++I)
         { HUD.DrawText(Lines[Page*9+I],FLinearColor::White,52*S,(172+43*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(FString::Printf(TEXT("Side %d/%d | PgUp/PgDn eller piler: bla | F3 / Escape: lukk"),Page+1,Pages),FLinearColor(0.5f,0.9f,0.8f),52*S,582*S,nullptr,1.0f*S);
-        HUD.DrawText(TEXT("Siste 32 oppgjør i denne økten. Nullstilles når økten avsluttes. Ingen lagret karriere."),FLinearColor(0.6f,0.85f,0.85f),52*S,626*S,nullptr,0.95f*S);
+        HUD.DrawText(TEXT("Siste 32 oppgjør i økten. P viser lagret karriere. F4 viser varig journal."),FLinearColor(0.6f,0.85f,0.85f),52*S,626*S,nullptr,0.95f*S);
         return;
     }
     HUD.DrawText(TEXT("DAGSOPPGJØR OG FANGSTER"),FLinearColor::White,52*S,60*S,nullptr,2.0f*S);

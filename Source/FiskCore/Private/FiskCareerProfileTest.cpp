@@ -19,7 +19,7 @@ bool FFiskCareerLedgerTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Chain extends initial"),P.Extends(Initial));TestTrue(TEXT("Conservation validates"),P.IsValid());
     FFiskCareerProfile Forged=P;++Forged.Cash;TestFalse(TEXT("Unexplained money rejected"),Forged.IsValid());
     Forged=P;Forged.Owned=15;TestFalse(TEXT("Unpaid equipment rejected"),Forged.IsValid());
-    Forged=P;Forged.Receipts.Add(Forged.Receipts.Last());++Forged.Revision;TestFalse(TEXT("Duplicate receipt rejected"),Forged.IsValid());
+    Forged=P;const FFiskCareerReceipt Duplicate=Forged.Receipts.Last();Forged.Receipts.Add(Duplicate);++Forged.Revision;TestFalse(TEXT("Duplicate receipt rejected"),Forged.IsValid());
     FFiskCareerProfile Branch=Initial;TestTrue(TEXT("Other valid branch"),Branch.Buy(FGuid::NewGuid(),1,0));TestFalse(TEXT("Divergent branch is not imported over known history"),P.Extends(Branch));
     while(P.Revision<FFiskCareerProfile::MaxReceipts) { if(!P.Credit(FGuid::NewGuid(),0)) { AddError(TEXT("Could not fill receipt log"));return false; } }
     TestFalse(TEXT("Full ledger fails closed"),P.Credit(FGuid::NewGuid(),0));TestTrue(TEXT("Old receipt still idempotent at capacity"),P.Credit(Day,47200));

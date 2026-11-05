@@ -133,6 +133,11 @@ void AFiskBoardingController::BeginPlay()
     Super::BeginPlay();
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCareerReleaseSmoke="),CareerSmokeMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CareerSmokeDir);
+        GetWorldTimerManager().SetTimer(CareerSmokeTimer,this,&AFiskBoardingController::RunCareerReleaseSmoke,.5f,true,2.f);
+    }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFishingReleaseSmoke="),FishingReleaseMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FishingReleaseCapture);

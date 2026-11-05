@@ -149,6 +149,13 @@ private:
 
 #if WITH_DEV_AUTOMATION_TESTS
     int32 RejectedCaptainRequests=0;
+    void RunCareerReleaseSmoke();
+    FString CareerSmokeMode,CareerSmokeDir;
+    FTimerHandle CareerSmokeTimer;
+    int32 CareerSmokeStage=0,CareerSmokeRevision=0;
+    int64 CareerSmokeCash=0;
+    double CareerSmokeAt=0,CareerSmokeFightAt=0;
+    bool bCareerSmokePrivate=false;
     void RunFishingReleaseSmoke();
     FString FishingReleaseMode,FishingReleaseCapture;
     FTimerHandle FishingReleaseTimer;

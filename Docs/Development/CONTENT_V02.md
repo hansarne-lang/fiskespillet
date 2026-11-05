@@ -4,7 +4,7 @@ Oppgave #61 bygger på enspillerversjonen i PR #60. Prosjekteieren har valgt den
 
 ## Fangstinnhold og hemmelighold
 
-Korallrevet gir snapper, undervannsskrenten amberjack og åpent hav gulfinnet tunfisk. Serveren genererer data én gang per utsetting, med en tilfeldigsekvens som er adskilt fra nappberegningen. Art, vekt, lengde og verdi er et privat C++-medlem på serverens stang og inngår ikke i replikerte stang-/riggdata. En avbrutt utsetting gir ingen fangst. Landingen bruker samme data og unik fangst-ID; gjentakelser kan ikke erstatte fisk eller eier.
+Korallrevet har snapper som hovedart og amberjack som alternativ; undervannsskrenten har amberjack og snapper, og åpent hav gulfinnet tunfisk og amberjack. Foreløpig fordeling er 80/20 prosent. Fiskeplassen antyder dermed en art, men bekrefter den ikke. Serveren genererer data én gang per utsetting fra en egen privat GUID som aldri replikeres; den synlige utsettings-ID-en brukes ikke som frø for fangstdata. Sekvensen er også adskilt fra nappberegningen. Art, vekt, lengde og verdi er et privat C++-medlem på serverens stang og inngår ikke i replikerte stang-/riggdata. En avbrutt utsetting gir ingen fangst. Landingen bruker samme data og unik fangst-ID; gjentakelser kan ikke erstatte fisk eller eier.
 
 | Art | Foreløpig vekt | Foreløpig lengde | Testpris per kg |
 |---|---|---|---|

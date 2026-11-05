@@ -143,7 +143,7 @@ void AFiskBoardingController::RunContentSmoke()
         {
             if(Row.DeliveredFish!=1 || Row.LostFish!=0 || Row.Catches.Num()!=1) { Fail(TEXT("wrong_catch_count"));return; }
             const FFiskCatchResult& Catch=Row.Catches[0];
-            if(!Catch.bDelivered || Catch.Fish.Species!=1 || !FiskCatches::IsValid(Catch.Fish)
+            if(!Catch.bDelivered || !FiskCatches::IsValid(Catch.Fish)
                 || Row.SessionBalance!=Catch.Fish.Value || Row.DeliveredWeightGrams!=Catch.Fish.WeightGrams)
             { Fail(TEXT("wrong_catch_details_or_payment"));return; }
             Ids.Add(Catch.CatchId);

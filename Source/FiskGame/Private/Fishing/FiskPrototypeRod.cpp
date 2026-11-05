@@ -30,7 +30,9 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     View.CastId = Cycle.GetId();
     CatchId.Invalidate();
     LandedAtMs = -1;
-    CatchData=FiskCatches::Roll(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().D ^ 0x4F17B5D3),Boat->GetGroundId());
+    // CastId is visible to the owner. Catch entropy must never be derived from it.
+    const FGuid PrivateEntropy=FGuid::NewGuid();
+    CatchData=FiskCatches::Roll(static_cast<int32>(PrivateEntropy.A ^ PrivateEntropy.B ^ PrivateEntropy.C ^ PrivateEntropy.D),Boat->GetGroundId());
     FRandomStream BiteRandom(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().B ^ Cycle.GetId().C ^ Cycle.GetId().D));
     NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom, Ground);
     SetState(EFiskRodState::Fishing);

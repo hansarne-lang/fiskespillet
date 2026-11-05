@@ -97,7 +97,7 @@ bool FFiskCatchDetailsTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Exact integer sum"),Row.SessionBalance,First.Value+Second.Value);
     TestEqual(TEXT("Exact weight sum"),Row.DeliveredWeightGrams,First.WeightGrams+Second.WeightGrams);
     const FFiskCatchResult* Detail=Row.Catches.FindByPredicate([&](const FFiskCatchResult& C){return C.CatchId==Id;});
-    TestTrue(TEXT("Immutable original catch survives"),Detail && Detail->Fish.WeightGrams==First.WeightGrams && Detail->Fish.Species==0 && Detail->bDelivered);
+    TestTrue(TEXT("Immutable original catch survives"),Detail && Detail->Fish.WeightGrams==First.WeightGrams && Detail->Fish.Species==First.Species && Detail->bDelivered);
     TestFalse(TEXT("Payout cannot repeat"),Ledger.Settle(1200000,900000));
     return true;
 }
@@ -112,7 +112,7 @@ bool FFiskLostDetailsTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("No revenue from lost fish"),Row.SessionBalance,0);
     TestEqual(TEXT("No delivered weight"),Row.DeliveredWeightGrams,0);
     TestEqual(TEXT("Lost count"),Row.LostFish,1);
-    TestTrue(TEXT("Details revealed as lost"),Row.Catches.Num()==1 && !Row.Catches[0].bDelivered && Row.Catches[0].Fish.Species==1);
+    TestTrue(TEXT("Details revealed as lost"),Row.Catches.Num()==1 && !Row.Catches[0].bDelivered && Row.Catches[0].Fish.Species==Fish.Species);
     return true;
 }
 #endif

@@ -6,18 +6,22 @@ bool FFiskCatchCatalogTest::RunTest(const FString& Parameters)
 {
     for(int32 Ground=0;Ground<3;++Ground)
     {
-        TSet<int32> Weights;
-        for(int32 Seed=0;Seed<128;++Seed)
+        TSet<int32> Weights;int32 Preferred=0,Other=0;
+        for(int32 Seed=0;Seed<1024;++Seed)
         {
             const FFiskCatchData A=FiskCatches::Roll(Seed,Ground),B=FiskCatches::Roll(Seed,Ground);
             TestTrue(TEXT("Generated catch is valid"),FiskCatches::IsValid(A));
-            TestEqual(TEXT("Habitat species"),A.Species,Ground);
+            static const int32 Alternative[]={1,0,1};
+            TestTrue(TEXT("Only habitat-supported species"),A.Species==Ground || A.Species==Alternative[Ground]);
+            if(A.Species==Ground) { ++Preferred; } else { ++Other; }
+            TestEqual(TEXT("Same seed retains species"),A.Species,B.Species);
             TestEqual(TEXT("Same cast retains weight"),A.WeightGrams,B.WeightGrams);
             TestEqual(TEXT("Same cast retains length"),A.LengthMm,B.LengthMm);
             TestEqual(TEXT("Same cast retains value"),A.Value,B.Value);
             Weights.Add(A.WeightGrams);
         }
         TestTrue(TEXT("Different casts vary"),Weights.Num()>10);
+        TestTrue(TEXT("Habitat preference without certainty"),Preferred>700 && Other>100);
     }
     TestFalse(TEXT("Unknown habitat rejected"),FiskCatches::IsValid(FiskCatches::Roll(7,-1)));
     return true;

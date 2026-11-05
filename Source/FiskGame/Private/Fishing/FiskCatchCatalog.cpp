@@ -21,9 +21,12 @@ FFiskCatchData FiskCatches::Roll(int32 Seed,int32 GroundId)
 {
     FFiskCatchData Fish;
     Fish.Species=GroundId;
-    const FFiskSpecies* Species=Find(Fish.Species);
-    if(!Species) { return Fish; }
+    if(!Find(GroundId)) { return Fish; }
     FRandomStream Random(Seed);
+    // A habitat suggests a species; it must not reveal the confirmed catch.
+    static const int32 Alternative[]={1,0,1};
+    Fish.Species=Random.RandRange(0,99)<80?GroundId:Alternative[GroundId];
+    const FFiskSpecies* Species=Find(Fish.Species);
     Fish.WeightGrams=Random.RandRange(Species->MinGrams/100,Species->MaxGrams/100)*100;
     Fish.LengthMm=LengthForWeight(*Species,Fish.WeightGrams);
     Fish.Value=ValueForWeight(*Species,Fish.WeightGrams);

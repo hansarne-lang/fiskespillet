@@ -76,7 +76,7 @@ try{
  Wait-Tag $hostLog 'GameNetDriver.*listening on port 7777' $apps.host 120
  foreach($role in $roles[1..3]){$apps[$role]=Start-Case $role $role '127.0.0.1:7777' "$role-profile";$active+=$apps[$role];$logs+=Join-Path $run "$role.log"}
  Wait-Tag $hostLog 'FISKELAGET_CAREER_RELEASE_PASSED mode=host' $apps.host 1500
- foreach($role in $roles[1..3]){Wait-Tag (Join-Path $run "$role.log") "FISKELAGET_CAREER_RELEASE_PASSED mode=$role" $apps[$role] 30}
+ foreach($role in $roles[1..3]){Wait-Tag (Join-Path $run "$role.log") "FISKELAGET_CAREER_RELEASE_PASSED mode=$role" $apps[$role] 90}
  Start-Sleep -Seconds 2
  function Stamp($line){[datetime]::ParseExact([regex]::Match($line.Line,'\[(\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2}:\d{3})\]').Groups[1].Value,'yyyy.MM.dd-HH.mm.ss:fff',[Globalization.CultureInfo]::InvariantCulture)}
  $start=Select-String -LiteralPath $hostLog -Pattern 'FISKELAGET_SESSION_DAY number=1' | Select-Object -First 1

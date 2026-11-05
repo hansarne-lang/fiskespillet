@@ -186,6 +186,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
         const int64 Expected=225000+static_cast<int64>(Own->SessionBalance)*100;
         if(GI->Career.Cash!=Expected || GI->GetJournal().GetEntries().Num()!=1) { if(Now<1030) { return; }Fail(TEXT("income_or_journal_not_applied"));return; }
         CareerSmokeCash=GI->Career.Cash;CareerSmokeRevision=GI->Career.Revision;
+        if(bResultsVisible || bHistoryVisible || bHelpVisible) { Key(EKeys::Escape); }
         Key(EKeys::P);Shot(TEXT("career-after17"));ServerCareerHello(GI->Career);CareerSmokeAt=Now;CareerSmokeStage=28;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAREER_REVEAL_PASSED player=%d income=%d cash=%lld"),Self,Own->SessionBalance,static_cast<long long>(GI->Career.Cash));
     }
@@ -197,7 +198,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     else if(CareerSmokeStage==29)
     {
         if(Host && Day->GetDayNumber()==1 && Now>=1200) { Key(EKeys::N); }
-        if(Day->GetDayNumber()==2 && Now>=30)
+        if(Day->GetDayNumber()==2 && Day->GetElapsedSeconds()>=30)
         {
             if(GI->Career.Cash!=CareerSmokeCash || GI->Career.Revision!=CareerSmokeRevision || Boat->GetCrewCount()!=4 || Selection.Slot!=0 || Selection.Day!=2
                 || First->GetState()!=EFiskRodState::Ready || GetRodAt(1)->GetState()!=EFiskRodState::Ready || GetRodAt(2)->GetState()!=EFiskRodState::Ready) { Fail(TEXT("day2_career_or_rods_reset_wrong"));return; }

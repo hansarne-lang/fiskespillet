@@ -78,9 +78,17 @@ void UFiskFrontEnd::RunMenuSmoke()
         if(!Day->HasStarted()) { Fail(TEXT("solo_day_did_not_start"));return; }
         if(Step==1)
         {
-            SmokeKey(EKeys::E);
+            SmokeKey(EKeys::E);Step=11;
+        }
+        else if(Step==11)
+        {
+            // Input is dispatched on the next frame, including on a local host.
+            if(!Boat->IsAboard(PC->PlayerState->GetPlayerId())) { return; }
             if(Boat->GetCrewCount()!=1 || Boat->GetCaptainId()!=PC->PlayerState->GetPlayerId()) { Fail(TEXT("solo_boarding"));return; }
-            SmokeKey(EKeys::R);
+            SmokeKey(EKeys::R);Step=12;
+        }
+        else if(Step==12)
+        {
             if(Day->GetElapsedSeconds()>=120 || Boat->GetTripProgress()!=AFiskStarterBoat::AtDock) { Fail(TEXT("solo_early_departure"));return; }
             GI->SmokeClockAt=Day->GetElapsedMilliseconds();GI->SmokeAt=Now;
             UE_LOG(LogTemp,Display,TEXT("FISKELAGET_SOLO_STARTED players=1"));Step=2;SmokeKey(EKeys::Escape);

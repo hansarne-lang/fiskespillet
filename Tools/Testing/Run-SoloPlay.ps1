@@ -1,7 +1,7 @@
 param([Parameter(Mandatory)][string]$Package,[Parameter(Mandatory)][string]$LogDirectory)
 $ErrorActionPreference='Stop'
-$exe=Join-Path $Package 'FiskELaget.exe'
-if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged launcher missing'}
+$exe=Join-Path $Package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
+if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged executable missing'}
 if(@(Get-NetUDPEndpoint -LocalPort 7777 -ErrorAction SilentlyContinue).Count){throw 'Port 7777 is occupied'}
 $run=Join-Path $LogDirectory (Get-Date -Format yyyyMMdd-HHmmss)
 New-Item -ItemType Directory -Path $run -Force | Out-Null

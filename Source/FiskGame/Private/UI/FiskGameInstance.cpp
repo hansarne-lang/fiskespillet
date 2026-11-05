@@ -9,10 +9,21 @@
 #include "HAL/FileManager.h"
 #include "Boats/FiskBoardingController.h"
 #include "Economy/FiskDaySettlement.h"
+#include "Career/FiskCareerStore.h"
 
 void UFiskGameInstance::Init()
 {
     Super::Init();
+    const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);
+    bCareerBlocked=CareerLoad==EFiskCareerLoad::Blocked;
+    if(CareerLoad==EFiskCareerLoad::Empty)
+    {
+        Career=FFiskCareerProfile::Create(TEXT("FISKER"));bCareerBlocked=!FFiskCareerStore::Save(CareerFile(),Career);
+    }
+    CareerMessage=bCareerBlocked?TEXT("Karriere kunne ikke leses/lagres. Filene er bevart. P: prøv lagring igjen.")
+        :CareerLoad==EFiskCareerLoad::Recovered?TEXT("Karriere hentet fra sikkerhetskopi. Kontroller saldo; P / F5 lagrer hovedfil.")
+        :TEXT("Karriere lagret lokalt. Dagens inntekt kommer først ved 17:00.");
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAREER_LOADED revision=%d cash=%lld owned=%d blocked=%d recovery=%d"),Career.Revision,static_cast<long long>(Career.Cash),Career.Owned,bCareerBlocked,CareerLoad==EFiskCareerLoad::Recovered);
     const bool PlacesLoaded=Places.Load(PlacesFile());
     PlacesMessage=PlacesLoaded?TEXT("Favoritter lagres lokalt på denne PC-en."):TEXT("Kunne ikke lese favoritter. Eksisterende fil er bevart; kontroller filen før lagring.");
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PLACES_LOADED success=%d"),PlacesLoaded);
@@ -38,6 +49,14 @@ void UFiskGameInstance::Init()
     }
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_LOADED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate);
 }
+FString UFiskGameInstance::CareerFile() const
+{ return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetCareer.ini")); }
+bool UFiskGameInstance::AcceptCareer(const FFiskCareerProfile& P)
+{
+    if(!P.IsValid() || (Career.IsValid() && !P.Extends(Career)) || !FFiskCareerStore::Save(CareerFile(),P))
+    { CareerMessage=TEXT("Lagring av karriere venter. Eksisterende filer bevares. P / F5 prøver igjen.");return false; }
+    Career=P;bCareerBlocked=false;CareerMessage=TEXT("Karriere og kvitteringer er lagret lokalt.");return true;
+}
 FString UFiskGameInstance::JournalFile() const
 {
     return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetJournal.ini"));
@@ -56,6 +75,12 @@ bool UFiskGameInstance::ClearPlace(int32 Slot)
     const bool Saved=Places.Clear(Slot,PlacesFile());
     PlacesMessage=Saved?TEXT("Favoritten er slettet."):TEXT("Kunne ikke slette favoritten. Eksisterende fil er bevart.");
     return Saved;
+}
+bool UFiskGameInstance::SaveSeaPlace(int32 Slot,FVector Point,const FString& Name)
+{
+    const bool Saved=Places.SavePoint(Slot,Point,Name,PlacesFile());
+    PlacesMessage=Saved?TEXT("Koordinat og navn er lagret lokalt."):TEXT("Kunne ikke lagre sjøpunkt. Eksisterende data er bevart.");
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PLACE_POINT_SAVE success=%d x=%.0f y=%.0f"),Saved,Point.X,Point.Y);return Saved;
 }
 bool UFiskGameInstance::RetryJournalSave()
 {

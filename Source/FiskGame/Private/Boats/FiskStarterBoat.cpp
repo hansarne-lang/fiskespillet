@@ -9,6 +9,8 @@
 #include "Net/UnrealNetwork.h"
 
 #include "FiskFishingGround.h"
+#include "FiskRouteGeometry.h"
+#include "Boats/FiskJourneyAudio.h"
 
 void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
 {
@@ -18,13 +20,14 @@ void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
     const int32 View=PC->GetCameraView();
     const FVector Eye=View==2?FVector(-1700,-200,1000):FVector(-1250,View==1?1200:-1200,550);
     const FVector Focus=View==2?FVector(-200,0,130):View==1?FVector(-250,150,120):FVector(-100,-600,110);
-    OutResult.Location=GetActorTransform().TransformPosition(Eye);
+    OutResult.Location=GetActorTransform().TransformPosition(Eye*(Kind==1?1.3:1.0));
     OutResult.Rotation=(GetActorTransform().TransformPosition(Focus)-OutResult.Location).Rotation();
     OutResult.FOV=View==2?70.0f:75.0f;
 }
 
 AFiskStarterBoat::AFiskStarterBoat()
 {
+    RodActivities.Init(0,6);FishVisuals.SetNum(6);
     SetActorHiddenInGame(false);
     bReplicates = true;
     bAlwaysRelevant = true;
@@ -39,6 +42,7 @@ AFiskStarterBoat::AFiskStarterBoat()
     Camera->FieldOfView = 75.0f;
     CreateDefaultSubobject<UFiskBoatPresentation>(TEXT("BoatPresentation"));
     CreateDefaultSubobject<UFiskFishPresentation>(TEXT("FishPresentation"));
+    CreateDefaultSubobject<UFiskJourneyAudio>(TEXT("JourneyAudio"));
 
     SetReplicateMovement(true);
 
@@ -62,13 +66,14 @@ void AFiskStarterBoat::ResetForDay()
     TripProgress = AtDock; ++Route.Revision;
     PortRodActivity = StarboardRodActivity = 0;
     PortFish = FFiskFishVisualState(); StarboardFish = FFiskFishVisualState();
+    RodActivities.Init(0,6);FishVisuals.Init(FFiskFishVisualState(),6);
     SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
     OnRep_TripProgress(); OnRep_Route(); ForceNetUpdate();
 }
 
 void AFiskStarterBoat::Board(int32 PlayerId)
 {
-    if (!HasAuthority() || TripProgress != AtDock || PlayerId == INDEX_NONE || IsAboard(PlayerId) || Crew.Num() >= Capacity)
+    if (!HasAuthority() || TripProgress != AtDock || PlayerId == INDEX_NONE || IsAboard(PlayerId) || Crew.Num() >= GetCapacity())
     {
         return;
     }
@@ -107,6 +112,7 @@ bool AFiskStarterBoat::TransferCaptain(int32 Requester,int32 ExpectedRevision,in
 void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    DOREPLIFETIME(AFiskStarterBoat,Kind);DOREPLIFETIME(AFiskStarterBoat,RodActivities);DOREPLIFETIME(AFiskStarterBoat,FishVisuals);
     DOREPLIFETIME(AFiskStarterBoat, OwnerId);
     DOREPLIFETIME(AFiskStarterBoat, Route);
     DOREPLIFETIME(AFiskStarterBoat, Crew);
@@ -131,7 +137,8 @@ bool AFiskStarterBoat::SelectGround(int32 PlayerId,int32 ExpectedRevision,int32 
     { Message=TEXT("Velg fiskeplass ved brygga før avreise.");return false; }
     if(ExpectedRevision!=Route.Revision || Route.Revision==MAX_int32) { Message=TEXT("Kartet ble oppdatert. Velg på nytt.");return false; }
     if(!FiskGrounds::Find(GroundId)) { Message=TEXT("Ugyldig fiskeplass.");return false; }
-    Route.GroundId=GroundId;++Route.Revision;OnRep_Route();ForceNetUpdate();
+    Route.GroundId=GroundId;Route.Destination=FiskGrounds::Find(GroundId)->Position;Route.BaseTravelMs=FiskGrounds::Find(GroundId)->TravelMs;
+    ++Route.Revision;OnRep_Route();ForceNetUpdate();
     Message=TEXT("Rute valgt. R starter turen fra 02:00.");return true;
 }
 void AFiskStarterBoat::OnRep_Route()
@@ -153,7 +160,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
     {
         LegStartedMs = Day->GetElapsedMilliseconds();
         ReturnStartedMs = LegStartedMs;
-        SetActorRotation((-FiskGrounds::Find(Route.GroundId)->Position).Rotation());
+        SetActorRotation((-Route.Destination).Rotation());
 
         TripProgress = AtFishingSpot + 1;
         OnRep_TripProgress();
@@ -172,7 +179,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
     }
 
     LegStartedMs = Day->GetElapsedMilliseconds();
-    SetActorRotation(FiskGrounds::Find(Route.GroundId)->Position.Rotation());
+    SetActorRotation(Route.Destination.Rotation());
     TripProgress = 0;
     OnRep_TripProgress();
     SetActorTickEnabled(true);
@@ -186,9 +193,9 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (!HasAuthority() || !Day) { return; }
     const int32 NowMs = Day->GetElapsedMilliseconds();
-    const FFiskFishingGround* Ground=FiskGrounds::Find(Route.GroundId);
-    if(!Ground) { return; }
-    const double Fraction = FMath::Clamp((NowMs - LegStartedMs) / static_cast<double>(Ground->TravelMs), 0.0, 1.0);
+    const TArray<FVector> Path=FiskRouteGeometry::Path(Route.Destination);
+    if(Path.IsEmpty()) { return; }
+    const double Fraction = FMath::Clamp((NowMs - LegStartedMs) / static_cast<double>(GetTravelMs()), 0.0, 1.0);
     if (MarinaArrivalMs < 0)
     {
         MarinaArrivalMs = GetMarinaArrivalMs(NowMs);
@@ -199,7 +206,10 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     }
 
     const bool bReturning = TripProgress > AtFishingSpot;
-    SetActorLocation(Ground->Position * (bReturning ? 1.0f - Fraction : Fraction));
+    const double Along=bReturning?1.0-Fraction:Fraction;
+    const FVector Position=FiskRouteGeometry::Position(Path,Along);
+    const FVector Next=FiskRouteGeometry::Position(Path,FMath::Clamp(Along+(bReturning?-0.001:0.001),0.0,1.0));
+    if(!Next.Equals(Position,.01)) { SetActorRotation((Next-Position).Rotation()); }SetActorLocation(Position);
     const int32 Percent = FMath::FloorToInt(Fraction * AtFishingSpot);
     TripProgress = bReturning ? AtFishingSpot + FMath::Max(1, Percent) : Percent;
 
@@ -244,13 +254,15 @@ int32 AFiskStarterBoat::GetMarinaArrivalMs(int32 NowMs) const
 {
     if (MarinaArrivalMs >= 0) { return MarinaArrivalMs; }
     if (ReturnStartedMs < 0) { return -1; }
-    const int32 CrossingMs = CalculateCrossingMs(ReturnStartedMs, Route.GroundId);
+    const double Length=FiskRouteGeometry::Length(FiskRouteGeometry::Path(Route.Destination));
+    const int32 CrossingMs = ReturnStartedMs+FMath::CeilToInt(GetTravelMs()*(1.0-500.0/FMath::Max(Length,500.0)));
     return NowMs >= CrossingMs ? CrossingMs : -1;
 }
 
 
 void AFiskStarterBoat::SetRodActivities(uint8 Port, uint8 Starboard)
 {
+    if(RodActivities.Num()==6) { RodActivities[0]=Port;RodActivities[1]=Starboard; }
     if (HasAuthority() && (PortRodActivity != Port || StarboardRodActivity != Starboard))
     {
         PortRodActivity = Port;
@@ -262,10 +274,42 @@ void AFiskStarterBoat::SetRodActivities(uint8 Port, uint8 Starboard)
 
 void AFiskStarterBoat::SetFishVisuals(const FFiskFishVisualState& Port, const FFiskFishVisualState& Starboard)
 {
+    if(FishVisuals.Num()==6) { FishVisuals[0]=Port;FishVisuals[1]=Starboard; }
     if (HasAuthority() && (PortFish != Port || StarboardFish != Starboard))
     {
         PortFish = Port;
         StarboardFish = Starboard;
         ForceNetUpdate();
     }
+}
+
+bool AFiskStarterBoat::ChooseKind(int32 Requester,int32 Revision,int32 NewKind)
+{
+    if(!HasAuthority() || Requester!=OwnerId || Revision!=Route.Revision || Route.Revision==MAX_int32
+        || (NewKind!=0 && NewKind!=1) || (TripProgress!=AtDock && TripProgress!=AtMarina) || Crew.Num()>FiskBoatLayout::Seats(NewKind)) { return false; }
+    Kind=NewKind;++Route.Revision;OnRep_Route();ForceNetUpdate();return true;
+}
+bool AFiskStarterBoat::SelectPoint(int32 Requester,int32 Revision,FVector Point,FString& Message)
+{
+    int32 Habitat=0,Duration=0;
+    if(!FiskGrounds::MakeSeaPoint(Point,Habitat,Duration)) { Message=TEXT("Velg sjø innenfor kartet, utenfor øyer og marina.");return false; }
+    if(!SelectGround(Requester,Revision,Habitat,Message)) { return false; }
+    Route.Destination=Point;Route.BaseTravelMs=Duration;ForceNetUpdate();
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_SEA_POINT x=%.0f y=%.0f habitat=%d travel=%d"),Point.X,Point.Y,Habitat,GetTravelMs());return true;
+}
+int32 AFiskStarterBoat::ReturnMarginMs(int32 NowMs) const
+{
+    int64 Home=NowMs;const int64 Travel=GetTravelMs();
+    if(TripProgress==-1) { Home=FMath::Max(NowMs,120000)+2*Travel; }
+    else if(TripProgress<100) { Home+=FMath::DivideAndRoundUp<int64>((100LL-TripProgress)*Travel,100)+Travel; }
+    else if(TripProgress==100) { Home+=Travel; }
+    else if(TripProgress<200) { Home+=FMath::DivideAndRoundUp<int64>((TripProgress==101?100LL:200LL-TripProgress)*Travel,100); }
+    return static_cast<int32>(FMath::Clamp<int64>(1020000-Home,MIN_int32,MAX_int32));
+}
+void AFiskStarterBoat::SetHolderVisuals(const TArray<uint8>& Activities,const TArray<FFiskFishVisualState>& Fish)
+{
+    if(!HasAuthority() || Activities.Num()!=6 || Fish.Num()!=6) { return; }
+    bool Changed=RodActivities!=Activities;
+    for(int32 I=0;I<6;++I) { Changed|=FishVisuals[I]!=Fish[I]; }
+    if(Changed) { RodActivities=Activities;FishVisuals=Fish;ForceNetUpdate(); }
 }

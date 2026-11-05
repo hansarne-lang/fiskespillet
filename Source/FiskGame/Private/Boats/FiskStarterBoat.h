@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Info.h"
 #include "Fishing/FiskFishVisualState.h"
+#include "FiskBoatLayout.h"
 #include "FiskStarterBoat.generated.h"
 
 USTRUCT()
@@ -12,6 +13,8 @@ struct FFiskRouteView
     UPROPERTY() int32 GroundId = 0;
     UPROPERTY() int32 Revision = 0;
     UPROPERTY() int32 CaptainId = INDEX_NONE;
+    UPROPERTY() FVector Destination=FVector(20000,0,0);
+    UPROPERTY() int32 BaseTravelMs=12000;
     bool Authorizes(int32 Requester,int32 ExpectedRevision,const TArray<int32>& Crew) const;
     bool Transfer(int32 Requester,int32 ExpectedRevision,int32 Target,const TArray<int32>& Crew);
     bool RefreshCaptain(const TArray<int32>& Crew,int32 OwnerId,bool bPreferOwner);
@@ -29,6 +32,17 @@ public:
     static constexpr int32 AtMarina = 200;
 
     AFiskStarterBoat();
+    int32 GetKind() const { return Kind; }
+    int32 GetCapacity() const { return FiskBoatLayout::Seats(Kind); }
+    int32 GetHolderCount() const { return FiskBoatLayout::Holders(Kind); }
+    int32 GetRodsFor(int32 Player) const { return FiskBoatLayout::Rods(Kind,Crew.Num(),GetSeatIndex(Player)); }
+    int32 GetHolderFor(int32 Player,int32 Slot) const { const int32 Seat=GetSeatIndex(Player);return Seat<0 || Slot<0 || Slot>=GetRodsFor(Player)?-1:FiskBoatLayout::FirstHolder(Kind,Crew.Num(),Seat)+Slot; }
+    int32 GetOwnerId() const { return OwnerId; }
+    int32 GetTravelMs() const { return Kind==1?FMath::Max(1,Route.BaseTravelMs*4/5):Route.BaseTravelMs; }
+    FVector GetDestination() const { return Route.Destination; }
+    bool ChooseKind(int32 Requester,int32 Revision,int32 NewKind);
+    bool SelectPoint(int32 Requester,int32 Revision,FVector Point,FString& Message);
+    int32 ReturnMarginMs(int32 NowMs) const;
     virtual void CalcCamera(float DeltaTime,struct FMinimalViewInfo& OutResult) override;
     void SetOwnerPlayer(int32 PlayerId);
     void ResetForDay();
@@ -55,16 +69,20 @@ public:
     bool CanCaptainCommand(int32 Requester,int32 ExpectedRevision) const { return Route.Authorizes(Requester,ExpectedRevision,Crew); }
     bool TransferCaptain(int32 Requester,int32 ExpectedRevision,int32 Target);
     int32 GetSeatIndex(int32 PlayerId) const { return Crew.IndexOfByKey(PlayerId); }
-    uint8 GetRodActivity(int32 Seat) const { return Seat == 0 ? PortRodActivity : StarboardRodActivity; }
+    uint8 GetRodActivity(int32 Seat) const { return RodActivities.IsValidIndex(Seat)?RodActivities[Seat]:0; }
 
     void SetRodActivities(uint8 Port, uint8 Starboard);
-    const FFiskFishVisualState& GetFishVisual(int32 Seat) const { return Seat == 0 ? PortFish : StarboardFish; }
+    const FFiskFishVisualState& GetFishVisual(int32 Seat) const { static const FFiskFishVisualState Empty;return FishVisuals.IsValidIndex(Seat)?FishVisuals[Seat]:Empty; }
     void SetFishVisuals(const FFiskFishVisualState& Port, const FFiskFishVisualState& Starboard);
+    void SetHolderVisuals(const TArray<uint8>& Activities,const TArray<FFiskFishVisualState>& Fish);
 
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+    UPROPERTY(Replicated) int32 Kind=0;
+    UPROPERTY(Replicated) TArray<uint8> RodActivities;
+    UPROPERTY(Replicated) TArray<FFiskFishVisualState> FishVisuals;
     UPROPERTY(Replicated)
 
     int32 OwnerId = INDEX_NONE;

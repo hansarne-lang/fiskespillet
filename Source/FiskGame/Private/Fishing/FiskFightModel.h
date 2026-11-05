@@ -8,7 +8,7 @@ enum class EFiskFightOutcome : uint8 { Fighting, ReadyToLand, LineBreak, Slack }
 class FFiskFightModel
 {
 public:
-    void Reset(int32 Seed, float InitialLine = 30.0f,int32 Species=1);
+    void Reset(int32 Seed, float InitialLine = 30.0f,int32 Species=1,int32 Equipment=0);
     void SetRaised(bool Value) { bRaised = Value; }
     void SetReeling(bool Value) { bReeling = Value; }
     void AdjustDrag(int32 Steps);
@@ -22,6 +22,7 @@ public:
     EFiskFightOutcome GetOutcome() const { return Outcome; }
 private:
     FFiskFightProfile Profile;
+    int32 Gear=0;
     void Step();
     FRandomStream Random;
     double Pending = 0.0, Age = 0.0, NextRun = 0.0, RunLeft = 0.0;

@@ -5,6 +5,7 @@ struct FFiskSavedPlace
 {
     int32 Ground = INDEX_NONE;
     FString Name;
+    FVector Point=FVector::ZeroVector;
 };
 
 // Preferences only: every use still goes through the captain's server command.
@@ -15,6 +16,7 @@ public:
     static constexpr int32 NameLimit=24;
     bool Load(const FString& File);
     bool Save(int32 Slot,int32 Ground,const FString& Name,const FString& File);
+    bool SavePoint(int32 Slot,FVector Point,const FString& Name,const FString& File);
     bool Clear(int32 Slot,const FString& File);
     const FFiskSavedPlace* Get(int32 Slot) const;
     bool IsBlocked() const { return bBlocked; }

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Fishing/FiskRodSelection.h"
+#include "FiskCareerProfile.h"
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
@@ -34,11 +35,25 @@ class AFiskBoardingController final : public APlayerController
 
 public:
     AFiskBoardingController();
+    bool IsCareerReady() const { return bCareerReady; }
+    bool IsCareerSynced() const { return bCareerReady && CareerAck>=ServerCareer.Revision; }
+    const FFiskCareerProfile& GetServerCareer() const { return ServerCareer; }
+    bool HasEquipment(int32 Item) const { return bCareerReady && ServerCareer.Has(Item); }
+    bool HandleCareerKey(const FInputKeyEventArgs& Args);
+    void DrawCareer(class AHUD& HUD,class UCanvas& Canvas);
+    bool IsCareerVisible() const { return bCareerVisible; }
+    void TickCareer();
+    UFUNCTION(Server,Reliable) void ServerCareerHello(FFiskCareerProfile Profile);
+    UFUNCTION(Client,Reliable) void ClientCareerSnapshot(FFiskCareerProfile Profile,const FString& Message);
+    UFUNCTION(Server,Reliable) void ServerCareerAck(FGuid Profile,int32 Revision);
+    UFUNCTION(Server,Reliable) void ServerBuyCareer(FGuid Command,int32 Revision,int32 Item);
+    UFUNCTION(Server,Reliable) void ServerChooseBoat(int32 Revision,int32 Kind);
+    UFUNCTION(Server,Reliable) void ServerSelectSeaPoint(int32 Revision,FVector_NetQuantize Point);
     virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
-    const UFiskPrototypeRod* GetRod() const { return Selection.Slot==1?ExtraRod:Rod; }
-    const UFiskPrototypeRod* GetRodAt(int32 Slot) const { return Slot==0?Rod.Get():Slot==1?ExtraRod.Get():nullptr; }
+    const UFiskPrototypeRod* GetRod() const { return GetRodAt(Selection.Slot); }
+    const UFiskPrototypeRod* GetRodAt(int32 Slot) const { return Slot==0?Rod.Get():Slot==1?ExtraRod.Get():Slot==2?ThirdRod.Get():nullptr; }
     int32 GetRodCapacity() const;
     int32 GetSelectedRod() const { return Selection.Slot; }
     bool IsRodSelectionPending() const { return PendingRod>=0; }
@@ -80,10 +95,16 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    FFiskCareerProfile ServerCareer,PendingCareer;
+    int32 CareerAck=0,ShopRow=0;
+    bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;
+    double CareerRetryAt=0;
+    FString CareerAuthorityFile() const;
+    bool SaveServerCareer(const FFiskCareerProfile& Candidate,const FString& Message);
     FFiskRodSelection Selection;
     int32 PendingRod=-1,CameraView=0;
     void ReconcileRodCapacity();
-    UFiskPrototypeRod* MutableRod() const { return Selection.Slot==1?ExtraRod:Rod; }
+    UFiskPrototypeRod* MutableRod() const { return const_cast<UFiskPrototypeRod*>(GetRodAt(Selection.Slot)); }
     bool bHelpVisible=false,bResultsVisible=false,bHistoryVisible=false,bAutoResultsSeen=false;
     int32 ObservedDay=0, ReturnWarningLevel=0;
     int32 ResultPage=0;
@@ -118,6 +139,7 @@ private:
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;
     UPROPERTY() TObjectPtr<UFiskPrototypeRod> ExtraRod;
+    UPROPERTY() TObjectPtr<UFiskPrototypeRod> ThirdRod;
     UPROPERTY() TObjectPtr<UFiskFrontEnd> FrontEnd;
     UPROPERTY() TObjectPtr<UFiskRigPanel> RigPanel;
     UPROPERTY() TObjectPtr<UFiskSeaChart> SeaChart;

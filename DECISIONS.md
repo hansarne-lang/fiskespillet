@@ -31,3 +31,11 @@ Uavklarte forhold og gjennomføringsstatus føres i GitHub Issues, ikke i en lok
 ## 2026-11-04 — Marinasone og returfrist
 
 Prosjekteieren godkjente at serveren registrerer ankomst når båtens midtpunkt krysser en synlig marinasone. Ankomst senest ved 1 020 000 ms teller som i tide. Serveren behandler autoritativ kryssing før oppgjøret, også når begge skjer i samme ramme. En forsinket klientmelding flytter ingen ankomsttid. Testprototypen bruker en sirkel med radius fem meter rundt bryggepunktet. Størrelsen er en foreløpig testverdi.
+
+## 2026-11-05 — Eiergodkjent v0.7
+
+Prosjekteieren svarte «Ja – bygg hele v0.7-pakken» på det konkrete forslaget i [#72](https://github.com/hansarne-lang/fiskespillet/issues/72). Godkjenningen omfatter varig karriere med $30 000 engangs teststartsaldo, egne fangstinntekter først ved17:00, butikkprisene $250/$1 000/$1 500/$25 000 og foreløpige utstyrsbonuser15% bruddgrense/15% innsveiving/10% pumping.
+
+Én aktiv felles båt velges av verten/eieren ved brygga. Offshorebåten har4plasser,6holdere og25% høyere fart. Fordelingen for1/2/3/4om bord er3 /3+3 /2+2+2 /2+2+1+1, med maksimalt3stenger per spiller. Startbåtens godkjente to-alene/én-hver-fordeling beholdes. Fire LAN-spillere, fritt valg av gyldige sjøpunkter, migrerte koordinatfavoritter og rikere kildebygd miljø/lyd inngår.
+
+Den begrensede økonomi-/profilarkitekturen i v0.7-kontrakten er godkjent innen de eksisterende to UE-modulene. Historisk journal etterbetales ikke. Offline-profilkopiering kan ikke forhindres mellom uavhengige servere. Flere samtidige båter, lager/overlast/sleping, offshore-sannsynlighet, reisehopp, strandbar, naust og veddemål inngår ikke; deres øvrige åpne eierbeslutninger beholdes. Tallene er testbalanse, ikke endelig økonomi.

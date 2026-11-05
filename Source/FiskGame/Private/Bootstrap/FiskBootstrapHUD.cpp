@@ -133,6 +133,7 @@ void AFiskBootstrapHUD::DrawHUD()
             DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,Canvas->ClipY-42*S,1232*S,36*S);
             DrawText(Feedback,FLinearColor(1,0.86f,0.5f),40*S,Canvas->ClipY-34*S,nullptr,0.95f*S);
         }
+        if(PC->IsCareerVisible()) { const_cast<AFiskBoardingController*>(PC)->DrawCareer(*this,*Canvas);return; }
         if(PC->GetJournalPanel()->IsVisible()) { PC->GetJournalPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetDeckPanel()->IsVisible()) { PC->GetDeckPanel()->Draw(*this,*Canvas);return; }
         if(PC->IsHelpVisible() || PC->IsResultsVisible() || PC->IsHistoryVisible()) { DrawContentPanel(*this,*Canvas,*PC);return; }

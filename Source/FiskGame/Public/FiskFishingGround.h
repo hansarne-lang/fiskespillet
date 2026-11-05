@@ -17,4 +17,5 @@ namespace FiskGrounds
     FISKGAME_API const FFiskFishingGround* Find(int32 Id);
     FISKGAME_API int32 CrossingMs(int32 ReturnStartMs, int32 Id);
     FISKGAME_API int32 ReturnMarginMs(int32 NowMs, int32 Progress, int32 Id);
+    FISKGAME_API bool MakeSeaPoint(FVector Point,int32& Habitat,int32& TravelMs);
 }

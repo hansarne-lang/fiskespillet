@@ -1,4 +1,12 @@
 #include "FiskFishingGround.h"
+#include "FiskRouteGeometry.h"
+bool FiskGrounds::MakeSeaPoint(FVector Point,int32& Habitat,int32& TravelMs)
+{
+    const TArray<FVector> Path=FiskRouteGeometry::Path(Point);if(Path.IsEmpty()) { return false; }
+    Habitat=0;for(int32 I=1;I<Count;++I) { if(FVector::DistSquared(Point,Find(I)->Position)<FVector::DistSquared(Point,Find(Habitat)->Position)) { Habitat=I; } }
+    const FFiskFishingGround& G=*Find(Habitat);
+    TravelMs=FMath::Clamp(FMath::RoundToInt(G.TravelMs*FiskRouteGeometry::Length(Path)/G.Position.Size()),4000,150000);return true;
+}
 const FFiskFishingGround* FiskGrounds::Find(int32 Id)
 {
     static const FFiskFishingGround Grounds[] = {

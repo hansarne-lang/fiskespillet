@@ -23,7 +23,7 @@ bool UFiskSeaChart::HandleFavorites(const FInputKeyEventArgs& Args)
             const FFiskSavedPlace* Saved=GI->Places.Get(FavoriteSlot);
             const FString Name=EditName.TrimStartAndEnd();
             if(!Saved || !FFiskNavigationNotebook::ValidName(Name)) { Message=TEXT("Bruk 1-24 bokstaver/tall, mellomrom, - eller _. Navnet kan ikke være tomt."); }
-            else { GI->SavePlace(FavoriteSlot,Saved->Ground,Name);Message=GI->PlacesMessage;bRenaming=false; }
+            else { GI->SaveSeaPlace(FavoriteSlot,Saved->Point,Name);Message=GI->PlacesMessage;bRenaming=false; }
         }
         else if(EditName.Len()<FFiskNavigationNotebook::NameLimit)
         {
@@ -45,7 +45,7 @@ bool UFiskSeaChart::HandleFavorites(const FInputKeyEventArgs& Args)
     {
         const AFiskStarterBoat* Boat=PC->FindStarterBoat();
         if(Boat && FiskGrounds::Find(Boat->GetGroundId()))
-        { GI->SavePlace(FavoriteSlot,Boat->GetGroundId(),FiskGrounds::Find(Boat->GetGroundId())->Name);Message=GI->PlacesMessage; }
+        { GI->SaveSeaPlace(FavoriteSlot,Boat->GetDestination(),FiskGrounds::Find(Boat->GetGroundId())->Name);Message=GI->PlacesMessage; }
     }
     else if(K==EKeys::F2)
     {
@@ -55,7 +55,7 @@ bool UFiskSeaChart::HandleFavorites(const FInputKeyEventArgs& Args)
     else if(K==EKeys::Delete) { GI->ClearPlace(FavoriteSlot);Message=GI->PlacesMessage; }
     else if(K==EKeys::Enter)
     {
-        if(const FFiskSavedPlace* Saved=GI->Places.Get(FavoriteSlot)) { Row=Saved->Ground;Choose(); }
+        if(const FFiskSavedPlace* Saved=GI->Places.Get(FavoriteSlot)) { if(const AFiskStarterBoat* B=PC->FindStarterBoat()) { PC->ServerSelectSeaPoint(B->GetRouteRevision(),Saved->Point); } }
         else { Message=TEXT("Denne favorittplassen er tom. F5 lagrer båtens valgte rute."); }
     }
     else if(K==EKeys::LeftMouseButton)

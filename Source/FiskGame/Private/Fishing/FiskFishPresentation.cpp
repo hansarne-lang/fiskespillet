@@ -43,7 +43,7 @@ void UFiskFishPresentation::BeginPlay()
 #if WITH_DEV_AUTOMATION_TESTS
     FParse::Value(FCommandLine::Get(), TEXT("FiskScreenshotDir="), ScreenshotDirectory);
 #endif
-    for (int32 Seat = 0; Seat < 2; ++Seat)
+    for (int32 Seat = 0; Seat < 6; ++Seat)
     {
         USceneComponent* Root = NewObject<USceneComponent>(Boat, *FString::Printf(TEXT("Fish%dRoot"), Seat));
         Boat->AddInstanceComponent(Root);
@@ -145,7 +145,7 @@ void UFiskFishPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             UE_LOG(LogTemp, Display, TEXT("FISKELAGET_FISH_VISUAL_FINISHED seat=%d"), Seat);
         }
         const bool bSplash = bNear || bReady || (bLanding && LandingAge >= 0.0 && LandingAge < 0.8);
-        const float SplashSign = Seat == 0 ? -1.0f : 1.0f;
+        const float SplashSign = Seat%2 == 0 ? -1.0f : 1.0f;
         for (int32 Drop = 0; Drop < 8; ++Drop)
         {
             UStaticMeshComponent* Splash = Droplets[Seat * 8 + Drop];
@@ -164,8 +164,8 @@ void UFiskFishPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
         }
         if (!Visible[Seat]) { continue; }
 
-        const float Sign = Seat == 0 ? -1.0f : 1.0f;
-        FVector Position(-180, Sign * (300 + FMath::Min(State.LineMeters, 10) * 12), 4 + FMath::Sin(Time * 5 + Seat) * 4);
+        const float Sign = Seat%2 == 0 ? -1.0f : 1.0f;
+        FVector Position(-180+(Seat/2)*100, Sign * (300 + FMath::Min(State.LineMeters, 10) * 12), 4 + FMath::Sin(Time * 5 + Seat) * 4);
         FRotator Rotation(FMath::Sin(Time * 4) * 4, FMath::Sin(Time * 2 + Seat) * 8, FMath::Sin(Time * 6) * 8);
         if (bLanding)
         {

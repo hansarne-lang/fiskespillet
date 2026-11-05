@@ -45,6 +45,9 @@ bool FFiskJournalStore::Read(const FString& File,FFiskJournalModel& Model,int32&
             || !Integer(Config,Section,TEXT("Depth"),E.Context.Depth) || !Integer(Config,Section,TEXT("Program"),E.Context.Program)
             || !Integer(Config,Section,TEXT("FightMs"),E.Context.FightMs) || !Integer(Config,Section,TEXT("LandedAtMs"),E.Context.LandedAtMs)
             || !Config.GetString(Section,TEXT("LandedUtc"),E.Context.LandedUtc)) { return false; }
+        FString Optional;
+        if(Config.GetString(Section,TEXT("BoatKind"),Optional) && !Integer(Config,Section,TEXT("BoatKind"),E.Context.BoatKind)) { return false; }
+        if(Config.GetString(Section,TEXT("Equipment"),Optional) && !Integer(Config,Section,TEXT("Equipment"),E.Context.Equipment)) { return false; }
         E.bSold=Sold==1;Entries.Add(E);
     }
     return Entries.Num()==Count && Model.Restore(Entries);
@@ -62,6 +65,7 @@ bool FFiskJournalStore::Write(const FString& File,const FFiskJournalModel& Model
         Put(Config,S,TEXT("Sold"),E.bSold?1:0);Put(Config,S,TEXT("Ground"),E.Context.Ground);Put(Config,S,TEXT("Bait"),E.Context.Bait);
         Put(Config,S,TEXT("Depth"),E.Context.Depth);Put(Config,S,TEXT("Program"),E.Context.Program);Put(Config,S,TEXT("FightMs"),E.Context.FightMs);
         Put(Config,S,TEXT("LandedAtMs"),E.Context.LandedAtMs);Config.SetString(S,TEXT("LandedUtc"),*E.Context.LandedUtc);
+        Put(Config,S,TEXT("BoatKind"),E.Context.BoatKind);Put(Config,S,TEXT("Equipment"),E.Context.Equipment);
     }
     Config.Dirty=true;
     return Config.Write(File) && IFileManager::Get().FileSize(*File)<=MaxBytes;

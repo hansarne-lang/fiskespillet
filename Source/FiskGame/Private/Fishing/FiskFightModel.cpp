@@ -1,9 +1,10 @@
 #include "Fishing/FiskFightModel.h"
 
-void FFiskFightModel::Reset(int32 Seed, float InitialLine,int32 Species)
+void FFiskFightModel::Reset(int32 Seed, float InitialLine,int32 Species,int32 Equipment)
 {
     *this = FFiskFightModel();
     Profile=FFiskFightProfile::ForSpecies(Species);
+    Gear=Equipment&7;Profile.Pump*=Gear&4?1.10f:1.0f;
     Line = FMath::IsFinite(InitialLine) ? FMath::Clamp(InitialLine, 2.0f, 1000.0f) : 30.0f;
     Random.Initialize(Seed);
     NextRun = Random.FRandRange(5.0f, 8.0f);
@@ -40,7 +41,7 @@ void FFiskFightModel::Step()
     Load = FMath::Max(0.0f, 12.0f + DragPercent * 0.55f
         + (bRaised ? 22.0f : 0.0f) + (bReeling ? 18.0f : 0.0f)
         + (bRun ? 40.0f : 0.0f) - FMath::Max(0.0f, Idle - 2.0f) * 4.0f);
-    Overload = Load > 100.0f ? Overload + Dt : 0.0f;
+    Overload = Load > (Gear&1?115.0f:100.0f) ? Overload + Dt : 0.0f;
     SlackTime = Load < 20.0f ? SlackTime + Dt : 0.0f;
     if (Overload >= 1.0f) { Outcome = EFiskFightOutcome::LineBreak; return; }
     if (SlackTime >= 3.0f) { Outcome = EFiskFightOutcome::Slack; return; }
@@ -56,7 +57,7 @@ void FFiskFightModel::Step()
     }
     else if (!bRaised && bReeling)
     {
-        const float Gain = FMath::Min(PumpCredit, 4.0f * Profile.Pump * Dt);
+        const float Gain = FMath::Min(PumpCredit, 4.0f * Profile.Pump * (Gear&2?1.15f:1.0f) * Dt);
         Line = FMath::Max(0.0f, Line - Gain);
         PumpCredit -= Gain;
     }

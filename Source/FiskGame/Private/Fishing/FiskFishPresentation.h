@@ -24,12 +24,12 @@ private:
     UPROPERTY() TArray<TObjectPtr<USceneComponent>> FishRoots;
     UPROPERTY() TArray<TObjectPtr<USceneComponent>> TailRoots;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Droplets;
-    bool SplashReported[2] = {false, false};
-    FGuid SeenCast[2];
-    bool Visible[2] = {false, false};
-    bool NearReported[2] = {false, false};
-    bool LandingReported[2] = {false, false};
-    bool HiddenReported[2] = {false, false};
+    bool SplashReported[6] = {};
+    FGuid SeenCast[6];
+    bool Visible[6] = {};
+    bool NearReported[6] = {};
+    bool LandingReported[6] = {};
+    bool HiddenReported[6] = {};
 #if WITH_DEV_AUTOMATION_TESTS
     FString ScreenshotDirectory;
     bool bCapturedNear = false;

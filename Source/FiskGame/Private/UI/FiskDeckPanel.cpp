@@ -1,5 +1,6 @@
 #include "UI/FiskDeckPanel.h"
 #include "UI/FiskNavigationModel.h"
+#include "UI/FiskGameInstance.h"
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Fishing/FiskPrototypeRod.h"
@@ -128,29 +129,29 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     const bool Aboard=Boat && Boat->IsAboard(Self),Captain=Boat && Boat->GetCaptainId()==Self;
     const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():-1);
     const bool RigValid=Ground && FFiskRigRules::IsValid(Rod->GetRig().Bait,Rod->GetRig().Depth,Rod->GetRig().Program,Ground->BottomDepth);
-    Rect(20,20,330,376);Text(TEXT("FISKELAGET"),38,36,1.7f,Teal);
+    Rect(20,20,330,420);Text(TEXT("FISKELAGET"),38,36,1.7f,Teal);
     Text(Ground?Ground->Name:TEXT("Marina"),38,81,1.1f);
-    Text(FString::Printf(TEXT("Startbåt | %d/2 om bord | Kaptein: %s"),Boat?Boat->GetCrewCount():0,Captain?TEXT("deg"):!Boat || Boat->GetCaptainId()==INDEX_NONE?TEXT("ingen"):TEXT("medspiller")),38,116,.9f,Muted);
-    for(int32 Slot=0;Slot<2;++Slot)
+    Text(FString::Printf(TEXT("%s | %d/%d om bord | Kaptein: %s"),Boat && Boat->GetKind()==1?TEXT("Offshore"):TEXT("Startbåt"),Boat?Boat->GetCrewCount():0,Boat?Boat->GetCapacity():2,Captain?TEXT("deg"):!Boat || Boat->GetCaptainId()==INDEX_NONE?TEXT("ingen"):TEXT("medspiller")),38,116,.8f,Muted);
+    for(int32 Slot=0;Slot<3;++Slot)
     {
         const UFiskPrototypeRod* CardRod=PC.GetRodAt(Slot);
         const bool Available=Slot<PC.GetRodCapacity(),Selected=Slot==PC.GetSelectedRod();
-        const float Y=151+Slot*113;
-        Rect(32,Y,306,103,Selected?FLinearColor(.09f,.26f,.28f):FLinearColor(.025f,.08f,.11f));
+        const float Y=145+Slot*95;
+        Rect(32,Y,306,87,Selected?FLinearColor(.09f,.26f,.28f):FLinearColor(.025f,.08f,.11f));
         Text(FString::Printf(TEXT("%d: STANG %d %s"),Slot+1,Slot+1,Selected?TEXT("[VALGT]"):TEXT("")),44,Y+9,1.0f,Selected?Teal:Muted);
-        if(!Available) { Text(Aboard?TEXT("Delt båt: én stang hver"):TEXT("Gå om bord med E"),44,Y+47,.9f,Muted);continue; }
+        if(!Available) { Text(Aboard?TEXT("Ingen ledig egen holder her"):TEXT("Gå om bord med E"),44,Y+47,.9f,Muted);continue; }
         const EFiskRodState CardState=CardRod->GetState();
         const TCHAR* StateName=CardState==EFiskRodState::Fishing?TEXT("Fisker automatisk"):CardState==EFiskRodState::InitialRun?TEXT("NAPP - FØRSTE UTRAS")
             :CardState==EFiskRodState::Fighting?TEXT("FISKEKAMP") :CardState==EFiskRodState::ReadyToLand?TEXT("KLAR TIL LANDING")
             :CardState==EFiskRodState::Lost?TEXT("Fisk mistet - klar igjen"):CardState==EFiskRodState::Landed?TEXT("Fisk landet"):TEXT("Ledig");
-        Text(StateName,44,Y+34,.95f,CardState==EFiskRodState::InitialRun || CardState==EFiskRodState::ReadyToLand?Gold:FLinearColor::White);
+        Text(StateName,44,Y+29,.9f,CardState==EFiskRodState::InitialRun || CardState==EFiskRodState::ReadyToLand?Gold:FLinearColor::White);
         const FFiskRigSettings& R=CardRod->GetRig();
-        Text(FString::Printf(TEXT("%s | %d m"),FFiskRigRules::BaitName(R.Bait),R.Depth),44,Y+61,.85f,Teal);
-        Text(FString::Printf(TEXT("%s | G: oppsett for valgt stang"),FFiskRigRules::ProgramName(R.Program)),44,Y+83,.75f,Muted);
+        Text(FString::Printf(TEXT("%s | %d m"),FFiskRigRules::BaitName(R.Bait),R.Depth),44,Y+50,.8f,Teal);
+        Text(FString::Printf(TEXT("%s | G: oppsett"),FFiskRigRules::ProgramName(R.Program)),44,Y+69,.75f,Muted);
     }
     Rect(900,20,360,134);
     Text(FString::Printf(TEXT("DAG %d  %02d:%02d"),Day?Day->GetDayNumber():1,Ms/60000,Ms/1000%60),920,36,1.8f);
-    const int32 Margin=Boat?FiskGrounds::ReturnMarginMs(Ms,Progress,Boat->GetGroundId()):0;
+    const int32 Margin=Boat?Boat->ReturnMarginMs(Ms):0;
     const int32 Warning=FiskSession::ReturnWarning(Margin);
     const FLinearColor Risk=Progress==200?Teal:Warning==2?FLinearColor(1,.35f,.3f):Warning==1?Gold:Teal;
     Text(TEXT("ABSOLUTT RETURFRIST 17:00"),920,83,1.0f,Muted);
@@ -172,11 +173,12 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     }
     Rect(20,630,1240,76);Text(TEXT("NESTE HANDLING"),38,642,0.85f,Teal);
     Text(FiskNavigation::NextAction(Day && Day->HasStarted(),Ms,Progress,Aboard,Captain,PC.GetNetMode()==NM_ListenServer,static_cast<int32>(State),RigValid,Ms<Rod->GetAvailableAtMs()),38,672,1.05f);
-    Text(TEXT("1/2 stang | C kamera | M kart | K mannskap | F1 hjelp"),38,414,.8f,Muted);
-    Text(TEXT("F2 oppgjør | F3 historikk | F4 journal | F7 ekkolodd | F8 LAN-tavle"),38,439,.72f,Muted);
+    Text(TEXT("1/2/3 stang | C kamera | M kart | K mannskap | P butikk"),38,457,.75f,Muted);
+    Text(TEXT("F1 hjelp | F2 oppgjør | F3 historikk | F4 journal | F7 ekkolodd | F8 tavle"),38,480,.68f,Muted);
+    Text(CastChecked<UFiskGameInstance>(PC.GetGameInstance())->Career.Money(),38,514,1.1f,Gold);
     if(!Fight && Aboard && Progress==100 && Ms<1020000)
     {
-        Text(State==EFiskRodState::Fishing?TEXT("STANGA FISKER - VENTER PÅ NAPP"):State==EFiskRodState::Lost?TEXT("FISKEN SLAPP UNNA - F FOR Å PRØVE IGJEN"):TEXT("STANGA ER LEDIG"),38,477,.75f,Gold);
+        Text(State==EFiskRodState::Fishing?TEXT("STANGA FISKER - VENTER PÅ NAPP"):State==EFiskRodState::Lost?TEXT("FISKEN SLAPP UNNA - F FOR Å PRØVE IGJEN"):TEXT("STANGA ER LEDIG"),38,550,.7f,Gold);
     }
     const FString Feedback=PC.GetActionFeedback();
     if(!Feedback.IsEmpty())

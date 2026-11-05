@@ -64,6 +64,8 @@ void UFiskBoatPresentation::BeginPlay()
     const FLinearColor Steel(0.45f, 0.52f, 0.56f);
     auto Part = [&](const TCHAR* Name, UStaticMesh* Mesh, FVector Position, FVector Scale, FLinearColor Color)
     {
+        const FString Label(Name);const int32 Seat=FCString::Atoi(*Label.Right(1));
+        if(Seat>=2 && (Label.StartsWith(TEXT("Seat")) || Label.StartsWith(TEXT("RoofPost")))) { Position.X+=(Seat/2)*110; }
         return FiskVisual::AddPart(Boat, VisualRoot, Mesh, Material, Name, Position, Scale, Color);
     };
     Part(TEXT("Hull"), Sphere, FVector(0, 0, 20), FVector(7.2, 2.6, 1.2), White);
@@ -75,17 +77,17 @@ void UFiskBoatPresentation::BeginPlay()
     Part(TEXT("Console"), Cube, FVector(45, 0, 145), FVector(1.0, 0.85, 1.3), White);
     Part(TEXT("Windscreen"), Cube, FVector(85, 0, 214), FVector(0.08, 0.9, 0.55), FLinearColor(0.07f, 0.27f, 0.33f));
     Part(TEXT("Roof"), Cube, FVector(20, 0, 270), FVector(3.0, 2.0, 0.10), White);
-    for (int32 Side = 0; Side < 2; ++Side)
+    for (int32 Side = 0; Side < 6; ++Side)
     {
-        const float Sign = Side == 0 ? -1.0f : 1.0f;
+        const float Sign = Side%2 == 0 ? -1.0f : 1.0f;
         Part(*FString::Printf(TEXT("RoofPost%d"), Side), Cylinder,
             FVector(0, Sign * 80, 180), FVector(0.04, 0.04, 1.8), Steel);
         Part(*FString::Printf(TEXT("Seat%d"), Side), Cube, FVector(-85, Sign * 55, 110), FVector(0.7, 0.65, 0.16), Navy);
         Part(*FString::Printf(TEXT("SeatBack%d"), Side), Cube, FVector(-115, Sign * 55, 138), FVector(0.12, 0.65, 0.5), White);
         Part(*FString::Printf(TEXT("RodHolder%d"), Side), Cylinder,
-            FVector(-230, Sign * 97, 120), FVector(0.07, 0.07, 0.5), Steel);
+            FiskBoatLayout::RodBase(Side)-FVector(0,0,15), FVector(0.07, 0.07, 0.5), Steel);
         Part(*FString::Printf(TEXT("Reel%d"), Side), Sphere,
-            FVector(-247, Sign * 97, 152), FVector(0.2, 0.2, 0.2), FLinearColor(0.7f, 0.51f, 0.13f));
+            FiskBoatLayout::RodBase(Side)+FVector(-17,0,17), FVector(0.2, 0.2, 0.2), FLinearColor(0.7f, 0.51f, 0.13f));
         for (int32 Segment = 0; Segment < 6; ++Segment)
         {
             RodSections.Add(Part(*FString::Printf(TEXT("Rod%dSection%d"), Side, Segment), Cylinder,
@@ -94,6 +96,9 @@ void UFiskBoatPresentation::BeginPlay()
     }
     Part(TEXT("Motor"), Cube, FVector(-357, 0, 55), FVector(0.8, 0.7, 1.0), Navy);
     Part(TEXT("MotorCap"), Sphere, FVector(-357, 0, 105), FVector(0.85, 0.72, 0.5), Navy);
+    Part(TEXT("OffshoreMotorPort"),Cube,FVector(-357,-65,55),FVector(.8,.6,1),Navy);
+    Part(TEXT("OffshoreMotorStarboard"),Cube,FVector(-357,65,55),FVector(.8,.6,1),Navy);
+    Part(TEXT("OffshoreRadar"),Sphere,FVector(20,0,305),FVector(.5,.5,.15),White);
     for (int32 Index = 0; Index < 12; ++Index)
     {
         UStaticMeshComponent* Foam = FiskVisual::AddPart(Boat, Boat->GetRootComponent(), Sphere, Material,
@@ -116,9 +121,20 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
     const FVector Offset = Boat->GetActorTransform().InverseTransformPosition(SmoothedWorldPosition);
     VisualRoot->SetRelativeLocation(Offset + FVector(0, 0, FMath::Sin(Time * 1.5) * 3.0));
     VisualRoot->SetRelativeRotation(FRotator(FMath::Sin(Time * 1.1) * 0.8, 0, FMath::Sin(Time * 1.4) * 1.2));
+    VisualRoot->SetRelativeScale3D(Boat->GetKind()==1?FVector(1.45,1.25,1.15):FVector::OneVector);
+    for(USceneComponent* Part:VisualRoot->GetAttachChildren())
+    {
+        const FString Name=Part->GetName();
+        if(Name.StartsWith(TEXT("Offshore"))) { Part->SetVisibility(Boat->GetKind()==1,true); }
+        if(Name==TEXT("Motor") || Name==TEXT("MotorCap")) { Part->SetVisibility(Boat->GetKind()==0,true); }
+        for(int32 I=2;I<6;++I)
+        { if(Name==FString::Printf(TEXT("RodHolder%d"),I) || Name==FString::Printf(TEXT("Reel%d"),I)
+            || Name==FString::Printf(TEXT("RoofPost%d"),I) || Name==FString::Printf(TEXT("Seat%d"),I) || Name==FString::Printf(TEXT("SeatBack%d"),I))
+            { const bool Holder=Name.StartsWith(TEXT("RodHolder")) || Name.StartsWith(TEXT("Reel"));Part->SetVisibility(Boat->GetKind()==1 && (Holder || I<4),true); } }
+    }
 
-    uint8 Activities[2] = {0, 0};
-    FFiskFishVisualState FishStates[2];
+    TArray<uint8> Activities;Activities.Init(0,6);
+    TArray<FFiskFishVisualState> FishStates;FishStates.SetNum(6);
     for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         const AFiskBoardingController* PC = Cast<AFiskBoardingController>(It->Get());
@@ -128,7 +144,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             for(int32 Slot=0;CrewSeat>=0 && Slot<PC->GetRodCapacity();++Slot)
             {
                 const UFiskPrototypeRod* Rod=PC->GetRodAt(Slot);
-                const int32 Seat=Boat->GetCrewCount()==1?Slot:CrewSeat;
+                const int32 Seat=Boat->GetHolderFor(PC->PlayerState->GetPlayerId(),Slot);
                 const EFiskRodState State=Rod->GetState();
                 Activities[Seat]=State==EFiskRodState::Fishing?1:State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand?2:0;
                 FFiskFishVisualState& Fish=FishStates[Seat];
@@ -144,30 +160,30 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
 
     if (Boat->HasAuthority())
     {
-        Boat->SetRodActivities(Activities[0], Activities[1]);
-        Boat->SetFishVisuals(FishStates[0], FishStates[1]);
+        Boat->SetHolderVisuals(Activities,FishStates);
     }
 
 
     const AFiskBoardingController* LocalPC = Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     const int32 LocalSeat = LocalPC && LocalPC->IsLocalController() && LocalPC->PlayerState
-        ? (Boat->GetCrewCount()==1?LocalPC->GetSelectedRod():Boat->GetSeatIndex(LocalPC->PlayerState->GetPlayerId())) : INDEX_NONE;
-    for (int32 Seat = 0; Seat < 2; ++Seat)
+        ? Boat->GetHolderFor(LocalPC->PlayerState->GetPlayerId(),LocalPC->GetSelectedRod()) : INDEX_NONE;
+    for (int32 Seat = 0; Seat < 6; ++Seat)
     {
-        const float Sign = Seat == 0 ? -1.0f : 1.0f;
+        const float Sign = Seat%2 == 0 ? -1.0f : 1.0f;
         const uint8 Activity = Boat->GetRodActivity(Seat);
-        const FVector Start(-230, Sign * 97, 135);
+        const FVector Start=FiskBoatLayout::RodBase(Seat);
         const float Motion = FMath::Sin(Time * (Activity == 2 ? 3.5 : 1.4) + Seat) * (Activity == 2 ? 22.0f : 4.0f);
         const FFiskFishVisualState& Pose = Boat->GetFishVisual(Seat);
         const float FightingHeight = Pose.bSurging ? 155.0f : Pose.bRaised ? 240.0f : 175.0f;
-        const FVector End(-540, Sign * 220, Activity == 2 ? FightingHeight + Motion : 270 + Motion);
-        const FVector Control(-320, Sign * 145, Activity == 2 ? 310 : 260);
+        const FVector End(Start.X-310, Sign * 220, Activity == 2 ? FightingHeight + Motion : 270 + Motion);
+        const FVector Control(Start.X-90, Sign * 145, Activity == 2 ? 310 : 260);
         FVector Previous = Start;
         for (int32 Segment = 0; Segment < 6; ++Segment)
         {
             const float T = (Segment + 1) / 6.0f;
             const FVector Point = FMath::Square(1.0f - T) * Start + 2.0f * (1.0f - T) * T * Control + T * T * End;
             FiskVisual::SetCylinder(RodSections[Seat * 6 + Segment], Previous, Point, 1.6f - Segment * 0.18f);
+            RodSections[Seat*6+Segment]->SetVisibility(Seat<Boat->GetHolderCount());
             Previous = Point;
         }
         if (Seat == LocalSeat)

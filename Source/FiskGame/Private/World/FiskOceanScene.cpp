@@ -13,6 +13,7 @@
 #include "EngineUtils.h"
 #include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
+#include "FiskRouteGeometry.h"
 
 AFiskOceanScene::AFiskOceanScene()
 {
@@ -62,9 +63,25 @@ void AFiskOceanScene::BeginPlay()
         return FiskVisual::AddPart(this, RootComponent, Mesh, Material, Name, Position, Scale, Color);
     };
     UStaticMeshComponent* Water = FiskVisual::AddPart(this, RootComponent, Plane, Material, TEXT("Ocean"),
-        FVector(10000, 0, -10), FVector(10000, 10000, 1), FLinearColor(0.01f, 0.23f, 0.34f), 0.15f);
+        FVector(10000, 0, -10), FVector(10000, 10000, 1), FLinearColor(0.005f, 0.07f, 0.16f), 0.15f);
 
     Water->SetCastShadow(false);
+    Part(TEXT("ShallowWater"),Sphere,FVector(18000,0,-13),FVector(700,950,.03),FLinearColor(.015f,.32f,.38f))->SetCastShadow(false);
+    for(int32 I=0;I<2;++I)
+    {
+        const FVector P=FiskRouteGeometry::Island(I);const double R=FiskRouteGeometry::Radius(I);
+        Part(*FString::Printf(TEXT("SeaIslandSand%d"),I),Sphere,P+FVector(0,0,-40),FVector(R/50,R/50,5),FLinearColor(.68f,.55f,.32f));
+        Part(*FString::Printf(TEXT("SeaIslandGreen%d"),I),Sphere,P+FVector(0,0,150),FVector(R/65,R/65,14),FLinearColor(.08f,.23f,.055f));
+        Part(*FString::Printf(TEXT("SeaIslandHill%d"),I),Sphere,P+FVector(-R/4,0,650),FVector(R/110,R/120,20),FLinearColor(.11f,.22f,.08f));
+    }
+    for(int32 I=0;I<4;++I)
+    {
+        const FVector P(-2800-I*1600,-900,270);
+        Part(*FString::Printf(TEXT("MarinaHouse%d"),I),Cube,P,FVector(10,7,4.5),FLinearColor(.58f,.68f,.6f));
+        Part(*FString::Printf(TEXT("MarinaRoof%d"),I),Cube,P+FVector(0,0,260),FVector(11,8,.25),FLinearColor(.14f,.25f,.31f));
+        Part(*FString::Printf(TEXT("HouseWindow%d"),I),Cube,P+FVector(0,-356,45),FVector(5,.06,1.3),FLinearColor(.02f,.12f,.17f));
+        Part(*FString::Printf(TEXT("PierWing%d"),I),Cube,FVector(-1000-I*450,-480,110),FVector(.35,7,.25),FLinearColor(.34f,.18f,.08f));
+    }
     Part(TEXT("Sand"), Sphere, FVector(-8000, 0, -70), FVector(140, 180, 2), FLinearColor(0.7f, 0.56f, 0.32f));
     Part(TEXT("IslandGreen"), Sphere, FVector(-12000, 0, 40), FVector(100, 140, 3), FLinearColor(0.14f, 0.29f, 0.06f));
     Part(TEXT("Pier"), Cube, FVector(-1000, 0, 110), FVector(12, 3.0, 0.35), FLinearColor(0.34f, 0.18f, 0.08f));
@@ -98,6 +115,16 @@ void AFiskOceanScene::BeginPlay()
         Ripple->SetCastShadow(false);
         Ripples.Add(Ripple);
     }
+    for(int32 I=0;I<12;++I)
+    {
+        UStaticMeshComponent* Bird=Part(*FString::Printf(TEXT("Seabird%d"),I),Sphere,FVector::ZeroVector,FVector(.5,1.8,.06),FLinearColor(.84f,.87f,.82f));
+        Bird->SetCastShadow(false);Birds.Add(Bird);
+    }
+    for(int32 I=0;I<8;++I)
+    {
+        UStaticMeshComponent* Fish=Part(*FString::Printf(TEXT("FlyingFish%d"),I),Sphere,FVector::ZeroVector,FVector(.6,.08,.1),FLinearColor(.34f,.6f,.68f));
+        Fish->SetCastShadow(false);Flyers.Add(Fish);
+    }
 }
 
 void AFiskOceanScene::Tick(float DeltaSeconds)
@@ -107,6 +134,17 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     const FVector Center = Boats ? Boats->GetActorLocation() : FVector::ZeroVector;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const double Time = Day ? Day->GetElapsedRealSeconds() : GetWorld()->GetTimeSeconds();
+    for(int32 I=0;I<Birds.Num();++I)
+    {
+        const double A=Time*.12+I*.52,R=1800+I*140;Birds[I]->SetRelativeLocation(Center+FVector(FMath::Cos(A)*R,FMath::Sin(A)*R,700+I*55));
+        Birds[I]->SetRelativeRotation(FRotator(0,FMath::RadiansToDegrees(A)+90,FMath::Sin(Time*3+I)*12));
+    }
+    for(int32 I=0;I<Flyers.Num();++I)
+    {
+        const double P=FMath::Fmod(Time*.18+I*.13,1.0);Flyers[I]->SetVisibility(P<.65);
+        Flyers[I]->SetRelativeLocation(Center+FVector(1800-P*2400,600+I*220,FMath::Sin(FMath::Min(P/.65,1.0)*PI)*150));
+        Flyers[I]->SetRelativeRotation(FRotator(FMath::Cos(P/.65*PI)*18,180,0));
+    }
     for (int32 Index = 0; Index < Ripples.Num(); ++Index)
     {
         const double X = (Index % 8 - 4) * 900.0 + FMath::Sin(Index * 7.3) * 250.0;

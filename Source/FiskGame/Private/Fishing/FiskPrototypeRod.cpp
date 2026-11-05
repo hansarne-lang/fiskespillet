@@ -134,6 +134,7 @@ void UFiskPrototypeRod::Land()
     if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
     const AFiskStarterBoat* Boat=Mode->GetStarterBoat();if(!Boat) { return; }
     FFiskCatchContext Context;Context.Ground=Boat->GetGroundId();Context.Bait=Rig.Bait;Context.Depth=Rig.Depth;Context.Program=Rig.Program;
+    Context.BoatKind=Boat->GetKind();const AFiskBoardingController* OwnerPC=::Cast<AFiskBoardingController>(GetOwner());Context.Equipment=OwnerPC?OwnerPC->GetServerCareer().Owned&7:0;
     Context.LandedAtMs=Day->GetElapsedMilliseconds();Context.FightMs=FMath::Max(0,Context.LandedAtMs-FirstRunAtMs);
     Context.LandedUtc=FDateTime::UtcNow().ToIso8601();
     if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId(),CatchData,Context)) { return; }
@@ -181,7 +182,8 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
         View.Line = Rig.Depth + FMath::Clamp(FMath::RoundToInt((Now-(NextTransitionAt-InitialRunDuration))*InitialRunGain/InitialRunDuration),0,FMath::RoundToInt(InitialRunGain));
         if (Now >= NextTransitionAt)
         {
-            Fight.Reset(FMath::Rand(), Rig.Depth+InitialRunGain,CatchData.Species);
+            const AFiskBoardingController* OwnerPC=::Cast<AFiskBoardingController>(GetOwner());
+            Fight.Reset(FMath::Rand(), Rig.Depth+InitialRunGain,CatchData.Species,OwnerPC?OwnerPC->GetServerCareer().Owned:0);
             LastFightAt = Now;
             SyncFight();
             SetState(EFiskRodState::Fighting);

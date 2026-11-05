@@ -13,6 +13,8 @@ struct FFiskCatchContext
     UPROPERTY() int32 FightMs = 0;
     UPROPERTY() int32 LandedAtMs = 0;
     UPROPERTY() FString LandedUtc;
+    UPROPERTY() int32 BoatKind=0;
+    UPROPERTY() int32 Equipment=0;
     bool IsValid(bool bRequireTimestamp) const;
     bool operator==(const FFiskCatchContext& Other) const;
 };

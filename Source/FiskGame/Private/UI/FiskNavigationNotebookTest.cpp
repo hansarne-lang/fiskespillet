@@ -51,7 +51,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPlaceCorruptTest,"Fiskelaget.Navigation.Pl
 bool FFiskPlaceCorruptTest::RunTest(const FString& Parameters)
 {
     const FString File=PlacesTestFile();IFileManager::Get().MakeDirectory(*FPaths::GetPath(File),true);
-    for(const FString& Bad:TArray<FString>{TEXT("truncated"),TEXT("[Fiskelaget.Places]\nVersion=2\n"),TEXT("[Fiskelaget.Places]\nVersion=1\n[Place1]\nGround=999\nName=Bad\n")})
+    for(const FString& Bad:TArray<FString>{TEXT("truncated"),TEXT("[Fiskelaget.Places]\nVersion=3\n"),TEXT("[Fiskelaget.Places]\nVersion=1\n[Place1]\nGround=999\nName=Bad\n")})
     {
         FFileHelper::SaveStringToFile(Bad,*File);FFiskNavigationNotebook N;
         TestFalse(TEXT("Invalid load"),N.Load(File));TestTrue(TEXT("Blocked status"),N.IsBlocked());

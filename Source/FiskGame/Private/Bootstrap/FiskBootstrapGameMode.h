@@ -21,8 +21,11 @@ public:
     AFiskStarterBoat* GetStarterBoat() const { return StarterBoat; }
     AFiskDaySettlement* GetSettlement() const { return Settlement; }
     bool StartNextDay(APlayerController* Requester, int32 ExpectedDay);
+    void BindCareer(int32 Player,const FGuid& Profile) { DayProfiles.Add(Player,Profile); }
+    int64 CareerIncome(const FGuid& Profile) const;
 
 private:
+    TMap<int32,FGuid> DayProfiles;
     UPROPERTY()
     TObjectPtr<AFiskStarterBoat> StarterBoat;
     UPROPERTY()

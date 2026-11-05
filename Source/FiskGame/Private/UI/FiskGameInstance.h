@@ -5,6 +5,7 @@
 #include "UI/FiskRigPresets.h"
 #include "UI/FiskJournalStore.h"
 #include "UI/FiskNavigationNotebook.h"
+#include "FiskCareerProfile.h"
 #include "FiskGameInstance.generated.h"
 class UNetDriver;
 UCLASS()
@@ -18,11 +19,17 @@ public:
     bool bSound = true;
     int32 FrameRate = 60;
     FString ConnectionMessage;
+    FFiskCareerProfile Career;
+    FString CareerMessage;
+    bool bCareerBlocked=false;
+    bool AcceptCareer(const FFiskCareerProfile& Profile);
+    FString CareerFile() const;
     FFiskRigPresets RigPresets;
     bool SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig);
     FFiskNavigationNotebook Places;
     FString PlacesMessage;
     bool SavePlace(int32 Slot,int32 Ground,const FString& Name);
+    bool SaveSeaPlace(int32 Slot,FVector Point,const FString& Name);
     bool ClearPlace(int32 Slot);
     const FFiskJournalModel& GetJournal() const { return Journal; }
     FString GetJournalMessage() const { return JournalMessage; }

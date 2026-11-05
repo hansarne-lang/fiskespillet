@@ -9,6 +9,7 @@ class UFiskFrontEnd;
 class UFiskRigPanel;
 class UFiskSeaChart;
 class UFiskCrewPanel;
+class UFiskJournalPanel;
 class AFiskStarterBoat;
 
 UENUM()
@@ -38,6 +39,7 @@ public:
     UFiskRigPanel* GetRigPanel() const { return RigPanel; }
     UFiskSeaChart* GetSeaChart() const { return SeaChart; }
     UFiskCrewPanel* GetCrewPanel() const { return CrewPanel; }
+    UFiskJournalPanel* GetJournalPanel() const { return JournalPanel; }
     bool IsHelpVisible() const { return bHelpVisible; }
     bool IsResultsVisible() const { return bResultsVisible; }
     bool IsHistoryVisible() const { return bHistoryVisible; }
@@ -101,8 +103,14 @@ private:
     UPROPERTY() TObjectPtr<UFiskRigPanel> RigPanel;
     UPROPERTY() TObjectPtr<UFiskSeaChart> SeaChart;
     UPROPERTY() TObjectPtr<UFiskCrewPanel> CrewPanel;
+    UPROPERTY() TObjectPtr<UFiskJournalPanel> JournalPanel;
 
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunJournalSmoke();
+    FString JournalMode,JournalCaptureDir;
+    FTimerHandle JournalTimer;
+    int32 JournalStage=0,JournalExpectedDepth=0;
+    double JournalAt=0;
     void RunSessionSmoke();
     FString SessionMode, SessionCaptureDir;
     FTimerHandle SessionTimer;

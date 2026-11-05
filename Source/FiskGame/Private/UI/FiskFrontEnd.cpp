@@ -212,6 +212,7 @@ void UFiskFrontEnd::Draw(AHUD& HUD, UCanvas& Canvas)
     else if (Model.Page == EFiskMenuPage::Home) { HUD.DrawText(TEXT("Spill starter en vert. Venner kan koble til på LAN."),FLinearColor(0.65f,0.78f,0.80f),X,548*S,nullptr,0.9f*S); }
     else if (Model.Page == EFiskMenuPage::Join) { HUD.DrawText(TEXT("Skriv vertens adresse. Ctrl+A erstatter teksten."),FLinearColor(0.65f,0.78f,0.80f),X,548*S,nullptr,0.9f*S); }
     if (GetNetMode() != NM_Standalone) { HUD.DrawText(TEXT("Spillet fortsetter mens menyen er åpen."),FLinearColor(1,0.8f,0.5f),X,582*S,nullptr,0.9f*S); }
+    else { HUD.DrawText(TEXT("F4: Din lagrede fangstjournal og artsrekorder"),FLinearColor(0.5f,0.9f,0.8f),X,582*S,nullptr,0.9f*S); }
     HUD.DrawText(TEXT("Mus eller piltaster / Tab   Enter: velg   Esc: tilbake"),FLinearColor(0.65f,0.78f,0.80f),X,626*S,nullptr,0.85f*S);
     if (!bReadyReported) { bReadyReported = true; UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MENU_READY")); }
 }

@@ -83,4 +83,5 @@ private:
     // Never replicated or exposed through the owner-only rod view.
     FFiskCatchData CatchData;
     int32 LandedAtMs = -1;
+    int32 FirstRunAtMs = 0;
 };

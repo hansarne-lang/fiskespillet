@@ -11,6 +11,7 @@ struct FFiskSettlementView
 {
     GENERATED_BODY()
     UPROPERTY() int32 DayNumber = 1;
+    UPROPERTY() FGuid DayId;
     UPROPERTY() bool bRevealed = false;
     UPROPERTY() TArray<FFiskDayResult> Results;
 };
@@ -21,7 +22,8 @@ class AFiskDaySettlement final : public AInfo
     GENERATED_BODY()
 public:
     AFiskDaySettlement();
-    bool RegisterCatch(const FGuid& CatchId, int32 PlayerId, const FFiskCatchData& Fish);
+    bool RegisterCatch(const FGuid& CatchId, int32 PlayerId, const FFiskCatchData& Fish,const FFiskCatchContext& Context=FFiskCatchContext());
+    virtual void BeginPlay() override;
     const FFiskSettlementView& GetView() const { return View; }
     const TArray<FFiskHistoryDay>& GetHistory() const { return HistoryView; }
     void ResetForDay(int32 DayNumber);

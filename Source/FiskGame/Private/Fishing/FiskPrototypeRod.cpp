@@ -30,6 +30,7 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     View.CastId = Cycle.GetId();
     CatchId.Invalidate();
     LandedAtMs = -1;
+    FirstRunAtMs = 0;
     // CastId is visible to the owner. Catch entropy must never be derived from it.
     const FGuid PrivateEntropy=FGuid::NewGuid();
     CatchData=FiskCatches::Roll(static_cast<int32>(PrivateEntropy.A ^ PrivateEntropy.B ^ PrivateEntropy.C ^ PrivateEntropy.D),Boat->GetGroundId());
@@ -129,7 +130,11 @@ void UFiskPrototypeRod::Land()
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (!Mode || !Mode->GetSettlement() || !PC->PlayerState || !Day) { return; }
     if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
-    if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId(),CatchData)) { return; }
+    const AFiskStarterBoat* Boat=Mode->GetStarterBoat();if(!Boat) { return; }
+    FFiskCatchContext Context;Context.Ground=Boat->GetGroundId();Context.Bait=Rig.Bait;Context.Depth=Rig.Depth;Context.Program=Rig.Program;
+    Context.LandedAtMs=Day->GetElapsedMilliseconds();Context.FightMs=FMath::Max(0,Context.LandedAtMs-FirstRunAtMs);
+    Context.LandedUtc=FDateTime::UtcNow().ToIso8601();
+    if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId(),CatchData,Context)) { return; }
     LandedAtMs = Day->GetElapsedMilliseconds();
     Cycle.FinishLanding(View.CastId, LandedAtMs);
     View.AvailableAtMs = Cycle.GetAvailableAtMs();
@@ -162,6 +167,7 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     const double Now = Day->GetElapsedRealSeconds();
     if (View.State == EFiskRodState::Fishing && Now >= NextTransitionAt)
     {
+        FirstRunAtMs=Day->GetElapsedMilliseconds();
         NextTransitionAt = Now + 3.0;
         View.Line = Rig.Depth;
         SetState(EFiskRodState::InitialRun);

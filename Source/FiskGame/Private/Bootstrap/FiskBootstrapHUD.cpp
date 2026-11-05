@@ -15,6 +15,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "Economy/FiskDaySettlement.h"
 #include "DayCycle/FiskSessionRules.h"
+#include "UI/FiskJournalPanel.h"
 
 namespace
 {
@@ -35,7 +36,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
             TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
-            TEXT("F2: dagsoppgjør. F3: økthistorikk. N: verten starter neste dag etter 20:00.")};
+            TEXT("F2: dagsoppgjør. F3: økthistorikk. F4: lagret journal/rekorder. N: neste dag etter 20:00.")};
         for(int32 I=0;I<Lines.Num();++I) { HUD.DrawText(Lines[I],FLinearColor::White,52*S,(126+44*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(TEXT("F1 / Escape: lukk. Dagen slutter ved 20:00."),FLinearColor(0.5f,0.9f,0.8f),52*S,620*S,nullptr,1.0f*S);
         return;
@@ -131,6 +132,7 @@ void AFiskBootstrapHUD::DrawHUD()
             DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,Canvas->ClipY-42*S,1232*S,36*S);
             DrawText(Feedback,FLinearColor(1,0.86f,0.5f),40*S,Canvas->ClipY-34*S,nullptr,0.95f*S);
         }
+        if(PC->GetJournalPanel()->IsVisible()) { PC->GetJournalPanel()->Draw(*this,*Canvas);return; }
         if(PC->IsHelpVisible() || PC->IsResultsVisible() || PC->IsHistoryVisible()) { DrawContentPanel(*this,*Canvas,*PC);return; }
         if (PC->GetCrewPanel() && PC->GetCrewPanel()->IsVisible())
         {
@@ -156,7 +158,7 @@ void AFiskBootstrapHUD::DrawHUD()
     const float Top = 24.0f;
     DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 560.0f, 455.0f);
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
-    DrawText(TEXT("M: Kart  K: Mannskap  F1: Hjelp  F2: Oppgjør  F3: Historikk"), FLinearColor::White, Left, Top + 65.0f, nullptr, 0.85f);
+    DrawText(TEXT("M: Kart  K: Mannskap  F1: Hjelp  F2: Oppgjør  F3: Historikk  F4: Journal"), FLinearColor::White, Left, Top + 65.0f, nullptr, 0.80f);
 
     if (!StarterBoat.IsValid())
     {

@@ -8,10 +8,19 @@
 #include "UI/FiskUserSettings.h"
 #include "HAL/FileManager.h"
 #include "Boats/FiskBoardingController.h"
+#include "Economy/FiskDaySettlement.h"
 
 void UFiskGameInstance::Init()
 {
     Super::Init();
+    const EFiskJournalLoad JournalLoad=JournalStore.Load(JournalFile(),Journal);
+    bJournalRecovered=JournalLoad==EFiskJournalLoad::Recovered;
+    bJournalPending=JournalLoad==EFiskJournalLoad::Unavailable;
+    JournalMessage=bJournalRecovered?TEXT("Journalen ble hentet fra sikkerhetskopi. Siste lagring kan mangle; F5 lagrer en ny hovedfil.")
+        :bJournalPending?TEXT("Kunne ikke lese journalen. Eksisterende filer er bevart. Kontroller filene og prøv F5.")
+        :TEXT("Tidligere bekreftede fangster lagres lokalt. Dagens nye resultater kommer først ved 17:00.");
+    ++JournalRevision;
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNAL_LOADED count=%d recovery=%d blocked=%d"),Journal.GetEntries().Num(),bJournalRecovered,bJournalPending);
     RigPresets.Load(RigPresetFile());
     if (!IFileManager::Get().FileExists(*RigPresetFile()))
     { RigPresets.Load(TEXT("FiskelagetRigPresets.ini")); }
@@ -25,6 +34,31 @@ void UFiskGameInstance::Init()
         GEngine->OnTravelFailure().AddUObject(this, &UFiskGameInstance::TravelFailure);
     }
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_LOADED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate);
+}
+FString UFiskGameInstance::JournalFile() const
+{
+    return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetJournal.ini"));
+}
+bool UFiskGameInstance::RetryJournalSave()
+{
+    const bool Saved=JournalStore.Save(JournalFile(),Journal);bJournalPending=!Saved || bJournalReceiptRejected;
+    if(Saved) { ++JournalRevision;JournalMessage=bJournalReceiptRejected
+        ?TEXT("Journalfilen er lagret, men et oppgjør mangler. Kontroller kapasitet/data og se dagens F2.")
+        :TEXT("Journalen er lagret lokalt. Sikkerhetskopi beholdes."); }
+    else { JournalMessage=TEXT("Kunne ikke lagre journalen. Postene vises i minnet; kontroller filer/skrivetilgang og prøv F5."); }
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNAL_SAVE success=%d count=%d"),Saved,Journal.GetEntries().Num());
+    return Saved;
+}
+void UFiskGameInstance::ObserveJournal(const FFiskSettlementView& View,int32 OwnPlayerId,int32 NowMs)
+{
+    if(!View.bRevealed || NowMs<1020000 || !View.DayId.IsValid() || OwnPlayerId<0 || ObservedJournalDays.Contains(View.DayId)) { return; }
+    const FFiskDayResult* Own=View.Results.FindByPredicate([&](const FFiskDayResult& Row){return Row.PlayerId==OwnPlayerId;});
+    ObservedJournalDays.Add(View.DayId);
+    if(!Own) { return; }
+    const EFiskJournalApply Applied=Journal.Apply(View.DayId,View.DayNumber,NowMs,true,*Own);
+    if(Applied==EFiskJournalApply::Added) { ++JournalRevision;RetryJournalSave(); }
+    else if(Applied==EFiskJournalApply::Rejected)
+    { bJournalReceiptRejected=bJournalPending=true;JournalMessage=TEXT("Oppgjøret kunne ikke legges til i journalen. Kontroller kapasitet og lagrede data; dagens F2 er fortsatt tilgjengelig."); }
 }
 FString UFiskGameInstance::RigPresetFile() const
 {

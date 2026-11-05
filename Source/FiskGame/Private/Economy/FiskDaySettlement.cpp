@@ -13,17 +13,23 @@ AFiskDaySettlement::AFiskDaySettlement()
     PrimaryActorTick.TickInterval = 0.1f;
 }
 
-bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId,const FFiskCatchData& Fish)
+void AFiskDaySettlement::BeginPlay()
+{
+    Super::BeginPlay();
+    if(HasAuthority()) { View.DayId=FGuid::NewGuid();ForceNetUpdate(); }
+}
+bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId,const FFiskCatchData& Fish,const FFiskCatchContext& Context)
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     return HasAuthority() && Day && Day->HasStarted()
-        && Ledger.Record(CatchId, PlayerId, Day->GetElapsedMilliseconds(),Fish);
+        && Ledger.Record(CatchId, PlayerId, Day->GetElapsedMilliseconds(),Fish,Context);
 }
 
 void AFiskDaySettlement::ResetForDay(int32 DayNumber)
 {
     if (!HasAuthority()) { return; }
     Ledger = FFiskDayLedger(); View = FFiskSettlementView(); View.DayNumber = DayNumber;
+    View.DayId=FGuid::NewGuid();
     SetActorTickEnabled(true); ForceNetUpdate();
 }
 

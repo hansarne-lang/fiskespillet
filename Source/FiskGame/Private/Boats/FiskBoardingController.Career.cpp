@@ -105,6 +105,8 @@ bool AFiskBoardingController::HandleCareerKey(const FInputKeyEventArgs& A)
     const bool Press=A.Event==IE_Pressed;
     if(!bCareerVisible && Press && A.Key==EKeys::P)
     {
+        // The chart owns typed letters while naming a favorite.
+        if(SeaChart->IsVisible()) { return false; }
         if(FrontEnd->IsVisible() || RigPanel->IsVisible() || SeaChart->IsVisible() || CrewPanel->IsVisible() || JournalPanel->IsVisible() || DeckPanel->IsVisible()
             || bHelpVisible || bResultsVisible || bHistoryVisible) { ClientActionFeedback_Implementation(TEXT("Lukk panelet først med Escape."));return true; }
         bCareerVisible=true;ReleaseRodInputsForMenu();bShowMouseCursor=true;SetInputMode(FInputModeGameAndUI());return true;

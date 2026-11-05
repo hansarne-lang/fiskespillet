@@ -85,8 +85,13 @@ try {
         }
         if (@(Events $log 'FISKELAGET_TEST_PRIVATE revealed=0 rows=0').Count -ne 1) { throw 'Early result exposure' }
         if (@(Events $log 'FISKELAGET_SETTLEMENT rows=2').Count -ne 1) { throw 'Missing or repeated settlement' }
-        $results = @(Events $log 'FISKELAGET_RESULT player=(\d+) delivered=1 lost=0 balance=10')
+        $results = @(Events $log 'FISKELAGET_RESULT player=(\d+) delivered=1 lost=0 balance=(\d+)$')
         if ($results.Count -ne 2) { throw 'Incorrect settlement results' }
+        foreach($result in $results){
+            $playerId=$result.Matches[0].Groups[1].Value
+            $details=@(Events $log "FISKELAGET_REVEALED_CATCH player=$playerId species=\d+ grams=\d+ mm=\d+ value=(\d+) delivered=1")
+            if($details.Count -ne 1 -or [int]$details[0].Matches[0].Groups[1].Value -ne [int]$result.Matches[0].Groups[2].Value){throw 'Catch value does not match payment'}
+        }
         $revealed = @(Events $log 'FISKELAGET_SETTLEMENT rows=2')[0]
         if (((Event-Time $revealed) - $startTime).TotalSeconds -lt 1020.0) { throw 'Result revealed before 17:00' }
         if (@(Events $log 'FISKELAGET_MARINA_REACHED crew=2').Count -ne 1) { throw 'Both players did not return' }

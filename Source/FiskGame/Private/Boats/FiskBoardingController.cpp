@@ -5,6 +5,8 @@
 #include "DayCycle/FiskDayState.h"
 #include "Fishing/FiskPrototypeRod.h"
 #include "Fishing/FiskCombatFeedback.h"
+#include "Economy/FiskDaySettlement.h"
+#include "HAL/PlatformTime.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
 #include "UI/FiskSeaChart.h"
@@ -30,6 +32,28 @@ AFiskBoardingController::AFiskBoardingController()
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
+    const bool Press=Params.Event==IE_Pressed;
+    const bool OtherPanel=(FrontEnd && FrontEnd->IsVisible()) || (CrewPanel && CrewPanel->IsVisible())
+        || (SeaChart && SeaChart->IsVisible()) || (RigPanel && RigPanel->IsVisible());
+    if(Press && (Params.Key==EKeys::F1 || Params.Key==EKeys::F2))
+    {
+        if(OtherPanel) { ClientActionFeedback_Implementation(TEXT("Lukk panelet først med Escape. F1 viser hjelp, F2 viser oppgjøret."));return true; }
+        if(Params.Key==EKeys::F1) { bHelpVisible=!bHelpVisible;bResultsVisible=false; }
+        else { bResultsVisible=!bResultsVisible;bHelpVisible=false;ResultPage=0; }
+        ReleaseRodInputsForMenu();return true;
+    }
+    if(bHelpVisible || bResultsVisible)
+    {
+        if(Press && Params.Key==EKeys::Escape) { bHelpVisible=bResultsVisible=false; }
+        if(bResultsVisible && (Press || Params.Event==IE_Repeat))
+        {
+            if(Params.Key==EKeys::PageDown || Params.Key==EKeys::Down) { ResultPage=FMath::Min(ResultPage+1,9999); }
+            if(Params.Key==EKeys::PageUp || Params.Key==EKeys::Up) { ResultPage=FMath::Max(ResultPage-1,0); }
+        }
+        return true;
+    }
+    if(Press && Params.Key==EKeys::R && OtherPanel)
+    { ClientActionFeedback_Implementation(TEXT("Lukk kart og menyer med Escape før du trykker R.")); }
     if (CrewPanel && CrewPanel->HandleKey(Params)) { return true; }
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
@@ -43,6 +67,11 @@ void AFiskBoardingController::BeginPlay()
     Super::BeginPlay();
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskContentSmoke="),ContentMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ContentCaptureDir);
+        GetWorldTimerManager().SetTimer(ContentTimer,this,&AFiskBoardingController::RunContentSmoke,0.5f,true,2.0f);
+    }
     if (IsLocalController() && GetNetMode() != NM_Standalone
         && FParse::Param(FCommandLine::Get(), TEXT("FiskLanSmoke")))
     {
@@ -96,9 +125,33 @@ void AFiskBoardingController::ServerStartBoatTrip_Implementation(int32 ExpectedR
         const bool bAuthorized=Boat->CanCaptainCommand(PlayerState->GetPlayerId(),ExpectedRevision);
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRIP_%s player=%d expected=%d current=%d"),
             bAuthorized?TEXT("AUTHORIZED"):TEXT("REJECTED"),PlayerState->GetPlayerId(),ExpectedRevision,Boat->GetRouteRevision());
+        if(!Boat->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Trykk E for å gå om bord først."));return; }
+        if(!bAuthorized) { ClientActionFeedback(Boat->GetCaptainId()==PlayerState->GetPlayerId()
+            ?TEXT("Båtstatusen ble oppdatert. Prøv R igjen."):TEXT("Bare kapteinen kan starte avreise og retur. K viser mannskapet."));return; }
+        const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+        if(!Day || !Day->HasStarted()) { ClientActionFeedback(TEXT("Fiskedagen starter. Prøv igjen om et øyeblikk."));return; }
+        const int32 Progress=Boat->GetTripProgress();
+        if(Progress==AFiskStarterBoat::AtDock && Day->GetElapsedSeconds()<120)
+        { ClientActionFeedback(FString::Printf(TEXT("Avreise fra 02:00. Vent %d sekunder."),120-Day->GetElapsedSeconds()));return; }
+        if(Progress==AFiskStarterBoat::AtDock && Day->GetElapsedSeconds()>=1020)
+        { ClientActionFeedback(TEXT("Sjøfasen er ferdig. Start en ny dag fra hovedmenyen."));return; }
+        if(Progress==AFiskStarterBoat::AtMarina)
+        { ClientActionFeedback(TEXT("Turen er avsluttet. Velg Til hovedmeny og Spill for en ny dag."));return; }
+        if(Progress!=AFiskStarterBoat::AtDock && Progress!=AFiskStarterBoat::AtFishingSpot)
+        { ClientActionFeedback(TEXT("Båten er allerede på vei."));return; }
         Boat->StartTrip(PlayerState->GetPlayerId(),ExpectedRevision);
+        ClientActionFeedback(Progress==AFiskStarterBoat::AtFishingSpot?TEXT("Retur til marinaen er startet."):TEXT("Avreise er startet. F setter ut stanga ved ankomst."));
     }
 }
+void AFiskBoardingController::ClientActionFeedback_Implementation(const FString& Message)
+{
+    ActionFeedback=Message;ActionFeedbackUntil=FPlatformTime::Seconds()+5.0;
+}
+FString AFiskBoardingController::GetActionFeedback() const
+{
+    return FPlatformTime::Seconds()<ActionFeedbackUntil?ActionFeedback:FString();
+}
+void AFiskBoardingController::ClientRigReply_Implementation(bool bAccepted) { RigPanel->RigReply(bAccepted); }
 
 void AFiskBoardingController::ServerTransferCaptain_Implementation(int32 ExpectedRevision,int32 Target)
 {
@@ -146,6 +199,7 @@ void AFiskBoardingController::ServerConfigureRig_Implementation(FGuid ExpectedCa
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_RIG_%s player=%d revision=%d bait=%d depth=%d program=%d"),
         bAccepted ? TEXT("ACCEPTED") : TEXT("REJECTED"), PlayerState ? PlayerState->GetPlayerId() : INDEX_NONE,
         Rod->GetRig().Revision, Rod->GetRig().Bait, Rod->GetRig().Depth, Rod->GetRig().Program);
+    ClientRigReply(bAccepted);
 }
 
 void AFiskBoardingController::RequestCast()
@@ -242,6 +296,14 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
     Super::PlayerTick(DeltaTime);
 
     if (!IsLocalController() || !PlayerState) { return; }
+    if(!bAutoResultsSeen && !bHelpVisible && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
+        && !SeaChart->IsVisible() && !RigPanel->IsVisible())
+    {
+        for(TActorIterator<AFiskDaySettlement> Settlement(GetWorld());Settlement;++Settlement)
+        {
+            if(Settlement->GetView().bRevealed) { bAutoResultsSeen=true;bResultsVisible=true;ResultPage=0;ReleaseRodInputsForMenu();break; }
+        }
+    }
     for (TActorIterator<AFiskOceanScene> Scene(GetWorld()); Scene; ++Scene)
     {
         TActorIterator<AFiskStarterBoat> Boat(GetWorld());

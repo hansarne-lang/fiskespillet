@@ -16,11 +16,15 @@ public:
     bool HandleKey(const FInputKeyEventArgs& Args);
     bool IsVisible() const { return bVisible; }
     void Draw(AHUD& HUD, UCanvas& Canvas);
+    void RigReply(bool bAccepted);
 private:
     void Show(bool bShow);
     void Change(int32 Direction);
     bool bVisible = false;
     int32 Row = 0;
+    int32 PresetSlot=0,PendingRevision=-1;
+    double PendingAt=0;
+    FString Message;
     TArray<FBox2D> Buttons;
 #if WITH_DEV_AUTOMATION_TESTS
     void Smoke();

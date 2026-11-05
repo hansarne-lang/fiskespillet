@@ -13,11 +13,11 @@ AFiskDaySettlement::AFiskDaySettlement()
     PrimaryActorTick.TickInterval = 0.1f;
 }
 
-bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId)
+bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId,const FFiskCatchData& Fish)
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     return HasAuthority() && Day && Day->HasStarted()
-        && Ledger.Record(CatchId, PlayerId, Day->GetElapsedMilliseconds());
+        && Ledger.Record(CatchId, PlayerId, Day->GetElapsedMilliseconds(),Fish);
 }
 
 void AFiskDaySettlement::Tick(float DeltaSeconds)
@@ -54,5 +54,10 @@ void AFiskDaySettlement::OnRep_View()
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_RESULT player=%d delivered=%d lost=%d balance=%d"),
             Row.PlayerId, Row.DeliveredFish, Row.LostFish, Row.SessionBalance);
+        for(const FFiskCatchResult& Catch:Row.Catches)
+        {
+            UE_LOG(LogTemp,Display,TEXT("FISKELAGET_REVEALED_CATCH player=%d species=%d grams=%d mm=%d value=%d delivered=%d"),
+                Row.PlayerId,Catch.Fish.Species,Catch.Fish.WeightGrams,Catch.Fish.LengthMm,Catch.bDelivered?Catch.Fish.Value:0,Catch.bDelivered);
+        }
     }
 }

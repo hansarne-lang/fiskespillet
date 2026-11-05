@@ -86,7 +86,13 @@ try {
         Exactly $log 'FISKELAGET_REPEAT_STALE_READY_SURVIVED player=' 1
         Exactly $log 'FISKELAGET_TEST_PRIVATE revealed=0 rows=0' 1
         Exactly $log 'FISKELAGET_SETTLEMENT rows=2' 1
-        Exactly $log 'FISKELAGET_RESULT player=\d+ delivered=2 lost=0 balance=20$' 2
+        Exactly $log 'FISKELAGET_RESULT player=\d+ delivered=2 lost=0 balance=\d+$' 2
+        foreach($result in @(Events $log 'FISKELAGET_RESULT player=(\d+) delivered=2 lost=0 balance=(\d+)$')){
+            $playerId=$result.Matches[0].Groups[1].Value
+            $details=@(Events $log "FISKELAGET_REVEALED_CATCH player=$playerId species=\d+ grams=\d+ mm=\d+ value=(\d+) delivered=1")
+            $sum=0;foreach($detail in $details){$sum += [int]$detail.Matches[0].Groups[1].Value}
+            if($details.Count -ne 2 -or $sum -ne [int]$result.Matches[0].Groups[2].Value){throw 'Actual catch values do not match payment'}
+        }
         $start = @(Events $hostLog 'FISKELAGET_DAY_STARTED')[0]
         $settle = @(Events $log 'FISKELAGET_SETTLEMENT rows=2')[0]
         $end = @(Events $log 'FISKELAGET_TEST_DAY_END ms=1200000')[0]

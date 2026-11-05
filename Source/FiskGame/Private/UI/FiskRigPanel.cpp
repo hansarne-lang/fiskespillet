@@ -2,6 +2,7 @@
 #include "Boats/FiskStarterBoat.h"
 #include "FiskFishingGround.h"
 #include "UI/FiskFrontEnd.h"
+#include "UI/FiskGameInstance.h"
 #include "Boats/FiskBoardingController.h"
 #include "Fishing/FiskPrototypeRod.h"
 #include "Engine/Canvas.h"
@@ -10,6 +11,7 @@
 #include "GameFramework/HUD.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "HAL/PlatformTime.h"
 #include "TimerManager.h"
 
 UFiskRigPanel::UFiskRigPanel() { PrimaryComponentTick.bCanEverTick = true; }
@@ -40,6 +42,7 @@ void UFiskRigPanel::Show(bool bShow)
 }
 void UFiskRigPanel::Change(int32 Direction)
 {
+    if(PendingRevision>=0) { Message=TEXT("Vent på vertens bekreftelse.");return; }
     AFiskBoardingController* PC = CastChecked<AFiskBoardingController>(GetOwner());
     const FFiskRigSettings& Rig = PC->GetRod()->GetRig();
     int32 Bait=Rig.Bait, Depth=Rig.Depth, Program=Rig.Program;
@@ -53,7 +56,13 @@ void UFiskRigPanel::Change(int32 Direction)
     }
     else if (Row==2) { Program=(Program+Direction+3)%3; }
     else { Show(false); return; }
+    PendingRevision=Rig.Revision+1;PendingAt=FPlatformTime::Seconds();
     PC->RequestRig(Bait,Depth,Program);
+}
+void UFiskRigPanel::RigReply(bool bAccepted)
+{
+    if(!bAccepted) { PendingRevision=-1; }
+    Message=bAccepted?TEXT("Oppsett bekreftet av verten."):TEXT("Endring avvist. Stanga må være ledig og dybden gyldig.");
 }
 bool UFiskRigPanel::HandleKey(const FInputKeyEventArgs& Args)
 {
@@ -67,7 +76,30 @@ bool UFiskRigPanel::HandleKey(const FInputKeyEventArgs& Args)
     }
     if (!bVisible) { return false; }
     if (!bPress) { return true; }
-    if (Args.Key==EKeys::Escape) { Show(false); }
+    UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
+    if(Args.Key==EKeys::One || Args.Key==EKeys::Two || Args.Key==EKeys::Three)
+    { PresetSlot=Args.Key==EKeys::One?0:Args.Key==EKeys::Two?1:2;Message.Reset(); }
+    else if(Args.Key==EKeys::F5)
+    {
+        Message=PendingRevision>=0?TEXT("Vent på vertens bekreftelse før lagring."):
+            GI->SaveRigPreset(PresetSlot,PC->GetRod()->GetRig())?TEXT("Oppsett lagret på denne PC-en."):TEXT("Kunne ikke lagre oppsettet.");
+    }
+    else if(Args.Key==EKeys::F9)
+    {
+        const FFiskSavedRig* Saved=GI->RigPresets.Get(PresetSlot);
+        const AFiskStarterBoat* Boat=PC->FindStarterBoat();
+        const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():0);
+        if(PendingRevision>=0) { Message=TEXT("Vent på vertens bekreftelse."); }
+        else if(!Saved || !Saved->bExists) { Message=TEXT("Dette oppsettet er tomt. F5 lagrer gjeldende valg."); }
+        else if(!Ground || !FFiskRigRules::IsValid(Saved->Rig.Bait,Saved->Rig.Depth,Saved->Rig.Program,Ground->BottomDepth))
+        { Message=TEXT("Lagret oppsett passer ikke dybden på denne plassen."); }
+        else
+        {
+            PendingRevision=PC->GetRod()->GetRig().Revision+1;PendingAt=FPlatformTime::Seconds();
+            PC->RequestRig(Saved->Rig.Bait,Saved->Rig.Depth,Saved->Rig.Program);
+        }
+    }
+    else if (Args.Key==EKeys::Escape) { Show(false); }
     else if (Args.Key==EKeys::Up) { Row=(Row+3)%4; }
     else if (Args.Key==EKeys::Down || Args.Key==EKeys::Tab) { Row=(Row+1)%4; }
     else if (Args.Key==EKeys::Home) { Row=0; }
@@ -87,6 +119,9 @@ void UFiskRigPanel::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 {
     Super::TickComponent(DeltaTime,TickType,Tick);
     const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
+    if(PendingRevision>=0 && PC->GetRod()->GetRig().Revision>=PendingRevision) { PendingRevision=-1; }
+    if(PendingRevision>=0 && FPlatformTime::Seconds()-PendingAt>5)
+    { PendingRevision=-1;Message=TEXT("Ingen bekreftelse mottatt. Kontroller valgene og prøv igjen."); }
     if (bVisible && !PC->CanOpenRig()) { Show(false); }
 }
 void UFiskRigPanel::Draw(AHUD& HUD,UCanvas& Canvas)
@@ -108,8 +143,10 @@ void UFiskRigPanel::Draw(AHUD& HUD,UCanvas& Canvas)
         HUD.DrawRect(I==Row?FLinearColor(0.18f,0.45f,0.46f):FLinearColor(0.035f,0.13f,0.16f),A.X,A.Y,W,52*S);
         HUD.DrawText(Labels[I],FLinearColor::White,A.X+16*S,A.Y+14*S,nullptr,1.2f*S);
     }
-    HUD.DrawText(FFiskRigRules::QualityName(Rig, Ground),FLinearColor(0.65f,0.95f,0.75f),X,510*S,nullptr,1.2f*S);
-    HUD.DrawText(TEXT("Piler: velg/endre. Klikk eller Enter: neste valg."),FLinearColor::White,X,552*S,nullptr,0.9f*S);
-    HUD.DrawText(TEXT("G / Escape: lukk. Klokken fortsetter."),FLinearColor::White,X,580*S,nullptr,0.9f*S);
-    HUD.DrawText(TEXT("Valgene bekreftes av verten. Trekk inn før endring."),FLinearColor(0.7f,0.8f,0.8f),X,616*S,nullptr,0.85f*S);
+    HUD.DrawText(FFiskRigRules::QualityName(Rig, Ground),FLinearColor(0.65f,0.95f,0.75f),X,500*S,nullptr,1.1f*S);
+    const FFiskSavedRig* Saved=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->RigPresets.Get(PresetSlot);
+    HUD.DrawText(FString::Printf(TEXT("Oppsett %d: %s  |  1 / 2 / 3: velg"),PresetSlot+1,Saved && Saved->bExists?TEXT("lagret"):TEXT("tomt")),FLinearColor::White,X,532*S,nullptr,0.9f*S);
+    HUD.DrawText(TEXT("F5: lagre bekreftede valg. F9: hent lagret oppsett."),FLinearColor::White,X,558*S,nullptr,0.85f*S);
+    HUD.DrawText(Message,FLinearColor(1,0.85f,0.5f),X,586*S,nullptr,0.82f*S);
+    HUD.DrawText(TEXT("Piler: velg/endre. G / Escape: lukk. Klokken fortsetter."),FLinearColor(0.7f,0.8f,0.8f),X,622*S,nullptr,0.8f*S);
 }

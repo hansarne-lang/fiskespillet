@@ -4,10 +4,12 @@
 #include "Engine/World.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Misc/ConfigCacheIni.h"
+#include "Misc/Paths.h"
 
 void UFiskGameInstance::Init()
 {
     Super::Init();
+    RigPresets.Load(RigPresetFile());
     GConfig->GetBool(TEXT("Fiskelaget.Settings"), TEXT("Sound"), bSound, GGameUserSettingsIni);
     GConfig->GetInt(TEXT("Fiskelaget.Settings"), TEXT("FrameRate"), FrameRate, GGameUserSettingsIni);
     FrameRate = FrameRate == 30 ? 30 : 60;
@@ -17,6 +19,16 @@ void UFiskGameInstance::Init()
         GEngine->OnTravelFailure().AddUObject(this, &UFiskGameInstance::TravelFailure);
     }
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_LOADED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate);
+}
+FString UFiskGameInstance::RigPresetFile() const
+{
+    return FPaths::Combine(FPaths::GetPath(GGameUserSettingsIni),TEXT("FiskelagetRigPresets.ini"));
+}
+bool UFiskGameInstance::SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig)
+{
+    const bool Saved=RigPresets.Save(Slot,Rig,RigPresetFile());
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PRESET_SAVE slot=%d success=%d"),Slot+1,Saved);
+    return Saved;
 }
 void UFiskGameInstance::Shutdown()
 {

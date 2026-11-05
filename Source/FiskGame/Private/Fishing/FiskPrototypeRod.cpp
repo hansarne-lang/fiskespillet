@@ -30,6 +30,7 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     View.CastId = Cycle.GetId();
     CatchId.Invalidate();
     LandedAtMs = -1;
+    CatchData=FiskCatches::Roll(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().D ^ 0x4F17B5D3),Boat->GetGroundId());
     FRandomStream BiteRandom(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().B ^ Cycle.GetId().C ^ Cycle.GetId().D));
     NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom, Ground);
     SetState(EFiskRodState::Fishing);
@@ -113,7 +114,7 @@ void UFiskPrototypeRod::Land()
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (!Mode || !Mode->GetSettlement() || !PC->PlayerState || !Day) { return; }
     if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
-    if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId())) { return; }
+    if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId(),CatchData)) { return; }
     LandedAtMs = Day->GetElapsedMilliseconds();
     Cycle.FinishLanding(View.CastId, LandedAtMs);
     View.AvailableAtMs = Cycle.GetAvailableAtMs();

@@ -4,6 +4,7 @@
 #include "Fishing/FiskFightModel.h"
 #include "Fishing/FiskRodCycle.h"
 #include "Fishing/FiskRigSettings.h"
+#include "Fishing/FiskCatchCatalog.h"
 #include "FiskPrototypeRod.generated.h"
 
 UENUM()
@@ -78,5 +79,7 @@ private:
     bool bPreviousSurge = false;
     double NextTransitionAt = 0.0, LastFightAt = 0.0;
     FGuid CatchId;
+    // Never replicated or exposed through the owner-only rod view.
+    FFiskCatchData CatchData;
     int32 LandedAtMs = -1;
 };

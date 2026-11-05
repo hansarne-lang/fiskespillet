@@ -38,6 +38,12 @@ public:
     UFiskRigPanel* GetRigPanel() const { return RigPanel; }
     UFiskSeaChart* GetSeaChart() const { return SeaChart; }
     UFiskCrewPanel* GetCrewPanel() const { return CrewPanel; }
+    bool IsHelpVisible() const { return bHelpVisible; }
+    bool IsResultsVisible() const { return bResultsVisible; }
+    int32 GetResultPage() const { return ResultPage; }
+    FString GetActionFeedback() const;
+    UFUNCTION(Client,Reliable) void ClientActionFeedback(const FString& Message);
+    UFUNCTION(Client,Reliable) void ClientRigReply(bool bAccepted);
     UFUNCTION(Server,Reliable) void ServerTransferCaptain(int32 ExpectedRevision,int32 Target);
     UFUNCTION(Client,Reliable) void ClientCaptainReply(bool bAccepted);
     UFUNCTION(Server,Reliable) void ServerStartBoatTrip(int32 ExpectedRevision);
@@ -55,6 +61,10 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    bool bHelpVisible=false,bResultsVisible=false,bAutoResultsSeen=false;
+    int32 ResultPage=0;
+    FString ActionFeedback;
+    double ActionFeedbackUntil=0;
     void RequestBoarding();
 
     UFUNCTION(Server, Reliable)
@@ -89,6 +99,12 @@ private:
     UPROPERTY() TObjectPtr<UFiskCrewPanel> CrewPanel;
 
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunContentSmoke();
+    FString ContentMode,ContentCaptureDir;
+    FTimerHandle ContentTimer;
+    int32 ContentStage=0;
+    double ContentAt=0,ContentFightAt=0;
+    bool bContentPrivateChecked=false;
     void RunLanSmoke();
     void RunRepeatedFishingSmoke(const class AFiskStarterBoat& Boat, const class AFiskDayState& Day);
     int32 RepeatStage = 0, RepeatCatches = 0;

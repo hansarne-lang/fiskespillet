@@ -79,4 +79,40 @@ bool FFiskMultipleCatchesTest::RunTest(const FString& Parameters)
     TestFalse(TEXT("No catches after barrier"), Ledger.Record(FGuid::NewGuid(), 256, 900000));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCatchDetailsTest,"Fiskelaget.Content.PrivateDetailedSettlement",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskCatchDetailsTest::RunTest(const FString& Parameters)
+{
+    FFiskDayLedger Ledger;const FGuid Id=FGuid::NewGuid();
+    const FFiskCatchData First=FiskCatches::Roll(127,0),Second=FiskCatches::Roll(51,2);
+    TestTrue(TEXT("Store first server-generated fish"),Ledger.Record(Id,256,300000,First));
+    TestFalse(TEXT("Duplicate cannot replace fish or owner"),Ledger.Record(Id,257,400000,Second));
+    TestTrue(TEXT("Store another species"),Ledger.Record(FGuid::NewGuid(),256,500000,Second));
+    TestEqual(TEXT("No details exposed during day"),Ledger.GetResults().Num(),0);
+    TestFalse(TEXT("No details one ms early"),Ledger.Settle(1019999,900000));
+    TestTrue(TEXT("Reveal exactly at barrier"),Ledger.Settle(1020000,1020000));
+    TestEqual(TEXT("One player row"),Ledger.GetResults().Num(),1);
+    if(Ledger.GetResults().Num()!=1) { return false; }
+    const FFiskDayResult& Row=Ledger.GetResults()[0];
+    TestEqual(TEXT("Every fish appears"),Row.Catches.Num(),2);
+    TestEqual(TEXT("Exact integer sum"),Row.SessionBalance,First.Value+Second.Value);
+    TestEqual(TEXT("Exact weight sum"),Row.DeliveredWeightGrams,First.WeightGrams+Second.WeightGrams);
+    const FFiskCatchResult* Detail=Row.Catches.FindByPredicate([&](const FFiskCatchResult& C){return C.CatchId==Id;});
+    TestTrue(TEXT("Immutable original catch survives"),Detail && Detail->Fish.WeightGrams==First.WeightGrams && Detail->Fish.Species==0 && Detail->bDelivered);
+    TestFalse(TEXT("Payout cannot repeat"),Ledger.Settle(1200000,900000));
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskLostDetailsTest,"Fiskelaget.Content.LateReturnAndInvalidCatch",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskLostDetailsTest::RunTest(const FString& Parameters)
+{
+    FFiskDayLedger Ledger;FFiskCatchData Fish=FiskCatches::Roll(42,1),Bad=Fish;Bad.Value=-1;
+    TestFalse(TEXT("Bad value cannot enter ledger"),Ledger.Record(FGuid::NewGuid(),256,400000,Bad));
+    TestTrue(TEXT("Valid fish enters ledger"),Ledger.Record(FGuid::NewGuid(),256,400000,Fish));
+    TestTrue(TEXT("Late arrival settles once"),Ledger.Settle(1020000,1020001));
+    const FFiskDayResult& Row=Ledger.GetResults()[0];
+    TestEqual(TEXT("No revenue from lost fish"),Row.SessionBalance,0);
+    TestEqual(TEXT("No delivered weight"),Row.DeliveredWeightGrams,0);
+    TestEqual(TEXT("Lost count"),Row.LostFish,1);
+    TestTrue(TEXT("Details revealed as lost"),Row.Catches.Num()==1 && !Row.Catches[0].bDelivered && Row.Catches[0].Fish.Species==1);
+    return true;
+}
 #endif

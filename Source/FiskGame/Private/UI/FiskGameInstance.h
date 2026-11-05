@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Engine/EngineBaseTypes.h"
+#include "UI/FiskRigPresets.h"
 #include "FiskGameInstance.generated.h"
 class UNetDriver;
 UCLASS()
@@ -15,12 +16,15 @@ public:
     bool bSound = true;
     int32 FrameRate = 60;
     FString ConnectionMessage;
+    FFiskRigPresets RigPresets;
+    bool SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig);
 #if WITH_DEV_AUTOMATION_TESTS
     int32 MenuSmokeStep = 0;
     double SmokeAt = 0.0;
     int32 SmokeClockAt = 0;
 #endif
 private:
+    FString RigPresetFile() const;
     void NetworkFailure(UWorld* World, UNetDriver* Driver, ENetworkFailure::Type Type, const FString& Error);
     void TravelFailure(UWorld* World, ETravelFailure::Type Type, const FString& Error);
 };

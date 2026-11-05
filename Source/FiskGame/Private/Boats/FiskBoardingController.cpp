@@ -2,6 +2,7 @@
 #include "Boats/FiskStarterBoat.h"
 #include "Bootstrap/FiskBootstrapGameMode.h"
 #include "Components/InputComponent.h"
+#include "Camera/PlayerCameraManager.h"
 #include "DayCycle/FiskDayState.h"
 #include "Fishing/FiskPrototypeRod.h"
 #include "Fishing/FiskCombatFeedback.h"
@@ -89,12 +90,35 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
+    // Handle rod commands before a later key can change the selected holder.
+    // Deferred input bindings otherwise make X followed by 1 act on rod 1.
+    const bool Release=Params.Event==IE_Released;
+    const bool RodKey=Params.Key==EKeys::F || Params.Key==EKeys::X || Params.Key==EKeys::LeftMouseButton
+        || Params.Key==EKeys::RightMouseButton || Params.Key==EKeys::MouseScrollUp || Params.Key==EKeys::MouseScrollDown || Params.Key==EKeys::SpaceBar;
+    if(RodKey)
+    {
+        if(PendingRod>=0) { return true; }
+        if(Press && Params.Key==EKeys::F) { RequestCast(); }
+        else if(Press && Params.Key==EKeys::X) { RequestWithdraw(); }
+        else if(Press && Params.Key==EKeys::LeftMouseButton) { RequestLift(); }
+        else if(Release && Params.Key==EKeys::LeftMouseButton) { RequestLower(); }
+        else if(Press && Params.Key==EKeys::RightMouseButton) { RequestReel(); }
+        else if(Release && Params.Key==EKeys::RightMouseButton) { RequestStopReel(); }
+        else if(Press && Params.Key==EKeys::MouseScrollUp) { RequestDragUp(); }
+        else if(Press && Params.Key==EKeys::MouseScrollDown) { RequestDragDown(); }
+        else if(Press && Params.Key==EKeys::SpaceBar) { RequestLand(); }
+        return true;
+    }
     if(Press && (Params.Key==EKeys::One || Params.Key==EKeys::Two))
     { RequestRodSelection(Params.Key==EKeys::One?0:1);return true; }
     if(Press && Params.Key==EKeys::C)
     {
         if(PlayerState && FindStarterBoat() && FindStarterBoat()->IsAboard(PlayerState->GetPlayerId()))
-        { CameraView=(CameraView+1)%3;ClientActionFeedback_Implementation(FString::Printf(TEXT("Kamera: %s"),CameraView==0?TEXT("Babord"):CameraView==1?TEXT("Styrbord"):TEXT("Oversikt"))); }
+        {
+            CameraView=(CameraView+1)%3;
+            if(PlayerCameraManager) { PlayerCameraManager->SetGameCameraCutThisFrame(); }
+            ClientActionFeedback_Implementation(FString::Printf(TEXT("Kamera: %s"),CameraView==0?TEXT("Babord"):CameraView==1?TEXT("Styrbord"):TEXT("Oversikt")));
+        }
         return true;
     }
     return Super::InputKey(Params);
@@ -145,15 +169,6 @@ void AFiskBoardingController::SetupInputComponent()
     Super::SetupInputComponent();
     InputComponent->BindKey(EKeys::E, IE_Pressed, this, &AFiskBoardingController::RequestBoarding);
     InputComponent->BindKey(EKeys::R, IE_Pressed, this, &AFiskBoardingController::RequestDeparture);
-    InputComponent->BindKey(EKeys::F, IE_Pressed, this, &AFiskBoardingController::RequestCast);
-    InputComponent->BindKey(EKeys::X, IE_Pressed, this, &AFiskBoardingController::RequestWithdraw);
-    InputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AFiskBoardingController::RequestLift);
-    InputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &AFiskBoardingController::RequestLower);
-    InputComponent->BindKey(EKeys::RightMouseButton, IE_Pressed, this, &AFiskBoardingController::RequestReel);
-    InputComponent->BindKey(EKeys::RightMouseButton, IE_Released, this, &AFiskBoardingController::RequestStopReel);
-    InputComponent->BindKey(EKeys::MouseScrollUp, IE_Pressed, this, &AFiskBoardingController::RequestDragUp);
-    InputComponent->BindKey(EKeys::MouseScrollDown, IE_Pressed, this, &AFiskBoardingController::RequestDragDown);
-    InputComponent->BindKey(EKeys::SpaceBar, IE_Pressed, this, &AFiskBoardingController::RequestLand);
 }
 
 void AFiskBoardingController::RequestBoarding()
@@ -476,6 +491,12 @@ void AFiskBoardingController::ClientRodSelection_Implementation(bool bAccepted,F
 }
 void AFiskBoardingController::ReconcileRodCapacity()
 {
+    const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+    if(Day && Selection.Day!=Day->GetDayNumber())
+    {
+        Rod->Lower();Rod->StopReel();ExtraRod->Lower();ExtraRod->StopReel();
+        Selection.Reset(Day->GetDayNumber());ClientRodSelection(true,Selection);
+    }
     if(Selection.Slot>=GetRodCapacity() && Selection.Slot!=0)
     {
         ExtraRod->Lower();ExtraRod->StopReel();ExtraRod->Withdraw();

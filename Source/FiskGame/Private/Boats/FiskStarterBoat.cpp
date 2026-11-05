@@ -16,8 +16,8 @@ void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
     const AFiskBoardingController* PC=GetWorld()?Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController()):nullptr;
     if(!PC || !PC->IsLocalController()) { return; }
     const int32 View=PC->GetCameraView();
-    const FVector Eye=View==2?FVector(-1500,0,780):FVector(-1250,View==1?1200:-1200,550);
-    const FVector Focus=View==2?FVector(-120,0,100):FVector(-100,View==1?600:-600,110);
+    const FVector Eye=View==2?FVector(-1700,-200,1000):FVector(-1250,View==1?1200:-1200,550);
+    const FVector Focus=View==2?FVector(-200,0,130):View==1?FVector(-250,150,120):FVector(-100,-600,110);
     OutResult.Location=GetActorTransform().TransformPosition(Eye);
     OutResult.Rotation=(GetActorTransform().TransformPosition(Focus)-OutResult.Location).Rotation();
     OutResult.FOV=View==2?70.0f:75.0f;

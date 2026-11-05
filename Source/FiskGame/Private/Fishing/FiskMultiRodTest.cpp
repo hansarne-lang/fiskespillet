@@ -23,6 +23,9 @@ bool FFiskRodAllocationTest::RunTest(const FString& Parameters)
     const FFiskRodSelection BeforeDay=S;S.Reset(2);
     TestFalse(TEXT("Prior day commands rejected"),S.Matches(BeforeDay));TestEqual(TEXT("New morning starts on first rod"),S.Slot,0);
     TestTrue(TEXT("Disconnect releases second holder"),S.Select(S.Revision,2,1,FFiskRodSelection::Capacity(1)));
+    FFiskRodSelection LateJoin;LateJoin.Reset(7);
+    TestTrue(TEXT("Late join selects against current server day"),LateJoin.Select(LateJoin.Revision,7,1,2));
+    TestFalse(TEXT("Late join rejects default-day commands"),LateJoin.Select(LateJoin.Revision,1,0,2));
     S.Revision=MAX_int32;TestFalse(TEXT("Selection revision saturates closed"),S.Select(MAX_int32,2,0,2));
     return true;
 }

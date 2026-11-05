@@ -40,10 +40,14 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
         {
             if(GetSelectedRod()!=0 || Second->GetState()!=EFiskRodState::Ready) { Fail(TEXT("guest_extra_rod_accepted"));return; }
             Key(EKeys::C);if(GetCameraView()!=1) { Fail(TEXT("camera_one"));return; }
-            Capture(TEXT("shared-camera-starboard"));FishingReleaseAt=Now;FishingReleaseStage=2;
+            FishingReleaseAt=Now;FishingReleaseStage=12;
         }
+        else if(FishingReleaseStage==12 && Now-FishingReleaseAt>=1)
+        { Capture(TEXT("shared-camera-starboard"));FishingReleaseAt=Now;FishingReleaseStage=2; }
         else if(FishingReleaseStage==2 && Now-FishingReleaseAt>=1)
-        { Key(EKeys::C);if(GetCameraView()!=2) { Fail(TEXT("camera_two"));return; }Capture(TEXT("shared-camera-overview"));FishingReleaseAt=Now;FishingReleaseStage=3; }
+        { Key(EKeys::C);if(GetCameraView()!=2) { Fail(TEXT("camera_two"));return; }FishingReleaseAt=Now;FishingReleaseStage=22; }
+        else if(FishingReleaseStage==22 && Now-FishingReleaseAt>=1)
+        { Capture(TEXT("shared-camera-overview"));FishingReleaseAt=Now;FishingReleaseStage=3; }
         else if(FishingReleaseStage==3 && Now-FishingReleaseAt>=1) { Key(EKeys::C);FishingReleaseStage=4; }
         else if(FishingReleaseStage==4 && Day->GetDayNumber()==2 && Now>=40)
         {
@@ -73,11 +77,17 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
         Key(EKeys::G);Capture(TEXT("second-rod-rig"));FishingReleaseAt=Now;FishingReleaseStage=4;
     }
     else if(FishingReleaseStage==4 && Now-FishingReleaseAt>=1)
-    { Key(EKeys::G);Key(EKeys::C);Capture(TEXT("solo-camera-starboard"));FishingReleaseAt=Now;FishingReleaseStage=5; }
+    { Key(EKeys::G);Key(EKeys::C);FishingReleaseAt=Now;FishingReleaseStage=45; }
+    else if(FishingReleaseStage==45 && Now-FishingReleaseAt>=1)
+    { Capture(TEXT("solo-camera-starboard"));FishingReleaseAt=Now;FishingReleaseStage=5; }
     else if(FishingReleaseStage==5 && Now-FishingReleaseAt>=1)
-    { Key(EKeys::C);Capture(TEXT("solo-camera-overview"));FishingReleaseAt=Now;FishingReleaseStage=6; }
+    { Key(EKeys::C);FishingReleaseAt=Now;FishingReleaseStage=55; }
+    else if(FishingReleaseStage==55 && Now-FishingReleaseAt>=1)
+    { Capture(TEXT("solo-camera-overview"));FishingReleaseAt=Now;FishingReleaseStage=6; }
     else if(FishingReleaseStage==6 && Now-FishingReleaseAt>=1)
-    { Key(EKeys::C);Capture(TEXT("solo-camera-port"));FishingReleaseStage=7; }
+    { Key(EKeys::C);FishingReleaseAt=Now;FishingReleaseStage=65; }
+    else if(FishingReleaseStage==65 && Now-FishingReleaseAt>=1)
+    { Capture(TEXT("solo-camera-port"));FishingReleaseStage=7; }
     else if(FishingReleaseStage==7)
     {
         if(Progress==-1 && Now>=120) { Key(EKeys::R); }

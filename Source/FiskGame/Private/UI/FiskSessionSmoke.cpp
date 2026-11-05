@@ -51,7 +51,11 @@ void AFiskBoardingController::RunSessionSmoke()
     TActorIterator<AFiskDaySettlement> Settlement(GetWorld());if(!Settlement) { return; }
     const FFiskSettlementView& View=Settlement->GetView();
     const TArray<FFiskHistoryDay>& History=Settlement->GetHistory();
-    if(Day->GetDayNumber()==1 && Day->GetElapsedSeconds()<1020 && !History.IsEmpty()) { Fail(TEXT("early_history"));return; }
+    // GameState clock and settlement use different actor channels. A valid server
+    // reveal can arrive before the client's next clock snapshot. The wrapper also
+    // checks the reveal against the host's actual 1020-second wall-clock start.
+    if(Day->GetDayNumber()==1 && View.DayNumber==1 && !View.bRevealed && !History.IsEmpty())
+    { Fail(TEXT("history_without_confirmed_reveal"));return; }
     if(Day->GetDayNumber()==2 && View.DayNumber==2 && (View.bRevealed || !View.Results.IsEmpty())) { Fail(TEXT("new_day_result_leak"));return; }
     if(SessionStage==0)
     {

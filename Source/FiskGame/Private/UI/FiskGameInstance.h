@@ -4,6 +4,7 @@
 #include "Engine/EngineBaseTypes.h"
 #include "UI/FiskRigPresets.h"
 #include "UI/FiskJournalStore.h"
+#include "UI/FiskNavigationNotebook.h"
 #include "FiskGameInstance.generated.h"
 class UNetDriver;
 UCLASS()
@@ -19,6 +20,10 @@ public:
     FString ConnectionMessage;
     FFiskRigPresets RigPresets;
     bool SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig);
+    FFiskNavigationNotebook Places;
+    FString PlacesMessage;
+    bool SavePlace(int32 Slot,int32 Ground,const FString& Name);
+    bool ClearPlace(int32 Slot);
     const FFiskJournalModel& GetJournal() const { return Journal; }
     FString GetJournalMessage() const { return JournalMessage; }
     int32 GetJournalRevision() const { return JournalRevision; }
@@ -34,6 +39,7 @@ public:
 private:
     FString RigPresetFile() const;
     FString JournalFile() const;
+    FString PlacesFile() const;
     FFiskJournalModel Journal;
     FFiskJournalStore JournalStore;
     FString JournalMessage;

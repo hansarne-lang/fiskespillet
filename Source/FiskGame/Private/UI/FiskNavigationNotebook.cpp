@@ -1,0 +1,73 @@
+#include "UI/FiskNavigationNotebook.h"
+#include "FiskFishingGround.h"
+#include "Misc/ConfigCacheIni.h"
+#include "Misc/Paths.h"
+#include "HAL/FileManager.h"
+#include "HAL/CriticalSection.h"
+
+bool FFiskNavigationNotebook::ValidName(const FString& Name)
+{
+    if(Name.IsEmpty() || Name.Len()>NameLimit || Name!=Name.TrimStartAndEnd()) { return false; }
+    for(TCHAR C:Name) { if(!FChar::IsAlnum(C) && C!=' ' && C!='-' && C!='_') { return false; } }
+    return true;
+}
+const FFiskSavedPlace* FFiskNavigationNotebook::Get(int32 Slot) const
+{ return Slot>=0 && Slot<Count && Slots[Slot].Ground!=INDEX_NONE?&Slots[Slot]:nullptr; }
+bool FFiskNavigationNotebook::Read(const FString& File,FFiskNavigationNotebook& Result)
+{
+    if(IFileManager::Get().FileSize(*File)<0 || IFileManager::Get().FileSize(*File)>16384) { return false; }
+    FConfigFile Config;Config.Read(File);FString Version;
+    if(!Config.GetString(TEXT("Fiskelaget.Places"),TEXT("Version"),Version) || Version!=TEXT("1")) { return false; }
+    FFiskNavigationNotebook Candidate;
+    for(int32 I=0;I<Count;++I)
+    {
+        const FString Section=FString::Printf(TEXT("Place%d"),I+1);
+        if(!Config.Contains(Section)) { continue; }
+        FString Ground,Name;
+        if(!Config.GetString(*Section,TEXT("Ground"),Ground) || (Ground!=TEXT("0") && Ground!=TEXT("1") && Ground!=TEXT("2"))
+            || !Config.GetString(*Section,TEXT("Name"),Name) || !ValidName(Name)) { return false; }
+        Candidate.Slots[I]={FCString::Atoi(*Ground),Name};
+    }
+    for(const auto& Pair:Config)
+    {
+        if(Pair.Key==TEXT("Fiskelaget.Places")) { continue; }
+        bool Known=false;for(int32 I=0;I<Count;++I) { Known|=Pair.Key==FString::Printf(TEXT("Place%d"),I+1); }
+        if(!Known) { return false; }
+    }
+    Result=Candidate;return true;
+}
+bool FFiskNavigationNotebook::Load(const FString& File)
+{
+    *this=FFiskNavigationNotebook();
+    if(!IFileManager::Get().FileExists(*File)) { return true; }
+    FFiskNavigationNotebook Candidate;
+    if(!Read(File,Candidate)) { bBlocked=true;return false; }
+    *this=Candidate;return true;
+}
+bool FFiskNavigationNotebook::Commit(int32 Slot,const FFiskSavedPlace& Place,const FString& File)
+{
+    if(Slot<0 || Slot>=Count) { return false; }
+    FString Canonical=FPaths::ConvertRelativePathToFull(File);FPaths::NormalizeFilename(Canonical);
+    FSystemWideCriticalSection Lock(FString::Printf(TEXT("FiskelagetPlaces-%08X"),GetTypeHash(Canonical.ToLower())),FTimespan::FromSeconds(1));
+    if(!Lock.IsValid()) { return false; }
+    // Re-read under lock so another process's other slots are preserved.
+    FFiskNavigationNotebook Candidate;
+    if(IFileManager::Get().FileExists(*File) && !Read(File,Candidate)) { bBlocked=true;return false; }
+    Candidate.Slots[Slot]=Place;
+    FConfigFile Config;Config.SetString(TEXT("Fiskelaget.Places"),TEXT("Version"),TEXT("1"));
+    for(int32 I=0;I<Count;++I)
+    {
+        if(!Candidate.Get(I)) { continue; }
+        const FString Section=FString::Printf(TEXT("Place%d"),I+1);
+        Config.SetString(*Section,TEXT("Ground"),*FString::FromInt(Candidate.Slots[I].Ground));
+        Config.SetString(*Section,TEXT("Name"),*Candidate.Slots[I].Name);
+    }
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(File),true);
+    const FString Temporary=File+TEXT(".tmp");Config.Dirty=true;
+    if(!Config.Write(Temporary) || !IFileManager::Get().Move(*File,*Temporary,true,true)) { return false; }
+    *this=Candidate;return true;
+}
+bool FFiskNavigationNotebook::Save(int32 Slot,int32 Ground,const FString& Name,const FString& File)
+{ return FiskGrounds::Find(Ground) && ValidName(Name) && Commit(Slot,{Ground,Name},File); }
+bool FFiskNavigationNotebook::Clear(int32 Slot,const FString& File)
+{ return Commit(Slot,FFiskSavedPlace(),File); }

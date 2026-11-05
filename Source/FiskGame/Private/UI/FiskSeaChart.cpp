@@ -1,6 +1,7 @@
 #include "UI/FiskSeaChart.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
+#include "UI/FiskGameInstance.h"
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Fishing/FiskPrototypeRod.h"
@@ -61,13 +62,16 @@ bool UFiskSeaChart::HandleKey(const FInputKeyEventArgs& Args)
 {
     const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
     if(!PC->IsLocalController() || PC->GetFrontEnd()->IsVisible() || PC->GetRigPanel()->IsVisible()) { return false; }
+    if(bVisible && bRenaming) { return HandleFavorites(Args); }
     const bool bPress=Args.Event==IE_Pressed;
     if(Args.Key==EKeys::M && bPress) { if(bVisible || CanOpen()) { Show(!bVisible); }return true; }
     if(!bVisible) { return false; }
+    if(bPress && Args.Key==EKeys::Tab) { bFavorites=!bFavorites;Message.Reset();return true; }
+    if(bFavorites) { return HandleFavorites(Args); }
     if(!bPress) { return true; }
     if(Args.Key==EKeys::Escape) { Show(false); }
     else if(Args.Key==EKeys::Up) { Row=(Row+3)%4; }
-    else if(Args.Key==EKeys::Down || Args.Key==EKeys::Tab) { Row=(Row+1)%4; }
+    else if(Args.Key==EKeys::Down) { Row=(Row+1)%4; }
     else if(Args.Key==EKeys::Home) { Row=0; }
     else if(Args.Key==EKeys::End) { Row=3; }
     else if(Args.Key==EKeys::Enter || Args.Key==EKeys::SpaceBar) { Choose(); }
@@ -92,13 +96,14 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     const AFiskStarterBoat* Boat=PC->FindStarterBoat();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
     if(!Boat || !Day) { return; }
+    if(bFavorites) { DrawFavorites(HUD,Canvas);return; }
     const float S=FMath::Min(Canvas.ClipX/1280.f,Canvas.ClipY/720.f);
     const FLinearColor Teal(0.4f,0.9f,0.8f),Muted(0.65f,0.8f,0.83f);
     HUD.DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,28*S,1232*S,650*S);
     HUD.DrawText(TEXT("SJØKART"),FLinearColor::White,52*S,58*S,nullptr,2.5f*S);
     const int32 Seconds=Day->HasStarted()?Day->GetElapsedSeconds():0;
     HUD.DrawText(FString::Printf(TEXT("%02d:%02d  |  Dagsklokken fortsetter"),Seconds/60,Seconds%60),Muted,680*S,90*S,nullptr,1.1f*S);
-    HUD.DrawText(TEXT("Tre prototypeplasser - kapteinen velger ved brygga"),Muted,52*S,110*S,nullptr,1.1f*S);
+    HUD.DrawText(TEXT("Tab: plasser / lagrede favoritter | Kapteinen velger ved brygga"),Muted,52*S,110*S,nullptr,1.0f*S);
     Buttons.Reset();Points.Reset();
     for(int32 I=0;I<3;++I)
     {

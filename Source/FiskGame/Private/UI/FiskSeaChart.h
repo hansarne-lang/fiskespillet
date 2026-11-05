@@ -21,6 +21,11 @@ private:
     bool CanOpen() const;
     void Show(bool bShow);
     void Choose();
+    void DrawFavorites(AHUD& HUD,UCanvas& Canvas);
+    bool HandleFavorites(const FInputKeyEventArgs& Args);
+    bool bFavorites=false,bRenaming=false;
+    int32 FavoriteSlot=0;
+    FString EditName;
     bool bVisible=false;
     int32 Row=0;
     FString Message;

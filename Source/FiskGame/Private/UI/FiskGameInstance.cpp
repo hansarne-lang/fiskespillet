@@ -13,6 +13,9 @@
 void UFiskGameInstance::Init()
 {
     Super::Init();
+    const bool PlacesLoaded=Places.Load(PlacesFile());
+    PlacesMessage=PlacesLoaded?TEXT("Favoritter lagres lokalt på denne PC-en."):TEXT("Kunne ikke lese favoritter. Eksisterende fil er bevart; kontroller filen før lagring.");
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PLACES_LOADED success=%d"),PlacesLoaded);
     const EFiskJournalLoad JournalLoad=JournalStore.Load(JournalFile(),Journal);
     bJournalRecovered=JournalLoad==EFiskJournalLoad::Recovered;
     bJournalPending=JournalLoad==EFiskJournalLoad::Unavailable;
@@ -38,6 +41,21 @@ void UFiskGameInstance::Init()
 FString UFiskGameInstance::JournalFile() const
 {
     return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetJournal.ini"));
+}
+FString UFiskGameInstance::PlacesFile() const
+{ return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetPlaces.ini")); }
+bool UFiskGameInstance::SavePlace(int32 Slot,int32 Ground,const FString& Name)
+{
+    const bool Saved=Places.Save(Slot,Ground,Name,PlacesFile());
+    PlacesMessage=Saved?TEXT("Favoritten er lagret på denne PC-en."):TEXT("Kunne ikke lagre. Kontroller favorittfil og skrivetilgang. Ingen endring bekreftet.");
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PLACE_SAVE success=%d slot=%d ground=%d"),Saved,Slot,Ground);
+    return Saved;
+}
+bool UFiskGameInstance::ClearPlace(int32 Slot)
+{
+    const bool Saved=Places.Clear(Slot,PlacesFile());
+    PlacesMessage=Saved?TEXT("Favoritten er slettet."):TEXT("Kunne ikke slette favoritten. Eksisterende fil er bevart.");
+    return Saved;
 }
 bool UFiskGameInstance::RetryJournalSave()
 {

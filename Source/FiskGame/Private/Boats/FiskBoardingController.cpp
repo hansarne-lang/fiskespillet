@@ -23,6 +23,7 @@
 #include "DayCycle/FiskSessionRules.h"
 #include "UI/FiskJournalPanel.h"
 #include "UI/FiskGameInstance.h"
+#include "UI/FiskDeckPanel.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -32,12 +33,21 @@ AFiskBoardingController::AFiskBoardingController()
     SeaChart = CreateDefaultSubobject<UFiskSeaChart>(TEXT("SeaChart"));
     CrewPanel = CreateDefaultSubobject<UFiskCrewPanel>(TEXT("CrewPanel"));
     JournalPanel = CreateDefaultSubobject<UFiskJournalPanel>(TEXT("JournalPanel"));
+    DeckPanel = CreateDefaultSubobject<UFiskDeckPanel>(TEXT("DeckPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(DeckPanel->IsVisible()) { return DeckPanel->HandleKey(Params); }
+    if(Press && (Params.Key==EKeys::F7 || Params.Key==EKeys::F8))
+    {
+        if(JournalPanel->IsVisible() || FrontEnd->IsVisible() || CrewPanel->IsVisible() || SeaChart->IsVisible() || RigPanel->IsVisible()
+            || bHelpVisible || bResultsVisible || bHistoryVisible)
+        { ClientActionFeedback_Implementation(TEXT("Lukk det åpne panelet med Escape først."));return true; }
+        DeckPanel->Open(Params.Key==EKeys::F7);return true;
+    }
     if(JournalPanel->IsVisible()) { return JournalPanel->HandleKey(Params); }
     if(Press && Params.Key==EKeys::F4)
     {
@@ -45,6 +55,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
         { ClientActionFeedback_Implementation(TEXT("Lukk panelet med Escape før du åpner F4-journalen."));return true; }
         bHelpVisible=bResultsVisible=bHistoryVisible=false;JournalPanel->Toggle();return true;
     }
+    if(SeaChart->IsVisible() && Params.Key==EKeys::F2) { return SeaChart->HandleKey(Params); }
     const bool OtherPanel=(FrontEnd && FrontEnd->IsVisible()) || (CrewPanel && CrewPanel->IsVisible())
         || (SeaChart && SeaChart->IsVisible()) || (RigPanel && RigPanel->IsVisible());
     if(Press && Params.Key==EKeys::N && !OtherPanel && !bHelpVisible)
@@ -85,6 +96,11 @@ void AFiskBoardingController::BeginPlay()
     Super::BeginPlay();
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskNavigationSmoke="),NavigationMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),NavigationCaptureDir);
+        GetWorldTimerManager().SetTimer(NavigationTimer,this,&AFiskBoardingController::RunNavigationSmoke,0.5f,true,2.0f);
+    }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskJournalSmoke="),JournalMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),JournalCaptureDir);
@@ -357,7 +373,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             }
         }
     }
-    if(!bAutoResultsSeen && !bHelpVisible && !bHistoryVisible && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
+    if(!bAutoResultsSeen && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
         && !SeaChart->IsVisible() && !RigPanel->IsVisible())
     {
         for(TActorIterator<AFiskDaySettlement> Settlement(GetWorld());Settlement;++Settlement)

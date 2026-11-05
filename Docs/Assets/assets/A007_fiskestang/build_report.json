@@ -1,0 +1,196 @@
+{
+  "asset_id": "A007",
+  "units": "metres",
+  "length_m": 1.9,
+  "blank_base_m": 0.8,
+  "butt_max_diameter_m": 0.0344,
+  "source_parts": 85,
+  "game_name": "SK_FISK_BoatRod_v1",
+  "triangles": 46060,
+  "bone_names": [
+    "GripRoot",
+    "Flex_01",
+    "Flex_02",
+    "Flex_03",
+    "Flex_04",
+    "Flex_05",
+    "Flex_06",
+    "Flex_07"
+  ],
+  "guide_specs": [
+    {
+      "name": "Guide_01",
+      "position_m": [
+        0,
+        0.029,
+        0.9
+      ],
+      "bone": "Flex_01",
+      "bore_radius_m": 0.0102
+    },
+    {
+      "name": "Guide_02",
+      "position_m": [
+        0,
+        0.026714285714285715,
+        1.08
+      ],
+      "bone": "Flex_02",
+      "bore_radius_m": 0.0092
+    },
+    {
+      "name": "Guide_03",
+      "position_m": [
+        0,
+        0.02442857142857143,
+        1.25
+      ],
+      "bone": "Flex_03",
+      "bore_radius_m": 0.0082
+    },
+    {
+      "name": "Guide_04",
+      "position_m": [
+        0,
+        0.022142857142857145,
+        1.4
+      ],
+      "bone": "Flex_04",
+      "bore_radius_m": 0.0072000000000000015
+    },
+    {
+      "name": "Guide_05",
+      "position_m": [
+        0,
+        0.019857142857142858,
+        1.54
+      ],
+      "bone": "Flex_05",
+      "bore_radius_m": 0.006200000000000001
+    },
+    {
+      "name": "Guide_06",
+      "position_m": [
+        0,
+        0.01757142857142857,
+        1.66
+      ],
+      "bone": "Flex_06",
+      "bore_radius_m": 0.0052
+    },
+    {
+      "name": "Guide_07",
+      "position_m": [
+        0,
+        0.015285714285714288,
+        1.77
+      ],
+      "bone": "Flex_07",
+      "bore_radius_m": 0.004200000000000001
+    },
+    {
+      "name": "Guide_08",
+      "position_m": [
+        0,
+        0.013000000000000001,
+        1.865
+      ],
+      "bone": "Flex_07",
+      "bore_radius_m": 0.0032
+    },
+    {
+      "name": "Tip",
+      "position_m": [
+        0,
+        0.006,
+        1.9
+      ],
+      "bone": "Flex_07",
+      "bore_radius_m": 0.00315
+    }
+  ],
+  "anchors_m": {
+    "Holder": [
+      0,
+      0,
+      0.245
+    ],
+    "Reel": [
+      0,
+      0.013,
+      0.5
+    ],
+    "RearHand": [
+      0,
+      0,
+      0.27
+    ],
+    "FrontHand": [
+      0,
+      0,
+      0.705
+    ],
+    "Guide_01": [
+      0,
+      0.029,
+      0.9
+    ],
+    "Guide_02": [
+      0,
+      0.026714285714285715,
+      1.08
+    ],
+    "Guide_03": [
+      0,
+      0.02442857142857143,
+      1.25
+    ],
+    "Guide_04": [
+      0,
+      0.022142857142857145,
+      1.4
+    ],
+    "Guide_05": [
+      0,
+      0.019857142857142858,
+      1.54
+    ],
+    "Guide_06": [
+      0,
+      0.01757142857142857,
+      1.66
+    ],
+    "Guide_07": [
+      0,
+      0.015285714285714288,
+      1.77
+    ],
+    "Guide_08": [
+      0,
+      0.013000000000000001,
+      1.865
+    ],
+    "Tip": [
+      0,
+      0.006,
+      1.9
+    ]
+  },
+  "reel_asset": "A008",
+  "load_demo": {
+    "frames": [
+      1,
+      31,
+      61,
+      91
+    ],
+    "strength": [
+      0,
+      0.45,
+      1,
+      0
+    ],
+    "note": "Illustrative poses, not calibrated load or fish weight."
+  },
+  "status": "rigged_source_and_exports_created; game_integration_pending"
+}

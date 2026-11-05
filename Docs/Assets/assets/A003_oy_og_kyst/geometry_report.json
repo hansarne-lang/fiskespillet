@@ -1,0 +1,54 @@
+{
+  "asset": "A003",
+  "units": "Unreal metres in manifest; centimetres in OBJ",
+  "obj_y_to_unreal_y": -1,
+  "seed": 307,
+  "island": {
+    "file": "island_coast_v1.obj",
+    "vertices": 104322,
+    "triangles": 208640,
+    "bounds_m": [
+      [
+        -380.0,
+        -380.0,
+        -40.0
+      ],
+      [
+        380.0,
+        380.0,
+        50.02419165197281
+      ]
+    ],
+    "top_vertices": 103041,
+    "closed_skirt": true
+  },
+  "rocks": [
+    {
+      "file": "coastal_rock_1_v1.obj",
+      "vertices": 266,
+      "triangles": 528
+    },
+    {
+      "file": "coastal_rock_2_v1.obj",
+      "vertices": 266,
+      "triangles": 528
+    },
+    {
+      "file": "coastal_rock_3_v1.obj",
+      "vertices": 266,
+      "triangles": 528
+    }
+  ],
+  "anchors": {
+    "marina_land_m": [
+      -90.0,
+      -60.0,
+      2.2
+    ],
+    "marina_water_m": [
+      -90.0,
+      -105.0,
+      0.0
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "status": "engine_build_and_preview_checked; main_game_integration_pending",
+  "compile_errors": [],
+  "expressions": 17,
+  "master": "/Game/Fiskelaget/Water/M_FISK_Ocean_v1.M_FISK_Ocean_v1",
+  "instances": {
+    "MI_FISK_Harbor_v1": "/Game/Fiskelaget/Water/MI_FISK_Harbor_v1.MI_FISK_Harbor_v1",
+    "MI_FISK_Reef_v1": "/Game/Fiskelaget/Water/MI_FISK_Reef_v1.MI_FISK_Reef_v1",
+    "MI_FISK_Offshore_v1": "/Game/Fiskelaget/Water/MI_FISK_Offshore_v1.MI_FISK_Offshore_v1"
+  },
+  "mesh": "/Game/Fiskelaget/Water/SM_FISK_OceanGrid64m_v1.SM_FISK_OceanGrid64m_v1",
+  "preview_map": "/Game/Fiskelaget/Water/Preview/L_A001_Ocean",
+  "verified_parameters": {
+    "MI_FISK_Harbor_v1": {
+      "WaveHeightCm": 6.0,
+      "WaveSpeed": 0.6000000238418579,
+      "Roughness": 0.11999999731779099,
+      "MicroNormalStrength": 0.03500000014901161,
+      "Scattering": [
+        4.999999873689376e-05,
+        0.0002800000074785203,
+        0.0003000000142492354
+      ],
+      "Absorption": [
+        0.0026000000070780516,
+        0.0008500000112690032,
+        0.0006000000284984708
+      ]
+    },
+    "MI_FISK_Reef_v1": {
+      "WaveHeightCm": 12.0,
+      "WaveSpeed": 0.75,
+      "Roughness": 0.12999999523162842,
+      "MicroNormalStrength": 0.04500000178813934,
+      "Scattering": [
+        3.9999998989515007e-05,
+        0.0002800000074785203,
+        0.00031999999191612005
+      ],
+      "Absorption": [
+        0.0032999999821186066,
+        0.0010000000474974513,
+        0.0006500000017695129
+      ]
+    },
+    "MI_FISK_Offshore_v1": {
+      "WaveHeightCm": 24.0,
+      "WaveSpeed": 1.0,
+      "Roughness": 0.1599999964237213,
+      "MicroNormalStrength": 0.054999999701976776,
+      "Scattering": [
+        1.9999999494757503e-05,
+        7.000000186963007e-05,
+        0.00018000000272877514
+      ],
+      "Absorption": [
+        0.0032999999821186066,
+        0.0017999999690800905,
+        0.0005499999970197678
+      ]
+    }
+  },
+  "mesh_size_cm": [
+    6400.0,
+    6400.0,
+    0.0
+  ],
+  "preview": "A001_hav_preview_v1.png"
+}

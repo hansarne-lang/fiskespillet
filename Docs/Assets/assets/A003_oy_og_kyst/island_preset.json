@@ -1,0 +1,26 @@
+{
+  "asset_id": "A003",
+  "version": 1,
+  "seed": 307,
+  "mesh_span_m": 760.0,
+  "grid_segments": 320,
+  "sea_level_cm": 0.0,
+  "beach_limit_m": 3.2,
+  "sand_dry_srgb": "F3D7A2",
+  "sand_wet_srgb": "B9A77E",
+  "limestone_light_srgb": "C9C1A6",
+  "limestone_dark_srgb": "898B79",
+  "grass_light_srgb": "6A9B48",
+  "grass_dark_srgb": "326B42",
+  "marina_land_anchor_m": [
+    -90.0,
+    -60.0,
+    2.2
+  ],
+  "marina_water_anchor_m": [
+    -90.0,
+    -105.0,
+    0.0
+  ],
+  "notes": "Foreslatt form og storrelse. Ikke en fastlast verden eller fastsatte reisetider."
+}

@@ -1,0 +1,14 @@
+{
+  "asset_id": "A005",
+  "version": 1,
+  "hull_length_m": 7.9248,
+  "beam_m": 2.64,
+  "waterline_z_m": 0.0,
+  "cockpit_floor_z_m": 0.52,
+  "player_count": 2,
+  "active_rod_positions": 2,
+  "hull_color_srgb": "289F9C",
+  "gelcoat_color_srgb": "F6F0DF",
+  "seat_color_srgb": "E9DFCB",
+  "design_note": "Original centre-console model. Length and gameplay capacities follow the project specification; beam, hull form and single-outboard layout are visual working choices."
+}

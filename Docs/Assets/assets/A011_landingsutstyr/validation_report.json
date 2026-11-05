@@ -1,0 +1,122 @@
+{
+  "asset_id": "A011",
+  "saved_source_reopened": true,
+  "game_integration": "pending",
+  "meshes": {
+    "SM_FISK_Landing_HandleOuter_v1": {
+      "triangles": 8400,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.024000000208616257,
+          -1.5199999809265137,
+          -0.024000002071261406
+        ],
+        [
+          0.024000000208616257,
+          -0.6150000095367432,
+          0.029500000178813934
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Landing_HandleInner_v1": {
+      "triangles": 344,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.017999999225139618,
+          -0.6850000023841858,
+          -0.018000002950429916
+        ],
+        [
+          0.017999999225139618,
+          0.0350000262260437,
+          0.018000002950429916
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Landing_Hoop_v1": {
+      "triangles": 1908,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.3294117748737335,
+          -0.09000000357627869,
+          -0.023499999195337296
+        ],
+        [
+          0.3294117748737335,
+          0.7005882263183594,
+          0.03100000135600567
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Landing_NetBag_v1": {
+      "triangles": 22120,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.3210906386375427,
+          -0.031037671491503716,
+          -0.5649999976158142
+        ],
+        [
+          0.3210906386375427,
+          0.691037654876709,
+          -0.01227752398699522
+        ]
+      ],
+      "materials": 1
+    },
+    "SM_FISK_Landing_Strap_v1": {
+      "triangles": 2340,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.18462499976158142,
+          -0.3125,
+          -0.004000000189989805
+        ],
+        [
+          0.18462499976158142,
+          0.07349999248981476,
+          0.004000000189989805
+        ]
+      ],
+      "materials": 3
+    }
+  },
+  "assembly": {
+    "source_parts": 108,
+    "anchors": 7,
+    "bait_fits_net_opening_by_nominal_dimensions": true,
+    "net_and_strap_have_separate_roots": true
+  },
+  "FISK_LandingEquipment_v1_fbx": {
+    "meshes": 5,
+    "max_bounds_error_m": 1.3224780559539795e-07
+  },
+  "FISK_LandingEquipment_v1_glb": {
+    "meshes": 5,
+    "max_bounds_error_m": 0.0
+  },
+  "status": "passed"
+}

@@ -1,0 +1,20 @@
+{
+  "asset_id": "A006",
+  "version": 1,
+  "units": "metres",
+  "source": "Own A005 tube with a new annular flange, three fixing heads and a butt support pin",
+  "inner_diameter_m": 0.054,
+  "outer_tube_diameter_m": 0.076,
+  "flange_diameter_m": 0.132,
+  "tube_depth_below_flange_m": 0.28,
+  "support_pin_z_m": -0.245,
+  "rod_socket_m": [
+    0,
+    0,
+    0.03
+  ],
+  "triangles": 768,
+  "source_parts": 6,
+  "mounting_axis": "Local +Z; flange origin at Z 0; tube extends down -Z",
+  "status": "blender_model_created; rod_line_camera_and_game_integration_pending"
+}

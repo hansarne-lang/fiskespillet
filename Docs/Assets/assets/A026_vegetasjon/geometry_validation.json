@@ -1,0 +1,78 @@
+{
+  "asset": "A026",
+  "status": "passed",
+  "meshes": [
+    {
+      "file": "palm_1_v1.obj",
+      "vertices": 8402,
+      "triangles": 10060,
+      "triangles_by_material": {
+        "Bark": 984,
+        "Fruit": 500,
+        "Leaves": 8576
+      },
+      "height_m": 12.840721700000001,
+      "finite_unit_normals": true,
+      "nondegenerate_faces": true,
+      "closed_stems_and_fruit": true,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "palm_2_v1.obj",
+      "vertices": 9424,
+      "triangles": 11140,
+      "triangles_by_material": {
+        "Bark": 984,
+        "Fruit": 500,
+        "Leaves": 9656
+      },
+      "height_m": 14.937659300000002,
+      "finite_unit_normals": true,
+      "nondegenerate_faces": true,
+      "closed_stems_and_fruit": true,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "palm_3_v1.obj",
+      "vertices": 10510,
+      "triangles": 12284,
+      "triangles_by_material": {
+        "Bark": 984,
+        "Fruit": 500,
+        "Leaves": 10800
+      },
+      "height_m": 16.6365499,
+      "finite_unit_normals": true,
+      "nondegenerate_faces": true,
+      "closed_stems_and_fruit": true,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "tropical_shrub_v1.obj",
+      "vertices": 805,
+      "triangles": 870,
+      "triangles_by_material": {
+        "Bark": 150,
+        "Leaves": 720
+      },
+      "height_m": 1.3713933,
+      "finite_unit_normals": true,
+      "nondegenerate_faces": true,
+      "closed_stems_and_fruit": true,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "coastal_grass_v1.obj",
+      "vertices": 160,
+      "triangles": 160,
+      "triangles_by_material": {
+        "Leaves": 160
+      },
+      "height_m": 0.7150432999999999,
+      "finite_unit_normals": true,
+      "nondegenerate_faces": true,
+      "closed_stems_and_fruit": true,
+      "open_leaf_edges_intentional": true
+    }
+  ]
+}

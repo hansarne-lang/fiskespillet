@@ -1,0 +1,3546 @@
+{
+  "asset": "A003",
+  "version": 2,
+  "status": "native_assets_and_reopened_scene_checked; game_integration_pending",
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "details_level": "/Game/Fiskelaget/Island/L_A003_Details_v2",
+  "preview_level": "/Game/Fiskelaget/Island/Preview/L_A003_TropicalIsland_v2",
+  "counts": {
+    "palms": 42,
+    "shrubs": 45,
+    "grass": 90,
+    "shore_rocks": 48,
+    "cliff_outcrops": 8
+  },
+  "placement": {
+    "palms": [
+      {
+        "label": "A026 Palm 01",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -166.7054544786982,
+          -46.53844145014787,
+          4.298297525194326
+        ],
+        "scale": [
+          1.0065702119710278,
+          1.0065702119710278,
+          1.0065702119710278
+        ],
+        "yaw": 12.22661556262588
+      },
+      {
+        "label": "A026 Palm 02",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -202.53489082228535,
+          24.807861854591277,
+          7.54978291243967
+        ],
+        "scale": [
+          0.8882002636038383,
+          0.8882002636038383,
+          0.8882002636038383
+        ],
+        "yaw": 149.5151795975741
+      },
+      {
+        "label": "A026 Palm 03",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -19.778418201969842,
+          -74.36812066636315,
+          3.692238006245829
+        ],
+        "scale": [
+          1.147423384565422,
+          1.147423384565422,
+          1.147423384565422
+        ],
+        "yaw": -12.242353974375277
+      },
+      {
+        "label": "A026 Palm 04",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          80.61405098519995,
+          -115.49527033773794,
+          6.113111619771736
+        ],
+        "scale": [
+          0.9912389103953785,
+          0.9912389103953785,
+          0.9912389103953785
+        ],
+        "yaw": -86.87634370548315
+      },
+      {
+        "label": "A026 Palm 05",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          168.64957922553975,
+          -68.91667613945945,
+          5.205381503170033
+        ],
+        "scale": [
+          1.05403464532901,
+          1.05403464532901,
+          1.05403464532901
+        ],
+        "yaw": 36.815849622392705
+      },
+      {
+        "label": "A026 Palm 06",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -74.3666780884518,
+          99.15240784904361,
+          24.808575616703557
+        ],
+        "scale": [
+          0.9981172820940106,
+          0.9981172820940106,
+          0.9981172820940106
+        ],
+        "yaw": 154.02703385915186
+      },
+      {
+        "label": "A026 Palm 07",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          97.69793886846497,
+          123.13326158934778,
+          29.141438214757294
+        ],
+        "scale": [
+          1.0843424966764152,
+          1.0843424966764152,
+          1.0843424966764152
+        ],
+        "yaw": -29.291523255154488
+      },
+      {
+        "label": "A026 Palm 08",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -148.65358118204583,
+          -65.27609809484409,
+          2.2322829923502066
+        ],
+        "scale": [
+          0.857204129944424,
+          0.857204129944424,
+          0.857204129944424
+        ],
+        "yaw": 149.48876412115612
+      },
+      {
+        "label": "A026 Palm 09",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -187.21012422260642,
+          20.619002978671823,
+          9.128340680051735
+        ],
+        "scale": [
+          0.8512178338517234,
+          0.8512178338517234,
+          0.8512178338517234
+        ],
+        "yaw": 56.82211509118525
+      },
+      {
+        "label": "A026 Palm 10",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -45.43615705243965,
+          -59.2471405490474,
+          3.3259229718589847
+        ],
+        "scale": [
+          0.9388083229733332,
+          0.9388083229733332,
+          0.9388083229733332
+        ],
+        "yaw": 111.67765460838962
+      },
+      {
+        "label": "A026 Palm 11",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          58.32818259340233,
+          -133.66442347081463,
+          6.801947288010125
+        ],
+        "scale": [
+          1.0127552942299538,
+          1.0127552942299538,
+          1.0127552942299538
+        ],
+        "yaw": -107.636722218205
+      },
+      {
+        "label": "A026 Palm 12",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          202.4097945324567,
+          -67.93663121132865,
+          1.3482464816843307
+        ],
+        "scale": [
+          0.85226033185161,
+          0.85226033185161,
+          0.85226033185161
+        ],
+        "yaw": 21.304830182492225
+      },
+      {
+        "label": "A026 Palm 13",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -89.81575103367643,
+          0.4237548140137122,
+          21.147404264400965
+        ],
+        "scale": [
+          1.1396004931476735,
+          1.1396004931476735,
+          1.1396004931476735
+        ],
+        "yaw": -113.92198736626291
+      },
+      {
+        "label": "A026 Palm 14",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          138.41476216394216,
+          108.71577582672114,
+          29.426144068721374
+        ],
+        "scale": [
+          1.070640480578748,
+          1.070640480578748,
+          1.070640480578748
+        ],
+        "yaw": 31.7904616040951
+      },
+      {
+        "label": "A026 Palm 15",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -157.50166784582973,
+          -56.18168557861881,
+          4.022932090420765
+        ],
+        "scale": [
+          1.0985337179403118,
+          1.0985337179403118,
+          1.0985337179403118
+        ],
+        "yaw": -138.74138288902893
+      },
+      {
+        "label": "A026 Palm 16",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -220.23631449826937,
+          24.82626180536175,
+          7.588861950415015
+        ],
+        "scale": [
+          0.8725559250483873,
+          0.8725559250483873,
+          0.8725559250483873
+        ],
+        "yaw": 34.29035592615736
+      },
+      {
+        "label": "A026 Palm 17",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -49.9321787599748,
+          -67.26046105214624,
+          2.0959957320854046
+        ],
+        "scale": [
+          1.0811626757157597,
+          1.0811626757157597,
+          1.0811626757157597
+        ],
+        "yaw": -53.1372692014325
+      },
+      {
+        "label": "A026 Palm 18",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          108.2074143459068,
+          -109.07009495374174,
+          3.6756653212142845
+        ],
+        "scale": [
+          1.0438190143503574,
+          1.0438190143503574,
+          1.0438190143503574
+        ],
+        "yaw": 90.11360630050052
+      },
+      {
+        "label": "A026 Palm 19",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          213.26921387077908,
+          -33.76159099224751,
+          2.5438390250799783
+        ],
+        "scale": [
+          1.1555830183687874,
+          1.1555830183687874,
+          1.1555830183687874
+        ],
+        "yaw": -36.199368429012765
+      },
+      {
+        "label": "A026 Palm 20",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -78.70218951130387,
+          13.344338789523004,
+          29.38766096942892
+        ],
+        "scale": [
+          0.8584635352497806,
+          0.8584635352497806,
+          0.8584635352497806
+        ],
+        "yaw": -8.386147502217739
+      },
+      {
+        "label": "A026 Palm 21",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          78.45220068796104,
+          113.93963026487471,
+          29.182948817524572
+        ],
+        "scale": [
+          0.9680300618947975,
+          0.9680300618947975,
+          0.9680300618947975
+        ],
+        "yaw": 158.9865890847875
+      },
+      {
+        "label": "A026 Palm 22",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -165.58349342766144,
+          -64.29378223807488,
+          2.5629135343343195
+        ],
+        "scale": [
+          0.881640580536443,
+          0.881640580536443,
+          0.881640580536443
+        ],
+        "yaw": -21.239518691129632
+      },
+      {
+        "label": "A026 Palm 23",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -243.16202486947248,
+          6.733078199163948,
+          2.03297939578845
+        ],
+        "scale": [
+          1.041137340319515,
+          1.041137340319515,
+          1.041137340319515
+        ],
+        "yaw": -99.61737165662325
+      },
+      {
+        "label": "A026 Palm 24",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -27.394125682201174,
+          -68.32090291599579,
+          3.7603167605021417
+        ],
+        "scale": [
+          0.8612444491866632,
+          0.8612444491866632,
+          0.8612444491866632
+        ],
+        "yaw": 138.82670786693046
+      },
+      {
+        "label": "A026 Palm 25",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          48.63354116631297,
+          -137.74765152919173,
+          5.3101583098872585
+        ],
+        "scale": [
+          1.101348300280446,
+          1.101348300280446,
+          1.101348300280446
+        ],
+        "yaw": -73.7658967436905
+      },
+      {
+        "label": "A026 Palm 26",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          194.17507881397077,
+          -37.9994075091165,
+          5.912955824468435
+        ],
+        "scale": [
+          1.000530337844444,
+          1.000530337844444,
+          1.000530337844444
+        ],
+        "yaw": 124.22943191081538
+      },
+      {
+        "label": "A026 Palm 27",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -87.56796674005832,
+          13.885404149421735,
+          27.182174387744833
+        ],
+        "scale": [
+          1.0062334344599178,
+          1.0062334344599178,
+          1.0062334344599178
+        ],
+        "yaw": -153.17546412620004
+      },
+      {
+        "label": "A026 Palm 28",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -160.9487020853977,
+          86.9811203519933,
+          11.818733531289851
+        ],
+        "scale": [
+          0.9474255251195607,
+          0.9474255251195607,
+          0.9474255251195607
+        ],
+        "yaw": -11.597041910780149
+      },
+      {
+        "label": "A026 Palm 29",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -140.1703659002537,
+          83.3977800525268,
+          13.942095358282197
+        ],
+        "scale": [
+          1.0589642696794943,
+          1.0589642696794943,
+          1.0589642696794943
+        ],
+        "yaw": 63.9218080863138
+      },
+      {
+        "label": "A026 Palm 30",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -63.36502106726229,
+          99.64880287973756,
+          26.546797503829154
+        ],
+        "scale": [
+          0.8679785902001752,
+          0.8679785902001752,
+          0.8679785902001752
+        ],
+        "yaw": -121.10028307526852
+      },
+      {
+        "label": "A026 Palm 31",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -160.1185302807475,
+          60.152402715126925,
+          11.996928122192424
+        ],
+        "scale": [
+          1.005760240149522,
+          1.005760240149522,
+          1.005760240149522
+        ],
+        "yaw": -90.65704001160194
+      },
+      {
+        "label": "A026 Palm 32",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          186.70598750938592,
+          -57.25421200376081,
+          5.408214918119139
+        ],
+        "scale": [
+          1.0762786480411666,
+          1.0762786480411666,
+          1.0762786480411666
+        ],
+        "yaw": 28.591390087622813
+      },
+      {
+        "label": "A026 Palm 33",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -258.22791049492844,
+          38.48542896645506,
+          11.607591912382734
+        ],
+        "scale": [
+          0.9472068972188629,
+          0.9472068972188629,
+          0.9472068972188629
+        ],
+        "yaw": 106.04780256809391
+      },
+      {
+        "label": "A026 Palm 34",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          128.09187073076203,
+          -32.27840442748615,
+          25.108881880862327
+        ],
+        "scale": [
+          0.9291212011892053,
+          0.9291212011892053,
+          0.9291212011892053
+        ],
+        "yaw": -73.08456574313503
+      },
+      {
+        "label": "A026 Palm 35",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          161.09274311367875,
+          -10.498917243340713,
+          22.469455383699948
+        ],
+        "scale": [
+          0.9265996584905103,
+          0.9265996584905103,
+          0.9265996584905103
+        ],
+        "yaw": -159.74261814898838
+      },
+      {
+        "label": "A026 Palm 36",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          22.710298177718528,
+          151.89958368527306,
+          24.70832923528853
+        ],
+        "scale": [
+          1.1236248206337387,
+          1.1236248206337387,
+          1.1236248206337387
+        ],
+        "yaw": -172.4452946883999
+      },
+      {
+        "label": "A026 Palm 37",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -169.06834773647353,
+          104.31022171163494,
+          16.81265897728422
+        ],
+        "scale": [
+          0.9509082045733005,
+          0.9509082045733005,
+          0.9509082045733005
+        ],
+        "yaw": -85.74599810296343
+      },
+      {
+        "label": "A026 Palm 38",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          234.90243935438798,
+          73.161894587164,
+          22.45697425095911
+        ],
+        "scale": [
+          1.1081445032329147,
+          1.1081445032329147,
+          1.1081445032329147
+        ],
+        "yaw": 25.79243719270849
+      },
+      {
+        "label": "A026 Palm 39",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -148.28470987732237,
+          -9.938230326902215,
+          11.945802806856596
+        ],
+        "scale": [
+          1.0415881109126162,
+          1.0415881109126162,
+          1.0415881109126162
+        ],
+        "yaw": -164.71685591212872
+      },
+      {
+        "label": "A026 Palm 40",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+        "position_m": [
+          -100.9005218877374,
+          12.253115907207274,
+          23.80217775563101
+        ],
+        "scale": [
+          0.9233117038968808,
+          0.9233117038968808,
+          0.9233117038968808
+        ],
+        "yaw": -62.8103689787516
+      },
+      {
+        "label": "A026 Palm 41",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+        "position_m": [
+          -91.12262563445609,
+          149.0925240253141,
+          21.90908250952495
+        ],
+        "scale": [
+          1.0109318470142874,
+          1.0109318470142874,
+          1.0109318470142874
+        ],
+        "yaw": -73.80034160333493
+      },
+      {
+        "label": "A026 Palm 42",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+        "position_m": [
+          -197.39700892920982,
+          113.3899466225904,
+          24.271701725597175
+        ],
+        "scale": [
+          0.9239209478592221,
+          0.9239209478592221,
+          0.9239209478592221
+        ],
+        "yaw": -7.093771023250042
+      }
+    ],
+    "shrubs": [
+      {
+        "label": "A026 Shrub 01",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -159.37962427050294,
+          -75.89383822705662,
+          1.416149126391216
+        ],
+        "scale": [
+          0.8816111173911516,
+          0.8816111173911516,
+          0.8816111173911516
+        ],
+        "yaw": 171.81439954870035
+      },
+      {
+        "label": "A026 Shrub 02",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -184.45917127178848,
+          22.68092450116159,
+          9.859614126981938
+        ],
+        "scale": [
+          0.6934645295691402,
+          0.6934645295691402,
+          0.6934645295691402
+        ],
+        "yaw": 74.7484622734076
+      },
+      {
+        "label": "A026 Shrub 03",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -42.477121180534134,
+          -64.24638815849401,
+          2.753876425174301
+        ],
+        "scale": [
+          0.9879755451310694,
+          0.9879755451310694,
+          0.9879755451310694
+        ],
+        "yaw": 5.619728297981851
+      },
+      {
+        "label": "A026 Shrub 04",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          83.24953091424885,
+          -147.03408402000477,
+          2.3471804037134834
+        ],
+        "scale": [
+          0.6571730714092134,
+          0.6571730714092134,
+          0.6571730714092134
+        ],
+        "yaw": -135.08100698929283
+      },
+      {
+        "label": "A026 Shrub 05",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          193.08958073224002,
+          -55.723153286163495,
+          4.529204153364214
+        ],
+        "scale": [
+          0.7518091123088155,
+          0.7518091123088155,
+          0.7518091123088155
+        ],
+        "yaw": -90.55655529424128
+      },
+      {
+        "label": "A026 Shrub 06",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -110.0289553515401,
+          14.543752911210273,
+          22.480691276007235
+        ],
+        "scale": [
+          1.3335293727029036,
+          1.3335293727029036,
+          1.3335293727029036
+        ],
+        "yaw": -22.953909582236008
+      },
+      {
+        "label": "A026 Shrub 07",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          174.6701382601574,
+          87.26244988750275,
+          24.40394027714871
+        ],
+        "scale": [
+          1.2355664638974289,
+          1.2355664638974289,
+          1.2355664638974289
+        ],
+        "yaw": -105.93958395710709
+      },
+      {
+        "label": "A026 Shrub 08",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -148.73226636538854,
+          -50.04437012028237,
+          4.425568757384094
+        ],
+        "scale": [
+          0.7618461487914501,
+          0.7618461487914501,
+          0.7618461487914501
+        ],
+        "yaw": -54.84463878613445
+      },
+      {
+        "label": "A026 Shrub 09",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -211.63405919006345,
+          28.494682629691187,
+          7.745270475527158
+        ],
+        "scale": [
+          0.6670760092589957,
+          0.6670760092589957,
+          0.6670760092589957
+        ],
+        "yaw": 132.52760649273392
+      },
+      {
+        "label": "A026 Shrub 10",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -7.756120454840428,
+          -78.38236252731525,
+          5.300960699136823
+        ],
+        "scale": [
+          0.7609692753174446,
+          0.7609692753174446,
+          0.7609692753174446
+        ],
+        "yaw": -4.320098444004259
+      },
+      {
+        "label": "A026 Shrub 11",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          106.39854929189666,
+          -106.90968368078515,
+          4.1398301630280985
+        ],
+        "scale": [
+          1.0303407679921728,
+          1.0303407679921728,
+          1.0303407679921728
+        ],
+        "yaw": -139.56073040366857
+      },
+      {
+        "label": "A026 Shrub 12",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          164.2274234876205,
+          -39.85444448968534,
+          14.30473186822887
+        ],
+        "scale": [
+          0.9355531782001306,
+          0.9355531782001306,
+          0.9355531782001306
+        ],
+        "yaw": -100.81208378824252
+      },
+      {
+        "label": "A026 Shrub 13",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -92.94749482398026,
+          81.29989075309686,
+          24.56206377534505
+        ],
+        "scale": [
+          0.9194694811938535,
+          0.9194694811938535,
+          0.9194694811938535
+        ],
+        "yaw": -155.9170851529731
+      },
+      {
+        "label": "A026 Shrub 14",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          72.90375124746049,
+          -153.40199161802212,
+          2.855395396839345
+        ],
+        "scale": [
+          1.011642794517083,
+          1.011642794517083,
+          1.011642794517083
+        ],
+        "yaw": 12.537919943088156
+      },
+      {
+        "label": "A026 Shrub 15",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -142.09716668288033,
+          176.3210207896077,
+          23.678989247136414
+        ],
+        "scale": [
+          0.9804100352461567,
+          0.9804100352461567,
+          0.9804100352461567
+        ],
+        "yaw": 86.09033298283356
+      },
+      {
+        "label": "A026 Shrub 16",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -164.8642032012107,
+          155.0078443813748,
+          24.0206113855772
+        ],
+        "scale": [
+          0.654284370969268,
+          0.654284370969268,
+          0.654284370969268
+        ],
+        "yaw": -144.21006186541794
+      },
+      {
+        "label": "A026 Shrub 17",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          227.0065363492713,
+          65.89906107250022,
+          18.934020822684165
+        ],
+        "scale": [
+          0.9234362776495234,
+          0.9234362776495234,
+          0.9234362776495234
+        ],
+        "yaw": -150.77070651698648
+      },
+      {
+        "label": "A026 Shrub 18",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          115.48343505701945,
+          -81.49252713211763,
+          10.09280124978196
+        ],
+        "scale": [
+          1.2526534823629085,
+          1.2526534823629085,
+          1.2526534823629085
+        ],
+        "yaw": -133.44446303808235
+      },
+      {
+        "label": "A026 Shrub 19",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -139.79487243097478,
+          20.619175338709255,
+          17.37684195651589
+        ],
+        "scale": [
+          1.3390219589548509,
+          1.3390219589548509,
+          1.3390219589548509
+        ],
+        "yaw": 42.04887017736348
+      },
+      {
+        "label": "A026 Shrub 20",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -111.73646263526601,
+          117.0744305487467,
+          13.748479275960998
+        ],
+        "scale": [
+          0.684857198673879,
+          0.684857198673879,
+          0.684857198673879
+        ],
+        "yaw": 89.19267863863945
+      },
+      {
+        "label": "A026 Shrub 21",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -173.4839000835181,
+          -26.59959990270346,
+          4.730441400593808
+        ],
+        "scale": [
+          0.7619150337655163,
+          0.7619150337655163,
+          0.7619150337655163
+        ],
+        "yaw": 164.26507634869148
+      },
+      {
+        "label": "A026 Shrub 22",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          99.37397432863196,
+          -60.13434479271123,
+          19.82743442430819
+        ],
+        "scale": [
+          1.3463847711812322,
+          1.3463847711812322,
+          1.3463847711812322
+        ],
+        "yaw": -117.35616406803668
+      },
+      {
+        "label": "A026 Shrub 23",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          94.725033087861,
+          -78.07415057761625,
+          14.878961887541825
+        ],
+        "scale": [
+          0.848165510696848,
+          0.848165510696848,
+          0.848165510696848
+        ],
+        "yaw": -1.4381034606228695
+      },
+      {
+        "label": "A026 Shrub 24",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -168.74678224875183,
+          127.27117674621911,
+          22.27370482620998
+        ],
+        "scale": [
+          1.1290263261332898,
+          1.1290263261332898,
+          1.1290263261332898
+        ],
+        "yaw": 22.83230493632678
+      },
+      {
+        "label": "A026 Shrub 25",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          236.24626285888542,
+          20.477435734669086,
+          6.886372470272246
+        ],
+        "scale": [
+          1.3227984256746894,
+          1.3227984256746894,
+          1.3227984256746894
+        ],
+        "yaw": -42.05560086174262
+      },
+      {
+        "label": "A026 Shrub 26",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          69.72581341310706,
+          -146.21525529258037,
+          3.324896521364553
+        ],
+        "scale": [
+          1.1414249158703484,
+          1.1414249158703484,
+          1.1414249158703484
+        ],
+        "yaw": 49.337795215285524
+      },
+      {
+        "label": "A026 Shrub 27",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -126.148531840543,
+          -5.30236146050504,
+          15.086347977417864
+        ],
+        "scale": [
+          1.3480537588169885,
+          1.3480537588169885,
+          1.3480537588169885
+        ],
+        "yaw": 131.14815018399793
+      },
+      {
+        "label": "A026 Shrub 28",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -160.74425561906696,
+          -10.610871488423157,
+          9.282937360012353
+        ],
+        "scale": [
+          0.760673412544447,
+          0.760673412544447,
+          0.760673412544447
+        ],
+        "yaw": 52.75646786679383
+      },
+      {
+        "label": "A026 Shrub 29",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          25.988348342142956,
+          -146.0840796919569,
+          1.4476818110671612
+        ],
+        "scale": [
+          0.8617334309679028,
+          0.8617334309679028,
+          0.8617334309679028
+        ],
+        "yaw": 68.94814702275707
+      },
+      {
+        "label": "A026 Shrub 30",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          49.308229621599196,
+          -131.38962802196278,
+          6.083238285159328
+        ],
+        "scale": [
+          0.9736829900897273,
+          0.9736829900897273,
+          0.9736829900897273
+        ],
+        "yaw": -35.31234956747224
+      },
+      {
+        "label": "A026 Shrub 31",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          38.70392529800961,
+          156.95876849607384,
+          23.66885945824149
+        ],
+        "scale": [
+          1.2380885834451152,
+          1.2380885834451152,
+          1.2380885834451152
+        ],
+        "yaw": 167.62386600664627
+      },
+      {
+        "label": "A026 Shrub 32",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          177.187458340457,
+          -34.85003194690077,
+          10.80056170374741
+        ],
+        "scale": [
+          1.0208582340704082,
+          1.0208582340704082,
+          1.0208582340704082
+        ],
+        "yaw": 20.60835859322404
+      },
+      {
+        "label": "A026 Shrub 33",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          114.0769682350479,
+          -56.94771355944303,
+          19.159270307476373
+        ],
+        "scale": [
+          0.7562046593322458,
+          0.7562046593322458,
+          0.7562046593322458
+        ],
+        "yaw": 158.75490221844774
+      },
+      {
+        "label": "A026 Shrub 34",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          223.17202464998127,
+          62.604764538232416,
+          17.589147846153487
+        ],
+        "scale": [
+          1.2896641827810744,
+          1.2896641827810744,
+          1.2896641827810744
+        ],
+        "yaw": -134.70822496342007
+      },
+      {
+        "label": "A026 Shrub 35",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          282.4059422500068,
+          46.381639930915355,
+          14.762272781683254
+        ],
+        "scale": [
+          1.2972821804591737,
+          1.2972821804591737,
+          1.2972821804591737
+        ],
+        "yaw": 143.25886969747455
+      },
+      {
+        "label": "A026 Shrub 36",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          268.2671642476731,
+          7.7575842949748335,
+          1.6186682348503352
+        ],
+        "scale": [
+          0.7865977228827387,
+          0.7865977228827387,
+          0.7865977228827387
+        ],
+        "yaw": -98.23776313129736
+      },
+      {
+        "label": "A026 Shrub 37",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -104.85175886969213,
+          102.90561893700499,
+          17.979895551180125
+        ],
+        "scale": [
+          1.2836129909461558,
+          1.2836129909461558,
+          1.2836129909461558
+        ],
+        "yaw": -152.03547671267938
+      },
+      {
+        "label": "A026 Shrub 38",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -174.22589762984018,
+          129.09850987416792,
+          23.4781150571713
+        ],
+        "scale": [
+          0.692677593460559,
+          0.692677593460559,
+          0.692677593460559
+        ],
+        "yaw": -12.049646195504778
+      },
+      {
+        "label": "A026 Shrub 39",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          186.58226291293374,
+          -14.654798756130191,
+          10.66660090939382
+        ],
+        "scale": [
+          0.663843642661303,
+          0.663843642661303,
+          0.663843642661303
+        ],
+        "yaw": 104.39417808057436
+      },
+      {
+        "label": "A026 Shrub 40",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -190.6583410280855,
+          -27.183735327713606,
+          2.4425443334353414
+        ],
+        "scale": [
+          0.9785126589546669,
+          0.9785126589546669,
+          0.9785126589546669
+        ],
+        "yaw": -78.92422262696681
+      },
+      {
+        "label": "A026 Shrub 41",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -195.16958534417142,
+          31.499736272359513,
+          9.129717108087128
+        ],
+        "scale": [
+          0.9635659726438988,
+          0.9635659726438988,
+          0.9635659726438988
+        ],
+        "yaw": 5.984446011723577
+      },
+      {
+        "label": "A026 Shrub 42",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -93.7763416828536,
+          -17.34636252792893,
+          9.163337628388623
+        ],
+        "scale": [
+          1.1720219108638001,
+          1.1720219108638001,
+          1.1720219108638001
+        ],
+        "yaw": -26.380970157074756
+      },
+      {
+        "label": "A026 Shrub 43",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -89.02713071111364,
+          103.42363036379948,
+          20.871158725481056
+        ],
+        "scale": [
+          1.2561154376506614,
+          1.2561154376506614,
+          1.2561154376506614
+        ],
+        "yaw": -169.90874171856936
+      },
+      {
+        "label": "A026 Shrub 44",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          -11.237353064906188,
+          -63.16118647184126,
+          10.417520812150977
+        ],
+        "scale": [
+          1.0974020269995772,
+          1.0974020269995772,
+          1.0974020269995772
+        ],
+        "yaw": 24.108860598642053
+      },
+      {
+        "label": "A026 Shrub 45",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+        "position_m": [
+          20.01452862156475,
+          -58.66293381134605,
+          23.141346202793184
+        ],
+        "scale": [
+          1.214696296557805,
+          1.214696296557805,
+          1.214696296557805
+        ],
+        "yaw": 0.9562973421797949
+      }
+    ],
+    "grass": [
+      {
+        "label": "A026 Grass 01",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          10.900852784247036,
+          -101.87229578712513,
+          4.19525381823042
+        ],
+        "scale": [
+          1.079978738439588,
+          1.079978738439588,
+          1.079978738439588
+        ],
+        "yaw": -90.04781456583177
+      },
+      {
+        "label": "A026 Grass 02",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          53.11634955960989,
+          -168.62771884134574,
+          2.611880468861637
+        ],
+        "scale": [
+          1.2341954697733888,
+          1.2341954697733888,
+          1.2341954697733888
+        ],
+        "yaw": -44.00860507461539
+      },
+      {
+        "label": "A026 Grass 03",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -201.43947104275094,
+          9.03813327087417,
+          5.609183071137859
+        ],
+        "scale": [
+          1.1924374512193927,
+          1.1924374512193927,
+          1.1924374512193927
+        ],
+        "yaw": -9.859321794298921
+      },
+      {
+        "label": "A026 Grass 04",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          179.7770382779005,
+          -89.94419273093112,
+          0.9312313521082113
+        ],
+        "scale": [
+          0.8271047487991869,
+          0.8271047487991869,
+          0.8271047487991869
+        ],
+        "yaw": -158.82007564177965
+      },
+      {
+        "label": "A026 Grass 05",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -157.63768813200488,
+          -49.55204718450594,
+          4.583031499255125
+        ],
+        "scale": [
+          1.206623182813601,
+          1.206623182813601,
+          1.206623182813601
+        ],
+        "yaw": -169.32788447839945
+      },
+      {
+        "label": "A026 Grass 06",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -163.14011304249962,
+          -64.03602832179257,
+          2.989825537348412
+        ],
+        "scale": [
+          0.772907959951072,
+          0.772907959951072,
+          0.772907959951072
+        ],
+        "yaw": -162.39718292507743
+      },
+      {
+        "label": "A026 Grass 07",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          199.99310531470087,
+          -36.59213681396082,
+          4.8007431168820816
+        ],
+        "scale": [
+          0.803249136330447,
+          0.803249136330447,
+          0.803249136330447
+        ],
+        "yaw": -76.62389884806167
+      },
+      {
+        "label": "A026 Grass 08",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          86.37111008750207,
+          -151.65244633668087,
+          1.5176758878845167
+        ],
+        "scale": [
+          0.7399795495103922,
+          0.7399795495103922,
+          0.7399795495103922
+        ],
+        "yaw": 125.59075509232508
+      },
+      {
+        "label": "A026 Grass 09",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -192.1611270423772,
+          -37.01110240184869,
+          1.9571434591273544
+        ],
+        "scale": [
+          1.2011118937561185,
+          1.2011118937561185,
+          1.2011118937561185
+        ],
+        "yaw": 142.41072585742904
+      },
+      {
+        "label": "A026 Grass 10",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          9.884412572054543,
+          -95.02630368008008,
+          5.155079800338219
+        ],
+        "scale": [
+          1.2843697747266005,
+          1.2843697747266005,
+          1.2843697747266005
+        ],
+        "yaw": -126.2094222789415
+      },
+      {
+        "label": "A026 Grass 11",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          166.26199527636612,
+          -82.95946770985285,
+          2.5248054436232055
+        ],
+        "scale": [
+          1.4613553900877527,
+          1.4613553900877527,
+          1.4613553900877527
+        ],
+        "yaw": 56.21451882712495
+      },
+      {
+        "label": "A026 Grass 12",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          17.27163761485923,
+          -134.0441201823486,
+          1.1146110047137316
+        ],
+        "scale": [
+          1.442789452000295,
+          1.442789452000295,
+          1.442789452000295
+        ],
+        "yaw": 14.775467570265704
+      },
+      {
+        "label": "A026 Grass 13",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -180.12041860276378,
+          -38.67332040072287,
+          3.6560981899262437
+        ],
+        "scale": [
+          1.1354211715970033,
+          1.1354211715970033,
+          1.1354211715970033
+        ],
+        "yaw": -59.168374388790056
+      },
+      {
+        "label": "A026 Grass 14",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -201.62164687001348,
+          -9.145035093597784,
+          2.138045283024364
+        ],
+        "scale": [
+          0.9958745268621609,
+          0.9958745268621609,
+          0.9958745268621609
+        ],
+        "yaw": 52.84956909250957
+      },
+      {
+        "label": "A026 Grass 15",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          17.715707104613216,
+          -125.8439011156229,
+          1.674304770396385
+        ],
+        "scale": [
+          1.4647661819153561,
+          1.4647661819153561,
+          1.4647661819153561
+        ],
+        "yaw": 60.91372129759446
+      },
+      {
+        "label": "A026 Grass 16",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          69.35241398158286,
+          -166.16164314011675,
+          2.612141970587344
+        ],
+        "scale": [
+          0.9847925060929569,
+          0.9847925060929569,
+          0.9847925060929569
+        ],
+        "yaw": -117.42924306062505
+      },
+      {
+        "label": "A026 Grass 17",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -143.58337710079775,
+          -41.09563065969266,
+          5.993050020265473
+        ],
+        "scale": [
+          1.011430053084037,
+          1.011430053084037,
+          1.011430053084037
+        ],
+        "yaw": 21.675256237446973
+      },
+      {
+        "label": "A026 Grass 18",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -208.4260472063353,
+          -0.4100024782450191,
+          2.552420545008804
+        ],
+        "scale": [
+          0.8972302957816503,
+          0.8972302957816503,
+          0.8972302957816503
+        ],
+        "yaw": -158.68177539331543
+      },
+      {
+        "label": "A026 Grass 19",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -52.821021302814074,
+          -47.29508598072837,
+          4.704854690761858
+        ],
+        "scale": [
+          1.0508081016821176,
+          1.0508081016821176,
+          1.0508081016821176
+        ],
+        "yaw": 94.22470486407963
+      },
+      {
+        "label": "A026 Grass 20",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -185.26613845923555,
+          -50.55014489734236,
+          1.8735865249217136
+        ],
+        "scale": [
+          1.1972733046223991,
+          1.1972733046223991,
+          1.1972733046223991
+        ],
+        "yaw": -30.718208208985345
+      },
+      {
+        "label": "A026 Grass 21",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          195.48131016610483,
+          -62.399954263029,
+          3.2847991683206352
+        ],
+        "scale": [
+          0.8838912411748725,
+          0.8838912411748725,
+          0.8838912411748725
+        ],
+        "yaw": 139.35944959342265
+      },
+      {
+        "label": "A026 Grass 22",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -243.08277963192234,
+          14.957089554583234,
+          4.2412127408922595
+        ],
+        "scale": [
+          1.2674303175871118,
+          1.2674303175871118,
+          1.2674303175871118
+        ],
+        "yaw": -9.96522870558178
+      },
+      {
+        "label": "A026 Grass 23",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          239.4649440116159,
+          1.209755905365256,
+          1.6855247405212712
+        ],
+        "scale": [
+          1.2868532895570133,
+          1.2868532895570133,
+          1.2868532895570133
+        ],
+        "yaw": 0.23189850421698566
+      },
+      {
+        "label": "A026 Grass 24",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          66.79964087322952,
+          -164.47390145331147,
+          2.804290779214824
+        ],
+        "scale": [
+          0.8040532561838658,
+          0.8040532561838658,
+          0.8040532561838658
+        ],
+        "yaw": -160.43411928470866
+      },
+      {
+        "label": "A026 Grass 25",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          176.85191823327392,
+          -95.91540580158625,
+          0.6926312922932211
+        ],
+        "scale": [
+          0.7516386583966064,
+          0.7516386583966064,
+          0.7516386583966064
+        ],
+        "yaw": 128.25793954234456
+      },
+      {
+        "label": "A026 Grass 26",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          113.07383290674164,
+          -112.92999367620301,
+          2.5636670839329216
+        ],
+        "scale": [
+          1.2519056443174112,
+          1.2519056443174112,
+          1.2519056443174112
+        ],
+        "yaw": 111.43248169432093
+      },
+      {
+        "label": "A026 Grass 27",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          69.8543281096803,
+          -161.55636390655084,
+          2.8422323040831587
+        ],
+        "scale": [
+          0.7701675625681984,
+          0.7701675625681984,
+          0.7701675625681984
+        ],
+        "yaw": 37.515411566467805
+      },
+      {
+        "label": "A026 Grass 28",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          115.15763609129692,
+          -101.55464821781312,
+          4.848122108744828
+        ],
+        "scale": [
+          1.1190014623994862,
+          1.1190014623994862,
+          1.1190014623994862
+        ],
+        "yaw": 179.20894340408364
+      },
+      {
+        "label": "A026 Grass 29",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -179.86883190973873,
+          -19.546159543882908,
+          4.298292367111479
+        ],
+        "scale": [
+          1.191372124010341,
+          1.191372124010341,
+          1.191372124010341
+        ],
+        "yaw": 128.03827796454448
+      },
+      {
+        "label": "A026 Grass 30",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -201.5316068847767,
+          14.180846197520424,
+          6.228719945862833
+        ],
+        "scale": [
+          1.129538805548599,
+          1.129538805548599,
+          1.129538805548599
+        ],
+        "yaw": -174.573818856692
+      },
+      {
+        "label": "A026 Grass 31",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -187.69367163781263,
+          -47.68131702311845,
+          1.9102522899630334
+        ],
+        "scale": [
+          0.7339964937738425,
+          0.7339964937738425,
+          0.7339964937738425
+        ],
+        "yaw": -2.2641150866824375
+      },
+      {
+        "label": "A026 Grass 32",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          17.01314401497308,
+          -115.92458899999774,
+          2.725299591720253
+        ],
+        "scale": [
+          0.9542623771959011,
+          0.9542623771959011,
+          0.9542623771959011
+        ],
+        "yaw": 155.060999550441
+      },
+      {
+        "label": "A026 Grass 33",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -166.0460345274318,
+          -46.77578013617065,
+          4.333033687557482
+        ],
+        "scale": [
+          1.4483737475609886,
+          1.4483737475609886,
+          1.4483737475609886
+        ],
+        "yaw": -173.70605841304882
+      },
+      {
+        "label": "A026 Grass 34",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -167.66823336157125,
+          -25.50155459760751,
+          5.7019525699995395
+        ],
+        "scale": [
+          1.2283152657421736,
+          1.2283152657421736,
+          1.2283152657421736
+        ],
+        "yaw": 163.86331298553233
+      },
+      {
+        "label": "A026 Grass 35",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          213.53050044287323,
+          -16.76545822953662,
+          2.86888395668241
+        ],
+        "scale": [
+          1.3101606020486456,
+          1.3101606020486456,
+          1.3101606020486456
+        ],
+        "yaw": -147.89556769563828
+      },
+      {
+        "label": "A026 Grass 36",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          195.613228701509,
+          -29.59380149299062,
+          5.808767330494232
+        ],
+        "scale": [
+          0.822077430653088,
+          0.822077430653088,
+          0.822077430653088
+        ],
+        "yaw": -44.240206178039045
+      },
+      {
+        "label": "A026 Grass 37",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          79.56376389873287,
+          -131.67029229491305,
+          3.995023147706074
+        ],
+        "scale": [
+          1.464800359982617,
+          1.464800359982617,
+          1.464800359982617
+        ],
+        "yaw": 98.43305356680287
+      },
+      {
+        "label": "A026 Grass 38",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -158.167825776006,
+          -54.77481615110693,
+          4.114511419253094
+        ],
+        "scale": [
+          0.7021853166844646,
+          0.7021853166844646,
+          0.7021853166844646
+        ],
+        "yaw": 125.45085932179961
+      },
+      {
+        "label": "A026 Grass 39",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -0.44235957619724786,
+          -105.20038711123001,
+          1.6539199949711891
+        ],
+        "scale": [
+          0.9396579152928434,
+          0.9396579152928434,
+          0.9396579152928434
+        ],
+        "yaw": -62.081284779226394
+      },
+      {
+        "label": "A026 Grass 40",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          7.121218084175609,
+          -111.95655316872529,
+          1.8393257781852876
+        ],
+        "scale": [
+          1.2030382414908454,
+          1.2030382414908454,
+          1.2030382414908454
+        ],
+        "yaw": -58.96431335953747
+      },
+      {
+        "label": "A026 Grass 41",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          131.62531247936016,
+          -88.09313394258716,
+          6.682798420798833
+        ],
+        "scale": [
+          1.189774287860571,
+          1.189774287860571,
+          1.189774287860571
+        ],
+        "yaw": 87.70940456093592
+      },
+      {
+        "label": "A026 Grass 42",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          47.44710687083642,
+          -166.57828780386765,
+          1.97488239576753
+        ],
+        "scale": [
+          0.9683924230792589,
+          0.9683924230792589,
+          0.9683924230792589
+        ],
+        "yaw": -75.04897860624513
+      },
+      {
+        "label": "A026 Grass 43",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          12.253115800111175,
+          -107.29821607816976,
+          3.4598437450056574
+        ],
+        "scale": [
+          1.1987744931100086,
+          1.1987744931100086,
+          1.1987744931100086
+        ],
+        "yaw": 81.48752159195573
+      },
+      {
+        "label": "A026 Grass 44",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          40.186262852221205,
+          -156.50436964718477,
+          2.630504298490166
+        ],
+        "scale": [
+          0.7194354878551812,
+          0.7194354878551812,
+          0.7194354878551812
+        ],
+        "yaw": -56.21061410835611
+      },
+      {
+        "label": "A026 Grass 45",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          158.93833587421358,
+          -80.73094602682892,
+          3.728950196078156
+        ],
+        "scale": [
+          0.9328926753141329,
+          0.9328926753141329,
+          0.9328926753141329
+        ],
+        "yaw": -64.33538064298905
+      },
+      {
+        "label": "A026 Grass 46",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -153.55198344545326,
+          -73.81598541098546,
+          1.3966427468369327
+        ],
+        "scale": [
+          1.2615220261404771,
+          1.2615220261404771,
+          1.2615220261404771
+        ],
+        "yaw": 114.34418651105057
+      },
+      {
+        "label": "A026 Grass 47",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -177.82086572096864,
+          -52.07064282031715,
+          2.291316607386407
+        ],
+        "scale": [
+          1.459069450385955,
+          1.459069450385955,
+          1.459069450385955
+        ],
+        "yaw": -8.56866885291356
+      },
+      {
+        "label": "A026 Grass 48",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -204.8088724477372,
+          -33.507206585095986,
+          0.7511541416717818
+        ],
+        "scale": [
+          1.1748372365282358,
+          1.1748372365282358,
+          1.1748372365282358
+        ],
+        "yaw": 72.79009251235794
+      },
+      {
+        "label": "A026 Grass 49",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -125.3689509842842,
+          -35.34193755787868,
+          5.080451874771169
+        ],
+        "scale": [
+          1.1502608952763929,
+          1.1502608952763929,
+          1.1502608952763929
+        ],
+        "yaw": 94.30470427189027
+      },
+      {
+        "label": "A026 Grass 50",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -159.01804862514643,
+          -41.97448433331931,
+          5.521817336752075
+        ],
+        "scale": [
+          0.825301491727598,
+          0.825301491727598,
+          0.825301491727598
+        ],
+        "yaw": 40.281063556221795
+      },
+      {
+        "label": "A026 Grass 51",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          62.19811303236054,
+          -141.6277447840844,
+          5.440087347412845
+        ],
+        "scale": [
+          0.7437995764920582,
+          0.7437995764920582,
+          0.7437995764920582
+        ],
+        "yaw": -14.85222022848032
+      },
+      {
+        "label": "A026 Grass 52",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          79.00116157803723,
+          -164.47869060797558,
+          1.500425455826941
+        ],
+        "scale": [
+          1.4219049550318517,
+          1.4219049550318517,
+          1.4219049550318517
+        ],
+        "yaw": 172.99143666779827
+      },
+      {
+        "label": "A026 Grass 53",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          4.612112988150159,
+          -96.9651159356464,
+          3.9996842865042503
+        ],
+        "scale": [
+          1.1029561054621673,
+          1.1029561054621673,
+          1.1029561054621673
+        ],
+        "yaw": 24.106663290889173
+      },
+      {
+        "label": "A026 Grass 54",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -228.04817213483696,
+          -5.74526309696725,
+          0.8527492990165024
+        ],
+        "scale": [
+          0.8745162193993582,
+          0.8745162193993582,
+          0.8745162193993582
+        ],
+        "yaw": 92.7492489945306
+      },
+      {
+        "label": "A026 Grass 55",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -225.33051227225275,
+          6.06791359202245,
+          2.29431610238735
+        ],
+        "scale": [
+          0.8982966641310548,
+          0.8982966641310548,
+          0.8982966641310548
+        ],
+        "yaw": -132.28493186110552
+      },
+      {
+        "label": "A026 Grass 56",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -200.95735468984492,
+          -39.2740153737947,
+          0.7955971915902361
+        ],
+        "scale": [
+          1.0353440096390012,
+          1.0353440096390012,
+          1.0353440096390012
+        ],
+        "yaw": -22.249913597785536
+      },
+      {
+        "label": "A026 Grass 57",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          227.59860609163047,
+          8.920388237298482,
+          5.1353230426556475
+        ],
+        "scale": [
+          1.1354157113405456,
+          1.1354157113405456,
+          1.1354157113405456
+        ],
+        "yaw": 152.19506350699595
+      },
+      {
+        "label": "A026 Grass 58",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -129.04062736345895,
+          -76.20894728169282,
+          1.1369771082117373
+        ],
+        "scale": [
+          1.461350936044428,
+          1.461350936044428,
+          1.461350936044428
+        ],
+        "yaw": -128.29519884210575
+      },
+      {
+        "label": "A026 Grass 59",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          197.8599086501439,
+          -64.23758894620184,
+          2.6438528061569326
+        ],
+        "scale": [
+          1.1579540738309113,
+          1.1579540738309113,
+          1.1579540738309113
+        ],
+        "yaw": -12.29487913256952
+      },
+      {
+        "label": "A026 Grass 60",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -197.2708117929656,
+          -27.388026275854656,
+          1.6482587987493456
+        ],
+        "scale": [
+          1.4552017376752349,
+          1.4552017376752349,
+          1.4552017376752349
+        ],
+        "yaw": -138.00313499805208
+      },
+      {
+        "label": "A026 Grass 61",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          195.62262003385587,
+          -20.90841058286361,
+          6.151150132902039
+        ],
+        "scale": [
+          1.3850581250982663,
+          1.3850581250982663,
+          1.3850581250982663
+        ],
+        "yaw": 111.09556358945679
+      },
+      {
+        "label": "A026 Grass 62",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          83.84305280460433,
+          -129.97718999551512,
+          3.3697143725519716
+        ],
+        "scale": [
+          0.7270306540802217,
+          0.7270306540802217,
+          0.7270306540802217
+        ],
+        "yaw": 104.88280368301616
+      },
+      {
+        "label": "A026 Grass 63",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          214.58507958579833,
+          -1.2483459348045471,
+          5.163766802191884
+        ],
+        "scale": [
+          1.0461204172479968,
+          1.0461204172479968,
+          1.0461204172479968
+        ],
+        "yaw": -91.3893355392353
+      },
+      {
+        "label": "A026 Grass 64",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          107.71058193766851,
+          -111.33282751336858,
+          3.2288541215620064
+        ],
+        "scale": [
+          1.1871788106617605,
+          1.1871788106617605,
+          1.1871788106617605
+        ],
+        "yaw": 54.21764639953389
+      },
+      {
+        "label": "A026 Grass 65",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          53.140409429635724,
+          -135.61818335516315,
+          6.142281377089506
+        ],
+        "scale": [
+          1.2848182342915413,
+          1.2848182342915413,
+          1.2848182342915413
+        ],
+        "yaw": 34.879037607419434
+      },
+      {
+        "label": "A026 Grass 66",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          92.90739032808403,
+          -105.47766513046315,
+          5.719455732060015
+        ],
+        "scale": [
+          1.1729294957218126,
+          1.1729294957218126,
+          1.1729294957218126
+        ],
+        "yaw": 116.86483701118743
+      },
+      {
+        "label": "A026 Grass 67",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          153.97150295118252,
+          -100.7759973378843,
+          2.13996644293684
+        ],
+        "scale": [
+          0.865112789652538,
+          0.865112789652538,
+          0.865112789652538
+        ],
+        "yaw": 159.32157604321446
+      },
+      {
+        "label": "A026 Grass 68",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -171.61001698431824,
+          -74.84278313487405,
+          1.1337780097472456
+        ],
+        "scale": [
+          1.464957642019588,
+          1.464957642019588,
+          1.464957642019588
+        ],
+        "yaw": -154.05461289906415
+      },
+      {
+        "label": "A026 Grass 69",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          254.92838640622654,
+          9.201221250773415,
+          2.456782369008308
+        ],
+        "scale": [
+          1.1201925097219165,
+          1.1201925097219165,
+          1.1201925097219165
+        ],
+        "yaw": 72.42316504200014
+      },
+      {
+        "label": "A026 Grass 70",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          35.92694026832754,
+          -197.25228055397858,
+          0.7048301112848187
+        ],
+        "scale": [
+          1.4822252978281314,
+          1.4822252978281314,
+          1.4822252978281314
+        ],
+        "yaw": 160.28472693057256
+      },
+      {
+        "label": "A026 Grass 71",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          195.46491536966664,
+          -48.46823175404069,
+          5.297752100462343
+        ],
+        "scale": [
+          1.1481527231422877,
+          1.1481527231422877,
+          1.1481527231422877
+        ],
+        "yaw": -168.56410319803365
+      },
+      {
+        "label": "A026 Grass 72",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          53.555357838925204,
+          -196.18238837298128,
+          0.6780100511940319
+        ],
+        "scale": [
+          1.1136043750968443,
+          1.1136043750968443,
+          1.1136043750968443
+        ],
+        "yaw": -1.8917975048086362
+      },
+      {
+        "label": "A026 Grass 73",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -15.75280878677313,
+          -69.80246326169674,
+          6.030819012546891
+        ],
+        "scale": [
+          1.071914539658404,
+          1.071914539658404,
+          1.071914539658404
+        ],
+        "yaw": 158.31721767647502
+      },
+      {
+        "label": "A026 Grass 74",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -115.56871038676093,
+          -26.556309820062467,
+          6.373362675354249
+        ],
+        "scale": [
+          1.142264181091556,
+          1.142264181091556,
+          1.142264181091556
+        ],
+        "yaw": -26.36371305308623
+      },
+      {
+        "label": "A026 Grass 75",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          275.5839202021531,
+          6.912525218048188,
+          0.6778486211730453
+        ],
+        "scale": [
+          1.142989040177224,
+          1.142989040177224,
+          1.142989040177224
+        ],
+        "yaw": -8.673762776079855
+      },
+      {
+        "label": "A026 Grass 76",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -161.45749496653195,
+          -26.31374364769016,
+          6.591381903523241
+        ],
+        "scale": [
+          0.7476927858275264,
+          0.7476927858275264,
+          0.7476927858275264
+        ],
+        "yaw": 91.04956375250862
+      },
+      {
+        "label": "A026 Grass 77",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          102.77955284925417,
+          -137.62835656242154,
+          0.7612727687393452
+        ],
+        "scale": [
+          1.0192210835251185,
+          1.0192210835251185,
+          1.0192210835251185
+        ],
+        "yaw": -14.021329053579478
+      },
+      {
+        "label": "A026 Grass 78",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          71.50604905500609,
+          -142.14401436042914,
+          3.7235384491650927
+        ],
+        "scale": [
+          1.3478309405255249,
+          1.3478309405255249,
+          1.3478309405255249
+        ],
+        "yaw": -35.60434169480533
+      },
+      {
+        "label": "A026 Grass 79",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -184.46523119425035,
+          -36.8192840677369,
+          3.1425623628307084
+        ],
+        "scale": [
+          1.033725761352179,
+          1.033725761352179,
+          1.033725761352179
+        ],
+        "yaw": -75.75276684197647
+      },
+      {
+        "label": "A026 Grass 80",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -170.68071531156625,
+          -67.36042554526853,
+          1.6615771452943144
+        ],
+        "scale": [
+          0.7743822024935714,
+          0.7743822024935714,
+          0.7743822024935714
+        ],
+        "yaw": 109.09986063197289
+      },
+      {
+        "label": "A026 Grass 81",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -24.4995254911874,
+          -78.99421010297792,
+          2.013040884080397
+        ],
+        "scale": [
+          1.4670810763920432,
+          1.4670810763920432,
+          1.4670810763920432
+        ],
+        "yaw": 177.11749424210524
+      },
+      {
+        "label": "A026 Grass 82",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          50.84210230153303,
+          -195.29536548225934,
+          0.7243380325619146
+        ],
+        "scale": [
+          0.9710118202266907,
+          0.9710118202266907,
+          0.9710118202266907
+        ],
+        "yaw": -50.69704503543238
+      },
+      {
+        "label": "A026 Grass 83",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -243.33289737010054,
+          17.357341293553617,
+          4.817390846590989
+        ],
+        "scale": [
+          1.3797655655042413,
+          1.3797655655042413,
+          1.3797655655042413
+        ],
+        "yaw": -37.66156883983405
+      },
+      {
+        "label": "A026 Grass 84",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          191.18775091988482,
+          -69.28606796632019,
+          2.666976420290866
+        ],
+        "scale": [
+          1.289757595583731,
+          1.289757595583731,
+          1.289757595583731
+        ],
+        "yaw": -23.79610067695714
+      },
+      {
+        "label": "A026 Grass 85",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -219.6513352487009,
+          14.689678818116022,
+          4.547838237507057
+        ],
+        "scale": [
+          1.331897799350877,
+          1.331897799350877,
+          1.331897799350877
+        ],
+        "yaw": -95.38804271720406
+      },
+      {
+        "label": "A026 Grass 86",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          24.288955327405233,
+          -159.04281727923808,
+          0.7416213502826147
+        ],
+        "scale": [
+          1.4906215044718234,
+          1.4906215044718234,
+          1.4906215044718234
+        ],
+        "yaw": 152.30351880964355
+      },
+      {
+        "label": "A026 Grass 87",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          49.559047093444406,
+          -145.4715950950113,
+          4.544260556226361
+        ],
+        "scale": [
+          1.170505464718528,
+          1.170505464718528,
+          1.170505464718528
+        ],
+        "yaw": -90.05552573975424
+      },
+      {
+        "label": "A026 Grass 88",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -158.29635494325754,
+          -46.42636651385169,
+          4.813174267057962
+        ],
+        "scale": [
+          1.3736205972090065,
+          1.3736205972090065,
+          1.3736205972090065
+        ],
+        "yaw": 3.888165995978426
+      },
+      {
+        "label": "A026 Grass 89",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          -202.7907963327227,
+          1.9277013686596547,
+          3.877905218525961
+        ],
+        "scale": [
+          1.0350915329357397,
+          1.0350915329357397,
+          1.0350915329357397
+        ],
+        "yaw": -96.85582024619151
+      },
+      {
+        "label": "A026 Grass 90",
+        "mesh": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+        "position_m": [
+          101.64611258973355,
+          -127.46654266047379,
+          1.6551984610088581
+        ],
+        "scale": [
+          0.8339439809522184,
+          0.8339439809522184,
+          0.8339439809522184
+        ],
+        "yaw": 164.1897183489216
+      }
+    ],
+    "shore_rocks": [
+      {
+        "label": "A003 Shore Detail 01",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          287.7800416187591,
+          20.2581236971985,
+          1.9538466747761771
+        ],
+        "scale": [
+          1.000438728740774,
+          0.995652191909732,
+          0.522281573377953
+        ],
+        "yaw": -37.70559906582952
+      },
+      {
+        "label": "A003 Shore Detail 02",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          -188.8722355550974,
+          -59.80076982295813,
+          0.5947120260308987
+        ],
+        "scale": [
+          0.8691784867610626,
+          0.908433150085239,
+          0.457851442691004
+        ],
+        "yaw": 164.22098495046555
+      },
+      {
+        "label": "A003 Shore Detail 03",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -167.92515333553763,
+          -89.54149490735982,
+          0.37450216714586804
+        ],
+        "scale": [
+          1.8854733937759507,
+          1.8400648731790779,
+          1.291925150572766
+        ],
+        "yaw": -71.85010246314214
+      },
+      {
+        "label": "A003 Shore Detail 04",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -159.49976377603753,
+          -74.67660778850271,
+          1.2608359945637486
+        ],
+        "scale": [
+          1.7872243501861425,
+          1.6855735057296926,
+          0.900943499482099
+        ],
+        "yaw": -157.64500595405156
+      },
+      {
+        "label": "A003 Shore Detail 05",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          215.87746613648216,
+          -55.82950173002237,
+          1.3585101669609028
+        ],
+        "scale": [
+          1.224559651738406,
+          1.0946456366822377,
+          0.8217631961099952
+        ],
+        "yaw": -153.8019976583851
+      },
+      {
+        "label": "A003 Shore Detail 06",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -2.6347692999872265,
+          -92.82797885773498,
+          2.9025661751980376
+        ],
+        "scale": [
+          1.9840680745585544,
+          1.4894373114182409,
+          1.5703257443529948
+        ],
+        "yaw": 127.5574327108668
+      },
+      {
+        "label": "A003 Shore Detail 07",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -212.52364320801465,
+          -50.39453522263102,
+          -0.047555374181239674
+        ],
+        "scale": [
+          1.057713818071778,
+          1.1448780441137438,
+          0.4928843377693994
+        ],
+        "yaw": 153.0332680244432
+      },
+      {
+        "label": "A003 Shore Detail 08",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          -239.3261646382952,
+          -1.5543596567048894,
+          0.6474536943123158
+        ],
+        "scale": [
+          0.544355875293731,
+          0.5572366440478759,
+          0.3888067398761537
+        ],
+        "yaw": 30.463662849757327
+      },
+      {
+        "label": "A003 Shore Detail 09",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          137.6089084147701,
+          -107.65551752672313,
+          2.5411038826259325
+        ],
+        "scale": [
+          1.164577310339301,
+          1.1802724597397087,
+          0.6497144671679144
+        ],
+        "yaw": 178.51691654558056
+      },
+      {
+        "label": "A003 Shore Detail 10",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          89.13940179255366,
+          -171.40201041177136,
+          0.25423346763994314
+        ],
+        "scale": [
+          0.8633457943888552,
+          0.8290750605751185,
+          0.5084088371862747
+        ],
+        "yaw": 2.6428166955482766
+      },
+      {
+        "label": "A003 Shore Detail 11",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          -158.17643307825398,
+          189.32312303637843,
+          0.009010435268927156
+        ],
+        "scale": [
+          0.685314199515904,
+          0.5714254311570326,
+          0.5209132498828345
+        ],
+        "yaw": 86.94419468977355
+      },
+      {
+        "label": "A003 Shore Detail 12",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          8.365043742625744,
+          -172.3048477028669,
+          -0.5998931933771804
+        ],
+        "scale": [
+          0.8309470836073586,
+          0.7225122833578328,
+          0.4009112035873117
+        ],
+        "yaw": -94.91687394119197
+      },
+      {
+        "label": "A003 Shore Detail 13",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -181.15737304723348,
+          175.26166908888172,
+          0.19297772349462908
+        ],
+        "scale": [
+          1.1776514662205013,
+          1.0746432761755194,
+          0.7958235503545189
+        ],
+        "yaw": -128.4860310622475
+      },
+      {
+        "label": "A003 Shore Detail 14",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          224.51752015222763,
+          -38.602524328465904,
+          0.7388298102280539
+        ],
+        "scale": [
+          1.9914591226807192,
+          1.7184313898234953,
+          1.2559482524309393
+        ],
+        "yaw": -2.727516144320248
+      },
+      {
+        "label": "A003 Shore Detail 15",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          24.127571520594927,
+          -139.98301419349337,
+          1.4074160595738503
+        ],
+        "scale": [
+          0.913887466329761,
+          0.8811483418866403,
+          0.5592181740862582
+        ],
+        "yaw": -33.784073203376835
+      },
+      {
+        "label": "A003 Shore Detail 16",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -241.35703263386705,
+          1.5577173265913302,
+          0.8282786099257775
+        ],
+        "scale": [
+          1.474470409770126,
+          1.5627564223039903,
+          1.1620021458119507
+        ],
+        "yaw": 141.44256265137278
+      },
+      {
+        "label": "A003 Shore Detail 17",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          92.27900502619019,
+          -141.79084508082897,
+          1.1083737066081947
+        ],
+        "scale": [
+          1.496654656022193,
+          1.5414783795940084,
+          0.9958871167525111
+        ],
+        "yaw": 72.08423367488146
+      },
+      {
+        "label": "A003 Shore Detail 18",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          37.536992948378725,
+          -193.76549390043368,
+          0.4516047110964228
+        ],
+        "scale": [
+          0.9128902099795586,
+          0.7712123056581764,
+          0.433740271431988
+        ],
+        "yaw": 169.99366076865317
+      },
+      {
+        "label": "A003 Shore Detail 19",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          15.691868162462299,
+          -113.64326330384407,
+          2.653820199849996
+        ],
+        "scale": [
+          1.0744469479479388,
+          0.8929868312432105,
+          0.5167318789328047
+        ],
+        "yaw": -129.75143577517304
+      },
+      {
+        "label": "A003 Shore Detail 20",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          84.58634506080546,
+          -164.8416669576015,
+          0.6883353376311215
+        ],
+        "scale": [
+          0.9693233280374711,
+          0.8390334314125575,
+          0.4563568866894626
+        ],
+        "yaw": 80.66820654920849
+      },
+      {
+        "label": "A003 Shore Detail 21",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -254.2109542283764,
+          4.810932670704631,
+          1.1467310922822638
+        ],
+        "scale": [
+          0.4846985062717246,
+          0.4599174441511498,
+          0.23446676602649033
+        ],
+        "yaw": -140.8317183257412
+      },
+      {
+        "label": "A003 Shore Detail 22",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -148.43688441392587,
+          -78.00050296669491,
+          0.9038075637534403
+        ],
+        "scale": [
+          1.1205698447583865,
+          0.8567181138905398,
+          0.719719817470169
+        ],
+        "yaw": 35.33254827343134
+      },
+      {
+        "label": "A003 Shore Detail 23",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          168.44737168786384,
+          -115.62290141683123,
+          0.0996549970828508
+        ],
+        "scale": [
+          1.1992454232421332,
+          1.066369048225202,
+          0.9197218691351544
+        ],
+        "yaw": -162.57258392471027
+      },
+      {
+        "label": "A003 Shore Detail 24",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          244.5329540815161,
+          -43.63081886489584,
+          -0.10716426209654428
+        ],
+        "scale": [
+          0.8698144767671134,
+          0.8759243281839312,
+          0.5255753046347417
+        ],
+        "yaw": 69.4000047833116
+      },
+      {
+        "label": "A003 Shore Detail 25",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          268.03789398277013,
+          7.561092161133104,
+          1.4873524905005222
+        ],
+        "scale": [
+          0.7878460371194702,
+          0.6445091320732317,
+          0.5846813646486162
+        ],
+        "yaw": -130.65075543965372
+      },
+      {
+        "label": "A003 Shore Detail 26",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          156.5315869458621,
+          -113.34957872826887,
+          0.5355006126730206
+        ],
+        "scale": [
+          0.8666419413331089,
+          0.9445123290499277,
+          0.4419305583289077
+        ],
+        "yaw": 62.96347695777456
+      },
+      {
+        "label": "A003 Shore Detail 27",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -16.37891571213845,
+          170.69843082558123,
+          -0.5134246599156445
+        ],
+        "scale": [
+          1.6635672217223645,
+          1.4198546917403057,
+          1.0713803430548516
+        ],
+        "yaw": -88.92873126193003
+      },
+      {
+        "label": "A003 Shore Detail 28",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -144.6803027290443,
+          -75.36670359971751,
+          1.0925867564083367
+        ],
+        "scale": [
+          1.0027526362275334,
+          1.0296485887544722,
+          0.4713000649399818
+        ],
+        "yaw": 86.37311484627509
+      },
+      {
+        "label": "A003 Shore Detail 29",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          191.75591635748492,
+          -104.7557656359492,
+          -0.16434325573462744
+        ],
+        "scale": [
+          1.8239169258723045,
+          1.712035623072541,
+          1.3850229034163166
+        ],
+        "yaw": 86.44024142987229
+      },
+      {
+        "label": "A003 Shore Detail 30",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -173.8208848302099,
+          -111.10239432060983,
+          0.04602684714214017
+        ],
+        "scale": [
+          1.562750552853669,
+          1.355041000030401,
+          0.9230781393073426
+        ],
+        "yaw": -55.07284084919523
+      },
+      {
+        "label": "A003 Shore Detail 31",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -143.2936303135126,
+          -58.84083333280486,
+          2.816885394253117
+        ],
+        "scale": [
+          1.4700535315183272,
+          1.155814549427871,
+          0.8925563753749731
+        ],
+        "yaw": 112.58888179539213
+      },
+      {
+        "label": "A003 Shore Detail 32",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          -249.654299174305,
+          97.11233480395634,
+          -0.001390305168856465
+        ],
+        "scale": [
+          0.7556260227924584,
+          0.7146775481314371,
+          0.5115992981653521
+        ],
+        "yaw": -177.98680601751613
+      },
+      {
+        "label": "A003 Shore Detail 33",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -219.0092966380765,
+          -5.258517256100703,
+          0.6604004017048802
+        ],
+        "scale": [
+          1.6444173972789953,
+          1.3245265777542252,
+          1.175059681641093
+        ],
+        "yaw": -168.34059948021235
+      },
+      {
+        "label": "A003 Shore Detail 34",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -124.38260596637375,
+          -42.995872897231095,
+          3.494543909106412
+        ],
+        "scale": [
+          0.7579476732215784,
+          0.7479356357225102,
+          0.4692909329158955
+        ],
+        "yaw": 77.94059021696643
+      },
+      {
+        "label": "A003 Shore Detail 35",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          165.2662068468373,
+          -124.90668682694889,
+          -0.08326058959679945
+        ],
+        "scale": [
+          1.0159583429618417,
+          1.023888536358477,
+          0.6818507845562936
+        ],
+        "yaw": 41.29497807706997
+      },
+      {
+        "label": "A003 Shore Detail 36",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          105.78660880928345,
+          -155.23311746160948,
+          -0.21429343545186977
+        ],
+        "scale": [
+          1.9679147527239835,
+          1.730058354464715,
+          1.0999788547994789
+        ],
+        "yaw": -25.30069810233482
+      },
+      {
+        "label": "A003 Shore Detail 37",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          8.487127493457365,
+          -168.77330947953922,
+          -0.4180994855003769
+        ],
+        "scale": [
+          0.6989859162401706,
+          0.7057490659453203,
+          0.5104885452404038
+        ],
+        "yaw": -60.50425652180877
+      },
+      {
+        "label": "A003 Shore Detail 38",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          148.42033294072235,
+          -95.3210271672138,
+          3.4278568136059233
+        ],
+        "scale": [
+          1.55903985198392,
+          1.6563548063612457,
+          1.149762825444336
+        ],
+        "yaw": -79.68558555690494
+      },
+      {
+        "label": "A003 Shore Detail 39",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          228.2384794078772,
+          -11.133888021238675,
+          1.2344678857076041
+        ],
+        "scale": [
+          1.5979812734729641,
+          1.3360046600927236,
+          1.1579370997214808
+        ],
+        "yaw": 125.40403664281604
+      },
+      {
+        "label": "A003 Shore Detail 40",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          197.74903098849433,
+          -107.12181510575112,
+          -0.8228110800721963
+        ],
+        "scale": [
+          1.4936671096101903,
+          1.514151362048109,
+          1.020899767012444
+        ],
+        "yaw": -13.676736868778619
+      },
+      {
+        "label": "A003 Shore Detail 41",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          3.1577586952303704,
+          -97.05210722441936,
+          3.478018723283436
+        ],
+        "scale": [
+          1.3710581316512334,
+          1.2629207468502481,
+          1.0527064557283115
+        ],
+        "yaw": 6.666818295069163
+      },
+      {
+        "label": "A003 Shore Detail 42",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          220.1830503848659,
+          -35.72979186987533,
+          1.3568804739595572
+        ],
+        "scale": [
+          1.2645979614307359,
+          1.0118302944035538,
+          0.9226351777060685
+        ],
+        "yaw": -22.26064671289501
+      },
+      {
+        "label": "A003 Shore Detail 43",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          71.16516415039024,
+          -154.7084234530105,
+          2.716889968884928
+        ],
+        "scale": [
+          1.9494547183399147,
+          2.0203543067176617,
+          1.0856968925938095
+        ],
+        "yaw": -171.66881977100226
+      },
+      {
+        "label": "A003 Shore Detail 44",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          -182.7537163032004,
+          -29.234740914863067,
+          3.325978376751667
+        ],
+        "scale": [
+          1.0650243971781128,
+          0.8130096462785336,
+          0.4826473812623284
+        ],
+        "yaw": -111.0225276889923
+      },
+      {
+        "label": "A003 Shore Detail 45",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          90.71717953918659,
+          -146.7417883481136,
+          1.0557674916412079
+        ],
+        "scale": [
+          1.2432313424812202,
+          1.1296074981361015,
+          0.8973882777405975
+        ],
+        "yaw": -72.62188298868598
+      },
+      {
+        "label": "A003 Shore Detail 46",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          34.930174865793845,
+          -173.6994336919155,
+          0.11730232676801239
+        ],
+        "scale": [
+          1.6323573848868402,
+          1.618053777851002,
+          0.8455601730974318
+        ],
+        "yaw": 135.2439294760826
+      },
+      {
+        "label": "A003 Shore Detail 47",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          27.134924205261086,
+          -205.07396250646326,
+          0.3229285587410634
+        ],
+        "scale": [
+          1.951884628802745,
+          1.6685174900832507,
+          1.0563406773406028
+        ],
+        "yaw": 164.60854330964884
+      },
+      {
+        "label": "A003 Shore Detail 48",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          158.18021303620742,
+          144.5274099528101,
+          -0.915432842161227
+        ],
+        "scale": [
+          1.740337358609753,
+          1.5918317057574822,
+          1.2142929662952586
+        ],
+        "yaw": 61.96413718854359
+      }
+    ],
+    "cliff_outcrops": [
+      {
+        "label": "A003 Cliff Detail 01",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          -95.5320124945342,
+          149.7160526870742,
+          20.046202766496044
+        ],
+        "scale": [
+          3.130056513631995,
+          2.0345367338607967,
+          2.504045210905596
+        ],
+        "yaw": 5.7317184648279635
+      },
+      {
+        "label": "A003 Cliff Detail 02",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          148.69505365034712,
+          23.8010915916241,
+          32.54603896233207
+        ],
+        "scale": [
+          5.830860897775355,
+          3.790059583553981,
+          4.664688718220284
+        ],
+        "yaw": 120.11271175022586
+      },
+      {
+        "label": "A003 Cliff Detail 03",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          -71.72683772989939,
+          142.975188232398,
+          23.952702182995523
+        ],
+        "scale": [
+          3.4630911031590847,
+          2.2510092170534053,
+          2.770472882527268
+        ],
+        "yaw": 6.353777434919408
+      },
+      {
+        "label": "A003 Cliff Detail 04",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          124.13443398268754,
+          158.14416546101938,
+          16.134645051059056
+        ],
+        "scale": [
+          5.511842903530401,
+          3.582697887294761,
+          4.409474322824321
+        ],
+        "yaw": 146.08274355391637
+      },
+      {
+        "label": "A003 Cliff Detail 05",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          176.71540597682224,
+          114.95523132930387,
+          24.28729172181899
+        ],
+        "scale": [
+          4.246690904375436,
+          2.7603490878440335,
+          3.397352723500349
+        ],
+        "yaw": -123.1118043962318
+      },
+      {
+        "label": "A003 Cliff Detail 06",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1",
+        "position_m": [
+          268.7355008329648,
+          91.39133504427033,
+          17.069753111746707
+        ],
+        "scale": [
+          3.594948458970519,
+          2.3367164983308375,
+          2.8759587671764155
+        ],
+        "yaw": -136.3161365332988
+      },
+      {
+        "label": "A003 Cliff Detail 07",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+        "position_m": [
+          275.42418586418216,
+          37.31830277045623,
+          10.06859957706287
+        ],
+        "scale": [
+          3.7491234973018486,
+          2.4369302732462015,
+          2.999298797841479
+        ],
+        "yaw": -24.04064681732521
+      },
+      {
+        "label": "A003 Cliff Detail 08",
+        "mesh": "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+        "position_m": [
+          171.52002349644647,
+          20.82855092775634,
+          24.141702727188736
+        ],
+        "scale": [
+          5.827453043524088,
+          3.787844478290657,
+          4.66196243481927
+        ],
+        "yaw": -116.18044210665965
+      }
+    ]
+  },
+  "vegetation_preset": {
+    "asset_id": "A026",
+    "version": 1,
+    "seed": 2607,
+    "palm_count": 42,
+    "shrub_count": 45,
+    "grass_count": 90,
+    "shore_rock_count": 48,
+    "marina_clear_radius_m": 32.0,
+    "leaf_dark_srgb": "2F713D",
+    "leaf_light_srgb": "88AC4E",
+    "bark_dark_srgb": "665443",
+    "bark_light_srgb": "A18C6C",
+    "coconut_srgb": "70603C",
+    "wind_strength_cm": 7.0,
+    "notes": "Første vegetasjonspakke. Antall og plassering er redigerbare forslag."
+  },
+  "baseline_preview_rebuilt": true,
+  "persisted_scene_reopened": true,
+  "previews": [
+    "A003_oy_og_kyst\\A003_marinabukt_v2.png",
+    "A003_oy_og_kyst\\A003_oy_oversikt_v2.png",
+    "A026_vegetasjon\\A026_palme_detalj_v1.png"
+  ]
+}

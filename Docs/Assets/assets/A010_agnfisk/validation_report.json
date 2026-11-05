@@ -1,0 +1,61 @@
+{
+  "asset_id": "A010",
+  "saved_source_reopened": true,
+  "game_integration": "pending",
+  "meshes": {
+    "SK_FISK_Baitfish_v1": {
+      "triangles": 10320,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.03370499983429909,
+          -0.10512982308864594,
+          -0.02735999971628189
+        ],
+        [
+          0.03370499983429909,
+          0.0949999988079071,
+          0.03456000238656998
+        ]
+      ],
+      "materials": 6
+    }
+  },
+  "swimming": {
+    "bones": 4,
+    "tail_rest_m": [
+      0.0,
+      -0.10100001096725464,
+      0.0
+    ],
+    "tail_positive_m": [
+      0.054279625415802,
+      -0.08403055369853973,
+      0.0
+    ],
+    "tail_negative_m": [
+      -0.054279625415802,
+      -0.08403055369853973,
+      0.0
+    ],
+    "head_fixed": true,
+    "loop_closed": true,
+    "normalized_weights": true
+  },
+  "SK_FISK_Baitfish_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "animation_preserved": true,
+    "tail_sample_error_m": 4.470348358154297e-08
+  },
+  "SK_FISK_Baitfish_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "animation_preserved": true,
+    "tail_sample_error_m": 4.012260442327338e-08
+  },
+  "status": "passed"
+}

@@ -7,6 +7,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "UI/FiskGameInstance.h"
 #include "UI/FiskSeaChart.h"
+#include "UI/FiskCrewPanel.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerState.h"
@@ -31,6 +32,11 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     if(CareerSmokeMode==TEXT("blocked"))
     { if(!GI->bCareerBlocked) { Fail(TEXT("invalid_profile_not_blocked"));return; }Key(EKeys::P);Key(EKeys::F5);Shot(TEXT("blocked-career"));Done();return; }
     if(!IsCareerReady() || !Day->HasStarted()) { return; }
+    if(!Solo && !Host && Progress==AFiskStarterBoat::AtDock && Boat->GetCaptainId()==Self)
+    {
+        ServerTransferCaptain(Boat->GetRouteRevision(),Boat->GetOwnerId());
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAREER_CAPTAIN_RETURNED player=%d"),Self);
+    }
     if(CareerSmokeMode==TEXT("verify"))
     {
         int64 Expected=0;FParse::Value(FCommandLine::Get(),TEXT("FiskCareerExpectedCash="),Expected);
@@ -114,7 +120,13 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     }
     else if(CareerSmokeStage==120)
     { if(Host && !Solo) { Key(EKeys::K);Shot(TEXT("offshore-crew"));CareerSmokeStage=121; }else { CareerSmokeStage=13; } }
-    else if(CareerSmokeStage==121) { Key(EKeys::K);CareerSmokeStage=13; }
+    else if(CareerSmokeStage==121)
+    {
+        const int32 Target=(Boat->GetSeatIndex(Self)+2)%4;int32 W=0,H=0;GetViewportSize(W,H);const double S=FMath::Min(W/1280.0,H/720.0);
+        SetMouseLocation(FMath::RoundToInt(300*S),FMath::RoundToInt((210+64*Target+27)*S));Key(EKeys::LeftMouseButton);
+        if(CrewPanel->IsVisible()) { Key(EKeys::K); }CareerSmokeStage=122;
+    }
+    else if(CareerSmokeStage==122 && Boat->GetCaptainId()==Self) { CareerSmokeStage=13; }
     else if(CareerSmokeStage==13)
     { if(Host && Progress==-1 && Now>=120) { Key(EKeys::R); }if(Progress==100) { Key(EKeys::F);CareerSmokeStage=14; } }
     else if(CareerSmokeStage==14 && First->GetState()==EFiskRodState::Fishing)

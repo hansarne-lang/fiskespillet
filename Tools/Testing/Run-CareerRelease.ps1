@@ -94,6 +94,7 @@ try{
  }
  if((($allocations | Sort-Object) -join ',') -ne '1,1,2,2'){throw 'Wrong six-holder distribution'}
  Check-Shots 'host' @('offshore-crew','free-sea-route')
+ if(@(Select-String -LiteralPath $hostLog -Pattern 'FISKELAGET_CAPTAIN_TRANSFER_ACCEPTED').Count -lt 2){throw 'Four-player captain handoff/return missing'}
  $cash=Career-Cash 'guest3-profile';$prior=@(Get-Content -LiteralPath $hostLog).Count
  Stop-Case $apps.guest3
  $until=(Get-Date).AddSeconds(90);$left=$false

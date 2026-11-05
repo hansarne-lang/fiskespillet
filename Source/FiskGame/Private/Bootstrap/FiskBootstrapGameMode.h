@@ -20,6 +20,7 @@ public:
     virtual void Logout(AController* Exiting) override;
     AFiskStarterBoat* GetStarterBoat() const { return StarterBoat; }
     AFiskDaySettlement* GetSettlement() const { return Settlement; }
+    bool StartNextDay(APlayerController* Requester, int32 ExpectedDay);
 
 private:
     UPROPERTY()

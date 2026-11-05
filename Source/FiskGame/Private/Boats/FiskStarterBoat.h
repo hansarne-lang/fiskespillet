@@ -30,6 +30,7 @@ public:
 
     AFiskStarterBoat();
     void SetOwnerPlayer(int32 PlayerId);
+    void ResetForDay();
     void Board(int32 PlayerId);
     void Leave(int32 PlayerId);
     void StartTrip(int32 PlayerId,int32 ExpectedRevision);

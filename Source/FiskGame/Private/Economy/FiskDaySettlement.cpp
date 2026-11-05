@@ -20,6 +20,13 @@ bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId,cons
         && Ledger.Record(CatchId, PlayerId, Day->GetElapsedMilliseconds(),Fish);
 }
 
+void AFiskDaySettlement::ResetForDay(int32 DayNumber)
+{
+    if (!HasAuthority()) { return; }
+    Ledger = FFiskDayLedger(); View = FFiskSettlementView(); View.DayNumber = DayNumber;
+    SetActorTickEnabled(true); ForceNetUpdate();
+}
+
 void AFiskDaySettlement::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
@@ -33,6 +40,8 @@ void AFiskDaySettlement::Tick(float DeltaSeconds)
     if (Ledger.Settle(NowMs, ArrivalMs))
     {
         View.Results = Ledger.GetResults();
+        View.DayNumber = Day->GetDayNumber();
+        if (History.Append(View.DayNumber, NowMs, Ledger)) { HistoryView = History.GetDays(); }
         View.bRevealed = true;
         OnRep_View();
         ForceNetUpdate();
@@ -44,6 +53,7 @@ void AFiskDaySettlement::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(AFiskDaySettlement, View);
+    DOREPLIFETIME(AFiskDaySettlement, HistoryView);
 }
 
 void AFiskDaySettlement::OnRep_View()

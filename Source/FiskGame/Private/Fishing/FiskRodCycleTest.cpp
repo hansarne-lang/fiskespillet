@@ -31,6 +31,13 @@ bool FFiskRodLifecycleTest::RunTest(const FString& Parameters)
     TestFalse(TEXT("Stale F after cancellation"), Cycle.TryStart(First, 6000));
     TestTrue(TEXT("Restart immediately after cancellation"), Cycle.TryStart(Second, 6000));
     TestTrue(TEXT("Each restart is independent"), Cycle.GetId() != First && Cycle.GetId() != Second);
+    const FGuid Yesterday=Cycle.GetId();Cycle.ResetForDay();
+    const FGuid Today=Cycle.GetId();
+    TestTrue(TEXT("New day rotates identity even before next cast"),Today.IsValid() && Today!=Yesterday);
+    TestFalse(TEXT("Yesterday's action denied"),Cycle.CanAct(Yesterday));
+    TestFalse(TEXT("Yesterday's cast denied"),Cycle.TryStart(Yesterday,0));
+    TestFalse(TEXT("Original empty token denied after day change"),Cycle.TryStart(FGuid(),0));
+    TestTrue(TEXT("Today's token starts fresh clock without old landing cooldown"),Cycle.TryStart(Today,0));
     return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskRodIsolationTest, "Fiskelaget.RodCycle.OwnerIsolation",

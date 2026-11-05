@@ -40,6 +40,9 @@ public:
     UFiskCrewPanel* GetCrewPanel() const { return CrewPanel; }
     bool IsHelpVisible() const { return bHelpVisible; }
     bool IsResultsVisible() const { return bResultsVisible; }
+    bool IsHistoryVisible() const { return bHistoryVisible; }
+    void ResetRodForDay();
+    UFUNCTION(Server,Reliable) void ServerNextDay(int32 ExpectedDay);
     int32 GetResultPage() const { return ResultPage; }
     FString GetActionFeedback() const;
     UFUNCTION(Client,Reliable) void ClientActionFeedback(const FString& Message);
@@ -61,7 +64,8 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
-    bool bHelpVisible=false,bResultsVisible=false,bAutoResultsSeen=false;
+    bool bHelpVisible=false,bResultsVisible=false,bHistoryVisible=false,bAutoResultsSeen=false;
+    int32 ObservedDay=0, ReturnWarningLevel=0;
     int32 ResultPage=0;
     FString ActionFeedback;
     double ActionFeedbackUntil=0;
@@ -99,6 +103,13 @@ private:
     UPROPERTY() TObjectPtr<UFiskCrewPanel> CrewPanel;
 
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunSessionSmoke();
+    FString SessionMode, SessionCaptureDir;
+    FTimerHandle SessionTimer;
+    int32 SessionStage=0;
+    double SessionAt=0;
+    FGuid SessionOldCast;
+    int32 SessionOldRoute=0;
     void RunContentSmoke();
     FString ContentMode,ContentCaptureDir;
     FTimerHandle ContentTimer;

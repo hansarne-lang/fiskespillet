@@ -19,6 +19,8 @@
 #include "TimerManager.h"
 #include "EngineUtils.h"
 #include "World/FiskOceanScene.h"
+#include "FiskFishingGround.h"
+#include "DayCycle/FiskSessionRules.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -35,17 +37,23 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     const bool Press=Params.Event==IE_Pressed;
     const bool OtherPanel=(FrontEnd && FrontEnd->IsVisible()) || (CrewPanel && CrewPanel->IsVisible())
         || (SeaChart && SeaChart->IsVisible()) || (RigPanel && RigPanel->IsVisible());
-    if(Press && (Params.Key==EKeys::F1 || Params.Key==EKeys::F2))
+    if(Press && Params.Key==EKeys::N && !OtherPanel && !bHelpVisible)
+    {
+        if(const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>()) { ServerNextDay(Day->GetDayNumber()); }
+        return true;
+    }
+    if(Press && (Params.Key==EKeys::F1 || Params.Key==EKeys::F2 || Params.Key==EKeys::F3))
     {
         if(OtherPanel) { ClientActionFeedback_Implementation(TEXT("Lukk panelet først med Escape. F1 viser hjelp, F2 viser oppgjøret."));return true; }
-        if(Params.Key==EKeys::F1) { bHelpVisible=!bHelpVisible;bResultsVisible=false; }
-        else { bResultsVisible=!bResultsVisible;bHelpVisible=false;ResultPage=0; }
+        if(Params.Key==EKeys::F1) { bHelpVisible=!bHelpVisible;bResultsVisible=bHistoryVisible=false; }
+        else if(Params.Key==EKeys::F2) { bResultsVisible=!bResultsVisible;bHelpVisible=bHistoryVisible=false;ResultPage=0; }
+        else { bHistoryVisible=!bHistoryVisible;bHelpVisible=bResultsVisible=false;ResultPage=0; }
         ReleaseRodInputsForMenu();return true;
     }
-    if(bHelpVisible || bResultsVisible)
+    if(bHelpVisible || bResultsVisible || bHistoryVisible)
     {
-        if(Press && Params.Key==EKeys::Escape) { bHelpVisible=bResultsVisible=false; }
-        if(bResultsVisible && (Press || Params.Event==IE_Repeat))
+        if(Press && Params.Key==EKeys::Escape) { bHelpVisible=bResultsVisible=bHistoryVisible=false; }
+        if((bResultsVisible || bHistoryVisible) && (Press || Params.Event==IE_Repeat))
         {
             if(Params.Key==EKeys::PageDown || Params.Key==EKeys::Down) { ResultPage=FMath::Min(ResultPage+1,9999); }
             if(Params.Key==EKeys::PageUp || Params.Key==EKeys::Up) { ResultPage=FMath::Max(ResultPage-1,0); }
@@ -67,6 +75,11 @@ void AFiskBoardingController::BeginPlay()
     Super::BeginPlay();
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSessionSmoke="),SessionMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),SessionCaptureDir);
+        GetWorldTimerManager().SetTimer(SessionTimer,this,&AFiskBoardingController::RunSessionSmoke,0.5f,true,2.0f);
+    }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskContentSmoke="),ContentMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ContentCaptureDir);
@@ -296,12 +309,37 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
     Super::PlayerTick(DeltaTime);
 
     if (!IsLocalController() || !PlayerState) { return; }
-    if(!bAutoResultsSeen && !bHelpVisible && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
+    const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
+    if(Day && Day->GetDayNumber()!=ObservedDay)
+    {
+        ObservedDay=Day->GetDayNumber(); bAutoResultsSeen=bHelpVisible=bResultsVisible=bHistoryVisible=false;
+        ResultPage=0; ReturnWarningLevel=0; RigPanel->ResetForDay();
+        FInputKeyEventArgs Escape; Escape.Key=EKeys::Escape;Escape.Event=IE_Pressed;
+        if(SeaChart->IsVisible()) { SeaChart->HandleKey(Escape); }
+        if(CrewPanel->IsVisible()) { CrewPanel->HandleKey(Escape); }
+    }
+    if(Day && Day->HasStarted())
+    {
+        const AFiskStarterBoat* Boat=FindStarterBoat();
+        if(Boat && Boat->IsAboard(PlayerState->GetPlayerId()) && Boat->GetTripProgress()==AFiskStarterBoat::AtFishingSpot
+            && Day->GetElapsedSeconds()<AFiskDayState::SettlementStart)
+        {
+            const int32 Level=FiskSession::ReturnWarning(FiskGrounds::ReturnMarginMs(Day->GetElapsedMilliseconds(),100,Boat->GetGroundId()));
+            if(Level>ReturnWarningLevel)
+            {
+                ReturnWarningLevel=Level;
+                ClientActionFeedback_Implementation(Level==2?TEXT("Returvarsel: beregnet ankomst er etter fristen. Kapteinen kan fortsatt starte retur med R.")
+                    :TEXT("Returvarsel: under ett minutts margin. Kapteinen bør vurdere retur med R."));
+            }
+        }
+    }
+    if(!bAutoResultsSeen && !bHelpVisible && !bHistoryVisible && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
         && !SeaChart->IsVisible() && !RigPanel->IsVisible())
     {
         for(TActorIterator<AFiskDaySettlement> Settlement(GetWorld());Settlement;++Settlement)
         {
-            if(Settlement->GetView().bRevealed) { bAutoResultsSeen=true;bResultsVisible=true;ResultPage=0;ReleaseRodInputsForMenu();break; }
+            if(Day && Settlement->GetView().DayNumber==Day->GetDayNumber() && Settlement->GetView().bRevealed)
+            { bAutoResultsSeen=true;bResultsVisible=true;ResultPage=0;ReleaseRodInputsForMenu();break; }
         }
     }
     for (TActorIterator<AFiskOceanScene> Scene(GetWorld()); Scene; ++Scene)
@@ -321,4 +359,14 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             return;
         }
     }
+}
+
+void AFiskBoardingController::ResetRodForDay() { Rod->ResetForDay(); }
+void AFiskBoardingController::ServerNextDay_Implementation(int32 ExpectedDay)
+{
+    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const bool Accepted=Mode && Mode->StartNextDay(this,ExpectedDay);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_NEXT_DAY_%s player=%d expected=%d"),Accepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,ExpectedDay);
+    ClientActionFeedback(Accepted?TEXT("Ny fiskedag! Mannskap, fiskeplass og oppsett er beholdt. Avreise fra 02:00.")
+        :TEXT("Bare verten kan starte neste dag, etter 20:00 og ferdig oppgjør. Oppdaterte dagsdata kreves."));
 }

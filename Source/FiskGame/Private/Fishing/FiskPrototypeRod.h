@@ -35,6 +35,7 @@ class UFiskPrototypeRod final : public UActorComponent
     GENERATED_BODY()
 public:
     UFiskPrototypeRod();
+    void ResetForDay();
     bool Cast(const FGuid& ExpectedId);
     void Withdraw();
     const FFiskRigSettings& GetRig() const { return Rig; }

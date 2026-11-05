@@ -41,6 +41,17 @@ void AFiskStarterBoat::SetOwnerPlayer(int32 PlayerId)
     }
 }
 
+void AFiskStarterBoat::ResetForDay()
+{
+    if (!HasAuthority()) { return; }
+    SetActorTickEnabled(false); LegStartedMs = ReturnStartedMs = MarinaArrivalMs = -1;
+    TripProgress = AtDock; ++Route.Revision;
+    PortRodActivity = StarboardRodActivity = 0;
+    PortFish = FFiskFishVisualState(); StarboardFish = FFiskFishVisualState();
+    SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+    OnRep_TripProgress(); OnRep_Route(); ForceNetUpdate();
+}
+
 void AFiskStarterBoat::Board(int32 PlayerId)
 {
     if (!HasAuthority() || TripProgress != AtDock || PlayerId == INDEX_NONE || IsAboard(PlayerId) || Crew.Num() >= Capacity)
@@ -188,6 +199,7 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
 
 void AFiskStarterBoat::OnRep_TripProgress()
 {
+    if (TripProgress == AtDock) { bReportedDeparture = bReportedReturn = false; }
     if (TripProgress >= 0 && TripProgress < AtFishingSpot && !bReportedDeparture)
     {
         bReportedDeparture = true;

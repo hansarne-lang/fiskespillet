@@ -1,6 +1,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "HAL/PlatformTime.h"
 #include "Net/UnrealNetwork.h"
+#include "DayCycle/FiskSessionRules.h"
 
 AFiskDayState::AFiskDayState()
 {
@@ -12,15 +13,24 @@ void AFiskDayState::StartDay()
 {
     if (!HasAuthority() || HasStarted()) { return; }
     StartedMonotonic = FPlatformTime::Seconds();
-    ElapsedMilliseconds = 0;
+    Clock.Number = 1;
+    Clock.ElapsedMs = 0;
     OnRep_Clock();
     ForceNetUpdate();
+}
+
+bool AFiskDayState::AdvanceDay()
+{
+    if (!HasAuthority() || !HasStarted() || GetElapsedMilliseconds() < DayEnd*1000 || Clock.Number >= FiskSession::MaxDay) { return false; }
+    StartedMonotonic = FPlatformTime::Seconds();
+    ++Clock.Number; Clock.ElapsedMs = 0; LastMinute = -1;
+    OnRep_Clock(); ForceNetUpdate(); return true;
 }
 
 int32 AFiskDayState::GetElapsedMilliseconds() const
 {
     if (!HasStarted()) { return 0; }
-    if (!HasAuthority()) { return ElapsedMilliseconds; }
+    if (!HasAuthority()) { return Clock.ElapsedMs; }
     const double Delta = FMath::Clamp(FPlatformTime::Seconds() - StartedMonotonic, 0.0, static_cast<double>(DayEnd));
     return FMath::FloorToInt(Delta * 1000.0);
 }
@@ -29,12 +39,12 @@ void AFiskDayState::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     if (!HasAuthority() || !HasStarted()) { return; }
-    ElapsedMilliseconds = GetElapsedMilliseconds();
-    const int32 Minute = ElapsedMilliseconds / 60000;
+    Clock.ElapsedMs = GetElapsedMilliseconds();
+    const int32 Minute = Clock.ElapsedMs / 60000;
     if (Minute != LastMinute)
     {
         LastMinute = Minute;
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_CLOCK ms=%d"), ElapsedMilliseconds);
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_CLOCK ms=%d"), Clock.ElapsedMs);
     }
 }
 
@@ -54,14 +64,15 @@ EFiskDayPhase AFiskDayState::GetPhase(int32 ElapsedSeconds)
 void AFiskDayState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    DOREPLIFETIME(AFiskDayState, ElapsedMilliseconds);
+    DOREPLIFETIME(AFiskDayState, Clock);
 }
 
 void AFiskDayState::OnRep_Clock()
 {
-    if (HasStarted() && !bReportedStart)
+    if (HasStarted() && ReportedDay != Clock.Number)
     {
-        bReportedStart = true;
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_DAY_STARTED ms=%d"), ElapsedMilliseconds);
+        ReportedDay = Clock.Number;
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_DAY_STARTED ms=%d"), Clock.ElapsedMs);
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SESSION_DAY number=%d ms=%d"), Clock.Number, Clock.ElapsedMs);
     }
 }

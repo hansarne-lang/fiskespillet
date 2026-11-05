@@ -14,6 +14,7 @@
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskDayState.h"
 #include "Economy/FiskDaySettlement.h"
+#include "DayCycle/FiskSessionRules.h"
 
 namespace
 {
@@ -34,14 +35,49 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
             TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
-            TEXT("F2: fangstoversikt. Menyer pauser ikke klokken eller fiskekampen.")};
+            TEXT("F2: dagsoppgjør. F3: økthistorikk. N: verten starter neste dag etter 20:00.")};
         for(int32 I=0;I<Lines.Num();++I) { HUD.DrawText(Lines[I],FLinearColor::White,52*S,(126+44*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(TEXT("F1 / Escape: lukk. Dagen slutter ved 20:00."),FLinearColor(0.5f,0.9f,0.8f),52*S,620*S,nullptr,1.0f*S);
         return;
     }
+    if(PC.IsHistoryVisible())
+    {
+        HUD.DrawText(TEXT("ØKTHISTORIKK"),FLinearColor::White,52*S,60*S,nullptr,2.0f*S);
+        TActorIterator<AFiskDaySettlement> Settlement(PC.GetWorld());
+        int64 Income=0, Delivered=0, Lost=0; int32 Best=0;
+        const int32 Self=PC.PlayerState?PC.PlayerState->GetPlayerId():INDEX_NONE;
+        if(Settlement)
+        {
+            const TArray<FFiskHistoryDay>& Days=Settlement->GetHistory();
+            for(int32 D=Days.Num()-1;D>=0;--D)
+            {
+                Lines.Add(FString::Printf(TEXT("Dag %d - oppgjort"),Days[D].Number));
+                if(Days[D].Rows.IsEmpty()) { Lines.Add(TEXT("  Ingen registrerte fangster.")); }
+                for(const FFiskHistoryRow& Row:Days[D].Rows)
+                {
+                    const FFiskSpecies* Species=FiskCatches::Find(Row.BestSpecies);
+                    const FString Who=Row.PlayerId==Self?TEXT("Deg"):FString::Printf(TEXT("Spiller %d"),Row.PlayerId);
+                    Lines.Add(FString::Printf(TEXT("  %s: levert %d / tapt %d | %.1f kg levert | %d fiskepenger"),*Who,Row.Delivered,Row.Lost,Row.DeliveredGrams/1000.0,Row.Income));
+                    Lines.Add(FString::Printf(TEXT("  Største landet: %s %.1f kg"),Species?Species->Name:TEXT("Ingen"),Row.BestGrams/1000.0));
+                    if(Row.PlayerId==Self) { Income+=Row.Income;Delivered+=Row.Delivered;Lost+=Row.Lost;Best=FMath::Max(Best,Row.BestGrams); }
+                }
+            }
+        }
+        HUD.DrawText(FString::Printf(TEXT("Deg i viste dager: %lld levert / %lld tapt | %lld fiskepenger | største %.1f kg"),
+            static_cast<long long>(Delivered),static_cast<long long>(Lost),static_cast<long long>(Income),Best/1000.0),FLinearColor(0.5f,0.9f,0.8f),52*S,116*S,nullptr,1.05f*S);
+        if(Lines.IsEmpty()) { Lines.Add(TEXT("Ingen oppgjorte dager ennå. Dagens resultater kommer først ved 17:00.")); }
+        const int32 Pages=FMath::Max(1,FMath::DivideAndRoundUp(Lines.Num(),9));
+        const int32 Page=FMath::Clamp(PC.GetResultPage(),0,Pages-1);
+        for(int32 I=0;I<9 && Page*9+I<Lines.Num();++I)
+        { HUD.DrawText(Lines[Page*9+I],FLinearColor::White,52*S,(172+43*I)*S,nullptr,1.05f*S); }
+        HUD.DrawText(FString::Printf(TEXT("Side %d/%d | PgUp/PgDn eller piler: bla | F3 / Escape: lukk"),Page+1,Pages),FLinearColor(0.5f,0.9f,0.8f),52*S,582*S,nullptr,1.0f*S);
+        HUD.DrawText(TEXT("Siste 32 oppgjør i denne økten. Nullstilles når økten avsluttes. Ingen lagret karriere."),FLinearColor(0.6f,0.85f,0.85f),52*S,626*S,nullptr,0.95f*S);
+        return;
+    }
     HUD.DrawText(TEXT("DAGSOPPGJØR OG FANGSTER"),FLinearColor::White,52*S,60*S,nullptr,2.0f*S);
     TActorIterator<AFiskDaySettlement> Settlement(PC.GetWorld());
-    if(!Settlement || !Settlement->GetView().bRevealed)
+    const AFiskDayState* CurrentDay=PC.GetWorld()->GetGameState<AFiskDayState>();
+    if(!Settlement || !CurrentDay || Settlement->GetView().DayNumber!=CurrentDay->GetDayNumber() || !Settlement->GetView().bRevealed)
     {
         HUD.DrawText(TEXT("Fangstart, mål, antall og verdi avsløres samlet ved 17:00."),FLinearColor::White,52*S,160*S,nullptr,1.15f*S);
         HUD.DrawText(TEXT("Ingen fangstresultater vises før den felles avsløringen."),FLinearColor(0.6f,0.85f,0.85f),52*S,210*S,nullptr,1.0f*S);
@@ -70,7 +106,11 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
         { HUD.DrawText(Lines[Page*PerPage+I],FLinearColor::White,52*S,(138+46*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(FString::Printf(TEXT("Side %d/%d | PgUp/PgDn eller piler: bla"),Page+1,Pages),FLinearColor(0.5f,0.9f,0.8f),52*S,582*S,nullptr,1.0f*S);
     }
-    HUD.DrawText(TEXT("F2 / Escape: lukk. Foreløpige artsverdier; saldoen gjelder denne økten."),FLinearColor(0.6f,0.85f,0.85f),52*S,626*S,nullptr,0.95f*S);
+    const TCHAR* Footer=CurrentDay && CurrentDay->GetElapsedSeconds()>=1200
+        ? (PC.GetNetMode()==NM_ListenServer?TEXT("N: start neste fiskedag | F3: historikk | F2 / Escape: lukk")
+            :TEXT("Venter på vertens neste dag. F3: historikk | F2 / Escape: lukk"))
+        :TEXT("F2 / Escape: lukk. F3: økthistorikk. Beløpene gjelder dagens oppgjør.");
+    HUD.DrawText(Footer,FLinearColor(0.6f,0.85f,0.85f),52*S,626*S,nullptr,0.95f*S);
 }
 }
 
@@ -91,7 +131,7 @@ void AFiskBootstrapHUD::DrawHUD()
             DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,Canvas->ClipY-42*S,1232*S,36*S);
             DrawText(Feedback,FLinearColor(1,0.86f,0.5f),40*S,Canvas->ClipY-34*S,nullptr,0.95f*S);
         }
-        if(PC->IsHelpVisible() || PC->IsResultsVisible()) { DrawContentPanel(*this,*Canvas,*PC);return; }
+        if(PC->IsHelpVisible() || PC->IsResultsVisible() || PC->IsHistoryVisible()) { DrawContentPanel(*this,*Canvas,*PC);return; }
         if (PC->GetCrewPanel() && PC->GetCrewPanel()->IsVisible())
         {
             PC->GetCrewPanel()->Draw(*this,*Canvas);return;
@@ -116,7 +156,7 @@ void AFiskBootstrapHUD::DrawHUD()
     const float Top = 24.0f;
     DrawRect(FLinearColor(0.01f, 0.025f, 0.04f, 0.78f), 14.0f, 12.0f, 560.0f, 455.0f);
     DrawText(TEXT("FISKELAGET"), FLinearColor::White, Left, Top, nullptr, 2.0f);
-    DrawText(TEXT("M: Sjøkart  K: Mannskap  F1: Hjelp  F2: Oppgjør"), FLinearColor::White, Left, Top + 65.0f, nullptr, 0.95f);
+    DrawText(TEXT("M: Kart  K: Mannskap  F1: Hjelp  F2: Oppgjør  F3: Historikk"), FLinearColor::White, Left, Top + 65.0f, nullptr, 0.85f);
 
     if (!StarterBoat.IsValid())
     {
@@ -217,23 +257,25 @@ void AFiskBootstrapHUD::DrawHUD()
         break;
     }
 
-    DrawText(FString::Printf(TEXT("%02d:%02d  %s"), Elapsed / 60, Elapsed % 60, Phase),
+    DrawText(FString::Printf(TEXT("Dag %d | %02d:%02d  %s"), Day->GetDayNumber(), Elapsed / 60, Elapsed % 60, Phase),
         FLinearColor::White, Left, Top + 100.0f);
+    if(Elapsed>=1200)
+    { DrawText(GetNetMode()==NM_ListenServer?TEXT("N: Neste fiskedag | F3: Økthistorikk"):TEXT("Venter på vertens neste fiskedag. F3: Historikk"),FLinearColor(0.5f,0.95f,0.8f),Left,Top+240.0f,nullptr,0.95f); }
 
 
     for (TActorIterator<AFiskDaySettlement> Settlement(GetWorld()); Settlement; ++Settlement)
     {
         const FFiskSettlementView& View = Settlement->GetView();
-        if (!View.bRevealed)
+        if (!View.bRevealed || View.DayNumber!=Day->GetDayNumber())
         {
-            DrawText(TEXT("Dagsresultat ved 17:00. Saldo (økt): 0"), FLinearColor::White, Left, Top + 355.0f);
+            DrawText(TEXT("Dagens fangstinntekt vises først ved 17:00. F3: tidligere oppgjør"), FLinearColor::White, Left, Top + 355.0f,nullptr,0.85f);
         }
         else
         {
             float RowY = Top + 355.0f;
             for (const FFiskDayResult& Row : View.Results)
             {
-                DrawText(FString::Printf(TEXT("Spiller %d: levert %d, tapt %d, saldo (økt) %d"),
+                DrawText(FString::Printf(TEXT("Spiller %d: levert %d, tapt %d, dagsinntekt %d"),
                     Row.PlayerId, Row.DeliveredFish, Row.LostFish, Row.SessionBalance), FLinearColor::White, Left, RowY);
                 RowY += 24.0f;
             }
@@ -298,7 +340,10 @@ void AFiskBootstrapHUD::DrawHUD()
             : TEXT("Pump: løft uten sveiving, senk og sveiv inn");
         DrawText(Hint, Color, Left, Top + 312.0f);
     }
-    DrawText(FString::Printf(TEXT("Returfrist 17:00 - %02d:%02d igjen"),
-        FMath::Max(0, 1020 - Elapsed) / 60, FMath::Max(0, 1020 - Elapsed) % 60),
-        FLinearColor::White, Left, Top + 332.0f);
+    const int32 Margin=FiskGrounds::ReturnMarginMs(Day->GetElapsedMilliseconds(),100,Boat->GetGroundId());
+    const int32 Warning=FiskSession::ReturnWarning(Margin);
+    const int32 Seconds=FMath::Max(0,Margin)/1000;
+    DrawText(Warning==2?TEXT("RETURVARSEL: Beregnet ankomst etter 17:00")
+        :FString::Printf(TEXT("Returfrist 17:00 | margin ved retur nå: %02d:%02d"),Seconds/60,Seconds%60),
+        Warning==2?FLinearColor::Red:Warning==1?FLinearColor::Yellow:FLinearColor::White,Left,Top+332.0f,nullptr,0.95f);
 }

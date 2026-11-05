@@ -40,6 +40,19 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     return true;
 }
 
+void UFiskPrototypeRod::ResetForDay()
+{
+    if (!GetOwner()->HasAuthority()) { return; }
+    SetComponentTickEnabled(false); Cycle.ResetForDay(); Fight = FFiskFightModel();
+    View = FFiskRodView(); View.CastId = Cycle.GetId();
+    CatchId.Invalidate(); CatchData = FFiskCatchData(); LandedAtMs = -1;
+    NextTransitionAt = LastFightAt = 0; ++Rig.Revision;
+#if WITH_DEV_AUTOMATION_TESTS
+    TestLandings = 0;
+#endif
+    OnRep_View(); GetOwner()->ForceNetUpdate();
+}
+
 bool UFiskPrototypeRod::CanConfigure() const
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();

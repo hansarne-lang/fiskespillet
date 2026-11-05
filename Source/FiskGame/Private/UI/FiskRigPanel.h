@@ -17,6 +17,7 @@ public:
     bool IsVisible() const { return bVisible; }
     void Draw(AHUD& HUD, UCanvas& Canvas);
     void RigReply(bool bAccepted);
+    void ResetForDay() { PendingRevision = -1; Message.Reset(); if(bVisible) { Show(false); } }
 private:
     void Show(bool bShow);
     void Change(int32 Direction);

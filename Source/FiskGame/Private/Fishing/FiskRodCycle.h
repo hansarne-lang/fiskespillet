@@ -6,6 +6,10 @@ class FFiskRodCycle
 {
 public:
     static constexpr int32 LandingDurationMs = 3000;
+    void ResetForDay()
+    {
+        Id = FGuid::NewGuid(); AvailableAtMs = 0; bOpen = false;
+    }
     bool TryStart(const FGuid& ExpectedId, int32 NowMs)
     {
         if (bOpen || ExpectedId != Id || NowMs < AvailableAtMs) { return false; }

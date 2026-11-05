@@ -20,7 +20,7 @@ Ved 17:00 avgjør eksisterende marinasonekryssing om fangstene leveres eller tap
 
 G åpner stangoppsettet. 1/2/3 velger plass, F5 lagrer gjeldende serverbekreftede valg, og F9 sender et lagret oppsett til vanlig servervalidering. Mens en UI-endring venter på bekreftelse, sperres lagring og flere endringer. For dypt oppsett avvises på grunnere steder. Lagrede revisjonsnumre brukes ikke i en ny økt.
 
-De tre plassene lagres i FiskelagetRigPresets.ini ved siden av motorens brukerinnstillinger. Filen skrives via en midlertidig fil før erstatning; mislykket lagring endrer ikke det bekreftede minneoppsettet. Manglende, ufullstendige, ugyldige eller fremtidige skjemaer lastes som tomme plasser. Lagrede agnvalg gir ingen fangstresultater eller eierskapsrettigheter.
+I v0.2 ble FiskelagetRigPresets.ini i pakket Development-bygg skrevet relativt til arbeidsmappen fordi motorens brukerinnstillingssti var tom. v0.3 bruker en fast brukersti og kan lese eldre oppsett som fallback; se SESSION_V03.md. Filen skrives via en midlertidig fil før erstatning; mislykket lagring endrer ikke det bekreftede minneoppsettet. Manglende, ufullstendige, ugyldige eller fremtidige skjemaer lastes som tomme plasser. Lagrede agnvalg gir ingen fangstresultater eller eierskapsrettigheter.
 
 ## Hjelp og tilbakemelding
 

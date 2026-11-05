@@ -6,6 +6,14 @@
 
 enum class EFiskDayPhase : uint8 { Preparation, FishingAndReturn, Settlement, Finished };
 
+USTRUCT()
+struct FFiskDayClock
+{
+    GENERATED_BODY()
+    UPROPERTY() int32 Number = 0;
+    UPROPERTY() int32 ElapsedMs = -1;
+};
+
 UCLASS()
 class AFiskDayState final : public AGameStateBase
 {
@@ -17,7 +25,9 @@ public:
 
     AFiskDayState();
     void StartDay();
-    bool HasStarted() const { return ElapsedMilliseconds >= 0; }
+    bool AdvanceDay();
+    int32 GetDayNumber() const { return Clock.Number; }
+    bool HasStarted() const { return Clock.ElapsedMs >= 0; }
     int32 GetElapsedMilliseconds() const;
     int32 GetElapsedSeconds() const { return GetElapsedMilliseconds() / 1000; }
     double GetElapsedRealSeconds() const { return GetElapsedMilliseconds() / 1000.0; }
@@ -28,10 +38,10 @@ public:
 
 private:
     UPROPERTY(ReplicatedUsing = OnRep_Clock)
-    int32 ElapsedMilliseconds = -1;
+    FFiskDayClock Clock;
     UFUNCTION()
     void OnRep_Clock();
     double StartedMonotonic = 0.0;
-    bool bReportedStart = false;
+    int32 ReportedDay = 0;
     int32 LastMinute = -1;
 };

@@ -5,14 +5,20 @@
 #include "GameFramework/GameUserSettings.h"
 #include "Misc/ConfigCacheIni.h"
 #include "Misc/Paths.h"
+#include "UI/FiskUserSettings.h"
+#include "HAL/FileManager.h"
+#include "Boats/FiskBoardingController.h"
 
 void UFiskGameInstance::Init()
 {
     Super::Init();
     RigPresets.Load(RigPresetFile());
-    GConfig->GetBool(TEXT("Fiskelaget.Settings"), TEXT("Sound"), bSound, GGameUserSettingsIni);
-    GConfig->GetInt(TEXT("Fiskelaget.Settings"), TEXT("FrameRate"), FrameRate, GGameUserSettingsIni);
-    FrameRate = FrameRate == 30 ? 30 : 60;
+    if (!IFileManager::Get().FileExists(*RigPresetFile()))
+    { RigPresets.Load(TEXT("FiskelagetRigPresets.ini")); }
+    FFiskUserSettings UserSettings;
+    UserSettings.Load(FPaths::Combine(FFiskUserSettings::DataDirectory(), TEXT("FiskelagetSettings.ini")));
+    bSound = UserSettings.bSound; FrameRate = UserSettings.FrameRate;
+    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_USER_DATA directory=%s"), *FFiskUserSettings::DataDirectory());
     if (GEngine)
     {
         GEngine->OnNetworkFailure().AddUObject(this, &UFiskGameInstance::NetworkFailure);
@@ -22,7 +28,7 @@ void UFiskGameInstance::Init()
 }
 FString UFiskGameInstance::RigPresetFile() const
 {
-    return FPaths::Combine(FPaths::GetPath(GGameUserSettingsIni),TEXT("FiskelagetRigPresets.ini"));
+    return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetRigPresets.ini"));
 }
 bool UFiskGameInstance::SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig)
 {
@@ -49,10 +55,15 @@ void UFiskGameInstance::ApplySettings(bool bSave)
     }
     if (bSave)
     {
-        GConfig->SetBool(TEXT("Fiskelaget.Settings"), TEXT("Sound"), bSound, GGameUserSettingsIni);
-        GConfig->SetInt(TEXT("Fiskelaget.Settings"), TEXT("FrameRate"), FrameRate, GGameUserSettingsIni);
-        GConfig->Flush(false, GGameUserSettingsIni);
-        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_SAVED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate);
+        FFiskUserSettings UserSettings; UserSettings.bSound = bSound; UserSettings.FrameRate = FrameRate;
+        const bool Saved = UserSettings.Save(FPaths::Combine(FFiskUserSettings::DataDirectory(), TEXT("FiskelagetSettings.ini")));
+        if (Saved) { UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_SAVED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate); }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("FISKELAGET_SETTINGS_SAVE_FAILED"));
+            if (AFiskBoardingController* PC = GetWorld() ? Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController()) : nullptr)
+            { if (PC->IsLocalController()) { PC->ClientActionFeedback(TEXT("Kunne ikke lagre innstillingene. Kontroller skrivetilgang til brukerdata.")); } }
+        }
     }
 }
 void UFiskGameInstance::NetworkFailure(UWorld* World, UNetDriver* Driver, ENetworkFailure::Type Type, const FString& Error)

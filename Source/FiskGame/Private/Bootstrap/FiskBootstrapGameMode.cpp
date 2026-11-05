@@ -8,6 +8,7 @@
 #include "Boats/FiskMarinaZone.h"
 #include "World/FiskOceanScene.h"
 #include "GameFramework/PlayerState.h"
+#include "DayCycle/FiskSessionRules.h"
 
 AFiskBootstrapGameMode::AFiskBootstrapGameMode()
 {
@@ -60,4 +61,17 @@ void AFiskBootstrapGameMode::Logout(AController* Exiting)
     }
 
     Super::Logout(Exiting);
+}
+
+bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 ExpectedDay)
+{
+    AFiskDayState* Day = GetGameState<AFiskDayState>();
+    const bool Host = Requester && Requester->IsLocalController() && GetNetMode() == NM_ListenServer;
+    if (!Day || !StarterBoat || !Settlement || !FiskSession::CanAdvance(Host, Day->GetDayNumber(), ExpectedDay,
+        Day->GetElapsedMilliseconds(), Settlement->GetView().bRevealed)) { return false; }
+    // All resets run in this one server frame before the fresh clock starts.
+    for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    { if (AFiskBoardingController* PC = Cast<AFiskBoardingController>(It->Get())) { PC->ResetRodForDay(); } }
+    StarterBoat->ResetForDay(); Settlement->ResetForDay(ExpectedDay + 1);
+    return Day->AdvanceDay();
 }

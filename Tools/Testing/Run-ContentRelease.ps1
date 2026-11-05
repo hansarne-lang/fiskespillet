@@ -9,6 +9,8 @@ function Wait-Tag($log,$tag,$app,$seconds){
  $until=(Get-Date).AddSeconds($seconds)
  while((Get-Date) -lt $until){
   if($app.HasExited){throw "Process exited before $tag"}
+  if($clientApp -and $clientApp.HasExited){throw 'Client exited during full-day test'}
+  if($clientLog -and (Test-Path -LiteralPath $clientLog) -and (Select-String -LiteralPath $clientLog -Pattern 'FISKELAGET_CONTENT_FAILED|Fatal error|Assertion failed|Unhandled Exception' -Quiet)){throw "Client runtime failure in $clientLog"}
   if(Test-Path -LiteralPath $log){
    if(Select-String -LiteralPath $log -Pattern 'FISKELAGET_CONTENT_FAILED|Fatal error|Assertion failed|Unhandled Exception' -Quiet){throw "Runtime failure in $log"}
    if(Select-String -LiteralPath $log -Pattern $tag -Quiet){return}

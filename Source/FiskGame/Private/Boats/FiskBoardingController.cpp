@@ -131,6 +131,9 @@ void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); Reques
 void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
+    // Remote server controllers have no PlayerInput and never receive PlayerTick.
+    // Settlement and durable snapshot retries must run for every connection.
+    GetWorldTimerManager().SetTimer(CareerTimer,this,&AFiskBoardingController::TickCareer,.5f,true);
 
 #if WITH_DEV_AUTOMATION_TESTS
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCareerReleaseSmoke="),CareerSmokeMode))
@@ -389,7 +392,6 @@ void AFiskBoardingController::ServerActOnSelectedRod_Implementation(EFiskRodActi
 void AFiskBoardingController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
-    TickCareer();
     if(HasAuthority()) { ReconcileRodCapacity(); }
 
     if (!IsLocalController() || !PlayerState) { return; }

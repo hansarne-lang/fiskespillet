@@ -99,6 +99,7 @@ private:
     int32 CareerAck=0,ShopRow=0;
     bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;
     double CareerRetryAt=0;
+    FTimerHandle CareerTimer;
     FString CareerAuthorityFile() const;
     bool SaveServerCareer(const FFiskCareerProfile& Candidate,const FString& Message);
     FFiskRodSelection Selection;

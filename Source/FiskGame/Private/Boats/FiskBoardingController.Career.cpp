@@ -65,7 +65,7 @@ void AFiskBoardingController::TickCareer()
     }
     if(Now<CareerRetryAt) { return; }CareerRetryAt=Now+2;
     if(IsLocalController() && PendingCareer.IsValid())
-    { UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());if(GI->AcceptCareer(PendingCareer)) { ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); } }
+    { UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());if(GI->AcceptCareer(PendingCareer)) { if(!HasAuthority()) { bCareerReady=true; }ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); } }
     if(!HasAuthority() || !bCareerReady) { return; }
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const AFiskDaySettlement* Settlement=Mode?Mode->GetSettlement():nullptr;
@@ -121,7 +121,7 @@ bool AFiskBoardingController::HandleCareerKey(const FInputKeyEventArgs& A)
         { for(int32 I=0;I<6;++I) { if(FBox2D(FVector2D(52*S,(180+58*I)*S),FVector2D(1210*S,(230+58*I)*S)).IsInside(Mouse)) { ShopRow=I;Choose=true; } } }
     }
     UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());
-    if(A.Key==EKeys::F5) { if(GI->AcceptCareer(PendingCareer.IsValid()?PendingCareer:GI->Career)) { if(PendingCareer.IsValid()) { ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); } } }
+    if(A.Key==EKeys::F5) { if(GI->AcceptCareer(PendingCareer.IsValid()?PendingCareer:GI->Career)) { if(PendingCareer.IsValid()) { if(!HasAuthority()) { bCareerReady=true; }ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); }else if(!bCareerReady) { bCareerHelloSent=false; } } }
     if(Choose)
     { if(ShopRow<4) { ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,ShopRow); }else if(const AFiskStarterBoat* Boat=FindStarterBoat()) { ServerChooseBoat(Boat->GetRouteRevision(),ShopRow-4); } }
     return true;

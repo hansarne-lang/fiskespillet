@@ -130,7 +130,8 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     for(int32 I=0;I<2;++I)
     {
         const FVector2D P=Point(FiskRouteGeometry::Island(I));const double R=FiskRouteGeometry::Radius(I);
-        HUD.DrawRect(FLinearColor(.52f,.43f,.24f),P.X-R/150000*560*S,P.Y-R/100000*180*S,2*R/150000*560*S,2*R/100000*180*S);
+        Canvas.K2_DrawPolygon(nullptr,P,FVector2D((R+2000)/150000*560*S,(R+2000)/100000*180*S),32,FLinearColor(.18f,.3f,.29f));
+        Canvas.K2_DrawPolygon(nullptr,P,FVector2D(R/150000*560*S,R/100000*180*S),32,FLinearColor(.52f,.43f,.24f));
     }
     const TArray<FVector> RoutePath=FiskRouteGeometry::Path(Boat->GetDestination());
     for(int32 I=1;I<RoutePath.Num();++I) { const FVector2D A=Point(RoutePath[I-1]),B=Point(RoutePath[I]);HUD.DrawLine(A.X,A.Y,B.X,B.Y,Teal,3*S); }

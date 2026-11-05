@@ -60,4 +60,17 @@ bool FFiskPlaceCorruptTest::RunTest(const FString& Parameters)
     }
     CleanPlaces(File);return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCoordinateMigrationTest,"Fiskelaget.Navigation.LegacyPlacesMigrateToExactCoordinates",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskCoordinateMigrationTest::RunTest(const FString& Parameters)
+{
+    const FString File=PlacesTestFile();IFileManager::Get().MakeDirectory(*FPaths::GetPath(File),true);
+    FFileHelper::SaveStringToFile(TEXT("[Fiskelaget.Places]\nVersion=1\n[Place1]\nGround=1\nName=GAMMEL\n[Place6]\nGround=0\nName=BEHOLD\n"),*File);
+    FFiskNavigationNotebook N,R;TestTrue(TEXT("Legacy load"),N.Load(File));
+    TestTrue(TEXT("Legacy anchor becomes coordinate"),N.Get(0) && N.Get(0)->Point.Equals(FVector(60000,24000,0)));
+    const FVector Point(26000,8000,0);TestTrue(TEXT("Save actual custom point"),N.SavePoint(0,Point,TEXT("EGET PUNKT"),File));
+    TestTrue(TEXT("Reload format 2"),R.Load(File));TestTrue(TEXT("Exact point retained"),R.Get(0) && R.Get(0)->Point.Equals(Point));
+    TestTrue(TEXT("Other legacy favorite retained"),R.Get(5) && R.Get(5)->Name==TEXT("BEHOLD") && R.Get(5)->Point.Equals(FVector(20000,0,0)));
+    TestFalse(TEXT("Island cannot be saved"),R.SavePoint(1,FVector(45000,55000,0),TEXT("LAND"),File));
+    CleanPlaces(File);return true;
+}
 #endif

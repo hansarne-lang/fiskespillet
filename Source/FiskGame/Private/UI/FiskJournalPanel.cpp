@@ -75,6 +75,9 @@ void UFiskJournalPanel::Draw(AHUD& HUD,UCanvas& Canvas)
             HUD.DrawText(FString::Printf(TEXT("%s UTC | %s | %s / %d m / %s | Kamp %.1f s"),*E.Context.LandedUtc.Left(19).Replace(TEXT("T"),TEXT(" ")),
                 Ground->Name,FFiskRigRules::BaitName(E.Context.Bait),E.Context.Depth,FFiskRigRules::ProgramName(E.Context.Program),E.Context.FightMs/1000.0),
                 FLinearColor(0.65f,0.85f,0.85f),52*S,Y+28*S,nullptr,0.90f*S);
+            HUD.DrawText(FString::Printf(TEXT("%s | Snøre %s | Snelle %s | Stang %s"),E.Context.BoatKind==1?TEXT("Offshorebåt"):TEXT("Startbåt"),
+                E.Context.Equipment&1?TEXT("oppgradert"):TEXT("standard"),E.Context.Equipment&2?TEXT("oppgradert"):TEXT("standard"),E.Context.Equipment&4?TEXT("oppgradert"):TEXT("standard")),
+                FLinearColor(.45f,.8f,.75f),52*S,Y+47*S,nullptr,.76f*S);
         }
         HUD.DrawText(FString::Printf(TEXT("Side %d/%d | PgUp/PgDn eller piler: bla | F6: artsrekorder"),Page+1,Pages),FLinearColor(0.5f,0.9f,0.8f),52*S,560*S,nullptr,1.0f*S);
     }

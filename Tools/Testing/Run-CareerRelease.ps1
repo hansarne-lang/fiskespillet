@@ -93,6 +93,18 @@ try{
   Check-Shots $role @('career-new','career-owned','offshore-ready','passive-rods','offshore-landed','offshore-home','career-before17','career-after17','career-day2')
  }
  if((($allocations | Sort-Object) -join ',') -ne '1,1,2,2'){throw 'Wrong six-holder distribution'}
+ $cash=Career-Cash 'guest3-profile';$prior=@(Get-Content -LiteralPath $hostLog).Count
+ Stop-Case $apps.guest3
+ $until=(Get-Date).AddSeconds(90);$left=$false
+ while((Get-Date) -lt $until){
+  $tail=Get-Content -LiteralPath $hostLog | Select-Object -Skip $prior
+  if($tail | Select-String -Pattern 'FISKELAGET_STARTER_BOAT_CREW 3' -Quiet){$left=$true;break}
+  Start-Sleep -Seconds 1
+ }
+ if(!$left){throw 'Guest disconnect did not release crew slot'}
+ $rejoin=Start-Case 'rejoin-guest3' 'rejoin' '127.0.0.1:7777' 'guest3-profile' $cash;$active+=$rejoin;$log=Join-Path $run 'rejoin-guest3.log';$logs+=$log
+ Wait-Tag $log 'FISKELAGET_CAREER_RELEASE_PASSED mode=rejoin' $rejoin 90
+ Start-Sleep -Seconds 2;Check-Shots 'rejoin-guest3' @('rejoined-day2');Stop-Case $rejoin
  foreach($role in $roles){Stop-Case $apps[$role]}
  foreach($role in $roles){$cash=Career-Cash "$role-profile";Reload-Profile $role "$role-profile" $cash}
  'PASS: four separate careers, six holders allocated 2+2+1+1, four real landings, full normal day, shared 17:00 reveal, own income exactly once, day 2 without duplicate credit, fresh-process reload and backup recovery for all four profiles.'

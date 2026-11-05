@@ -121,7 +121,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
     const FVector Offset = Boat->GetActorTransform().InverseTransformPosition(SmoothedWorldPosition);
     VisualRoot->SetRelativeLocation(Offset + FVector(0, 0, FMath::Sin(Time * 1.5) * 3.0));
     VisualRoot->SetRelativeRotation(FRotator(FMath::Sin(Time * 1.1) * 0.8, 0, FMath::Sin(Time * 1.4) * 1.2));
-    VisualRoot->SetRelativeScale3D(Boat->GetKind()==1?FVector(1.45,1.25,1.15):FVector::OneVector);
+    VisualRoot->SetRelativeScale3D(Boat->GetKind()==1?FVector(1.35):FVector::OneVector);
     for(USceneComponent* Part:VisualRoot->GetAttachChildren())
     {
         const FString Name=Part->GetName();

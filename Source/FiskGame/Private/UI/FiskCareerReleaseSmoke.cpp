@@ -35,7 +35,18 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     {
         int64 Expected=0;FParse::Value(FCommandLine::Get(),TEXT("FiskCareerExpectedCash="),Expected);
         if(GI->Career.Cash!=Expected || GI->Career.Owned!=15 || !GI->Career.IsValid()) { Fail(TEXT("career_reload_mismatch"));return; }
-        Key(EKeys::P);Shot(TEXT("career-reloaded"));Done();return;
+        if(CareerSmokeStage==0) { Key(EKeys::P);for(int32 I=0;I<5;++I) { Key(EKeys::Down); }Key(EKeys::Enter);CareerSmokeStage=1;return; }
+        if(Boat->GetKind()!=1) { return; }Shot(TEXT("career-reloaded"));Done();return;
+    }
+    if(CareerSmokeMode==TEXT("rejoin"))
+    {
+        int64 Expected=0;FParse::Value(FCommandLine::Get(),TEXT("FiskCareerExpectedCash="),Expected);
+        if(Day->GetDayNumber()!=2 || GI->Career.Cash!=Expected || GI->Career.Owned!=15) { Fail(TEXT("late_join_profile_or_day_wrong"));return; }
+        if(!Boat->IsAboard(Self)) { Key(EKeys::E);return; }
+        if(CareerSmokeStage==0) { Key(EKeys::One);CareerSmokeAt=Now;CareerSmokeStage=1;return; }
+        if(IsRodSelectionPending() || Now-CareerSmokeAt<1) { return; }
+        if(Selection.Day!=2 || Selection.Slot!=0 || Boat->GetCrewCount()!=4 || GetRodCapacity()!=1) { Fail(TEXT("late_join_selection_not_synchronized"));return; }
+        Key(EKeys::P);Shot(TEXT("rejoined-day2"));Done();return;
     }
     if(CareerSmokeMode==TEXT("migration"))
     {

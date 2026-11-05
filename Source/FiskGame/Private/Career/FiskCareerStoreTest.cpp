@@ -43,4 +43,22 @@ bool FFiskEquipmentFightTest::RunTest(const FString& Parameters)
         TestEqual(TEXT("Equipment remains playable for every species"),F.GetOutcome(),EFiskFightOutcome::ReadyToLand);
     } }return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCareerInterruptedTest,"Fiskelaget.Career.InterruptedWriteAndUnavailablePath",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskCareerInterruptedTest::RunTest(const FString& Parameters)
+{
+    const FString Dir=FPaths::Combine(FPaths::ProjectSavedDir(),TEXT("Automation"),FGuid::NewGuid().ToString());
+    const FString File=Dir/TEXT("Career.ini"),Other=Dir/TEXT("Candidate.ini");
+    FFiskCareerProfile P=FFiskCareerProfile::Create(TEXT("TEST")),Read;
+    TestTrue(TEXT("Committed initial profile"),FFiskCareerStore::Save(File,P));
+    P.Buy(FGuid::NewGuid(),P.Revision,0);TestTrue(TEXT("Prepare valid candidate in other file"),FFiskCareerStore::Save(Other,P));
+    TestEqual(TEXT("Copy uncommitted temporary file"),IFileManager::Get().Copy(*(File+TEXT(".tmp")),*Other,true,true),COPY_OK);
+    TestEqual(TEXT("Read committed generation"),FFiskCareerStore::Load(File,Read),EFiskCareerLoad::Loaded);
+    TestEqual(TEXT("Uncommitted debit not published"),Read.Cash,FFiskCareerProfile::InitialCash);
+    TestTrue(TEXT("Retry commits once"),FFiskCareerStore::Save(File,P));
+    TestEqual(TEXT("Committed candidate loads"),FFiskCareerStore::Load(File,Read),EFiskCareerLoad::Loaded);TestEqual(TEXT("Only one debit"),Read.Cash,P.Cash);
+    TestFalse(TEXT("Parent file cannot become data directory"),FFiskCareerStore::Save(File/TEXT("blocked.ini"),P));
+    TestEqual(TEXT("Failed write preserves original"),FFiskCareerStore::Load(File,Read),EFiskCareerLoad::Loaded);TestEqual(TEXT("Original money intact"),Read.Cash,P.Cash);
+    for(const FString& Target:TArray<FString>{File,Other}) { for(const TCHAR* S:{TEXT(""),TEXT(".bak"),TEXT(".tmp"),TEXT(".bak.tmp")}) { IFileManager::Get().Delete(*(Target+S)); } }
+    IFileManager::Get().DeleteDirectory(*Dir);return true;
+}
 #endif

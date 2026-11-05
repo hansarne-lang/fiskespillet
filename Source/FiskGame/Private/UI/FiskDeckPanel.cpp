@@ -160,15 +160,16 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     const bool Fight=State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand || State==EFiskRodState::InitialRun;
     if(Fight && Aboard && Progress==100 && Ms<1020000)
     {
-        const int32 Load=Rod->GetLoadPercent();const FLinearColor C=Load>100?FLinearColor(1,.3f,.25f):Load<20?Gold:Teal;
+        const int32 Load=Rod->GetLoadPercent(),Limit=CastChecked<UFiskGameInstance>(PC.GetGameInstance())->Career.Has(0)?115:100;
+        const FLinearColor C=Load>Limit?FLinearColor(1,.3f,.25f):Load<20?Gold:Teal;
         Rect(400,430,860,186);
         Text(State==EFiskRodState::ReadyToLand?TEXT("KLAR TIL LANDING - MELLOMROM"):Rod->IsSurging() || State==EFiskRodState::InitialRun?TEXT("UTRAS - SLIPP SVEIVA OG SENK STANGA"):TEXT("FISKEKAMP - PUMP OG SVEIV"),420,448,1.3f,State==EFiskRodState::ReadyToLand?Teal:C);
-        Text(FString::Printf(TEXT("Line ute: %d m   |   Brems: %d%%   |   Belastning: %d%%"),Rod->GetLineOut(),Rod->GetDragPercent(),Load),420,487,1.15f);
+        Text(FString::Printf(TEXT("Line %d m | Brems %d%% | Belastning %d%% | Bruddgrense %d%%"),Rod->GetLineOut(),Rod->GetDragPercent(),Load,Limit),420,487,1.05f);
         Rect(420,528,810,18,FLinearColor(.08f,.13f,.16f));
         Rect(420,528,810*FMath::Clamp(Load/120.f,0.f,1.f),18,C);
         HUD.DrawLine(555*S,524*S,555*S,550*S,Gold,2*S);
-        HUD.DrawLine(1095*S,524*S,1095*S,550*S,FLinearColor::Red,2*S);
-        Text(Load>100?TEXT("BRUDDFARE: avlast stanga eller løsne bremsen med musehjulet."):Load<20?TEXT("SLAKK: løft stanga eller stram bremsen med musehjulet.")
+        HUD.DrawLine((420+810*Limit/120.f)*S,524*S,(420+810*Limit/120.f)*S,550*S,FLinearColor::Red,2*S);
+        Text(Load>Limit?TEXT("BRUDDFARE: avlast stanga eller løsne bremsen med musehjulet."):Load<20?TEXT("SLAKK: løft stanga eller stram bremsen med musehjulet.")
             :TEXT("Venstre: løft | Høyre: sveiv | Musehjul: brems | X: avbryt"),420,570,1.0f,C);
     }
     Rect(20,630,1240,76);Text(TEXT("NESTE HANDLING"),38,642,0.85f,Teal);

@@ -127,7 +127,7 @@ void AFiskBootstrapHUD::DrawHUD()
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
         const FString Feedback=PC->GetActionFeedback();
-        if(!Feedback.IsEmpty())
+        if(!Feedback.IsEmpty() && !PC->IsCareerVisible())
         {
             const float S=FMath::Min(Canvas->ClipX/1280.f,Canvas->ClipY/720.f);
             DrawRect(FLinearColor(0.015f,0.055f,0.075f,0.96f),24*S,Canvas->ClipY-42*S,1232*S,36*S);

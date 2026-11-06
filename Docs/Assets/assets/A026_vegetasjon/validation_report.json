@@ -1,0 +1,76 @@
+{
+  "asset": "A026",
+  "island_version": 2,
+  "status": "passed",
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "checks": {
+    "world": "/Game/Fiskelaget/Island/Preview/L_A003_TropicalIsland_v2.L_A003_TropicalIsland_v2",
+    "materials": {
+      "Bark": {
+        "path": "/Game/Fiskelaget/Vegetation/M_FISK_PalmBark_v1.M_FISK_PalmBark_v1",
+        "compile_errors": [],
+        "wind_strength_cm": 7.0
+      },
+      "Leaves": {
+        "path": "/Game/Fiskelaget/Vegetation/M_FISK_TropicalLeaves_v1.M_FISK_TropicalLeaves_v1",
+        "compile_errors": [],
+        "wind_strength_cm": 7.0
+      },
+      "Fruit": {
+        "path": "/Game/Fiskelaget/Vegetation/M_FISK_Coconut_v1.M_FISK_Coconut_v1",
+        "compile_errors": [],
+        "wind_strength_cm": 7.0
+      }
+    },
+    "meshes": {
+      "SM_FISK_Palm_1_v1": {
+        "height_m": 12.840722064971924,
+        "slots": [
+          "Bark",
+          "Fruit",
+          "Leaves"
+        ]
+      },
+      "SM_FISK_Palm_2_v1": {
+        "height_m": 14.937659225463868,
+        "slots": [
+          "Bark",
+          "Fruit",
+          "Leaves"
+        ]
+      },
+      "SM_FISK_Palm_3_v1": {
+        "height_m": 16.636549587249757,
+        "slots": [
+          "Bark",
+          "Fruit",
+          "Leaves"
+        ]
+      },
+      "SM_FISK_TropicalShrub_v1": {
+        "height_m": 1.3713933086395265,
+        "slots": [
+          "Leaves",
+          "Bark"
+        ]
+      },
+      "SM_FISK_CoastalGrass_v1": {
+        "height_m": 0.7150433349609375,
+        "slots": [
+          "Leaves"
+        ]
+      }
+    },
+    "counts": {
+      "palms": 42,
+      "shrubs": 45,
+      "grass": 90,
+      "shore_rocks": 48,
+      "cliff_outcrops": 8
+    },
+    "separate_detail_level": true,
+    "marina_clear_radius_m": 32.0,
+    "island_and_morning_lighting_loaded": true
+  },
+  "persisted_scene_reopened": true
+}

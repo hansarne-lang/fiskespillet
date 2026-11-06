@@ -1,0 +1,17 @@
+{
+  "asset_id": "A026",
+  "version": 1,
+  "seed": 2607,
+  "palm_count": 42,
+  "shrub_count": 45,
+  "grass_count": 90,
+  "shore_rock_count": 48,
+  "marina_clear_radius_m": 32.0,
+  "leaf_dark_srgb": "2F713D",
+  "leaf_light_srgb": "88AC4E",
+  "bark_dark_srgb": "665443",
+  "bark_light_srgb": "A18C6C",
+  "coconut_srgb": "70603C",
+  "wind_strength_cm": 7.0,
+  "notes": "Første vegetasjonspakke. Antall og plassering er redigerbare forslag."
+}

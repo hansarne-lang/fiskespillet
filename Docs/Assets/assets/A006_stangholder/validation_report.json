@@ -1,0 +1,32 @@
+{
+  "asset_id": "A006",
+  "saved_source_reopened": true,
+  "degenerate_faces": 0,
+  "boundary_edges": 0,
+  "edges_with_more_than_two_faces": 0,
+  "triangles": 768,
+  "bounds_m": [
+    [
+      -0.06599999964237213,
+      -0.06599999964237213,
+      -0.28000009059906006
+    ],
+    [
+      0.06599999964237213,
+      0.06599999964237213,
+      0.02500009536743164
+    ]
+  ],
+  "fbx_roundtrip": {
+    "bounds_error_m": 7.450580596923828e-09,
+    "triangles": 768,
+    "socket_preserved": true
+  },
+  "glb_roundtrip": {
+    "bounds_error_m": 0.0,
+    "triangles": 768,
+    "socket_preserved": true
+  },
+  "status": "passed",
+  "game_integration": "pending"
+}

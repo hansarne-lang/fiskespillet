@@ -1,0 +1,66 @@
+{
+  "asset": "A003",
+  "status": "passed",
+  "meshes": [
+    {
+      "file": "island_coast_v1.obj",
+      "vertices": 104322,
+      "triangles": 208640,
+      "closed_manifold": true,
+      "consistent_outward_winding": true,
+      "finite_unit_normals": true,
+      "volume_m3": 17236299.515253995,
+      "land_bounds_unreal_m": [
+        [
+          -282.625,
+          -216.125,
+          0.0500075
+        ],
+        [
+          301.625,
+          190.0,
+          50.0241917
+        ]
+      ],
+      "nearest_anchor_samples_unreal_m": {
+        "marina_land": [
+          -90.25,
+          -59.375,
+          2.2
+        ],
+        "marina_water": [
+          -90.25,
+          -104.5,
+          -8.5781433
+        ]
+      }
+    },
+    {
+      "file": "coastal_rock_1_v1.obj",
+      "vertices": 266,
+      "triangles": 528,
+      "closed_manifold": true,
+      "consistent_outward_winding": true,
+      "finite_unit_normals": true,
+      "volume_m3": 2.7196018749306194
+    },
+    {
+      "file": "coastal_rock_2_v1.obj",
+      "vertices": 266,
+      "triangles": 528,
+      "closed_manifold": true,
+      "consistent_outward_winding": true,
+      "finite_unit_normals": true,
+      "volume_m3": 2.7196018848482164
+    },
+    {
+      "file": "coastal_rock_3_v1.obj",
+      "vertices": 266,
+      "triangles": 528,
+      "closed_manifold": true,
+      "consistent_outward_winding": true,
+      "finite_unit_normals": true,
+      "volume_m3": 2.7196018843091063
+    }
+  ]
+}

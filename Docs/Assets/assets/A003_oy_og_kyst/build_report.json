@@ -1,0 +1,111 @@
+{
+  "asset": "A003",
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "status": "geometry_engine_and_visual_checks_passed; main_game_integration_pending",
+  "island_map": "/Game/Fiskelaget/Island/L_A003_Island_v1",
+  "preview_map": "/Game/Fiskelaget/Island/Preview/L_A003_IslandBasePreview_v1",
+  "mesh": "/Game/Fiskelaget/Island/SM_FISK_IslandCoast_v1.SM_FISK_IslandCoast_v1",
+  "material": "/Game/Fiskelaget/Island/M_FISK_IslandSurface_v1.M_FISK_IslandSurface_v1",
+  "rocks": [
+    "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_1_v1.SM_FISK_CoastalRock_1_v1",
+    "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_2_v1.SM_FISK_CoastalRock_2_v1",
+    "/Game/Fiskelaget/Island/SM_FISK_CoastalRock_3_v1.SM_FISK_CoastalRock_3_v1"
+  ],
+  "material_compile_errors": [],
+  "rock_placements": [
+    {
+      "x_m": -225,
+      "y_m": -75,
+      "z_m": -3.481491066681655,
+      "size_m": 7.0
+    },
+    {
+      "x_m": -210,
+      "y_m": -108,
+      "z_m": -2.1495361255212746,
+      "size_m": 5.0
+    },
+    {
+      "x_m": -175,
+      "y_m": -153,
+      "z_m": -3.039104840426125,
+      "size_m": 4.8
+    },
+    {
+      "x_m": 18,
+      "y_m": -194,
+      "z_m": 1.3520304205687053,
+      "size_m": 6.8
+    },
+    {
+      "x_m": 178,
+      "y_m": -120,
+      "z_m": 1.2520682385630413,
+      "size_m": 8.2
+    },
+    {
+      "x_m": 239,
+      "y_m": -22,
+      "z_m": 1.6889046346851067,
+      "size_m": 9.0
+    },
+    {
+      "x_m": 224,
+      "y_m": 76,
+      "z_m": 22.170643391811318,
+      "size_m": 7.2
+    },
+    {
+      "x_m": 174,
+      "y_m": 131,
+      "z_m": 7.392605436237682,
+      "size_m": 9.5
+    },
+    {
+      "x_m": 65,
+      "y_m": 173,
+      "z_m": 0.6850883668309302,
+      "size_m": 7.2
+    },
+    {
+      "x_m": -120,
+      "y_m": 166,
+      "z_m": 24.55281571465408,
+      "size_m": 6.0
+    }
+  ],
+  "preset": {
+    "asset_id": "A003",
+    "version": 1,
+    "seed": 307,
+    "mesh_span_m": 760.0,
+    "grid_segments": 320,
+    "sea_level_cm": 0.0,
+    "beach_limit_m": 3.2,
+    "sand_dry_srgb": "F3D7A2",
+    "sand_wet_srgb": "B9A77E",
+    "limestone_light_srgb": "C9C1A6",
+    "limestone_dark_srgb": "898B79",
+    "grass_light_srgb": "6A9B48",
+    "grass_dark_srgb": "326B42",
+    "marina_land_anchor_m": [
+      -90.0,
+      -60.0,
+      2.2
+    ],
+    "marina_water_anchor_m": [
+      -90.0,
+      -105.0,
+      0.0
+    ],
+    "notes": "Foreslatt form og storrelse. Ikke en fastlast verden eller fastsatte reisetider."
+  },
+  "geometry_validation": "geometry_validation.json",
+  "engine_validation": "validation_report.json",
+  "previews": [
+    "A003_oy_oversikt_v1.png",
+    "A003_fra_sjoen_v1.png",
+    "A003_marinabukt_v1.png"
+  ],
+  "obj_y_to_unreal_y": -1
+}

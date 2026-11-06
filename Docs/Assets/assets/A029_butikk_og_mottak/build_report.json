@@ -1,0 +1,247 @@
+{
+  "asset_id": "A029",
+  "units": "metres",
+  "source_parts": 421,
+  "prefabs": {
+    "TackleShop": {
+      "root": "FISK_TackleShop_Root",
+      "width_m": 4.8,
+      "room_depth_m": 3.8,
+      "porch_depth_m": 1.75,
+      "floor_z_m": 0.32,
+      "door_clear_opening_m": 0.91,
+      "door_hinge_m": [
+        -1.85,
+        -0.035,
+        0.32
+      ],
+      "front_openings_m": {
+        "door": [
+          -1.85,
+          -0.85,
+          0.32,
+          2.5
+        ],
+        "window": [
+          0.12,
+          1.88,
+          1.27,
+          2.36
+        ]
+      },
+      "source_parts": 218,
+      "games": {
+        "SM_FISK_TackleShop_v1": {
+          "triangles": 46956,
+          "bounds_m": [
+            [
+              -2.7676899433135986,
+              -2.365000009536743,
+              0.0
+            ],
+            [
+              2.7676899433135986,
+              4.234999656677246,
+              4.249224662780762
+            ]
+          ],
+          "materials": 9,
+          "pivot_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "SM_FISK_TackleShop_Door_v1": {
+          "triangles": 1032,
+          "bounds_m": [
+            [
+              -1.8650000095367432,
+              -0.14000000059604645,
+              0.3399999141693115
+            ],
+            [
+              -0.877500057220459,
+              0.002500005066394806,
+              2.4800000190734863
+            ]
+          ],
+          "materials": 2,
+          "pivot_m": [
+            -1.850000023841858,
+            -0.03500000014901161,
+            0.3200000524520874
+          ]
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_TackleShop_v1_00",
+        "UCX_SM_FISK_TackleShop_v1_01",
+        "UCX_SM_FISK_TackleShop_v1_02",
+        "UCX_SM_FISK_TackleShop_v1_03",
+        "UCX_SM_FISK_TackleShop_v1_04",
+        "UCX_SM_FISK_TackleShop_v1_05",
+        "UCX_SM_FISK_TackleShop_v1_06"
+      ],
+      "anchors_m": {
+        "Entry": [
+          -1.35,
+          -0.25,
+          0.32
+        ],
+        "Trade": [
+          0.95,
+          -0.75,
+          0.32
+        ],
+        "Sign": [
+          0,
+          -1.87,
+          2.74
+        ],
+        "DoorHinge": [
+          -1.85,
+          -0.035,
+          0.32
+        ]
+      },
+      "sign": "FISKEUTSTYR"
+    },
+    "FishReception": {
+      "root": "FISK_FishReception_Root",
+      "width_m": 5.4,
+      "room_depth_m": 4.2,
+      "porch_depth_m": 1.75,
+      "floor_z_m": 0.32,
+      "door_clear_opening_m": 0.9100000000000003,
+      "door_hinge_m": [
+        1.22,
+        -0.035,
+        0.32
+      ],
+      "front_openings_m": {
+        "door": [
+          1.22,
+          2.22,
+          0.32,
+          2.5
+        ],
+        "window": [
+          -2.07,
+          0.62,
+          1.35,
+          2.4499999999999997
+        ]
+      },
+      "source_parts": 203,
+      "games": {
+        "SM_FISK_FishReception_v1": {
+          "triangles": 42636,
+          "bounds_m": [
+            [
+              -3.066159725189209,
+              -2.365000009536743,
+              0.0
+            ],
+            [
+              3.066159725189209,
+              4.634999752044678,
+              4.2498064041137695
+            ]
+          ],
+          "materials": 7,
+          "pivot_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "SM_FISK_FishReception_Door_v1": {
+          "triangles": 1032,
+          "bounds_m": [
+            [
+              1.2049999237060547,
+              -0.13999998569488525,
+              0.3399999141693115
+            ],
+            [
+              2.192500114440918,
+              0.002499997615814209,
+              2.4800000190734863
+            ]
+          ],
+          "materials": 2,
+          "pivot_m": [
+            1.2200000286102295,
+            -0.03500000387430191,
+            0.3200000524520874
+          ]
+        },
+        "SM_FISK_FishReception_Hatch_v1": {
+          "triangles": 228,
+          "bounds_m": [
+            [
+              -2.0500001907348633,
+              -1.0799999237060547,
+              1.9909709692001343
+            ],
+            [
+              0.6000000238418579,
+              -0.06000000238418579,
+              2.5625
+            ]
+          ],
+          "materials": 2,
+          "pivot_m": [
+            -0.7250000238418579,
+            -0.07999998331069946,
+            2.450000047683716
+          ]
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_FishReception_v1_00",
+        "UCX_SM_FISK_FishReception_v1_01",
+        "UCX_SM_FISK_FishReception_v1_02",
+        "UCX_SM_FISK_FishReception_v1_03",
+        "UCX_SM_FISK_FishReception_v1_04",
+        "UCX_SM_FISK_FishReception_v1_05",
+        "UCX_SM_FISK_FishReception_v1_06"
+      ],
+      "anchors_m": {
+        "Entry": [
+          1.7200000000000002,
+          -0.25,
+          0.32
+        ],
+        "Delivery": [
+          -0.72,
+          -1.15,
+          0.32
+        ],
+        "Sign": [
+          0,
+          -1.87,
+          2.74
+        ],
+        "DoorHinge": [
+          1.22,
+          -0.035,
+          0.32
+        ]
+      },
+      "sign": "FISKEMOTTAK"
+    }
+  },
+  "packed_textures": [
+    "T_FISK_MarinaWood_BaseColor_2K",
+    "T_FISK_MarinaWood_Roughness_2K",
+    "T_FISK_MarinaWood_NormalGL_2K"
+  ],
+  "preview_references": [
+    "A004",
+    "A026",
+    "A030"
+  ],
+  "status": "building_facades_and_exports_created; game_integration_pending"
+}

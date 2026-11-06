@@ -1,0 +1,42 @@
+{
+  "asset": "A002",
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "status": "engine_and_visual_checks_passed; main_game_integration_pending",
+  "lighting_map": "/Game/Fiskelaget/Lighting/L_A002_MorningSky_v1",
+  "preview_map": "/Game/Fiskelaget/Lighting/Preview/L_A002_MorningPreview_v1",
+  "preset": {
+    "asset_id": "A002",
+    "version": 1,
+    "sun_elevation_degrees": 32.0,
+    "sun_ray_yaw_degrees": -135.0,
+    "sun_intensity_lux": 65000.0,
+    "sun_temperature_kelvin": 6000.0,
+    "sun_source_angle_degrees": 1.0,
+    "sky_intensity": 2.0,
+    "sky_real_time_capture": false,
+    "rayleigh_scattering_scale": 0.038065,
+    "mie_scattering_scale": 0.0011988,
+    "mie_anisotropy": 0.75,
+    "multi_scattering_factor": 2.0,
+    "sky_luminance_rgb": [
+      0.6,
+      0.85,
+      1.1
+    ],
+    "cloud_bottom_km": 1.5,
+    "cloud_height_km": 2.5,
+    "cloud_coverage": -0.05,
+    "cloud_density": 0.006,
+    "cloud_layout_scale": 256.0,
+    "fog_density": 0.001,
+    "fog_max_opacity": 0.12,
+    "fog_start_distance_cm": 100000.0,
+    "manual_exposure_bias_ev": -13.2,
+    "bloom_intensity": 0.12
+  },
+  "validation_report": "validation_report.json",
+  "previews": [
+    "A002_morgenlys_v1.png",
+    "A002_farger_og_skygger_v1.png"
+  ]
+}

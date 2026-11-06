@@ -1,0 +1,161 @@
+{
+  "asset_id": "A008",
+  "saved_source_reopened": true,
+  "mechanism_actions": {
+    "Spool": {
+      "sample_frame": 31,
+      "angle_radians": 9.42477798461914
+    },
+    "Crank": {
+      "sample_frame": 31,
+      "angle_radians": 3.1415927410125732
+    },
+    "Knob": {
+      "sample_frame": 31,
+      "angle_radians": 3.1415927410125732
+    },
+    "Drag": {
+      "sample_frame": 31,
+      "angle_radians": 0.47996553778648376
+    }
+  },
+  "meshes": {
+    "SM_FISK_Reel_Body_v1": {
+      "triangles": 4880,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.054499998688697815,
+          -0.0004999998491257429,
+          -0.04600000008940697
+        ],
+        [
+          0.054499998688697815,
+          0.1080000028014183,
+          0.04600000008940697
+        ]
+      ],
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "materials": 4
+    },
+    "SM_FISK_Reel_Spool_v1": {
+      "triangles": 976,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.051500000059604645,
+          0.028999999165534973,
+          -0.035999998450279236
+        ],
+        [
+          0.051500000059604645,
+          0.10099999606609344,
+          0.035999998450279236
+        ]
+      ],
+      "pivot_m": [
+        0.0,
+        0.06499999761581421,
+        0.0
+      ],
+      "materials": 3
+    },
+    "SM_FISK_Reel_Crank_v1": {
+      "triangles": 404,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          0.058000002056360245,
+          0.053999997675418854,
+          -0.0690000057220459
+        ],
+        [
+          0.10350000113248825,
+          0.07599999755620956,
+          0.010999999940395355
+        ]
+      ],
+      "pivot_m": [
+        0.06400000303983688,
+        0.06499999761581421,
+        0.0
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Reel_Knob_v1": {
+      "triangles": 620,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          0.09550001472234726,
+          0.049000002443790436,
+          -0.08550000190734863
+        ],
+        [
+          0.13850000500679016,
+          0.08100000023841858,
+          -0.042500004172325134
+        ]
+      ],
+      "pivot_m": [
+        0.10300000011920929,
+        0.06499999761581421,
+        -0.06400000303983688
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Reel_Drag_v1": {
+      "triangles": 548,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          0.0495000034570694,
+          0.06242518872022629,
+          -0.002986577805131674
+        ],
+        [
+          0.0625,
+          0.10999999940395355,
+          0.03700000047683716
+        ]
+      ],
+      "pivot_m": [
+        0.05400000140070915,
+        0.06499999761581421,
+        0.0
+      ],
+      "materials": 2
+    }
+  },
+  "fbx_roundtrip": {
+    "mesh_count": 5,
+    "anchors": 6,
+    "crank_knob_hierarchy": true
+  },
+  "glb_roundtrip": {
+    "mesh_count": 5,
+    "anchors": 6,
+    "crank_knob_hierarchy": true
+  },
+  "status": "passed",
+  "game_integration": "pending"
+}

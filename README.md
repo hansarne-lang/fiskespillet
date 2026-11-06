@@ -14,6 +14,10 @@ Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengel
 
 ## Dokumentasjon
 
+- [Assetliste og fremdrift](Docs/Assets/FISKELAGET_Assetliste.md), [assetstandard](Docs/Assets/FISKELAGET_Assetstandard.md) og [assetdokumentasjon med forhåndsbilder](Docs/Assets/README.md)
+
+- [Assetliste og fremdrift](Docs/Assets/FISKELAGET_Assetliste.md), [assetstandard](Docs/Assets/FISKELAGET_Assetstandard.md) og [assetdokumentasjon med forhåndsbilder](Docs/Assets/README.md)
+
 - [Gjeldende kravspesifikasjon v1.1](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.md) og [Word-utgave](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.docx)
 - [Samlet idébank](Docs/Requirements/FISKELAGET_Idebank_2026-11-03.md) og [tidligere krav v1.0](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.0.md)
 - [Arkitektur](ARCHITECTURE.md) og [modulkontrakter](MODULE_CONTRACTS.md)
@@ -28,3 +32,4 @@ Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengel
 Endringer går gjennom pull request og relevante kontroller. En oppgave er ikke Done før tester, godkjenning og integrasjon er bekreftet. CI i bootstrapfasen kontrollerer repositoryet; dette er ikke en Unreal-byggtest.
 
 Kjør den lokale repositorykontrollen med `python Tools/Validation/check_repository.py` fra repositoryroten. Kontrollen krever bare Python 3.11 eller nyere og standardbiblioteket.
+

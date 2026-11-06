@@ -1,0 +1,42 @@
+{
+  "asset_id": "A010",
+  "units": "metres",
+  "species": "Generic original baitfish; no fixed real species",
+  "nominal_length_m": 0.2,
+  "source_parts": 39,
+  "game_name": "SK_FISK_Baitfish_v1",
+  "triangles": 10320,
+  "materials": 6,
+  "bone_names": [
+    "BodyRoot",
+    "Tail_01",
+    "Tail_02",
+    "Tail_03"
+  ],
+  "anchors_m": {
+    "BaitHook": [
+      0,
+      0.087,
+      0.00144
+    ],
+    "Mouth": [
+      0,
+      0.095,
+      -0.00072
+    ],
+    "Tail": [
+      0,
+      -0.101,
+      0
+    ]
+  },
+  "animation": "A010_BaitSwim_Loop",
+  "animation_frames": [
+    1,
+    16,
+    31,
+    46,
+    61
+  ],
+  "status": "model_and_swim_rig_created; game_integration_pending"
+}

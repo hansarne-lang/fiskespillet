@@ -15,10 +15,11 @@
 void UFiskGameInstance::Init()
 {
     Super::Init();
+    // Keep the v0.8 wire family for this storage/UI-only patch.
     FNetworkVersion::SetProjectVersion(TEXT("0.8.0"));
     FNetworkVersion::SetGameNetworkProtocolVersion(8);
     FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(8);
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=8 release=0.8.0"));
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=8 release=0.8.1"));
     const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);
     bCareerBlocked=CareerLoad==EFiskCareerLoad::Blocked;
     if(CareerLoad==EFiskCareerLoad::Empty)

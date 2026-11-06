@@ -41,12 +41,12 @@ void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponent
         const EFiskMarinaLoad Load=FFiskMarinaStore::Load(File(),LoadedProfile,Identity);bBlocked=Load==EFiskMarinaLoad::Blocked;
         if(Load==EFiskMarinaLoad::Empty) { bBlocked=!FFiskMarinaStore::Save(File(),LoadedProfile,Identity); }
         Draft=Identity;Status=bBlocked?TEXT("Naustfilen kunne ikke leses. Eksisterende filer er bevart."):Load==EFiskMarinaLoad::Recovered?TEXT("Naust hentet fra backup. Lagre for å reparere hovedfilen."):TEXT("Lagre valgene for å vise dem til venner.");
-        bSent=false;SentJournalRevision=-1;
+        bSent=false;bSending=false;bPendingSave=false;NextUpdate=0;SentJournalRevision=-1;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_LOADED blocked=%d recovery=%d"),bBlocked,Load==EFiskMarinaLoad::Recovered);
     }
     if(WantsCamera() && !IsAtDock()) { Show(0); }
     if(GetWorld()->GetRealTimeSeconds()<NextUpdate) { return; }NextUpdate=GetWorld()->GetRealTimeSeconds()+2;
-    if(bPendingSave && FFiskMarinaStore::Save(File(),LoadedProfile,Pending)) { Identity=Pending;bPendingSave=false;Status=TEXT("Naust og navn er lagret lokalt."); }
+    if(bPendingSave && FFiskMarinaStore::Save(File(),LoadedProfile,Pending)) { bPendingSave=false;Status=TEXT("Naust og navn er lagret lokalt."); }
     if(!bSent && !bBlocked && PC->IsCareerReady()) { bSent=true;PC->ServerMarinaIdentity(LoadedProfile,Identity); }
     if(bSent && PC->IsCareerReady() && SentJournalRevision!=GI->GetJournalRevision())
     {
@@ -57,8 +57,12 @@ void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponent
 }
 void UFiskMarinaPanel::ReceiveIdentity(const FFiskMarinaIdentity& Value)
 {
-    if(!Value.IsValid()) { return; }bSending=false;Pending=Value;bPendingSave=!FFiskMarinaStore::Save(File(),LoadedProfile,Value);
-    if(!bPendingSave) { Identity=Value;Draft=Value; }Status=bPendingSave?TEXT("Naust bekreftet av verten. Lokal lagring prøves igjen."):TEXT("Naust og navn er bekreftet og lagret.");
+    if(!Value.IsValid()) { return; }
+    const bool RefreshDraft=Draft==Identity;
+    bSending=false;Identity=Value;Pending=Value;
+    if(RefreshDraft) { Draft=Value; }
+    bPendingSave=!FFiskMarinaStore::Save(File(),LoadedProfile,Value);
+    Status=bPendingSave?TEXT("Naust bekreftet av verten. Lokal lagring prøves igjen."):TEXT("Naust og navn er bekreftet og lagret.");
 }
 void UFiskMarinaPanel::Show(int32 NewPage)
 {

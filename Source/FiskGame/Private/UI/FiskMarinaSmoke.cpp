@@ -32,13 +32,48 @@ void UFiskMarinaPanel::RunSmoke()
     const double Now=GetWorld()->GetRealTimeSeconds();
     auto Key=[&](FKey K){FInputKeyEventArgs A;A.InputDevice=FInputDeviceId::CreateFromInternalId(0);A.Key=K;A.Event=IE_Pressed;PC->InputKey(A);A.Event=IE_Released;PC->InputKey(A);};
     auto Type=[&](const FString& Name){const FKey Digits[]={EKeys::Zero,EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five,EKeys::Six,EKeys::Seven,EKeys::Eight,EKeys::Nine};for(int32 I=0;I<24;++I) { Key(EKeys::BackSpace); }for(TCHAR C:Name) { Key(C==' '?EKeys::SpaceBar:C>='0' && C<='9'?Digits[C-'0']:FKey(FName(*FString::Chr(C)))); }Key(EKeys::Enter);};
-    auto Shot=[&](const TCHAR* Name){if(!SmokeDirectory.IsEmpty() && !FScreenshotRequest::IsScreenshotRequested()) { IFileManager::Get().MakeDirectory(*SmokeDirectory,true);FScreenshotRequest::RequestScreenshot(FPaths::Combine(SmokeDirectory,FString(Name)+TEXT(".png")),false,false); }};
+    auto Shot=[&](const TCHAR* Name){if(!SmokeDirectory.IsEmpty()) { IFileManager::Get().MakeDirectory(*SmokeDirectory,true);const FString Path=FPaths::Combine(SmokeDirectory,FString(Name)+TEXT(".png"));FTimerHandle Capture;GetWorld()->GetTimerManager().SetTimer(Capture,FTimerDelegate::CreateWeakLambda(this,[Path](){if(!FScreenshotRequest::IsScreenshotRequested()) { FScreenshotRequest::RequestScreenshot(Path,false,false); }}),.25f,false); }};
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_MARINA_FAILED mode=%s stage=%d %s"),*SmokeMode,SmokeStage,Why);GetWorld()->GetTimerManager().ClearTimer(SmokeTimer);};
     auto Done=[&](){UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_PASSED mode=%s cash=%lld color=%d style=%d decor=%d"),*SmokeMode,static_cast<long long>(GI->Career.Cash),Identity.Color,Identity.Style,Identity.Decor);GetWorld()->GetTimerManager().ClearTimer(SmokeTimer);};
     const FFiskMarinaResident* Own=Hub->GetResidents().FindByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});
     if(SmokeMode==TEXT("blocked"))
     { if(!bBlocked || FFiskMarinaStore::Save(File(),LoadedProfile,FFiskMarinaIdentity())) { Fail(TEXT("invalid_files_not_preserved"));return; }Key(EKeys::H);Shot(TEXT("naust-blocked"));Done();return; }
     if(!Own) { return; }
+    if(SmokeMode==TEXT("retry"))
+    {
+        const FString Block=File()+TEXT(".tmp");
+        auto SaveHouse=[&](const FString& Name){Key(EKeys::Down);Key(EKeys::Enter);Type(Name);for(int32 I=0;I<4;++I) { Key(EKeys::Down); }Key(EKeys::Enter);};
+        if(SmokeStage==0)
+        {
+            SmokeCash=GI->Career.Cash;if(!IFileManager::Get().MakeDirectory(*Block)) { Fail(TEXT("could_not_block_temp_write"));return; }
+            Key(EKeys::H);SaveHouse(TEXT("VENTEHUS 1"));SmokeAt=Now;SmokeStage=1;
+        }
+        else if(SmokeStage==1 && Now-SmokeAt>=2)
+        {
+            if(!bPendingSave || Identity.HouseName!=TEXT("VENTEHUS 1") || Own->Identity.HouseName!=Identity.HouseName) { Fail(TEXT("confirmed_identity_not_shown_while_pending"));return; }
+            Key(EKeys::Escape);Key(EKeys::H);if(Draft.HouseName!=TEXT("VENTEHUS 1")) { Fail(TEXT("reopened_old_house_while_pending"));return; }
+            if(!IFileManager::Get().DeleteDirectory(*Block)) { Fail(TEXT("could_not_release_temp_write"));return; }Shot(TEXT("naust-retry-saved"));SmokeAt=Now;SmokeStage=2;
+        }
+        else if(SmokeStage==2 && Now-SmokeAt>=3)
+        {
+            FFiskMarinaIdentity Disk;if(bPendingSave || FFiskMarinaStore::Load(File(),LoadedProfile,Disk)!=EFiskMarinaLoad::Loaded || Disk.HouseName!=TEXT("VENTEHUS 1")) { Fail(TEXT("first_retry_not_persisted"));return; }
+            IFileManager::Get().MakeDirectory(*Block);SaveHouse(TEXT("VENTEHUS 2"));SmokeAt=Now;SmokeStage=3;
+        }
+        else if(SmokeStage==3 && Now-SmokeAt>=2)
+        {
+            if(!bPendingSave || Identity.HouseName!=TEXT("VENTEHUS 2")) { Fail(TEXT("second_save_not_pending"));return; }
+            Key(EKeys::Escape);Key(EKeys::H);Key(EKeys::Down);Key(EKeys::Enter);Type(TEXT("USLAGRET NAVN"));
+            if(!IFileManager::Get().DeleteDirectory(*Block)) { Fail(TEXT("second_temp_release_failed"));return; }SmokeAt=Now;SmokeStage=4;
+        }
+        else if(SmokeStage==4 && Now-SmokeAt>=3)
+        {
+            FFiskMarinaIdentity Disk;if(bPendingSave || FFiskMarinaStore::Load(File(),LoadedProfile,Disk)!=EFiskMarinaLoad::Loaded || Disk.HouseName!=TEXT("VENTEHUS 2") || Draft.HouseName!=TEXT("USLAGRET NAVN") || GI->Career.Cash!=SmokeCash) { Fail(TEXT("retry_overwrote_draft_or_wallet"));return; }
+            FFiskMarinaIdentity Ack=Identity;Ack.DisplayName=TEXT("BEKREFTET NAVN");ReceiveIdentity(Ack);
+            if(Draft.HouseName!=TEXT("USLAGRET NAVN")) { Fail(TEXT("ack_overwrote_unsent_draft"));return; }
+            Key(EKeys::Escape);Key(EKeys::F1);if(!PC->IsHelpVisible()) { Fail(TEXT("help_not_opened"));return; }Shot(TEXT("help-controls"));SmokeAt=Now;SmokeStage=5;
+        }
+        else if(SmokeStage==5 && Now-SmokeAt>=2) { Key(EKeys::Escape);Done(); }return;
+    }
     if(SmokeMode==TEXT("observe"))
     {
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());if(!Settlement) { return; }

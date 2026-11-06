@@ -11,12 +11,12 @@ bool Read(const FString& File,const FGuid& Profile,FFiskMarinaIdentity& Out,int3
 {
     const int64 Size=IFileManager::Get().FileSize(*File);if(Size<1 || Size>8192) { return false; }
     FConfigFile C;C.Read(File);int32 Version=0;C.GetInt(Section,TEXT("Version"),Version);Future=Version>1;
-    FString Id;FFiskMarinaIdentity V;
+    FString Id;FFiskMarinaIdentity V;int32 ValidatedRevision=0;
     if(Version!=1 || C.Num()!=1 || !C.GetString(Section,TEXT("Profile"),Id) || Id!=Profile.ToString(EGuidFormats::Digits)
-        || !C.GetInt(Section,TEXT("Revision"),Revision) || Revision<1 || Revision>=MAX_int32
+        || !C.GetInt(Section,TEXT("Revision"),ValidatedRevision) || ValidatedRevision<1 || ValidatedRevision>=MAX_int32
         || !C.GetString(Section,TEXT("DisplayName"),V.DisplayName) || !C.GetString(Section,TEXT("HouseName"),V.HouseName)
         || !C.GetInt(Section,TEXT("Color"),V.Color) || !C.GetInt(Section,TEXT("Style"),V.Style) || !C.GetInt(Section,TEXT("Decor"),V.Decor) || !V.IsValid()) { return false; }
-    Out=V;return true;
+    Out=V;Revision=ValidatedRevision;return true;
 }
 bool Write(const FString& File,const FGuid& Profile,const FFiskMarinaIdentity& V,int32 Revision)
 {
@@ -44,8 +44,9 @@ bool FFiskMarinaStore::Save(const FString& File,const FGuid& Profile,const FFisk
     FFiskMarinaIdentity A,B;int32 AR=0,BR=0;bool AF=false,BF=false;
     const bool AM=MarinaDisk::Read(File,Profile,A,AR,AF),BM=MarinaDisk::Read(File+TEXT(".bak"),Profile,B,BR,BF);
     if(AF || BF || (AM && BM && AR==BR && !(A==B)) || (!AM && !BM && (IFileManager::Get().FileExists(*File) || IFileManager::Get().FileExists(*(File+TEXT(".bak")))))) { return false; }
-    if(AM && AR>=BR && A==Identity) { return true; }
-    const int32 Revision=FMath::Max(AR,BR)+1;if(Revision>=MAX_int32) { return false; }
+    if(AM && (!BM || AR>=BR) && A==Identity) { return true; }
+    const int32 Highest=FMath::Max(AM?AR:0,BM?BR:0);if(Highest>=MAX_int32-1) { return false; }
+    const int32 Revision=Highest+1;
     IFileManager::Get().MakeDirectory(*FPaths::GetPath(File),true);const FString Temp=File+TEXT(".tmp"),Backup=File+TEXT(".bak.tmp");
     if(!MarinaDisk::Write(Temp,Profile,Identity,Revision)) { return false; }
     FFiskMarinaIdentity Check;int32 CR=0;bool CF=false;if(!MarinaDisk::Read(Temp,Profile,Check,CR,CF) || !(Check==Identity) || CR!=Revision) { return false; }

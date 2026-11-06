@@ -8,6 +8,8 @@ Spillbar UE5.8-prototype med solo og fire LAN-spillere, fiskekamp,20minuttersdag
 
 Windows-testpakker startes via medfølgende BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra spillklokken02:00 og F ved fiskeplassen. P: butikk, M: kart, H: naust, B: strandbar, I: artsbok. Kildeutvikling bruker lokal Unreal5.8.4 og C++-verktøyene i DEVELOPMENT.md. Gamle profiler kopieres med backup til den nye pakkens Saved/Config/Fiskelaget.
 
+v0.8.1 retter gjenoppretting av skadede naustrevisjoner, visning av serverbekreftede husvalg mens lokal lagring venter, og plasseringen av hjelpetekst. Se [kodegjennomgangen](Docs/Development/REVIEW_V08_STABILITY_V081.md). [Forslaget til v0.9](Docs/Development/EXPEDITIONS_V09_PLAN.md) om ekspedisjoner, værpresentasjon og journalgjenhenting er planlagt innhold, ikke implementert funksjonalitet.
+
 Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengelighet gir ikke automatisk en åpen kildekodelisens; lisens og tredjepartsrettigheter må avklares før gjenbruk eller videre distribusjon.
 
 ## Dokumentasjon

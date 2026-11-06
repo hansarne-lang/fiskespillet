@@ -42,6 +42,8 @@ try{
   $app=Start-Case 'blocked' 'blocked' '/Engine/Maps/Entry?listen' 'blocked-profile';$active+=$app;$logs+=Join-Path $run 'blocked.log'
   Wait-Tag $logs[-1] 'FISKELAGET_MARINA_PASSED mode=blocked' $app;Start-Sleep -Seconds 2;Stop-Case $app
   if([IO.File]::ReadAllText($badFile) -ne 'bad-primary-preserve' -or [IO.File]::ReadAllText($badFile+'.bak') -ne 'bad-backup-preserve'){throw 'Invalid cosmetics overwritten'}
+  $app=Start-Case 'retry' 'retry' '/Engine/Maps/Entry?listen' 'retry-profile';$active+=$app;$logs+=Join-Path $run 'retry.log'
+  Wait-Tag $logs[-1] 'FISKELAGET_MARINA_PASSED mode=retry' $app;Start-Sleep -Seconds 2;Stop-Case $app;Shots 'retry' @('naust-retry-saved','help-controls')
   if($LegacyProfile){
    $dest=Join-Path $run 'legacy-profile/Saved/Config/Fiskelaget';New-Item -ItemType Directory -Path $dest -Force | Out-Null
    foreach($name in 'FiskelagetCareer.ini','FiskelagetCareer.ini.bak','FiskelagetJournal.ini','FiskelagetJournal.ini.bak','FiskelagetPlaces.ini','FiskelagetRigPresets.ini','FiskelagetSettings.ini'){if(Test-Path -LiteralPath (Join-Path $LegacyProfile $name)){Copy-Item -LiteralPath (Join-Path $LegacyProfile $name) -Destination (Join-Path $dest $name)}}

@@ -4,6 +4,7 @@
 #include "Misc/AutomationTest.h"
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
+#include "Misc/ConfigCacheIni.h"
 #include "HAL/FileManager.h"
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskMarinaIdentityTest,"Fiskelaget.Marina.IdentityValidation",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskMarinaIdentityTest::RunTest(const FString& Parameters)
@@ -32,6 +33,26 @@ bool FFiskMarinaCorruptTest::RunTest(const FString& Parameters)
     IFileManager::Get().Delete(*File);IFileManager::Get().Delete(*(File+TEXT(".bak")));TestTrue(TEXT("Valid profile before future backup"),FFiskMarinaStore::Save(File,Profile,V));FFileHelper::SaveStringToFile(TEXT("[Fiskelaget.Marina]\nVersion=99\n"),*(File+TEXT(".bak")));
     TestEqual(TEXT("Future backup does not silently roll back"),FFiskMarinaStore::Load(File,Profile,V),EFiskMarinaLoad::Blocked);TestFalse(TEXT("Future data never overwritten"),FFiskMarinaStore::Save(File,Profile,V));
     for(const TCHAR* S:{TEXT(""),TEXT(".bak"),TEXT(".tmp"),TEXT(".bak.tmp")}) { IFileManager::Get().Delete(*(File+S)); }IFileManager::Get().DeleteDirectory(*Dir);return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskMarinaRevisionRecoveryTest,"Fiskelaget.Marina.ValidatedRevisionRecovery",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskMarinaRevisionRecoveryTest::RunTest(const FString& Parameters)
+{
+    const FString Dir=FPaths::Combine(FPaths::ProjectSavedDir(),TEXT("Automation"),FGuid::NewGuid().ToString()),File=Dir/TEXT("Marina.ini");
+    const FGuid Profile=FGuid::NewGuid();FFiskMarinaIdentity Original,Changed,Read;Changed.HouseName=TEXT("NYTT NAUST");
+    auto Cleanup=[&](){for(const TCHAR* S:{TEXT(""),TEXT(".bak"),TEXT(".tmp"),TEXT(".bak.tmp")}) { IFileManager::Get().Delete(*(File+S)); }};
+    for(const TCHAR* BadRevision:{TEXT("2147483647"),TEXT("2147483646"),TEXT("-1"),TEXT("9999999999999999")})
+    {
+        Cleanup();TestTrue(TEXT("Fresh baseline"),FFiskMarinaStore::Save(File,Profile,Original));TestTrue(TEXT("Second generation"),FFiskMarinaStore::Save(File,Profile,Changed));
+        FConfigFile Corrupt;Corrupt.Read(File);Corrupt.SetString(TEXT("Fiskelaget.Marina"),TEXT("Revision"),BadRevision);Corrupt.SetString(TEXT("Fiskelaget.Marina"),TEXT("Color"),TEXT("99"));Corrupt.Dirty=true;TestTrue(TEXT("Write corrupt primary"),Corrupt.Write(File));
+        TestEqual(TEXT("Recover known-good backup"),FFiskMarinaStore::Load(File,Profile,Read),EFiskMarinaLoad::Recovered);TestTrue(TEXT("Backup fields retained"),Read==Original);
+        TestTrue(TEXT("Invalid primary revision cannot prevent repair"),FFiskMarinaStore::Save(File,Profile,Read));
+        TestEqual(TEXT("Repaired primary validates"),FFiskMarinaStore::Load(File,Profile,Read),EFiskMarinaLoad::Loaded);
+        FConfigFile Repaired;Repaired.Read(File);int32 Revision=0;Repaired.GetInt(TEXT("Fiskelaget.Marina"),TEXT("Revision"),Revision);TestEqual(TEXT("Revision derives only from valid backup"),Revision,2);
+        Corrupt.Dirty=true;TestTrue(TEXT("Write corrupt backup"),Corrupt.Write(File+TEXT(".bak")));
+        TestTrue(TEXT("Invalid backup revision cannot prevent update"),FFiskMarinaStore::Save(File,Profile,Changed));
+        TestEqual(TEXT("Updated primary validates"),FFiskMarinaStore::Load(File,Profile,Read),EFiskMarinaLoad::Loaded);TestTrue(TEXT("Latest valid values retained"),Read==Changed);
+    }
+    Cleanup();IFileManager::Get().DeleteDirectory(*Dir);return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskSevenSpeciesTest,"Fiskelaget.Content.SevenSpeciesCoverage",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskSevenSpeciesTest::RunTest(const FString& Parameters)

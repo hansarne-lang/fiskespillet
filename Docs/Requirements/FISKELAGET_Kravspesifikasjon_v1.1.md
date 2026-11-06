@@ -386,3 +386,8 @@ K8: Den senere godkjente arkitekturen og masterpromptens valg av Unreal Engine 5
 Kapittel 2 og testprisene bygger på K2. Statistikkdetaljene bygger på K1, med utsatt resultatvisning etter K6. Den visuelle retningen bygger på K3 og K4. K5–K7 styrer de nye sosiale funksjonene, faste kameraer, hemmelige resultater og utsatt oppgjør. K8 bekrefter motorvalget. Øvrige krav er videreført fra v1.0.
 
 Samordning: Dagens bekreftede art, eksakte mål, verdi og resultater skal skjules til minutt 17, også etter landing og tidlig levering. Salg, fangstpremier og veddemålsgevinster venter til samme tidspunkt. Dette erstatter v1.0s tidligere resultatvisning og umiddelbare salg. Statistikk skal fortsatt være enkel, journalen detaljert og den første prototypen i realistisk 3D.
+
+
+## Avklaring 4. november 2026 — ankomst i marinaen
+
+Ankomst registreres av LAN-serveren når båtens midtpunkt krysser grensen til den synlige marinasonen. Ankomsttid mindre enn eller lik 1 020 000 ms fra fiskedagens start gir levering innen fristen. Serveren behandler kryssingen før oppgjøret, også når begge behandles i samme ramme. Klientens melding eller nettverksforsinkelse endrer ikke ankomsttidspunktet. Sonens størrelse er en testverdi som balanseres senere.

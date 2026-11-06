@@ -1,0 +1,29 @@
+#pragma once
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "FiskOceanScene.generated.h"
+
+class UStaticMesh;
+class UStaticMeshComponent;
+class UMaterialInterface;
+class UDirectionalLightComponent;
+
+UCLASS()
+class AFiskOceanScene final : public AActor
+{
+    GENERATED_BODY()
+public:
+    AFiskOceanScene();
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
+private:
+    UPROPERTY() TObjectPtr<UDirectionalLightComponent> Daylight;
+    UPROPERTY() TObjectPtr<UStaticMesh> Plane;
+    UPROPERTY() TObjectPtr<UStaticMesh> Cube;
+    UPROPERTY() TObjectPtr<UStaticMesh> Sphere;
+    UPROPERTY() TObjectPtr<UStaticMesh> Cylinder;
+    UPROPERTY() TObjectPtr<UMaterialInterface> Material;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Ripples;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Birds;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Flyers;
+};

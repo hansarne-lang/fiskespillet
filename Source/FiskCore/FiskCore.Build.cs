@@ -5,6 +5,6 @@ public class FiskCore : ModuleRules
     public FiskCore(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.Add("Core");
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject" });
     }
 }

@@ -134,3 +134,13 @@ Velg `ReasonCode` fra minst NotOwner, NotCaptain, WrongPhase, StaleRevision, Cap
 Valgfrie felt med entydig standard kan legges til som minor. Fjerning, ny betydning, nye påkrevde felt eller nye enumverdier som gamle mottakere ikke håndterer, krever major. Ukjent major avvises med eksplisitt inkompatibilitet. Eventversjon, nettverksprotokollversjon, profilformat og spillversjon skal være separate verdier.
 
 Modulene skal kunne testes med kontraktfakes uten å instansiere hverandres private objekter. Test duplikater, feil rekkefølge, manglende referanser, gjenstart og oppgjørsgrensen. Kontraktendringer krever integrasjonsreview, og designendringer krever prosjekteieren.
+
+## v0.7 – konkret prototypekontrakt
+
+Eiergodkjent i [#72](https://github.com/hansarne-lang/fiskespillet/issues/72), som en avgrenset implementering ved siden av de fullstendige hendelseskontraktene ovenfor. `FFiskCareerProfile` i FiskCore er et eierprivat snapshot med profil-ID/navn, Int64-saldo i hundredeler, revisjon, eide varer og inntil512 varige kvitteringer. Profilformat1 og favorittformat2 versjoneres separat. Core bruker CoreUObject for refleksjon/serialisering av delte USTRUCT-er, uten Engine eller funksjonsavhengigheter.
+
+Serveradapteren binder tilkoblingens PlayerId til profil-ID, autoriserer kjøp etter brygge-/eierskapskontroll og bruker DayId som idempotent oppgjørsnøkkel. Kvitteringens ID/type/vare/beløp må samsvare ved gjentakelse; en gjenbrukt ID med annet innhold avvises. Bare serverens avslørte resultat etter1 020 000ms gir ny inntekt. Lokalt båteierskap gir ingen andel av andres fangster. Importert offline-historikk er ikke en autentisert fangsthendelse i gjeldende dag.
+
+Serverens profilkopi lagres før snapshot sendes; lokal fil lagres før klienten kvitterer profil-ID/revisjon. Feil gir ventende lagring/retry uten ny betaling. Neste dag krever varig oppgjørskvittering og lokal ACK fra hver tilkoblet profil. Motstridende historikk, ukjent format, ugyldig fil og full kvitteringskjede avvises. Lagring bruker validerte midlertidige filer, atomisk flytting og backup under fil-lås. Import fra annen LAN-server godtar bare en lengre kjede med identisk prefiks; bevisst offline-profilendring er utenfor denne prototypens tillitsmodell.
+
+`FiskBoatLayout` og `FiskRouteGeometry` deler holderfordeling og sjø-/øygeometri. Rute-/båtkommandoer bruker serverens eier/kaptein, rute-revisjon, båtmodell og gyldig koordinat. Kartet skriver aldri posisjon eller økonomi direkte. Faktisk reise, reiseestimat og fristkryssing bruker samme rute/tid. Den nye båten aktiverer ikke lager-/slepekontraktene. Detaljert flyt og avgrensning står i [v0.7-kontrakten](Docs/Development/CAREER_OFFSHORE_V07.md).

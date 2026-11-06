@@ -7,7 +7,7 @@
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskGroundCatalogTest,"Fiskelaget.Grounds.CatalogAndRigDepth",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskGroundCatalogTest::RunTest(const FString& Parameters)
 {
-    TestNull(TEXT("Negative location"),FiskGrounds::Find(-1));TestNull(TEXT("Unknown location"),FiskGrounds::Find(3));
+    TestNull(TEXT("Negative location"),FiskGrounds::Find(-1));TestNull(TEXT("Unknown location"),FiskGrounds::Find(FiskGrounds::Count));
     for(int32 Id=0;Id<FiskGrounds::Count;++Id)
     {
         const FFiskFishingGround* G=FiskGrounds::Find(Id);

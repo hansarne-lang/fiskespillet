@@ -122,7 +122,7 @@ void UFiskMarinaPanel::RunSmoke()
         if(Count!=1) { Fail(TEXT("message_missing_or_replayed"));return; }Shot(TEXT("strandbar"));SmokeAt=Now;SmokeStage=4;
     }
     else if(SmokeStage==4 && Now-SmokeAt>=2)
-    { Key(EKeys::Escape);Key(EKeys::I);for(int32 I=0;I<6;++I) { Key(EKeys::Right); }if(Species!=6 || FiskCatches::Count!=11) { Fail(TEXT("species_book_incomplete"));return; }Shot(TEXT("artsbok-marlin"));SmokeAt=Now;SmokeStage=5; }
+    { Key(EKeys::Escape);Key(EKeys::I);for(int32 I=0;I<FiskCatches::Count-1;++I) { Key(EKeys::Right); }if(Species!=FiskCatches::Count-1 || FiskCatches::Count!=11) { Fail(TEXT("species_book_incomplete"));return; }Shot(TEXT("artsbok-marlin"));SmokeAt=Now;SmokeStage=5; }
     else if(SmokeStage==5 && Now-SmokeAt>=2)
     {
         Key(EKeys::Escape);FFiskMarinaIdentity Other=Identity;Other.HouseName=TEXT("FORFALSKET");PC->ServerMarinaIdentity(FGuid::NewGuid(),Other);

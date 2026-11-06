@@ -1,4 +1,5 @@
 #include "UI/FiskNavigationModel.h"
+#include "FiskFishingGround.h"
 #include "Fishing/FiskPrototypeRod.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
@@ -8,7 +9,7 @@ bool FFiskSonarTest::RunTest(const FString& Parameters)
     TestFalse(TEXT("No dock reading"),FiskNavigation::Sonar(0,-1,true,30).bAvailable);
     TestFalse(TEXT("No travelling reading"),FiskNavigation::Sonar(1,50,true,80).bAvailable);
     TestFalse(TEXT("No remote reading"),FiskNavigation::Sonar(1,100,false,80).bAvailable);
-    TestFalse(TEXT("No invalid ground"),FiskNavigation::Sonar(3,100,true,80).bAvailable);
+    TestFalse(TEXT("No invalid ground"),FiskNavigation::Sonar(FiskGrounds::Count,100,true,80).bAvailable);
     TestFalse(TEXT("No return reading"),FiskNavigation::Sonar(1,150,true,80).bAvailable);
     const FFiskSonarView V=FiskNavigation::Sonar(1,100,true,80);
     TestTrue(TEXT("Current ground available"),V.bAvailable);TestEqual(TEXT("Bottom matches chart"),V.Bottom,120);

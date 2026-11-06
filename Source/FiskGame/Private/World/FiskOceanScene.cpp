@@ -78,8 +78,8 @@ void AFiskOceanScene::BeginPlay()
     {
         const FVector P=FiskRouteGeometry::Island(I);const double R=FiskRouteGeometry::Radius(I);
         Part(*FString::Printf(TEXT("SeaIslandSand%d"),I),Sphere,P+FVector(0,0,-40),FVector(R/50,R/50,5),FLinearColor(.68f,.55f,.32f));
-        Part(*FString::Printf(TEXT("SeaIslandGreen%d"),I),Sphere,P+FVector(0,0,150),FVector(R/65,R/65,14),FLinearColor(.08f,.23f,.055f));
-        Part(*FString::Printf(TEXT("SeaIslandHill%d"),I),Sphere,P+FVector(-R/4,0,650),FVector(R/110,R/120,20),FLinearColor(.11f,.22f,.08f));
+        Part(*FString::Printf(TEXT("SeaIslandGreen%d"),I),Sphere,P+FVector(0,0,150),FVector(R/65,R/65,I==2?3:14),FLinearColor(.08f,.23f,.055f));
+        if(I<2) { Part(*FString::Printf(TEXT("SeaIslandHill%d"),I),Sphere,P+FVector(-R/4,0,650),FVector(R/110,R/120,20),FLinearColor(.11f,.22f,.08f)); }
     }
     // Root silhouettes stay inside the navigation exclusion around the mangrove island.
     for(int32 I=0;I<12;++I)

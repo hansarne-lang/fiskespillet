@@ -83,7 +83,11 @@ void AFiskBoardingController::RunExpeditionSmoke()
         Key(EKeys::U);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPEDITION_EQUIPMENT_PASSED player=%d"),Self);ExpeditionSmokeStage=6;
     }
     if(ExpeditionSmokeStage<6 || ExpeditionSmokeStage==20) { return; }
-    if(Day->GetDayNumber()==1 && Now<1020)
+    // A remote client's interpolated clock can lag the confirmed server reveal.
+    // The release collector additionally checks every reveal against the host's
+    // precise UTC start + 1020 seconds; this window is only for local estimates.
+    const double PrivacyLimit=HasAuthority()?1020.0:1018.0;
+    if(Day->GetDayNumber()==1 && Now<PrivacyLimit)
     {
         if(P.bEvaluated || P.bCompleted || !GI->Expeditions.IsEmpty() || !GI->GetJournal().GetEntries().IsEmpty() || GI->Career.Cash!=225000)
         { Fail(TEXT("pre17_results_or_money_leaked"));return; }

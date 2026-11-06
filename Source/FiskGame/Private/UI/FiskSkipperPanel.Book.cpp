@@ -38,14 +38,14 @@ void UFiskSkipperPanel::DrawBook(AHUD& H,UCanvas& C)
             T(FString::Printf(TEXT("Fangstside %d/%d | Dags-ID %s"),DetailPage+1,Pages,*D.Id.ToString(EGuidFormats::Digits).Left(8)),385,558,.9f);
             auto Point=[&](FVector P){return FVector2D((956+P.X/150000*240)*S,(418-P.Y/100000*110)*S);};
             H.DrawRect(FLinearColor(.025f,.19f,.25f),935*S,310*S,280*S,230*S);
-            for(int32 I=0;I<2;++I) { C.K2_DrawPolygon(nullptr,Point(FiskRouteGeometry::Island(I)),FVector2D(FiskRouteGeometry::Radius(I)/150000*240*S,FiskRouteGeometry::Radius(I)/100000*110*S),24,FLinearColor(.52f,.43f,.24f)); }
+            for(int32 I=0;I<FiskRouteGeometry::IslandCount;++I) { C.K2_DrawPolygon(nullptr,Point(FiskRouteGeometry::Island(I)),FVector2D(FiskRouteGeometry::Radius(I)/150000*240*S,FiskRouteGeometry::Radius(I)/100000*110*S),24,FLinearColor(.52f,.43f,.24f)); }
             int32 Plotted=0;for(int32 I:Rows) { const auto& E=J.GetEntries()[I];if(!E.Context.bHasSeaPoint) { continue; }const auto P=Point(E.Context.SeaPoint);H.DrawRect(Gold,P.X-3*S,P.Y-3*S,6*S,6*S);++Plotted; }
             T(FString::Printf(TEXT("%d bekreftede sjøpunkt"),Plotted),945,548,.85f,Teal);
         }
     }
     else
     {
-        const int32 Count=Tab==1?FiskCatches::Count:3,Pages=FMath::DivideAndRoundUp(Count,5);DetailPage=FMath::Clamp(DetailPage,0,Pages-1);
+        const int32 Count=Tab==1?FiskCatches::Count:Tab==2?FiskGrounds::Count:3,Pages=FMath::DivideAndRoundUp(Count,5);DetailPage=FMath::Clamp(DetailPage,0,Pages-1);
         T(TEXT("Samlet statistikk fra hele din bekreftede journal"),48,202,1.2f,Gold);
         for(int32 I=DetailPage*5;I<FMath::Min((DetailPage+1)*5,Count);++I)
         {

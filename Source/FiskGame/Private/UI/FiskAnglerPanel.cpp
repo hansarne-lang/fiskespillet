@@ -65,7 +65,7 @@ bool UFiskAnglerPanel::HandleKey(const FInputKeyEventArgs& A)
         if(Press && K==EKeys::Tab) { bControls=!bControls;Practice=FFiskPracticeSession();return true; }
         if((Press || Repeat) && !Practice.IsRunning())
         {
-            if(K==EKeys::Left) { Species=(Species+6)%7;Practice=FFiskPracticeSession(); }if(K==EKeys::Right) { Species=(Species+1)%7;Practice=FFiskPracticeSession(); }
+            if(K==EKeys::Left) { Species=(Species+FiskCatches::Count-1)%FiskCatches::Count;Practice=FFiskPracticeSession(); }if(K==EKeys::Right) { Species=(Species+1)%FiskCatches::Count;Practice=FFiskPracticeSession(); }
             if(K==EKeys::G) { Gear=Gear==0?7:0;Practice=FFiskPracticeSession(); }
         }
         if(Press && K==EKeys::Enter) { if(bControls) { Lesson=FFiskControlLesson(); }else { StartPractice(); } }
@@ -85,7 +85,7 @@ bool UFiskAnglerPanel::HandleKey(const FInputKeyEventArgs& A)
         }return true;
     }
     if(!Press && !Repeat) { return true; }
-    if(K==EKeys::Left) { Species=(Species+6)%7; }if(K==EKeys::Right) { Species=(Species+1)%7; }
+    if(K==EKeys::Left) { Species=(Species+FiskCatches::Count-1)%FiskCatches::Count; }if(K==EKeys::Right) { Species=(Species+1)%FiskCatches::Count; }
     if(Press && K==EKeys::G) { Bait=(Bait+1)%3; }if(Press && K==EKeys::Tab) { Slot=(Slot+1)%3; }
     if(Press && (K==EKeys::One || K==EKeys::Two || K==EKeys::Three)) { PC->RequestRodSelection(K==EKeys::One?0:K==EKeys::Two?1:2); }
     const auto* B=PC->FindStarterBoat();const auto Advice=FiskAngler::Advice(B?B->GetGroundId():0,Bait);

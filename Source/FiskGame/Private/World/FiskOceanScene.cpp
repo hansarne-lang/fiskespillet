@@ -74,13 +74,27 @@ void AFiskOceanScene::BeginPlay()
 
     Water->SetCastShadow(false);
     Part(TEXT("ShallowWater"),Sphere,FVector(18000,0,-13),FVector(700,950,.03),FLinearColor(.015f,.32f,.38f))->SetCastShadow(false);
-    for(int32 I=0;I<2;++I)
+    for(int32 I=0;I<FiskRouteGeometry::IslandCount;++I)
     {
         const FVector P=FiskRouteGeometry::Island(I);const double R=FiskRouteGeometry::Radius(I);
         Part(*FString::Printf(TEXT("SeaIslandSand%d"),I),Sphere,P+FVector(0,0,-40),FVector(R/50,R/50,5),FLinearColor(.68f,.55f,.32f));
         Part(*FString::Printf(TEXT("SeaIslandGreen%d"),I),Sphere,P+FVector(0,0,150),FVector(R/65,R/65,14),FLinearColor(.08f,.23f,.055f));
         Part(*FString::Printf(TEXT("SeaIslandHill%d"),I),Sphere,P+FVector(-R/4,0,650),FVector(R/110,R/120,20),FLinearColor(.11f,.22f,.08f));
     }
+    // Root silhouettes stay inside the navigation exclusion around the mangrove island.
+    for(int32 I=0;I<12;++I)
+    {
+        const double Angle=I*2*PI/12,Rad=2200+(I%3)*500;const FVector P=FiskRouteGeometry::Island(2)+FVector(FMath::Cos(Angle)*Rad,FMath::Sin(Angle)*Rad,0);
+        Part(*FString::Printf(TEXT("MangroveTrunk%d"),I),Cylinder,P+FVector(0,0,420),FVector(.65,.65,8),FLinearColor(.24f,.18f,.09f));
+        Part(*FString::Printf(TEXT("MangroveCrown%d"),I),Sphere,P+FVector(0,0,900),FVector(11,10,5),FLinearColor(.04f,.22f,.10f));
+        for(int32 J=0;J<4;++J)
+        {
+            const double A=J*PI/2+Angle;const FVector Base=P+FVector(FMath::Cos(A)*380,FMath::Sin(A)*380,25),Top=P+FVector(0,0,380),Delta=Top-Base;
+            auto* Root=Part(*FString::Printf(TEXT("MangroveRoot%d_%d"),I,J),Cylinder,(Base+Top)/2,FVector(.25,.25,Delta.Size()/100),FLinearColor(.2f,.14f,.07f));
+            Root->SetRelativeRotation(FRotationMatrix::MakeFromZ(Delta).Rotator());
+        }
+    }
+    Part(TEXT("MangroveWater"),Sphere,FiskRouteGeometry::Island(2)+FVector(0,0,-16),FVector(130,130,.025),FLinearColor(.025f,.20f,.13f))->SetCastShadow(false);
     for(int32 I=0;I<4;++I)
     {
         const FVector P(-2800-I*1600,-900,270);

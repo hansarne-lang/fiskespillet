@@ -53,7 +53,7 @@ void UFiskSeaChart::Show(bool bShow)
 }
 void UFiskSeaChart::Choose()
 {
-    if(Row==3) { Show(false);return; }
+    if(Row==FiskGrounds::Count) { Show(false);return; }
     AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
     const AFiskStarterBoat* Boat=PC->FindStarterBoat();
     if(!Boat || !PC->PlayerState) { return; }
@@ -75,10 +75,10 @@ bool UFiskSeaChart::HandleKey(const FInputKeyEventArgs& Args)
     if(bFavorites) { return HandleFavorites(Args); }
     if(!bPress) { return true; }
     if(Args.Key==EKeys::Escape) { Show(false); }
-    else if(Args.Key==EKeys::Up) { Row=(Row+3)%4; }
-    else if(Args.Key==EKeys::Down) { Row=(Row+1)%4; }
+    else if(Args.Key==EKeys::Up) { Row=(Row+FiskGrounds::Count)%(FiskGrounds::Count+1); }
+    else if(Args.Key==EKeys::Down) { Row=(Row+1)%(FiskGrounds::Count+1); }
     else if(Args.Key==EKeys::Home) { Row=0; }
-    else if(Args.Key==EKeys::End) { Row=3; }
+    else if(Args.Key==EKeys::End) { Row=FiskGrounds::Count; }
     else if(Args.Key==EKeys::Enter || Args.Key==EKeys::SpaceBar) { Choose(); }
     else if(Args.Key==EKeys::LeftMouseButton)
     {
@@ -118,21 +118,21 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     HUD.DrawText(FString::Printf(TEXT("%02d:%02d  |  Dagsklokken fortsetter"),Seconds/60,Seconds%60),Muted,680*S,90*S,nullptr,1.1f*S);
     HUD.DrawText(TEXT("A: hav-atlas | Tab: favoritter | Kapteinen velger rute"),Muted,52*S,110*S,nullptr,1.0f*S);
     Buttons.Reset();Points.Reset();
-    for(int32 I=0;I<3;++I)
+    for(int32 I=0;I<FiskGrounds::Count;++I)
     {
         const FFiskFishingGround& G=*FiskGrounds::Find(I);
-        const float Y=(170+96*I)*S;
-        Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(550*S,Y+82*S)));
-        HUD.DrawRect(I==Row?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,498*S,82*S);
-        HUD.DrawText(FString::Printf(TEXT("%s%s"),G.Name,I==Boat->GetGroundId()?(Boat->GetDestination().Equals(G.Position,1)?TEXT("  [VALGT]"):TEXT("  [HABITAT]")):TEXT("")),I==Boat->GetGroundId()?Teal:FLinearColor::White,68*S,Y+10*S,nullptr,1.15f*S);
-        HUD.DrawText(FString::Printf(TEXT("Reise %.1f s  |  Bunn %d m"),G.TravelMs/1000.0*(Boat->GetKind()==1?.8:1.0),G.BottomDepth),FLinearColor::White,68*S,Y+37*S,nullptr,1.0f*S);
-        HUD.DrawText(FString::Printf(TEXT("Fisketegn omtrent %d-%d m"),G.FishDepthMin,G.FishDepthMax),Muted,68*S,Y+59*S,nullptr,0.9f*S);
+        const float Y=(164+77*I)*S;
+        Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(550*S,Y+72*S)));
+        HUD.DrawRect(I==Row?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,498*S,72*S);
+        HUD.DrawText(FString::Printf(TEXT("%s%s"),G.Name,I==Boat->GetGroundId()?(Boat->GetDestination().Equals(G.Position,1)?TEXT("  [VALGT]"):TEXT("  [HABITAT]")):TEXT("")),I==Boat->GetGroundId()?Teal:FLinearColor::White,68*S,Y+5*S,nullptr,1.15f*S);
+        HUD.DrawText(FString::Printf(TEXT("Reise %.1f s  |  Bunn %d m"),G.TravelMs/1000.0*(Boat->GetKind()==1?.8:1.0),G.BottomDepth),FLinearColor::White,68*S,Y+29*S,nullptr,1.0f*S);
+        HUD.DrawText(FString::Printf(TEXT("Fisketegn omtrent %d-%d m"),G.FishDepthMin,G.FishDepthMax),Muted,68*S,Y+51*S,nullptr,0.9f*S);
     }
     auto Point=[&](FVector Position){return FVector2D((638+Position.X/150000.0*560)*S,(355-Position.Y/100000.0*180)*S);};
     const FVector2D Marina=Point(FVector::ZeroVector);
     HUD.DrawRect(FLinearColor(0.025f,0.19f,0.25f),610*S,156*S,614*S,398*S);
     HUD.DrawRect(FLinearColor(0.33f,0.36f,0.21f),610*S,250*S,30*S,155*S);
-    for(int32 I=0;I<2;++I)
+    for(int32 I=0;I<FiskRouteGeometry::IslandCount;++I)
     {
         const FVector2D P=Point(FiskRouteGeometry::Island(I));const double R=FiskRouteGeometry::Radius(I);
         Canvas.K2_DrawPolygon(nullptr,P,FVector2D((R+2000)/150000*560*S,(R+2000)/100000*180*S),32,FLinearColor(.18f,.3f,.29f));
@@ -141,7 +141,7 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     const TArray<FVector> RoutePath=Boat->GetActivePath();
     for(int32 I=1;I<RoutePath.Num();++I) { const FVector2D A=Point(RoutePath[I-1]),B=Point(RoutePath[I]);HUD.DrawLine(A.X,A.Y,B.X,B.Y,Teal,3*S); }
     const FVector2D Target=Point(Boat->GetDestination());HUD.DrawRect(FLinearColor(1,.7f,.25f),Target.X-5*S,Target.Y-5*S,10*S,10*S);
-    for(int32 I=0;I<3;++I)
+    for(int32 I=0;I<FiskGrounds::Count;++I)
     {
         const FFiskFishingGround& G=*FiskGrounds::Find(I);const FVector2D Pos=Point(G.Position);
         const FLinearColor Color=I==Boat->GetGroundId()?Teal:Muted;
@@ -170,6 +170,6 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     const FString Hint=!Message.IsEmpty()?Message:Boat->GetTripProgress()!=AFiskStarterBoat::AtDock?TEXT("Ruten er låst. Lukk kartet før R for retur."):TEXT("Piler: velg rad. Enter eller klikk: velg plass.");
     HUD.DrawText(Hint,FLinearColor(1,0.85f,0.5f),52*S,559*S,nullptr,0.95f*S);
     Buttons.Add(FBox2D(FVector2D(52*S,615*S),FVector2D(550*S,651*S)));
-    HUD.DrawRect(Row==3?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,615*S,498*S,36*S);
+    HUD.DrawRect(Row==FiskGrounds::Count?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,615*S,498*S,36*S);
     HUD.DrawText(TEXT("Tilbake  (M / Escape)"),FLinearColor::White,68*S,624*S,nullptr,1.0f*S);
 }

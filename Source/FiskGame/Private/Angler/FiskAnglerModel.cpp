@@ -8,7 +8,7 @@ FFiskRigSettings FiskAngler::Advice(int32 Ground,int32 Bait)
     R.Bait=R.Program=Bait;R.Depth=FMath::Clamp(((G->FishDepthMin+G->FishDepthMax)/20)*10,10,FMath::Min(120,G->BottomDepth));return R;
 }
 int32 FiskAngler::BestHabitat(int32 Species)
-{ if(!FiskCatches::Find(Species)) { return -1; }int32 Best=0;for(int32 G=1;G<3;++G) { if(FiskCatches::HabitatChance(G,Species)>FiskCatches::HabitatChance(Best,Species)) { Best=G; } }return Best; }
+{ if(!FiskCatches::Find(Species)) { return -1; }int32 Best=0;for(int32 G=1;G<FiskGrounds::Count;++G) { if(FiskCatches::HabitatChance(G,Species)>FiskCatches::HabitatChance(Best,Species)) { Best=G; } }return Best; }
 bool FiskAngler::Prepare(const FFiskRigBundle& R,int32 Day,int32 Count,int32 Bottom,const TArray<FGuid>& Casts,const TArray<FFiskRigSettings>& Current,const TArray<bool>& Safe,TArray<FFiskRigSettings>& Out)
 {
     if(Day<1 || R.Day!=Day || Count<1 || Count>3 || R.Rigs.Num()!=Count || R.Casts.Num()!=Count || R.Revisions.Num()!=Count || Casts.Num()!=Count || Current.Num()!=Count || Safe.Num()!=Count) { return false; }
@@ -43,10 +43,10 @@ bool FFiskPracticeScore::Complete(const FFiskPracticeSession& S)
     ++Completed;BestMs=BestMs==0?Ms:FMath::Min(BestMs,Ms);LastCompleted=S.Attempt;ActiveAttempt.Invalidate();return true;
 }
 FFiskAnglerData::FFiskAnglerData()
-{ Loadouts={{TEXT("STANGSETT 1"),{}},{TEXT("STANGSETT 2"),{}},{TEXT("STANGSETT 3"),{}}};Scores.SetNum(14); }
+{ Loadouts={{TEXT("STANGSETT 1"),{}},{TEXT("STANGSETT 2"),{}},{TEXT("STANGSETT 3"),{}}};Scores.SetNum(FiskAngler::ScoreCount); }
 bool FFiskAnglerData::Valid() const
 {
-    if(Loadouts.Num()!=3 || Scores.Num()!=14) { return false; }
+    if(Loadouts.Num()!=3 || Scores.Num()!=FiskAngler::ScoreCount) { return false; }
     for(const auto& L:Loadouts) { if(!FFiskCareerProfile::ValidName(L.Name) || L.Rigs.Num()>3) { return false; }for(const auto& R:L.Rigs) { if(!FFiskRigRules::IsValid(R.Bait,R.Depth,R.Program,250)) { return false; } } }
     for(const auto& S:Scores) { if(!S.Valid()) { return false; } }return true;
 }

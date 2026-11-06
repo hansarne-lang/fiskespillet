@@ -11,16 +11,16 @@
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskAtlasRoutesTest,"Fiskelaget.Exploration.AtlasAndInterIslandRoutes",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskAtlasRoutesTest::RunTest(const FString& Parameters)
 {
-    TestTrue(TEXT("Invalid mark safely rejected"),!FiskAtlas::Find(-1) && !FiskAtlas::Find(9));
-    for(int32 A=0;A<9;++A)
+    TestTrue(TEXT("Invalid mark safely rejected"),!FiskAtlas::Find(-1) && !FiskAtlas::Find(FiskAtlas::Count));
+    for(int32 A=0;A<FiskAtlas::Count;++A)
     {
         int32 Habitat=-1,Time=0;const FVector From=FiskAtlas::Find(A)->Point;
-        TestTrue(TEXT("Atlas point has valid habitat and home time"),FiskGrounds::MakeSeaPoint(From,Habitat,Time) && Habitat>=0 && Habitat<3 && Time>=4000);
+        TestTrue(TEXT("Atlas point has valid habitat and home time"),FiskGrounds::MakeSeaPoint(From,Habitat,Time) && Habitat>=0 && Habitat<FiskGrounds::Count && Time>=4000);
         TestEqual(TEXT("Location finds own atlas mark"),FiskAtlas::Nearest(From),A);
-        for(int32 B=0;B<9;++B)
+        for(int32 B=0;B<FiskAtlas::Count;++B)
         {
             const FVector To=FiskAtlas::Find(B)->Point;const auto Path=FiskRouteGeometry::Between(From,To);
-            TestTrue(TEXT("All 81 transfers have routes"),Path.Num()>=2);
+            TestTrue(TEXT("All atlas transfers have routes"),Path.Num()>=2);
             if(Path.Num()<2) { continue; }TestTrue(TEXT("Exact route endpoints"),Path[0]==From && Path.Last()==To);
             for(int32 I=1;I<Path.Num();++I) { TestTrue(TEXT("Each segment clears islands"),FiskRouteGeometry::Clear(Path[I-1],Path[I])); }
             TestTrue(TEXT("Interpolated arrival is exact"),FiskRouteGeometry::Position(Path,1)==To);
@@ -65,7 +65,7 @@ FFiskJournalEntry Entry(int32 Seed,int32 Species,int32 Ground)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPassportTest,"Fiskelaget.Exploration.ConfirmedPassportCollections",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskPassportTest::RunTest(const FString& Parameters)
 {
-    FFiskJournalModel Empty;const auto None=FiskSeaPassport::Build(Empty,{});TestEqual(TEXT("Twelve milestones"),None.Num(),12);for(const auto& R:None) { TestFalse(TEXT("No unconfirmed progress"),R.Complete()); }
+    FFiskJournalModel Empty;const auto None=FiskSeaPassport::Build(Empty,{});TestEqual(TEXT("Fourteen milestones"),None.Num(),14);for(const auto& R:None) { TestFalse(TEXT("No unconfirmed progress"),R.Complete()); }
     TArray<FFiskJournalEntry> Entries;for(int32 I=0;I<10;++I) { Entries.Add(PassportTest::Entry(I,I%7,I%3)); }
     FFiskJournalModel J;TestTrue(TEXT("Valid historic fixture"),J.Restore(Entries));TArray<FFiskExpeditionRecord> Records;
     for(int32 I=0;I<5;++I) { FFiskExpeditionRecord R;R.DayId=FGuid::NewGuid();R.Goal=I;R.Weather=I%3;R.bCompleted=true;Records.Add(R); }

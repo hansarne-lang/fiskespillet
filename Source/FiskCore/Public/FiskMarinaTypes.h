@@ -5,9 +5,9 @@
 
 namespace FiskMarina
 {
-    inline constexpr int32 SpeciesCount=7;
+    inline constexpr int32 SpeciesCount=11;
     inline const TCHAR* SpeciesName(int32 Species)
-    { static const TCHAR* Names[]={TEXT("Snapper"),TEXT("Amberjack"),TEXT("Gulfinnet tunfisk"),TEXT("Grouper"),TEXT("Mahi-mahi"),TEXT("Wahoo"),TEXT("Blå marlin")};return Species>=0 && Species<SpeciesCount?Names[Species]:TEXT("Ukjent"); }
+    { static const TCHAR* Names[]={TEXT("Snapper"),TEXT("Amberjack"),TEXT("Gulfinnet tunfisk"),TEXT("Grouper"),TEXT("Mahi-mahi"),TEXT("Wahoo"),TEXT("Blå marlin"),TEXT("Barrakuda"),TEXT("Tarpon"),TEXT("Permit"),TEXT("Snook")};return Species>=0 && Species<SpeciesCount?Names[Species]:TEXT("Ukjent"); }
 }
 
 USTRUCT()

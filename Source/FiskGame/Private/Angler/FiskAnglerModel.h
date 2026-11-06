@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "Fishing/FiskRigSettings.h"
 #include "Fishing/FiskFightModel.h"
+#include "Fishing/FiskCatchCatalog.h"
 #include "FiskAnglerModel.generated.h"
 USTRUCT()
 struct FFiskRigBundle
@@ -14,6 +15,7 @@ struct FFiskRigBundle
 };
 namespace FiskAngler
 {
+    inline constexpr int32 ScoreCount=FiskCatches::Count*2;
     FFiskRigSettings Advice(int32 Ground,int32 Bait);
     int32 BestHabitat(int32 Species);
     bool Prepare(const FFiskRigBundle& Request,int32 Day,int32 Capacity,int32 Bottom,const TArray<FGuid>& Casts,const TArray<FFiskRigSettings>& Current,const TArray<bool>& Safe,TArray<FFiskRigSettings>& Result);

@@ -30,4 +30,6 @@ private:
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Ripples;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Birds;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Flyers;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Wake;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Traffic;
 };

@@ -127,8 +127,19 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     const UFiskPrototypeRod* Rod=PC.GetRod();const int32 Self=PC.PlayerState?PC.PlayerState->GetPlayerId():-1;
     const int32 Ms=Day?Day->GetElapsedMilliseconds():0,Progress=Boat?Boat->GetTripProgress():-2;
     const bool Aboard=Boat && Boat->IsAboard(Self),Captain=Boat && Boat->GetCaptainId()==Self;
+    if(Aboard && Boat->UsesTravelCard())
+    {
+        Rect(0,0,1280,720,FLinearColor(.012f,.055f,.075f,1));Text(TEXT("PÅ VEI OVER HAVET"),80,90,2.6f,Teal);
+        Text(FString::Printf(TEXT("Dag %d | %02d:%02d | Mannskapet har valgt rolig reisevisning"),Day?Day->GetDayNumber():1,Ms/60000,Ms/1000%60),80,160,1.1f);
+        Text(Progress>100?TEXT("Vi vender hjem til marinaen."):TEXT("Vi er på vei til neste fiskeplass."),80,245,1.7f,Gold);
+        Rect(80,330,1100,22,FLinearColor(.04f,.16f,.2f));Rect(80,330,1100*(Progress>100?(Progress-100)/100.f:Progress/100.f),22,Teal);
+        Text(FString::Printf(TEXT("Reisen %d%% | Etappen tar ca. %d sekunder"),Progress>100?Progress-100:Progress,Boat->GetLegTravelMs()/1000),80,390,1.3f);
+        Text(TEXT("Båten reiser fysisk og dagsklokken går videre. Fiskingen åpner ved ankomst."),80,475,1.1f,Muted);
+        Text(TEXT("V: trekk din stemme og se sjøen | M: kart | K: mannskap | R: kapteinens retur"),80,580,1.0f,Teal);return;
+    }
     const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():-1);
     const bool RigValid=Ground && FFiskRigRules::IsValid(Rod->GetRig().Bait,Rod->GetRig().Depth,Rod->GetRig().Program,Ground->BottomDepth);
+    if(Aboard && Boat->IsTravelling()) { Text(FString::Printf(TEXT("V: reisevisning %d/%d har valgt"),Boat->GetTravelVoteCount(),Boat->GetCrewCount()),400,44,1.f,Teal); }
     Rect(20,20,330,420);Text(TEXT("FISKELAGET"),38,36,1.7f,Teal);
     Text(Ground?Ground->Name:TEXT("Marina"),38,81,1.1f);
     Text(FString::Printf(TEXT("%s | %d/%d om bord | Kaptein: %s"),Boat && Boat->GetKind()==1?TEXT("Offshore"):TEXT("Startbåt"),Boat?Boat->GetCrewCount():0,Boat?Boat->GetCapacity():2,Captain?TEXT("deg"):!Boat || Boat->GetCaptainId()==INDEX_NONE?TEXT("ingen"):TEXT("medspiller")),38,116,.8f,Muted);

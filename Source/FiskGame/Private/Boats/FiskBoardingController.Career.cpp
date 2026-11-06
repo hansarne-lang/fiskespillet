@@ -138,6 +138,13 @@ void AFiskBoardingController::ServerSelectSeaPoint_Implementation(int32 Revision
     if(Mode && Mode->GetStarterBoat() && PlayerState) { Mode->GetStarterBoat()->SelectPoint(PlayerState->GetPlayerId(),Revision,Point,Message); }
     ClientGroundReply(Message);
 }
+void AFiskBoardingController::ServerTravelVote_Implementation(int32 Leg,bool Vote)
+{
+    auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const bool Accepted=bCareerReady && PlayerState && Mode && Mode->GetStarterBoat() && Mode->GetStarterBoat()->VoteTravel(PlayerState->GetPlayerId(),Leg,Vote);
+    if(!Accepted) { ClientActionFeedback(TEXT("Reisevisning kan velges av dem om bord mens båten er underveis.")); }
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TRAVEL_VOTE_REPLY accepted=%d"),Accepted);
+}
 void AFiskBoardingController::DrawCareer(AHUD& HUD,UCanvas& C)
 {
     const UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());const FFiskCareerProfile& P=GI->Career;

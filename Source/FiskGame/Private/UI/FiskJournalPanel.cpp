@@ -6,17 +6,30 @@
 #include "Engine/Canvas.h"
 #include "Engine/World.h"
 #include "GameFramework/HUD.h"
+#include "Career/FiskSeaPassport.h"
+#include "UI/FiskUserSettings.h"
+#include "Misc/Paths.h"
 
 void UFiskJournalPanel::Toggle()
 {
-    bVisible=!bVisible;Page=0;CachedRevision=-1;
+    bVisible=!bVisible;bPassport=false;Page=0;CachedRevision=-1;
     if(bVisible) { CastChecked<AFiskBoardingController>(GetOwner())->ReleaseRodInputsForMenu(); }
 }
+void UFiskJournalPanel::TogglePassport()
+{ bVisible=true;bPassport=true;Page=0;CastChecked<AFiskBoardingController>(GetOwner())->ReleaseRodInputsForMenu(); }
 bool UFiskJournalPanel::HandleKey(const FInputKeyEventArgs& Args)
 {
     if(!bVisible) { return false; }
     if(Args.Event!=IE_Pressed && Args.Event!=IE_Repeat) { return true; }
     const FKey Key=Args.Key;
+    if(Key==EKeys::L) { if(bPassport) { bVisible=false; }else { bPassport=true; }return true; }
+    if(Key==EKeys::F10 && Args.Event==IE_Pressed)
+    {
+        FString File;const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
+        const bool Saved=FiskSeaPassport::Export(FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Exports")),GI->GetJournal(),File);
+        ExportMessage=Saved?TEXT("Hele din bekreftede journal er lagret i Fiskelaget/Exports som CSV."):TEXT("Eksport kunne ikke lagres. Journalen er bevart.");
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNAL_EXPORT success=%d records=%d file=%s"),Saved,GI->GetJournal().GetEntries().Num(),*File);return true;
+    }
     if(Key==EKeys::Escape || Key==EKeys::F4) { bVisible=false;return true; }
     if(Key==EKeys::F5)
     { CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->RetryJournalSave();return true; }
@@ -34,6 +47,7 @@ bool UFiskJournalPanel::HandleKey(const FInputKeyEventArgs& Args)
 }
 void UFiskJournalPanel::Draw(AHUD& HUD,UCanvas& Canvas)
 {
+    if(bPassport) { DrawPassport(HUD,Canvas);return; }
     const UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
     const FFiskJournalModel& Journal=GI->GetJournal();
     const float S=FMath::Min(Canvas.ClipX/1280.f,Canvas.ClipY/720.f);
@@ -82,6 +96,25 @@ void UFiskJournalPanel::Draw(AHUD& HUD,UCanvas& Canvas)
         }
         HUD.DrawText(FString::Printf(TEXT("Side %d/%d | PgUp/PgDn eller piler: bla | F6: artsrekorder"),Page+1,Pages),FLinearColor(0.5f,0.9f,0.8f),52*S,560*S,nullptr,1.0f*S);
     }
-    HUD.DrawText(GI->GetJournalMessage(),GI->IsJournalPending()?FLinearColor(1,0.8f,0.5f):FLinearColor(0.6f,0.85f,0.85f),52*S,598*S,nullptr,0.95f*S);
-    HUD.DrawText(TEXT("F4 / Escape: lukk | F5: prøv lagring igjen | F6: journal / rekorder | Lokal journal, ingen kontosaldo"),FLinearColor::White,52*S,636*S,nullptr,0.9f*S);
+    HUD.DrawText(ExportMessage.IsEmpty()?GI->GetJournalMessage():ExportMessage,GI->IsJournalPending()?FLinearColor(1,0.8f,0.5f):FLinearColor(0.6f,0.85f,0.85f),52*S,598*S,nullptr,0.95f*S);
+    HUD.DrawText(TEXT("F4 / Escape: lukk | F5: lagre igjen | F6: rekorder | L: sjøpass | F10: eksporter hele journalen"),FLinearColor::White,52*S,636*S,nullptr,0.9f*S);
+}
+void UFiskJournalPanel::DrawPassport(AHUD& HUD,UCanvas& C)
+{
+    const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const auto Rows=FiskSeaPassport::Build(GI->GetJournal(),GI->Expeditions);
+    const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const FLinearColor Teal(.5f,.9f,.84f),Gold(1,.8f,.4f);
+    auto T=[&](const FString& V,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){HUD.DrawText(V,Color,X*S,Y*S,nullptr,Size*S);};
+    HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);T(TEXT("MITT SJØPASS"),48,55,2.1f);
+    int32 Done=0;for(const auto& R:Rows) { Done+=R.Complete()?1:0; }
+    T(FString::Printf(TEXT("%d av 12 milepæler | Bekreftede opplevelser, ingen pengebonus"),Done),48,108,1.1f,Teal);
+    T(TEXT("Dagens nye fremgang vises først etter oppgjøret 17:00."),48,143,.95f);
+    for(int32 I=0;I<Rows.Num();++I)
+    {
+        const auto& R=Rows[I];const float X=48+(I/6)*600,Y=184+(I%6)*65;
+        HUD.DrawRect(R.Complete()?FLinearColor(.12f,.3f,.29f):FLinearColor(.03f,.12f,.15f),X*S,Y*S,568*S,58*S);
+        const FString Progress=I==4?FString::Printf(TEXT("%.1f / 100 kg"),FMath::Min(R.Current,R.Target)/1000.0):FString::Printf(TEXT("%lld / %lld"),static_cast<long long>(FMath::Min(R.Current,R.Target)),static_cast<long long>(R.Target));
+        T(FString(R.Complete()?TEXT("+ "):TEXT("  "))+R.Name,X+12,Y+9,1.03f,R.Complete()?Gold:Teal);T(Progress,X+420,Y+11,.9f);
+        T(R.Detail,X+12,Y+35,.82f);
+    }
+    T(ExportMessage,48,598,.9f,Gold);T(TEXT("L / F4 / Escape: lukk | F10: eksporter bekreftet journal | Gamle poster uten sjøpunkt gir ingen atlasmerker"),48,638,.85f,Teal);
 }

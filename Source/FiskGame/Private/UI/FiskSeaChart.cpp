@@ -69,7 +69,9 @@ bool UFiskSeaChart::HandleKey(const FInputKeyEventArgs& Args)
     const bool bPress=Args.Event==IE_Pressed;
     if(Args.Key==EKeys::M && bPress) { if(bVisible || CanOpen()) { Show(!bVisible); }return true; }
     if(!bVisible) { return false; }
-    if(bPress && Args.Key==EKeys::Tab) { bFavorites=!bFavorites;Message.Reset();return true; }
+    if(bPress && Args.Key==EKeys::A) { bAtlas=!bAtlas;bFavorites=false;Message.Reset();return true; }
+    if(bPress && Args.Key==EKeys::Tab) { bFavorites=!bFavorites;bAtlas=false;Message.Reset();return true; }
+    if(bAtlas) { return HandleAtlas(Args); }
     if(bFavorites) { return HandleFavorites(Args); }
     if(!bPress) { return true; }
     if(Args.Key==EKeys::Escape) { Show(false); }
@@ -106,6 +108,7 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     const AFiskStarterBoat* Boat=PC->FindStarterBoat();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
     if(!Boat || !Day) { return; }
+    if(bAtlas) { DrawAtlas(HUD,Canvas);return; }
     if(bFavorites) { DrawFavorites(HUD,Canvas);return; }
     const float S=FMath::Min(Canvas.ClipX/1280.f,Canvas.ClipY/720.f);
     const FLinearColor Teal(0.4f,0.9f,0.8f),Muted(0.65f,0.8f,0.83f);
@@ -113,7 +116,7 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     HUD.DrawText(TEXT("SJØKART"),FLinearColor::White,52*S,58*S,nullptr,2.5f*S);
     const int32 Seconds=Day->HasStarted()?Day->GetElapsedSeconds():0;
     HUD.DrawText(FString::Printf(TEXT("%02d:%02d  |  Dagsklokken fortsetter"),Seconds/60,Seconds%60),Muted,680*S,90*S,nullptr,1.1f*S);
-    HUD.DrawText(TEXT("Tab: plasser / lagrede favoritter | Kapteinen velger ved brygga"),Muted,52*S,110*S,nullptr,1.0f*S);
+    HUD.DrawText(TEXT("A: hav-atlas | Tab: favoritter | Kapteinen velger rute"),Muted,52*S,110*S,nullptr,1.0f*S);
     Buttons.Reset();Points.Reset();
     for(int32 I=0;I<3;++I)
     {
@@ -135,7 +138,7 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
         Canvas.K2_DrawPolygon(nullptr,P,FVector2D((R+2000)/150000*560*S,(R+2000)/100000*180*S),32,FLinearColor(.18f,.3f,.29f));
         Canvas.K2_DrawPolygon(nullptr,P,FVector2D(R/150000*560*S,R/100000*180*S),32,FLinearColor(.52f,.43f,.24f));
     }
-    const TArray<FVector> RoutePath=FiskRouteGeometry::Path(Boat->GetDestination());
+    const TArray<FVector> RoutePath=Boat->GetActivePath();
     for(int32 I=1;I<RoutePath.Num();++I) { const FVector2D A=Point(RoutePath[I-1]),B=Point(RoutePath[I]);HUD.DrawLine(A.X,A.Y,B.X,B.Y,Teal,3*S); }
     const FVector2D Target=Point(Boat->GetDestination());HUD.DrawRect(FLinearColor(1,.7f,.25f),Target.X-5*S,Target.Y-5*S,10*S,10*S);
     for(int32 I=0;I<3;++I)

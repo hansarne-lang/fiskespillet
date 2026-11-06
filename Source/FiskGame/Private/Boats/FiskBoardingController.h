@@ -69,6 +69,7 @@ public:
     UFUNCTION(Server,Reliable) void ServerBuyCareer(FGuid Command,int32 Revision,int32 Item);
     UFUNCTION(Server,Reliable) void ServerChooseBoat(int32 Revision,int32 Kind);
     UFUNCTION(Server,Reliable) void ServerSelectSeaPoint(int32 Revision,FVector_NetQuantize Point);
+    UFUNCTION(Server,Reliable) void ServerTravelVote(int32 Leg,bool Vote);
     virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
@@ -181,6 +182,12 @@ private:
 
 #if WITH_DEV_AUTOMATION_TESTS
     int32 RejectedCaptainRequests=0;
+    FString ExplorationMode,ExplorationDir;
+    FTimerHandle ExplorationTimer;
+    int32 ExplorationStage=0,ExplorationLeg=0,ExplorationRevision=0;
+    double ExplorationAt=0;
+    bool bExplorationRejected=false,bExplorationLateVote=false;
+    void RunExplorationSmoke();
     FString ExpeditionSmokeMode,ExpeditionSmokeDir;
     int32 ExpeditionSmokeStage=0;
     double ExpeditionSmokeAt=0;

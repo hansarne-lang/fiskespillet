@@ -11,6 +11,8 @@
 #include "FiskFishingGround.h"
 #include "FiskRouteGeometry.h"
 #include "Boats/FiskJourneyAudio.h"
+#include "Bootstrap/FiskBootstrapGameMode.h"
+#include "Expedition/FiskExpeditionState.h"
 
 void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
 {
@@ -178,6 +180,8 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
         return;
     }
 
+    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    if(!Mode || !Mode->GetExpedition() || !Mode->GetExpedition()->Depart()) { return; }
     LegStartedMs = Day->GetElapsedMilliseconds();
     SetActorRotation(Route.Destination.Rotation());
     TripProgress = 0;

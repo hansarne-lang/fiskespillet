@@ -7,6 +7,7 @@ class UStaticMesh;
 class UStaticMeshComponent;
 class UMaterialInterface;
 class UDirectionalLightComponent;
+class UExponentialHeightFogComponent;
 
 UCLASS()
 class AFiskOceanScene final : public AActor
@@ -18,6 +19,9 @@ public:
     virtual void Tick(float DeltaSeconds) override;
 private:
     UPROPERTY() TObjectPtr<UDirectionalLightComponent> Daylight;
+    UPROPERTY() TObjectPtr<UExponentialHeightFogComponent> Fog;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Rain;
+    int32 ReportedWeather=-1;
     UPROPERTY() TObjectPtr<UStaticMesh> Plane;
     UPROPERTY() TObjectPtr<UStaticMesh> Cube;
     UPROPERTY() TObjectPtr<UStaticMesh> Sphere;

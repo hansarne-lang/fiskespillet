@@ -15,6 +15,8 @@ struct FFiskCatchContext
     UPROPERTY() FString LandedUtc;
     UPROPERTY() int32 BoatKind=0;
     UPROPERTY() int32 Equipment=0;
+    UPROPERTY() bool bHasSeaPoint=false;
+    UPROPERTY() FVector SeaPoint=FVector::ZeroVector;
     bool IsValid(bool bRequireTimestamp) const;
     bool operator==(const FFiskCatchContext& Other) const;
 };

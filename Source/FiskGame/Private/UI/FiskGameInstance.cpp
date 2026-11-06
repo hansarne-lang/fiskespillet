@@ -11,15 +11,15 @@
 #include "Economy/FiskDaySettlement.h"
 #include "Career/FiskCareerStore.h"
 #include "Misc/NetworkVersion.h"
+#include "Expedition/FiskExpeditionStore.h"
 
 void UFiskGameInstance::Init()
 {
     Super::Init();
-    // Keep the v0.8 wire family for this storage/UI-only patch.
-    FNetworkVersion::SetProjectVersion(TEXT("0.8.0"));
-    FNetworkVersion::SetGameNetworkProtocolVersion(8);
-    FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(8);
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=8 release=0.8.1"));
+    FNetworkVersion::SetProjectVersion(TEXT("0.9.0"));
+    FNetworkVersion::SetGameNetworkProtocolVersion(9);
+    FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(9);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=9 release=0.9.0"));
     const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);
     bCareerBlocked=CareerLoad==EFiskCareerLoad::Blocked;
     if(CareerLoad==EFiskCareerLoad::Empty)
@@ -42,7 +42,9 @@ void UFiskGameInstance::Init()
     ++JournalRevision;
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNAL_LOADED count=%d recovery=%d blocked=%d"),Journal.GetEntries().Num(),bJournalRecovered,bJournalPending);
     RigPresets.Load(RigPresetFile());
-    if (!IFileManager::Get().FileExists(*RigPresetFile()))
+    ExpeditionMessage=FiskExpeditionStore::Load(FiskExpeditionStore::File(FFiskUserSettings::DataDirectory(),Career.Id),Career.Id,Expeditions)
+        ?TEXT("Medaljer og ekspedisjonshistorikk er lastet."):TEXT("Ekspedisjonsfilen kan ikke leses. Filene er bevart.");
+    if (!IFileManager::Get().FileExists(*RigPresetFile()) && !IFileManager::Get().FileExists(*(RigPresetFile()+TEXT(".bak"))))
     { RigPresets.Load(TEXT("FiskelagetRigPresets.ini")); }
     FFiskUserSettings UserSettings;
     UserSettings.Load(FPaths::Combine(FFiskUserSettings::DataDirectory(), TEXT("FiskelagetSettings.ini")));
@@ -128,6 +130,17 @@ bool UFiskGameInstance::SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig)
     const bool Saved=RigPresets.Save(Slot,Rig,RigPresetFile());
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PRESET_SAVE slot=%d success=%d"),Slot+1,Saved);
     return Saved;
+}
+bool UFiskGameInstance::RenameRigPreset(int32 Slot,const FString& Name)
+{ return RigPresets.Rename(Slot,Name,RigPresetFile()); }
+bool UFiskGameInstance::AcceptExpeditions(const FGuid& Profile,const TArray<FFiskExpeditionRecord>& Entries)
+{
+    if(Profile!=Career.Id || Entries.IsEmpty() || Entries.Num()>16) { return false; }
+    TArray<FFiskExpeditionRecord> Candidate;
+    const FString File=FiskExpeditionStore::File(FFiskUserSettings::DataDirectory(),Profile);
+    if(!FiskExpeditionStore::Load(File,Profile,Candidate) || !FiskExpeditionStore::Merge(Candidate,Entries) || !FiskExpeditionStore::Save(File,Profile,Candidate))
+    { ExpeditionMessage=TEXT("Lagring av ekspedisjoner venter. Filene er bevart.");return false; }
+    Expeditions=MoveTemp(Candidate);ExpeditionMessage=TEXT("Ekspedisjoner bekreftet av verten og lagret.");return true;
 }
 void UFiskGameInstance::Shutdown()
 {

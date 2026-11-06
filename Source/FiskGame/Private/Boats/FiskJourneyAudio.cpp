@@ -6,6 +6,8 @@
 #include "Engine/World.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Expedition/FiskExpeditionState.h"
+#include "EngineUtils.h"
 UFiskJourneyAudio::UFiskJourneyAudio() { PrimaryComponentTick.bCanEverTick=true;PrimaryComponentTick.TickInterval=1.f/20; }
 void UFiskJourneyAudio::BeginPlay()
 {
@@ -22,15 +24,16 @@ void UFiskJourneyAudio::TickComponent(float Delta,ELevelTick Type,FActorComponen
     if(!Audio || !Wave || !PC || !PC->IsLocalController()) { return; }
     const AFiskStarterBoat* Boat=CastChecked<AFiskStarterBoat>(GetOwner());const int32 P=Boat->GetTripProgress();
     const bool Moving=P>=0 && P!=100 && P!=200;
+    TActorIterator<AFiskExpeditionState> Expedition(GetWorld());const int32 Weather=Expedition?Expedition->GetPlan().Weather:0;
     if(!bReported && Moving && Audio->IsPlaying() && Queued>static_cast<uint64>(Wave->GetAvailableAudioByteCount())+4096)
-    { bReported=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNEY_AUDIO_CONSUMED")); }
+    { bReported=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNEY_AUDIO_CONSUMED"));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_WEATHER_AUDIO_CONSUMED weather=%d"),Weather); }
     while(Wave->GetAvailableAudioByteCount()<8192)
     {
         TArray<int16> Samples;Samples.SetNumUninitialized(1024);
         for(int32 I=0;I<1024;++I,++Offset)
         {
             const double T=Offset/24000.0;Noise=Noise*1664525u+1013904223u;
-            const double Surf=(static_cast<int32>(Noise>>16)-32768)/32768.0*(.018+.012*FMath::Sin(T*.8));
+            const double Surf=(static_cast<int32>(Noise>>16)-32768)/32768.0*((Weather==2?.09:Weather==1?.045:.018)+.012*FMath::Sin(T*.8));
             const double Motor=Moving?(.045*FMath::Sin(T*2*PI*(Boat->GetKind()==1?72:55))+.025*FMath::Sin(T*2*PI*111))*(.8+.2*FMath::Sin(T*9)):0;
             const double BirdPhase=FMath::Fmod(T,11.0),Envelope=BirdPhase<.7?FMath::Sin(BirdPhase/.7*PI):0;
             const double Bird=Envelope*.025*FMath::Sin(2*PI*(1300*T+40*FMath::Sin(T*18)));

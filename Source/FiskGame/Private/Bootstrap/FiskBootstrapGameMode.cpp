@@ -14,6 +14,7 @@
 #include "Career/FiskJournalAuthority.h"
 #include "UI/FiskUserSettings.h"
 #include "Misc/Paths.h"
+#include "Expedition/FiskExpeditionState.h"
 
 AFiskBootstrapGameMode::AFiskBootstrapGameMode()
 {
@@ -35,6 +36,7 @@ void AFiskBootstrapGameMode::InitGameState()
     if(GameSession) { GameSession->MaxPlayers=4; }
     StarterBoat = GetWorld()->SpawnActor<AFiskStarterBoat>();
     Settlement = GetWorld()->SpawnActor<AFiskDaySettlement>();
+    Expedition=GetWorld()->SpawnActor<AFiskExpeditionState>();
     GetWorld()->SpawnActor<AFiskMarinaZone>();
     GetWorld()->SpawnActor<AFiskOceanScene>();
     GetWorld()->SpawnActor<AFiskMarinaHub>();
@@ -100,6 +102,7 @@ bool AFiskBootstrapGameMode::ArchiveConfirmedDay()
     if(!Day || !Settlement || !Settlement->GetView().bRevealed) { return false; }
     if(ArchivedDay==Settlement->GetView().DayId) { return true; }
     const double Now=GetWorld()->GetRealTimeSeconds();if(Now<ArchiveRetryAt) { return false; }ArchiveRetryAt=Now+2;
+    if(!Expedition || !Expedition->Archive(Settlement->GetView(),Day->GetElapsedMilliseconds())) { return false; }
     if(!FiskJournalAuthority::Commit(FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Authority")),Settlement->GetView(),Day->GetElapsedMilliseconds(),DayProfiles)) { return false; }
     ArchivedDay=Settlement->GetView().DayId;++ArchiveRevision;
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_AUTHORITY_ARCHIVED day=%d profiles=%d"),Day->GetDayNumber(),DayProfiles.Num());return true;

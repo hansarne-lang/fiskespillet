@@ -76,11 +76,21 @@ void AFiskBoardingController::RunExplorationSmoke()
     else if(ExplorationStage==71 && Real-ExplorationAt>=3)
     {
         // Leave enough time for remote half-second probes to observe arrival before the next leg.
-        if(Host) { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point); }ExplorationAt=Real;ExplorationStage=70;
+        if(Host)
+        {
+            ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point);
+            if(B->GetLegSerial()<=ExplorationLeg || B->GetDestination()!=FiskAtlas::Find(7)->Point) { Fail(TEXT("second_transfer_not_started"));return; }
+        }
+        ExplorationAt=Real;ExplorationStage=70;
     }
-    else if(ExplorationStage==70 && B->IsTravelling() && B->GetTripProgress()<100 && Real-ExplorationAt>=2)
-    { if(Host) { Key(EKeys::R); }ExplorationStage=8; }
-    if(ExplorationStage>=8 && ExplorationStage<80 && Progress==200)
+    else if(ExplorationStage==70 && Real-ExplorationAt>=2 && B->GetLegSerial()>ExplorationLeg)
+    {
+        if(B->GetDestination()!=FiskAtlas::Find(7)->Point) { Fail(TEXT("second_transfer_destination_wrong"));return; }
+        if(Host)
+        { if(!B->IsTravelling() || Progress>=100) { Fail(TEXT("second_transfer_not_outbound"));return; }Key(EKeys::R); }
+        ExplorationStage=8;
+    }
+    if(ExplorationStage==8 && Progress==200)
     { Shot(TEXT("home-after-interrupted-leg"));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MULTISTOP_PASSED player=%d arrival=%d"),Self,B->GetMarinaArrivalMs(Day->GetElapsedMilliseconds()));ExplorationStage=80; }
     if(ExplorationStage>=3 && Day->GetDayNumber()==1 && Now<(HasAuthority()?1020.0:1018.0))
     {

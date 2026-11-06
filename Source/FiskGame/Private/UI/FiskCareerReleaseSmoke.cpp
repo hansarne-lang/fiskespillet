@@ -163,7 +163,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     { Shot(TEXT("offshore-landed"));CareerSmokeStage=26; }
     else if(CareerSmokeStage==26)
     {
-        if(Host && Progress==100 && (ExplorationMode.IsEmpty() || ExplorationStage>=8))
+        if(Host && Progress==100 && ExplorationMode.IsEmpty())
         {
             bool All=true;for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
             { const AFiskBoardingController* P=Cast<AFiskBoardingController>(It->Get());if(P && P->PlayerState && Boat->IsAboard(P->PlayerState->GetPlayerId()) && P->GetRodAt(0)->GetTestLandingCount()!=1) { All=false; } }

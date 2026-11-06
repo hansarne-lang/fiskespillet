@@ -10,10 +10,15 @@
 #include "Boats/FiskBoardingController.h"
 #include "Economy/FiskDaySettlement.h"
 #include "Career/FiskCareerStore.h"
+#include "Misc/NetworkVersion.h"
 
 void UFiskGameInstance::Init()
 {
     Super::Init();
+    FNetworkVersion::SetProjectVersion(TEXT("0.8.0"));
+    FNetworkVersion::SetGameNetworkProtocolVersion(8);
+    FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(8);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=8 release=0.8.0"));
     const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);
     bCareerBlocked=CareerLoad==EFiskCareerLoad::Blocked;
     if(CareerLoad==EFiskCareerLoad::Empty)

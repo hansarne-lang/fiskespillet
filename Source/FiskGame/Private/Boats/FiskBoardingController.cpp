@@ -26,6 +26,8 @@
 #include "UI/FiskGameInstance.h"
 #include "UI/FiskDeckPanel.h"
 #include "FiskBoatLayout.h"
+#include "UI/FiskMarinaPanel.h"
+#include "World/FiskMarinaHub.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -40,11 +42,13 @@ AFiskBoardingController::AFiskBoardingController()
     JournalPanel = CreateDefaultSubobject<UFiskJournalPanel>(TEXT("JournalPanel"));
     DeckPanel = CreateDefaultSubobject<UFiskDeckPanel>(TEXT("DeckPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
+    MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(MarinaPanel->HandleKey(Params)) { return true; }
     if(HandleCareerKey(Params)) { return true; }
     if(DeckPanel->IsVisible()) { return DeckPanel->HandleKey(Params); }
     if(Press && (Params.Key==EKeys::F7 || Params.Key==EKeys::F8))
@@ -426,7 +430,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             }
         }
     }
-    if(!bAutoResultsSeen && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
+    if(!bAutoResultsSeen && !MarinaPanel->IsVisible() && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
         && !SeaChart->IsVisible() && !RigPanel->IsVisible())
     {
         for(TActorIterator<AFiskDaySettlement> Settlement(GetWorld());Settlement;++Settlement)
@@ -435,6 +439,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             { bAutoResultsSeen=true;bResultsVisible=true;ResultPage=0;ReleaseRodInputsForMenu();break; }
         }
     }
+    if(MarinaPanel->WantsCamera()) { if(AFiskMarinaHub* Hub=MarinaPanel->FindHub()) { if(GetViewTarget()!=Hub) { SetViewTarget(Hub); }return; } }
     for (TActorIterator<AFiskOceanScene> Scene(GetWorld()); Scene; ++Scene)
     {
         TActorIterator<AFiskStarterBoat> Boat(GetWorld());

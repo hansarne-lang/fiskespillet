@@ -1,5 +1,6 @@
 #include "Career/FiskCareerStore.h"
 #include "Fishing/FiskFightModel.h"
+#include "FiskMarinaTypes.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
 #include "Misc/Paths.h"
@@ -35,7 +36,7 @@ bool FFiskEquipmentFightTest::RunTest(const FString& Parameters)
     Base.Reset(7,100,1);Line.Reset(7,100,1,2);Base.SetRaised(true);Line.SetRaised(true);Base.Advance(1.5);Line.Advance(1.5);
     Base.SetRaised(false);Line.SetRaised(false);Base.SetReeling(true);Line.SetReeling(true);Base.Advance(.25);Line.Advance(.25);
     TestTrue(TEXT("Reel improves actual gain"),Line.GetLine()<Base.GetLine());
-    for(int32 Gear=0;Gear<8;++Gear) { for(int32 Species=0;Species<3;++Species)
+    for(int32 Gear=0;Gear<8;++Gear) { for(int32 Species=0;Species<FiskMarina::SpeciesCount;++Species)
     {
         FFiskFightModel F;F.Reset(43,60,Species,Gear);
         for(int32 Tick=0;Tick<12000 && F.GetOutcome()==EFiskFightOutcome::Fighting;++Tick)

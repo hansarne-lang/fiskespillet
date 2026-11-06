@@ -4,7 +4,9 @@ FISKELAGET er et planlagt realistisk, sosialt fiskespill for Windows PC. Inntil 
 
 ## Prosjektstatus
 
-Dette repositoryet etablerer utviklingsgrunnlaget. Spillmotoren er Unreal Engine 5, og arkitekturen bruker FiskCore og FiskGame med ni logiske funksjonsområder. Selve spillmekanikkene er ikke implementert.
+Spillbar UE5.8-prototype med solo og fire LAN-spillere, fiskekamp,20minuttersdager, lagret karriere/butikk, to båttyper og frie sjøpunkter. v0.8-grenen legger til sju arter, artsbok, personlige naust, besøk, strandbar og dagslys. Arkitekturen bruker fortsatt FiskCore/FiskGame. Se [v0.8-kontrakten](Docs/Development/MARINA_DISCOVERY_V08.md) og [oppgave74](https://github.com/hansarne-lang/fiskespillet/issues/74) for faktisk utviklings-/teststatus; uintegrerte grener er ikke en godkjent hovedrelease.
+
+Windows-testpakker startes via medfølgende BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra spillklokken02:00 og F ved fiskeplassen. P: butikk, M: kart, H: naust, B: strandbar, I: artsbok. Kildeutvikling bruker lokal Unreal5.8.4 og C++-verktøyene i DEVELOPMENT.md. Gamle profiler kopieres med backup til den nye pakkens Saved/Config/Fiskelaget.
 
 Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengelighet gir ikke automatisk en åpen kildekodelisens; lisens og tredjepartsrettigheter må avklares før gjenbruk eller videre distribusjon.
 

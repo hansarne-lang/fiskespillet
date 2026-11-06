@@ -6,6 +6,7 @@
 class UStaticMesh;
 class UStaticMeshComponent;
 class UMaterialInterface;
+class UDirectionalLightComponent;
 
 UCLASS()
 class AFiskOceanScene final : public AActor
@@ -16,6 +17,7 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
 private:
+    UPROPERTY() TObjectPtr<UDirectionalLightComponent> Daylight;
     UPROPERTY() TObjectPtr<UStaticMesh> Plane;
     UPROPERTY() TObjectPtr<UStaticMesh> Cube;
     UPROPERTY() TObjectPtr<UStaticMesh> Sphere;

@@ -7,6 +7,7 @@
 #include "Economy/FiskDaySettlement.h"
 #include "Boats/FiskMarinaZone.h"
 #include "World/FiskOceanScene.h"
+#include "World/FiskMarinaHub.h"
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskSessionRules.h"
 #include "GameFramework/GameSession.h"
@@ -33,6 +34,7 @@ void AFiskBootstrapGameMode::InitGameState()
     Settlement = GetWorld()->SpawnActor<AFiskDaySettlement>();
     GetWorld()->SpawnActor<AFiskMarinaZone>();
     GetWorld()->SpawnActor<AFiskOceanScene>();
+    GetWorld()->SpawnActor<AFiskMarinaHub>();
 }
 
 void AFiskBootstrapGameMode::PostLogin(APlayerController* NewPlayer)

@@ -1,4 +1,5 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
+#include "UI/FiskMarinaPanel.h"
 #include "Engine/Canvas.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
@@ -38,7 +39,8 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
             TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
-            TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag.")};
+            TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),
+            TEXT("H: naust og besøk. B: strandbar. I: artsbok med sju arter.")};
         for(int32 I=0;I<Lines.Num();++I) { HUD.DrawText(Lines[I],FLinearColor::White,52*S,(126+44*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(TEXT("F1 / Escape: lukk. Dagen slutter ved 20:00."),FLinearColor(0.5f,0.9f,0.8f),52*S,620*S,nullptr,1.0f*S);
         return;
@@ -127,6 +129,7 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if(PC->GetMarinaPanel()->IsVisible()) { PC->GetMarinaPanel()->Draw(*this,*Canvas);return; }
         const FString Feedback=PC->GetActionFeedback();
         if(!Feedback.IsEmpty() && !PC->IsCareerVisible())
         {

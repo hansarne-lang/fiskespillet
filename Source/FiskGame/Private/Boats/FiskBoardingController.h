@@ -4,6 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Fishing/FiskRodSelection.h"
 #include "FiskCareerProfile.h"
+#include "FiskMarinaTypes.h"
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
@@ -14,6 +15,7 @@ class UFiskCrewPanel;
 class UFiskJournalPanel;
 class UFiskDeckPanel;
 class AFiskStarterBoat;
+class UFiskMarinaPanel;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -35,6 +37,11 @@ class AFiskBoardingController final : public APlayerController
 
 public:
     AFiskBoardingController();
+    UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
+    UFUNCTION(Server,Reliable) void ServerMarinaIdentity(FGuid Profile,FFiskMarinaIdentity Identity);
+    UFUNCTION(Client,Reliable) void ClientMarinaIdentity(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason);
+    UFUNCTION(Server,Reliable) void ServerMarinaRecords(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records);
+    UFUNCTION(Server,Reliable) void ServerMarinaSay(int32 Code);
     bool IsCareerReady() const { return bCareerReady; }
     bool IsCareerSynced() const { return bCareerReady && CareerAck>=ServerCareer.Revision; }
     const FFiskCareerProfile& GetServerCareer() const { return ServerCareer; }
@@ -95,6 +102,8 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
+    double LastMarinaMessage=-10;
     FFiskCareerProfile ServerCareer,PendingCareer;
     int32 CareerAck=0,ShopRow=0;
     bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;

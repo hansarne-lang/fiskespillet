@@ -1,4 +1,6 @@
 #include "UI/FiskCrewPanel.h"
+#include "World/FiskMarinaHub.h"
+#include "EngineUtils.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
 #include "UI/FiskSeaChart.h"
@@ -108,6 +110,7 @@ void UFiskCrewPanel::Draw(AHUD& HUD,UCanvas& Canvas)
         {
             const int32 Id=Boat->GetCrewMemberId(I);const bool Captain=Id==Boat->GetCaptainId();
             Label=FString::Printf(TEXT("%s #%d  -  %s"),Id==Self?TEXT("Deg"):TEXT("Medspiller"),Id,Captain?TEXT("KAPTEIN"):TEXT("Fisker"));
+            TActorIterator<AFiskMarinaHub> Hub(GetWorld());if(Hub) { if(const FFiskMarinaResident* R=Hub->GetResidents().FindByPredicate([&](const FFiskMarinaResident& V){return V.PlayerId==Id;})) { Label=R->Identity.DisplayName+(Captain?TEXT(" - KAPTEIN"):TEXT(" - Fisker")); } }
             if(!Captain && Boat->GetCaptainId()==Self) { Label+=TEXT("  |  Gi kapteinsrollen"); }
         }
         HUD.DrawText(Label,FLinearColor::White,70*S,Y+17*S,nullptr,1.1f*S);

@@ -25,7 +25,7 @@ bool UFiskJournalPanel::HandleKey(const FInputKeyEventArgs& Args)
     if(Key==EKeys::Two) { Sort=EFiskJournalSort::Species; }
     if(Key==EKeys::Three) { Sort=EFiskJournalSort::Weight; }
     if(Key==EKeys::Four) { StatusFilter=(StatusFilter+1)%3; }
-    if(Key==EKeys::Five) { SpeciesFilter=(SpeciesFilter+2)%4-1; }
+    if(Key==EKeys::Five) { SpeciesFilter=(SpeciesFilter+2)%(FiskCatches::Count+1)-1; }
     if(Key==EKeys::PageDown || Key==EKeys::Down) { Page=FMath::Min(Page+1,1024); }
     else if(Key==EKeys::PageUp || Key==EKeys::Up) { Page=FMath::Max(Page-1,0); }
     else if(Key==EKeys::One || Key==EKeys::Two || Key==EKeys::Three || Key==EKeys::Four || Key==EKeys::Five)
@@ -45,16 +45,17 @@ void UFiskJournalPanel::Draw(AHUD& HUD,UCanvas& Canvas)
         FLinearColor(0.5f,0.9f,0.8f),52*S,112*S,nullptr,1.05f*S);
     if(bRecords)
     {
-        for(int32 Species=0;Species<3;++Species)
+        const int32 RecordPages=(FiskCatches::Count+2)/3;Page=FMath::Clamp(Page,0,RecordPages-1);
+        for(int32 Species=Page*3;Species<FMath::Min(Page*3+3,FiskCatches::Count);++Species)
         {
             const FFiskJournalEntry* Best=Journal.Best(Species);const FFiskJournalStats PerSpecies=Journal.Stats(Species);
-            const float Y=(186+104*Species)*S;
+            const float Y=(186+104*(Species%3))*S;
             HUD.DrawText(FiskCatches::Find(Species)->Name,FLinearColor::White,52*S,Y,nullptr,1.4f*S);
             const FString Detail=Best?FString::Printf(TEXT("Største landet: %.1f kg / %.1f cm | %lld fisk totalt"),
                 Best->Fish.WeightGrams/1000.0,Best->Fish.LengthMm/10.0,static_cast<long long>(PerSpecies.Count)):TEXT("Ingen bekreftet fangst ennå.");
             HUD.DrawText(Detail,FLinearColor(0.65f,0.85f,0.85f),52*S,Y+38*S,nullptr,1.05f*S);
         }
-        HUD.DrawText(TEXT("Landede rekorder beholdes også når fisken tapes ved retur. Salgsinntekt teller bare solgt fisk."),FLinearColor::White,52*S,530*S,nullptr,0.95f*S);
+        HUD.DrawText(FString::Printf(TEXT("Artsrekorder side %d/%d | PgUp/PgDn: bla | Landede rekorder beholdes også ved sen retur."),Page+1,RecordPages),FLinearColor::White,52*S,530*S,nullptr,0.95f*S);
     }
     else
     {

@@ -25,6 +25,7 @@ AFiskOceanScene::AFiskOceanScene()
     USkyAtmosphereComponent* Sky = CreateDefaultSubobject<USkyAtmosphereComponent>(TEXT("Sky"));
     Sky->SetupAttachment(RootComponent);
     UDirectionalLightComponent* Sun = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Sun"));
+    Daylight=Sun;
     Sun->SetupAttachment(RootComponent);
     Sun->SetMobility(EComponentMobility::Movable);
     Sun->SetRelativeRotation(FRotator(-35, -35, 0));
@@ -134,6 +135,14 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     const FVector Center = Boats ? Boats->GetActorLocation() : FVector::ZeroVector;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const double Time = Day ? Day->GetElapsedRealSeconds() : GetWorld()->GetTimeSeconds();
+    if(Daylight)
+    {
+        const double Progress=Day && Day->HasStarted()?FMath::Clamp(Time/1200.0,0.0,1.0):.2;
+        const float Height=FMath::Sin(Progress*PI);
+        Daylight->SetRelativeRotation(FRotator(-15-45*Height,-70+130*Progress,0));
+        Daylight->SetIntensity(5.f+3.f*Height);
+        Daylight->SetLightColor(FMath::Lerp(FLinearColor(1,.73f,.47f),FLinearColor(1,.96f,.87f),Height));
+    }
     for(int32 I=0;I<Birds.Num();++I)
     {
         const double A=Time*.12+I*.52,R=1800+I*140;Birds[I]->SetRelativeLocation(Center+FVector(FMath::Cos(A)*R,FMath::Sin(A)*R,700+I*55));

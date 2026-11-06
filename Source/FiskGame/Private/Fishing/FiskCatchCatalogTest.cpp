@@ -6,14 +6,13 @@ bool FFiskCatchCatalogTest::RunTest(const FString& Parameters)
 {
     for(int32 Ground=0;Ground<3;++Ground)
     {
-        TSet<int32> Weights;int32 Preferred=0,Other=0;
+        TSet<int32> Weights;int32 Counts[FiskCatches::Count]={};
         for(int32 Seed=0;Seed<1024;++Seed)
         {
             const FFiskCatchData A=FiskCatches::Roll(Seed,Ground),B=FiskCatches::Roll(Seed,Ground);
             TestTrue(TEXT("Generated catch is valid"),FiskCatches::IsValid(A));
-            static const int32 Alternative[]={1,0,1};
-            TestTrue(TEXT("Only habitat-supported species"),A.Species==Ground || A.Species==Alternative[Ground]);
-            if(A.Species==Ground) { ++Preferred; } else { ++Other; }
+            TestTrue(TEXT("Only habitat-supported species"),FiskCatches::HabitatChance(Ground,A.Species)>0);
+            ++Counts[A.Species];
             TestEqual(TEXT("Same seed retains species"),A.Species,B.Species);
             TestEqual(TEXT("Same cast retains weight"),A.WeightGrams,B.WeightGrams);
             TestEqual(TEXT("Same cast retains length"),A.LengthMm,B.LengthMm);
@@ -21,7 +20,9 @@ bool FFiskCatchCatalogTest::RunTest(const FString& Parameters)
             Weights.Add(A.WeightGrams);
         }
         TestTrue(TEXT("Different casts vary"),Weights.Num()>10);
-        TestTrue(TEXT("Habitat preference without certainty"),Preferred>700 && Other>100);
+        int32 Sum=0;for(int32 Species=0;Species<FiskCatches::Count;++Species)
+        { const int32 Chance=FiskCatches::HabitatChance(Ground,Species);Sum+=Chance;TestTrue(TEXT("Observed habitat distribution within sampling tolerance"),FMath::Abs(Counts[Species]-1024.0*Chance/100)<80); }
+        TestEqual(TEXT("Distribution conserves probability"),Sum,100);
     }
     TestFalse(TEXT("Unknown habitat rejected"),FiskCatches::IsValid(FiskCatches::Roll(7,-1)));
     return true;
@@ -29,7 +30,7 @@ bool FFiskCatchCatalogTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCatchValidationTest,"Fiskelaget.Content.CatchValidation",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskCatchValidationTest::RunTest(const FString& Parameters)
 {
-    for(int32 Id=0;Id<3;++Id)
+    for(int32 Id=0;Id<FiskCatches::Count;++Id)
     {
         const FFiskSpecies& Species=*FiskCatches::Find(Id);
         for(int32 Grams:{Species.MinGrams,Species.MaxGrams})

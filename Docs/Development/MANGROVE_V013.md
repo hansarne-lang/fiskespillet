@@ -31,6 +31,6 @@ F9 åpner fotomodus, F12 lagrer PNG og H skjuler hjelpeteksten. Bildene lagres l
 
 ## Lagring og versjoner
 
-Eksisterende karriere, penger, fangster, ruter og stangsett følger med. Angler-filformat 1 fra v0.12 leses med de samme 14 gamle øvingsresultatene og åtte tomme nye resultater. Neste uttrykkelige lagring skriver format 2 og legger forrige fil i backup. Skadde filer og ukjente fremtidige formater bevares.
+Eksisterende karriere, penger, fangster, ruter og stangsett følger med. Gamle fangstposisjoner beholder sine historiske koordinater. Lagrede ruter og favoritter som nå ligger på den nye øya, kan fortsatt leses; erstatt landpunktet før ruten brukes. Nye valg og serverens båtruter avviser alltid land. Angler-filformat 1 fra v0.12 leses med de samme 14 gamle øvingsresultatene og åtte tomme nye resultater. Neste uttrykkelige lagring skriver format 2 og legger forrige fil i backup. Skadde filer og ukjente fremtidige formater bevares.
 
 Begge LAN-PC-er må bruke v0.13.0 (protokoll 13). Eldre pakker beholdes separat; lagringer oppgradert av v0.13 bør ikke åpnes med eldre spillversjoner. Pakk ut hele ZIP-en før du starter BAT-filen. `--check` på BAT-filen kontrollerer at de nødvendige pakkefilene finnes.

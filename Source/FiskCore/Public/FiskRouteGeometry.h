@@ -6,10 +6,10 @@ namespace FiskRouteGeometry
     inline constexpr int32 IslandCount=3,NodeCount=2+IslandCount*4;
     inline FVector Island(int32 I) { return I==0?FVector(45000,55000,0):I==1?FVector(110000,45000,0):FVector(42000,-66000,0); }
     inline double Radius(int32 I) { return I==0?9000:I==1?12000:4500; }
-    inline bool Sea(FVector P)
+    inline bool Sea(FVector P,int32 Islands=IslandCount)
     {
         if(P.ContainsNaN() || P.X<6000 || P.X>150000 || FMath::Abs(P.Y)>100000 || FMath::Abs(P.Z)>1 || P.Size2D()<6000) { return false; }
-        for(int32 I=0;I<IslandCount;++I) { if(FVector::Dist2D(P,Island(I))<=Radius(I)+2000) { return false; } }return true;
+        for(int32 I=0;I<Islands;++I) { if(FVector::Dist2D(P,Island(I))<=Radius(I)+2000) { return false; } }return true;
     }
     inline bool Clear(FVector A,FVector B)
     {

@@ -162,11 +162,11 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     {
         T(TEXT("ARTSBOK OG ARTSJAKT"),52,60,2);int32 Discovered=0;for(int32 I=0;I<FiskCatches::Count;++I) { if(GI->GetJournal().Best(I)) { ++Discovered; } }
         T(FString::Printf(TEXT("Oppdaget %d/%d arter | Dagens nye funn vises først ved 17:00"),Discovered,FiskCatches::Count),52,112,1.05f,Teal);
-        for(int32 I=0;I<FiskCatches::Count;++I) { if(I==Species) { HUD.DrawRect(FLinearColor(.14f,.34f,.36f),44*S,(165+49*I)*S,370*S,43*S); }T(FString::Printf(TEXT("%s %s"),GI->GetJournal().Best(I)?TEXT("+"):TEXT("-"),FiskCatches::Find(I)->Name),58,176+49*I,1.1f); }
+        for(int32 I=0;I<FiskCatches::Count;++I) { if(I==Species) { HUD.DrawRect(FLinearColor(.14f,.34f,.36f),44*S,(165+34*I)*S,370*S,30*S); }T(FString::Printf(TEXT("%s %s"),GI->GetJournal().Best(I)?TEXT("+"):TEXT("-"),FiskCatches::Find(I)->Name),58,171+34*I,1.03f); }
         const FFiskSpecies& V=*FiskCatches::Find(Species);T(V.Name,450,180,1.8f,Gold);T(FiskCatches::HabitatTip(Species),450,240,.95f,Teal);T(FiskCatches::FightTip(Species),450,287,.95f);
         T(FString::Printf(TEXT("Størrelse: %.1f–%.1f kg | Verdi $%d/kg"),V.MinGrams/1000.0,V.MaxGrams/1000.0,V.PricePerKg),450,337,1.f);
         const FFiskJournalEntry* Best=GI->GetJournal().Best(Species);T(Best?FString::Printf(TEXT("Din rekord: %.1f kg / %.1f cm"),Best->Fish.WeightGrams/1000.0,Best->Fish.LengthMm/10.0):TEXT("Ingen bekreftet fangst av denne arten ennå."),450,392,1.1f,Gold);
-        T(FString::Printf(TEXT("Habitatfordeling: rev %d%% | skrent %d%% | åpent hav %d%%"),FiskCatches::HabitatChance(0,Species),FiskCatches::HabitatChance(1,Species),FiskCatches::HabitatChance(2,Species)),450,450,.9f,Teal);
+        T(FString::Printf(TEXT("Habitatfordeling: rev %d%% | skrent %d%% | åpent hav %d%% | mangrove %d%%"),FiskCatches::HabitatChance(0,Species),FiskCatches::HabitatChance(1,Species),FiskCatches::HabitatChance(2,Species),FiskCatches::HabitatChance(3,Species)),450,450,.8f,Teal);
         T(TEXT("Tips gjelder habitat og rigg. Ingen rigg eller reise garanterer en bestemt art."),52,575,.95f);T(TEXT("Piler / PgUp/PgDn: velg art | I / Escape: lukk | F4 utenfor panelet: journal"),52,630,.95f,Teal);return;
     }
     if(Page==2)

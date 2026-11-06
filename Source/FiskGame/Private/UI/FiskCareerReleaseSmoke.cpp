@@ -88,7 +88,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
         if(Boat->GetCrewCount()!=(Solo?1:4)) { return; }
         if(Host)
         {
-            Key(EKeys::M);const FVector Point=Solo?FVector(26000,8000,0):FVector(70000,85000,0);
+            Key(EKeys::M);const FVector Point=Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskMangrove"))?FVector(35000,-60000,0):FVector(26000,8000,0)):FVector(70000,85000,0);
             int32 W=0,H=0;GetViewportSize(W,H);const double S=FMath::Min(W/1280.0,H/720.0);
             SetMouseLocation(FMath::RoundToInt((638+Point.X/150000*560)*S),FMath::RoundToInt((355-Point.Y/100000*180)*S));Key(EKeys::LeftMouseButton);
             Shot(TEXT("free-sea-route"));
@@ -97,7 +97,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     }
     else if(CareerSmokeStage==7 && Now-CareerSmokeAt>=2)
     {
-        if(Host && FVector::Dist2D(Boat->GetDestination(),Solo?FVector(26000,8000,0):FVector(70000,85000,0))>500) { Fail(TEXT("chart_click_did_not_choose_point"));return; }
+        if(Host && FVector::Dist2D(Boat->GetDestination(),Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskMangrove"))?FVector(35000,-60000,0):FVector(26000,8000,0)):FVector(70000,85000,0))>500) { Fail(TEXT("chart_click_did_not_choose_point"));return; }
         if(!Solo && Boat->GetGroundId()!=1) { return; }
         if(Host) { Key(EKeys::M);GI->SaveSeaPlace(0,Boat->GetDestination(),TEXT("EGET SJOPUNKT")); }
         const int32 Expected=Boat->GetRodsFor(Self);

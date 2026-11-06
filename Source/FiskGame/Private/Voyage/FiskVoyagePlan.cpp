@@ -5,12 +5,12 @@
 #include "DayCycle/FiskDayState.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
-bool FFiskVoyageRoute::Valid(const TArray<FVector>& Points)
+bool FFiskVoyageRoute::Valid(const TArray<FVector>& Points,bool bHistorical)
 {
     if(Points.Num()>5) { return false; }
     for(int32 I=0;I<Points.Num();++I)
     {
-        if(!FiskRouteGeometry::Sea(Points[I])) { return false; }
+        if(!FiskRouteGeometry::Sea(Points[I],bHistorical?2:FiskRouteGeometry::IslandCount)) { return false; }
         for(int32 J=0;J<I;++J) { if(FVector::Dist2D(Points[I],Points[J])<500) { return false; } }
     }return true;
 }

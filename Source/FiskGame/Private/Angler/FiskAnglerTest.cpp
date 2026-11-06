@@ -16,9 +16,9 @@ bool AnglerTestFinish(FFiskPracticeSession& S,double Dt=.1)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskAdviceTest,"Fiskelaget.Angler.CatalogAdviceWithoutCatchAccess",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskAdviceTest::RunTest(const FString& Parameters)
 {
-    for(int32 G=0;G<3;++G) { for(int32 B=0;B<3;++B) { const auto R=FiskAngler::Advice(G,B);TestTrue(TEXT("Valid local recommendation"),FFiskRigRules::IsValid(R.Bait,R.Depth,R.Program,FiskGrounds::Find(G)->BottomDepth));TestEqual(TEXT("Uses existing good-quality rule"),FFiskRigRules::Quality(R,FiskGrounds::Find(G)),2); } }
-    for(int32 S=0;S<7;++S) { const int32 Best=FiskAngler::BestHabitat(S);TestTrue(TEXT("Known habitat only"),Best>=0 && Best<3);for(int32 G=0;G<3;++G) { TestTrue(TEXT("Highest existing catalog weight"),FiskCatches::HabitatChance(Best,S)>=FiskCatches::HabitatChance(G,S)); } }
-    TestEqual(TEXT("No invented species"),FiskAngler::BestHabitat(7),-1);return true;
+    for(int32 G=0;G<FiskGrounds::Count;++G) { for(int32 B=0;B<3;++B) { const auto R=FiskAngler::Advice(G,B);TestTrue(TEXT("Valid local recommendation"),FFiskRigRules::IsValid(R.Bait,R.Depth,R.Program,FiskGrounds::Find(G)->BottomDepth));TestEqual(TEXT("Uses existing good-quality rule"),FFiskRigRules::Quality(R,FiskGrounds::Find(G)),2); } }
+    for(int32 S=0;S<FiskCatches::Count;++S) { const int32 Best=FiskAngler::BestHabitat(S);TestTrue(TEXT("Known habitat only"),Best>=0 && Best<FiskGrounds::Count);for(int32 G=0;G<FiskGrounds::Count;++G) { TestTrue(TEXT("Highest existing catalog weight"),FiskCatches::HabitatChance(Best,S)>=FiskCatches::HabitatChance(G,S)); } }
+    TestEqual(TEXT("No invented species"),FiskAngler::BestHabitat(FiskCatches::Count),-1);return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskBundleTest,"Fiskelaget.Angler.AtomicRigBundleFreshnessAndBounds",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskBundleTest::RunTest(const FString& Parameters)
@@ -36,8 +36,8 @@ bool FFiskLessonTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPracticeTest,"Fiskelaget.Angler.SameFightModelAllSpecies",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskPracticeTest::RunTest(const FString& Parameters)
 {
-    for(int32 I=0;I<7;++I) { FFiskPracticeSession P;TestTrue(TEXT("Start known species"),P.Start(I,7,2048+I));TestFalse(TEXT("Cannot land at start"),P.Land());TestTrue(TEXT("Actual model reaches landing"),AnglerTestFinish(P));TestTrue(TEXT("Finite elapsed practice time"),P.Seconds>1 && P.Seconds<1000);TestFalse(TEXT("Landing counted only once"),P.Land()); }
-    FFiskPracticeSession P;TestFalse(TEXT("Invalid species rejected"),P.Start(7,0,1));TestFalse(TEXT("Only known virtual gear options"),P.Start(0,99,1));return true;
+    for(int32 I=0;I<FiskCatches::Count;++I) { FFiskPracticeSession P;TestTrue(TEXT("Start known species"),P.Start(I,7,2048+I));TestFalse(TEXT("Cannot land at start"),P.Land());TestTrue(TEXT("Actual model reaches landing"),AnglerTestFinish(P));TestTrue(TEXT("Finite elapsed practice time"),P.Seconds>1 && P.Seconds<1000);TestFalse(TEXT("Landing counted only once"),P.Land()); }
+    FFiskPracticeSession P;TestFalse(TEXT("Invalid species rejected"),P.Start(FiskCatches::Count,0,1));TestFalse(TEXT("Only known virtual gear options"),P.Start(0,99,1));return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPracticeClockTest,"Fiskelaget.Angler.PracticeClockAndFailure",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskPracticeClockTest::RunTest(const FString& Parameters)
@@ -57,7 +57,7 @@ bool FFiskAnglerDiskTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Empty old career gets defaults"),D.Load(File,Id));D.Loadouts[0].Rigs={FiskAngler::Advice(0,0),FiskAngler::Advice(0,1)};D.Loadouts[0].Name=TEXT("FISKER 12");TestTrue(TEXT("Save initial data"),D.Save(File,Id));D.Loadouts[0].Name=TEXT("SECOND");TestTrue(TEXT("Save new generation"),D.Save(File,Id));FFiskAnglerData E;TestTrue(TEXT("Reload"),E.Load(File,Id));TestEqual(TEXT("Full rig count"),E.Loadouts[0].Rigs.Num(),2);
     TestFalse(TEXT("Wrong profile cannot load"),E.Load(File,FGuid::NewGuid()));TestFalse(TEXT("Wrong profile cannot replace"),D.Save(File,FGuid::NewGuid()));FFileHelper::SaveStringToFile(TEXT("bad-primary"),*File);TestTrue(TEXT("Prior backup used"),E.Load(File,Id));TestTrue(TEXT("Recovery flag"),E.bRecovered);TestEqual(TEXT("Previous name preserved"),E.Loadouts[0].Name,FString(TEXT("FISKER 12")));TestTrue(TEXT("Explicit repair"),E.Save(File,Id));
     FFileHelper::SaveStringToFile(TEXT("preserve-primary"),*File);FFileHelper::SaveStringToFile(TEXT("preserve-backup"),*(File+TEXT(".bak")));TestFalse(TEXT("Two damaged files block"),E.Load(File,Id));TestFalse(TEXT("Save cannot discard damaged files"),D.Save(File,Id));FString Text;FFileHelper::LoadFileToString(Text,*File);TestEqual(TEXT("Primary unchanged"),Text,FString(TEXT("preserve-primary")));
-    FFileHelper::SaveStringToFile(TEXT("[Fiskelaget.Angler]\nVersion=2\n"),*File);TestFalse(TEXT("Future file preserved"),D.Load(File,Id));TestFalse(TEXT("Future file not replaced"),E.Save(File,Id));
+    FFileHelper::SaveStringToFile(TEXT("[Fiskelaget.Angler]\nVersion=3\n"),*File);TestFalse(TEXT("Future file preserved"),D.Load(File,Id));TestFalse(TEXT("Future file not replaced"),E.Save(File,Id));
     for(const FString& T:{FString(),FString(TEXT(".bak")),FString(TEXT(".tmp")),FString(TEXT(".bak.tmp"))}) { IFileManager::Get().Delete(*(File+T)); }IFileManager::Get().DeleteDirectory(*Dir);return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskAlertTest,"Fiskelaget.Angler.RodAlertPrivacy",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

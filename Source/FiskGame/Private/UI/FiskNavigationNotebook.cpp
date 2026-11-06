@@ -1,5 +1,6 @@
 #include "UI/FiskNavigationNotebook.h"
 #include "FiskFishingGround.h"
+#include "FiskRouteGeometry.h"
 #include "Misc/ConfigCacheIni.h"
 #include "Misc/Paths.h"
 #include "HAL/FileManager.h"
@@ -24,7 +25,7 @@ bool FFiskNavigationNotebook::Read(const FString& File,FFiskNavigationNotebook& 
         const FString Section=FString::Printf(TEXT("Place%d"),I+1);
         if(!Config.Contains(Section)) { continue; }
         FString Ground,Name;
-        if(!Config.GetString(*Section,TEXT("Ground"),Ground) || (Ground!=TEXT("0") && Ground!=TEXT("1") && Ground!=TEXT("2"))
+        if(!Config.GetString(*Section,TEXT("Ground"),Ground) || (Ground!=TEXT("0") && Ground!=TEXT("1") && Ground!=TEXT("2") && Ground!=TEXT("3"))
             || !Config.GetString(*Section,TEXT("Name"),Name) || !ValidName(Name)) { return false; }
         Candidate.Slots[I]={FCString::Atoi(*Ground),Name};
         Candidate.Slots[I].Point=FiskGrounds::Find(Candidate.Slots[I].Ground)->Position;
@@ -35,7 +36,14 @@ bool FFiskNavigationNotebook::Read(const FString& File,FFiskNavigationNotebook& 
                 || X.Len()>8 || Y.Len()>8 || !LexTryParseString(PX,*X) || !LexTryParseString(PY,*Y)
                 || FString::FromInt(PX)!=X || FString::FromInt(PY)!=Y) { return false; }
             Candidate.Slots[I].Point=FVector(PX,PY,0);
-            if(!FiskGrounds::MakeSeaPoint(Candidate.Slots[I].Point,Habitat,Duration) || Habitat!=Candidate.Slots[I].Ground) { return false; }
+            const FVector P=Candidate.Slots[I].Point;if(!FiskRouteGeometry::Sea(P,2)) { return false; }
+            int32 Legacy=0;Habitat=0;
+            for(int32 G=1;G<FiskGrounds::Count;++G)
+            {
+                if(FVector::DistSquared(P,FiskGrounds::Find(G)->Position)<FVector::DistSquared(P,FiskGrounds::Find(Habitat)->Position)) { Habitat=G; }
+                if(G<3 && FVector::DistSquared(P,FiskGrounds::Find(G)->Position)<FVector::DistSquared(P,FiskGrounds::Find(Legacy)->Position)) { Legacy=G; }
+            }
+            if(Habitat!=Candidate.Slots[I].Ground && Legacy!=Candidate.Slots[I].Ground) { return false; }
         }
     }
     for(const auto& Pair:Config)

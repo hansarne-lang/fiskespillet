@@ -1,4 +1,5 @@
 #include "UI/FiskNavigationNotebook.h"
+#include "FiskFishingGround.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
 #include "Misc/Paths.h"
@@ -33,7 +34,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPlaceValidationTest,"Fiskelaget.Navigation
 bool FFiskPlaceValidationTest::RunTest(const FString& Parameters)
 {
     const FString File=PlacesTestFile();FFiskNavigationNotebook N;
-    TestFalse(TEXT("Bad ground"),N.Save(0,3,TEXT("Test"),File));
+    TestFalse(TEXT("Bad ground"),N.Save(0,FiskGrounds::Count,TEXT("Test"),File));
     TestFalse(TEXT("Bad slot"),N.Save(6,0,TEXT("Test"),File));
     TestFalse(TEXT("Newline"),FFiskNavigationNotebook::ValidName(TEXT("A\nB")));
     TestFalse(TEXT("INI injection"),FFiskNavigationNotebook::ValidName(TEXT("[Place2]")));

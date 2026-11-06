@@ -3,7 +3,7 @@
 struct FFiskAtlasMark { const TCHAR* Name;FVector Point;const TCHAR* Tip; };
 namespace FiskAtlas
 {
-    constexpr int32 Count=9;
+    constexpr int32 Count=12;
     const FFiskAtlasMark* Find(int32 Index);
     int32 Nearest(FVector Point,double Radius=500);
 }

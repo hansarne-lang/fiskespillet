@@ -28,7 +28,7 @@ bool RouteDiskRead(const FString& P,const FGuid& Id,TArray<FFiskSavedRoute>& Out
 FString RouteDiskLockName(const FString& P) { return FString::Printf(TEXT("FiskelagetRoutes-%08X"),GetTypeHash(FPaths::ConvertRelativePathToFull(P).ToLower())); }
 }
 bool FFiskSavedRoutes::Valid(const TArray<FFiskSavedRoute>& S)
-{ if(S.Num()!=3) { return false; }for(const auto& R:S) { if(!FFiskCareerProfile::ValidName(R.Name) || !FFiskVoyageRoute::Valid(R.Points)) { return false; } }return true; }
+{ if(S.Num()!=3) { return false; }for(const auto& R:S) { if(!FFiskCareerProfile::ValidName(R.Name) || !FFiskVoyageRoute::Valid(R.Points,true)) { return false; } }return true; }
 bool FFiskSavedRoutes::Load(const FString& File,const FGuid& Id)
 {
     Slots={{TEXT("RUTE 1"),{}},{TEXT("RUTE 2"),{}},{TEXT("RUTE 3"),{}}};bBlocked=false;bRecovered=false;

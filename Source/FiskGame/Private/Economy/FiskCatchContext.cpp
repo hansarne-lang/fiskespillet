@@ -6,7 +6,7 @@
 bool FFiskCatchContext::IsValid(bool bRequireTimestamp) const
 {
     const FFiskFishingGround* Place=FiskGrounds::Find(Ground);
-    if((bHasSeaPoint && !FiskRouteGeometry::Sea(SeaPoint)) || BoatKind<0 || BoatKind>1 || Equipment<0 || Equipment>7 || !Place || !FFiskRigRules::IsValid(Bait,Depth,Program,Place->BottomDepth)
+    if((bHasSeaPoint && !FiskRouteGeometry::Sea(SeaPoint,2)) || BoatKind<0 || BoatKind>1 || Equipment<0 || Equipment>7 || !Place || !FFiskRigRules::IsValid(Bait,Depth,Program,Place->BottomDepth)
         || LandedAtMs<0 || LandedAtMs>=1020000 || FightMs<0 || FightMs>LandedAtMs) { return false; }
     if(LandedUtc.IsEmpty()) { return !bRequireTimestamp; }
     FDateTime Time;

@@ -131,7 +131,7 @@ void UFiskSkipperPanel::DrawPlan(AHUD& H,UCanvas& C)
     }
     auto Point=[&](FVector V){return FVector2D((875+V.X/150000*330)*S,(330-V.Y/100000*130)*S);};
     H.DrawRect(FLinearColor(.025f,.19f,.25f),850*S,175*S,365*S,315*S);
-    for(int32 I=0;I<2;++I) { C.K2_DrawPolygon(nullptr,Point(FiskRouteGeometry::Island(I)),FVector2D(FiskRouteGeometry::Radius(I)/150000*330*S,FiskRouteGeometry::Radius(I)/100000*130*S),24,FLinearColor(.52f,.43f,.24f)); }
+    for(int32 I=0;I<FiskRouteGeometry::IslandCount;++I) { C.K2_DrawPolygon(nullptr,Point(FiskRouteGeometry::Island(I)),FVector2D(FiskRouteGeometry::Radius(I)/150000*330*S,FiskRouteGeometry::Radius(I)/100000*130*S),24,FLinearColor(.52f,.43f,.24f)); }
     FVector From=FVector::ZeroVector;double Length=0;
     for(int32 I=0;I<R.Points.Num();++I) { const auto Path=FiskRouteGeometry::Between(From,R.Points[I]);Length+=FiskRouteGeometry::Length(Path);for(int32 J=1;J<Path.Num();++J) { const auto A=Point(Path[J-1]),Z=Point(Path[J]);H.DrawLine(A.X,A.Y,Z.X,Z.Y,Teal,2*S); }const auto Q=Point(R.Points[I]);T(FString::FromInt(I+1),Q.X/S,Q.Y/S,.9f,Gold);From=R.Points[I]; }
     Length+=FiskRouteGeometry::Length(FiskRouteGeometry::Between(From,FVector::ZeroVector));T(FString::Printf(TEXT("Hele planlagte ruten: %.2f km inkl. hjemreise"),Length/100000),385,438,.95f);

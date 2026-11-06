@@ -7,10 +7,10 @@
 #include "HAL/FileManager.h"
 TArray<FFiskSeaMilestone> FiskSeaPassport::Build(const FFiskJournalModel& J,const TArray<FFiskExpeditionRecord>& Expeditions)
 {
-    TSet<int32> Species,Habitats,Baits,Marks,Goals,Weather;TSet<FGuid> Days;int64 Sold=0,Grams=0,Offshore=0,Upgraded=0;
+    TSet<int32> MangroveSpecies;TSet<int32> Species,Habitats,Baits,Marks,Goals,Weather;TSet<FGuid> Days;int64 Sold=0,Grams=0,Offshore=0,Upgraded=0;
     for(const auto& E:J.GetEntries())
     {
-        if(!E.IsValid()) { continue; }Species.Add(E.Fish.Species);Habitats.Add(E.Context.Ground);Baits.Add(E.Context.Bait);Days.Add(E.DayId);
+        if(!E.IsValid()) { continue; }Species.Add(E.Fish.Species);if(E.Fish.Species>=7) { MangroveSpecies.Add(E.Fish.Species); }Habitats.Add(E.Context.Ground);Baits.Add(E.Context.Bait);Days.Add(E.DayId);
         Sold+=E.bSold?1:0;Grams+=E.bSold?E.Fish.WeightGrams:0;Offshore+=E.Context.BoatKind==1?1:0;Upgraded+=E.Context.Equipment==7?1:0;
         if(E.Context.bHasSeaPoint) { const int32 Mark=FiskAtlas::Nearest(E.Context.SeaPoint);if(Mark>=0) { Marks.Add(Mark); } }
     }
@@ -19,16 +19,18 @@ TArray<FFiskSeaMilestone> FiskSeaPassport::Build(const FFiskJournalModel& J,cons
     return {
         {TEXT("Første fangst"),TEXT("Én bekreftet landet fisk"),J.GetEntries().Num(),1},
         {TEXT("Artsutforsker"),TEXT("Tre ulike bekreftede arter"),Species.Num(),3},
-        {TEXT("Hele artsboken"),TEXT("Alle sju arter oppdaget"),Species.Num(),7},
+        {TEXT("Sju arter"),TEXT("Alle sju arter oppdaget"),Species.Num(),7},
         {TEXT("Trygg levering"),TEXT("Ti fisk solgt ved rettidig retur"),Sold,10},
         {TEXT("Hundre kilo"),TEXT("100 kg bekreftet levert fangst"),Grams,100000},
-        {TEXT("Tre havmiljøer"),TEXT("Fangst fra alle tre habitatene"),Habitats.Num(),3},
+        {TEXT("Tre havmiljøer"),TEXT("Fangst fra tre ulike habitater"),Habitats.Num(),3},
         {TEXT("Agnmester"),TEXT("Bekreftet fangst med tre agntyper"),Baits.Num(),3},
         {TEXT("Kjentmann"),TEXT("Bekreftet fangst ved fem atlasmerker"),Marks.Num(),5},
         {TEXT("Offshorefisker"),TEXT("Fem bekreftede fangster i offshorebåt"),Offshore,5},
         {TEXT("Fullt rigget"),TEXT("Fangst med alle tre utstyrsoppgraderingene"),Upgraded,1},
         {TEXT("Ekspedisjonsveteran"),TEXT("Fem fullførte ekspedisjoner"),Medals,5},
-        {TEXT("Allværsfisker"),TEXT("Fullført ekspedisjon i alle tre værtypene"),Weather.Num(),3}
+        {TEXT("Allværsfisker"),TEXT("Fullført ekspedisjon i alle tre værtypene"),Weather.Num(),3},
+        {TEXT("Mangroveutforsker"),TEXT("Alle fire mangroveartene oppdaget"),MangroveSpecies.Num(),4},
+        {TEXT("Hele havet"),TEXT("Bekreftet fangst fra fire habitater"),Habitats.Num(),4}
     };
 }
 FString FiskSeaPassport::Csv(const FFiskJournalModel& J)

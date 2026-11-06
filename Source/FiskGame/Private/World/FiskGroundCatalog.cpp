@@ -12,7 +12,8 @@ const FFiskFishingGround* FiskGrounds::Find(int32 Id)
     static const FFiskFishingGround Grounds[] = {
         {TEXT("Korallrevet"),FVector(20000,0,0),12000,60,20,40},
         {TEXT("Undervannsskrenten"),FVector(60000,24000,0),40000,120,60,90},
-        {TEXT("Åpent hav"),FVector(100000,-75000,0),75000,250,20,60}
+        {TEXT("Åpent hav"),FVector(100000,-75000,0),75000,250,20,60},
+        {TEXT("Mangrovebanken"),FVector(35000,-60000,0),42000,80,20,50}
     };
     return Id>=0 && Id<Count ? &Grounds[Id] : nullptr;
 }

@@ -11,7 +11,7 @@ struct FFiskVoyageRoute
     UPROPERTY() int32 Day=1;
     UPROPERTY() int32 Next=0;
     UPROPERTY() int32 Active=-1;
-    static bool Valid(const TArray<FVector>& Points);
+    static bool Valid(const TArray<FVector>& Points,bool bHistorical=false);
     bool Matches(int32 ExpectedDay,int32 ExpectedRevision) const;
 };
 class AFiskStarterBoat;

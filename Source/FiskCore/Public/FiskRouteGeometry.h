@@ -14,9 +14,14 @@ namespace FiskRouteGeometry
     {
         for(int32 I=0;I<2;++I) { if(FMath::PointDistToSegment(Island(I),A,B)<=Radius(I)+1500) { return false; } }return true;
     }
-    inline TArray<FVector> Path(FVector Destination)
+    inline bool Navigable(FVector P)
     {
-        if(!Sea(Destination)) { return {}; }TArray<FVector> Nodes={FVector::ZeroVector,Destination};
+        if(P.ContainsNaN() || P.X<0 || P.X>150000 || FMath::Abs(P.Y)>100000 || FMath::Abs(P.Z)>1) { return false; }
+        for(int32 I=0;I<2;++I) { if(FVector::Dist2D(P,Island(I))<=Radius(I)+1500) { return false; } }return true;
+    }
+    inline TArray<FVector> Between(FVector Origin,FVector Destination)
+    {
+        if(!Navigable(Origin) || !Navigable(Destination)) { return {}; }TArray<FVector> Nodes={Origin,Destination};
         for(int32 I=0;I<2;++I) { for(int32 X=-1;X<=1;X+=2) { for(int32 Y=-1;Y<=1;Y+=2) { Nodes.Add(Island(I)+FVector(X,Y,0)*(Radius(I)+3500)); } } }
         double Dist[10];int32 Previous[10];bool Used[10]={};
         for(int32 I=0;I<10;++I) { Dist[I]=1.e30;Previous[I]=-1; }Dist[0]=0;
@@ -30,10 +35,14 @@ namespace FiskRouteGeometry
         if(Previous[1]<0) { return {}; }TArray<FVector> Result;int32 V=1;
         while(V>=0) { Result.Insert(Nodes[V],0);V=Previous[V]; }return Result;
     }
+    inline TArray<FVector> Path(FVector Destination)
+    { return Sea(Destination)?Between(FVector::ZeroVector,Destination):TArray<FVector>(); }
     inline double Length(const TArray<FVector>& P)
     { double N=0;for(int32 I=1;I<P.Num();++I) { N+=FVector::Dist(P[I-1],P[I]); }return N; }
     inline FVector Position(const TArray<FVector>& P,double Fraction)
     {
+        if(P.IsEmpty()) { return FVector::ZeroVector; }
+        if(Fraction<=0) { return P[0]; }if(Fraction>=1) { return P.Last(); }
         double Left=Length(P)*FMath::Clamp(Fraction,0.0,1.0);
         for(int32 I=1;I<P.Num();++I) { const double D=FVector::Dist(P[I-1],P[I]);if(Left<=D) { return FMath::Lerp(P[I-1],P[I],D>0?Left/D:0); }Left-=D; }
         return P.IsEmpty()?FVector::ZeroVector:P.Last();

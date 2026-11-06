@@ -62,11 +62,11 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
         DeckPanel->Open(Params.Key==EKeys::F7);return true;
     }
     if(JournalPanel->IsVisible()) { return JournalPanel->HandleKey(Params); }
-    if(Press && Params.Key==EKeys::F4)
+    if(Press && (Params.Key==EKeys::F4 || Params.Key==EKeys::L))
     {
         if(CrewPanel->IsVisible() || SeaChart->IsVisible() || RigPanel->IsVisible())
         { ClientActionFeedback_Implementation(TEXT("Lukk panelet med Escape før du åpner F4-journalen."));return true; }
-        bHelpVisible=bResultsVisible=bHistoryVisible=false;JournalPanel->Toggle();return true;
+        bHelpVisible=bResultsVisible=bHistoryVisible=false;if(Params.Key==EKeys::L) { JournalPanel->TogglePassport(); }else { JournalPanel->Toggle(); }return true;
     }
     if(SeaChart->IsVisible() && Params.Key==EKeys::F2) { return SeaChart->HandleKey(Params); }
     const bool OtherPanel=(FrontEnd && FrontEnd->IsVisible()) || (CrewPanel && CrewPanel->IsVisible())
@@ -100,6 +100,10 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
+    if(Press && Params.Key==EKeys::V)
+    {
+        const auto* B=FindStarterBoat();if(B && PlayerState) { ServerTravelVote(B->GetLegSerial(),!B->HasTravelVote(PlayerState->GetPlayerId())); }return true;
+    }
     // Handle rod commands before a later key can change the selected holder.
     // Deferred input bindings otherwise make X followed by 1 act on rod 1.
     const bool Release=Params.Event==IE_Released;
@@ -143,6 +147,11 @@ void AFiskBoardingController::BeginPlay()
     GetWorldTimerManager().SetTimer(CareerTimer,this,&AFiskBoardingController::TickCareer,.5f,true);
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExplorationSmoke="),ExplorationMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ExplorationDir);
+        GetWorldTimerManager().SetTimer(ExplorationTimer,this,&AFiskBoardingController::RunExplorationSmoke,.5f,true,2.f);
+    }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExpeditionSmoke="),ExpeditionSmokeMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ExpeditionSmokeDir);
@@ -235,10 +244,10 @@ void AFiskBoardingController::ServerStartBoatTrip_Implementation(int32 ExpectedR
         { ClientActionFeedback(TEXT("Sjøfasen er ferdig. Start en ny dag fra hovedmenyen."));return; }
         if(Progress==AFiskStarterBoat::AtMarina)
         { ClientActionFeedback(TEXT("Turen er avsluttet. Velg Til hovedmeny og Spill for en ny dag."));return; }
-        if(Progress!=AFiskStarterBoat::AtDock && Progress!=AFiskStarterBoat::AtFishingSpot)
+        if(Progress!=AFiskStarterBoat::AtDock && Progress!=AFiskStarterBoat::AtFishingSpot && !(Progress>=0 && Progress<100))
         { ClientActionFeedback(TEXT("Båten er allerede på vei."));return; }
         Boat->StartTrip(PlayerState->GetPlayerId(),ExpectedRevision);
-        ClientActionFeedback(Progress==AFiskStarterBoat::AtFishingSpot?TEXT("Retur til marinaen er startet."):TEXT("Avreise er startet. F setter ut stanga ved ankomst."));
+        ClientActionFeedback(Progress!=AFiskStarterBoat::AtDock?TEXT("Retur til marinaen er startet."):TEXT("Avreise er startet. F setter ut stanga ved ankomst."));
     }
 }
 void AFiskBoardingController::ClientActionFeedback_Implementation(const FString& Message)

@@ -16,9 +16,14 @@ public:
     bool HandleKey(const FInputKeyEventArgs& Args);
     bool IsVisible() const { return bVisible; }
     void Draw(AHUD& HUD,UCanvas& Canvas);
+    bool IsAtlas() const { return bAtlas; }
     void SetMessage(const FString& Text) { Message=Text; }
 private:
     bool CanOpen() const;
+    bool bAtlas=false;
+    int32 AtlasRow=0;
+    bool HandleAtlas(const FInputKeyEventArgs& Args);
+    void DrawAtlas(AHUD& HUD,UCanvas& Canvas);
     void Show(bool bShow);
     void Choose();
     void DrawFavorites(AHUD& HUD,UCanvas& Canvas);

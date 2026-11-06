@@ -39,6 +39,16 @@ public:
     int32 GetHolderFor(int32 Player,int32 Slot) const { const int32 Seat=GetSeatIndex(Player);return Seat<0 || Slot<0 || Slot>=GetRodsFor(Player)?-1:FiskBoatLayout::FirstHolder(Kind,Crew.Num(),Seat)+Slot; }
     int32 GetOwnerId() const { return OwnerId; }
     int32 GetTravelMs() const { return Kind==1?FMath::Max(1,Route.BaseTravelMs*4/5):Route.BaseTravelMs; }
+    int32 GetLegTravelMs() const { return LegTravelMs; }
+    int32 GetLegSerial() const { return LegSerial; }
+    bool IsTravelling() const { return TripProgress>=0 && TripProgress!=100 && TripProgress!=200; }
+    bool UsesTravelCard() const;
+    bool HasTravelVote(int32 Player) const { return TravelVotes.Contains(Player); }
+    int32 GetTravelVoteCount() const { return TravelVotes.Num(); }
+    bool VoteTravel(int32 Player,int32 ExpectedLeg,bool Vote);
+    bool Relocate(int32 Player,int32 Revision,FVector Point,FString& Message);
+    TArray<FVector> GetActivePath() const;
+    FVector PositionAt(int32 NowMs) const;
     FVector GetDestination() const { return Route.Destination; }
     bool ChooseKind(int32 Requester,int32 Revision,int32 NewKind);
     bool SelectPoint(int32 Requester,int32 Revision,FVector Point,FString& Message);
@@ -109,7 +119,13 @@ private:
     void OnRep_TripProgress();
 
 
-    int32 LegStartedMs = -1;
+    UPROPERTY(Replicated) int32 LegStartedMs = -1;
+    UPROPERTY(Replicated) int32 LegTravelMs=12000;
+    UPROPERTY(Replicated) int32 LegSerial=0;
+    UPROPERTY(Replicated) FVector LegOrigin=FVector::ZeroVector;
+    UPROPERTY(Replicated) FVector LegDestination=FVector(20000,0,0);
+    UPROPERTY(Replicated) TArray<int32> TravelVotes;
+    void BeginLeg(FVector Origin,FVector Destination,int32 Duration,int32 NowMs,bool Returning);
     int32 ReturnStartedMs = -1;
     UPROPERTY(Replicated)
     int32 MarinaArrivalMs = -1;

@@ -17,6 +17,8 @@
 #include "Expedition/FiskExpeditionState.h"
 #include "Components/ExponentialHeightFogComponent.h"
 #include "UI/FiskGameInstance.h"
+#include "World/FiskOceanAtlas.h"
+#include "Components/TextRenderComponent.h"
 
 AFiskOceanScene::AFiskOceanScene()
 {
@@ -135,6 +137,23 @@ void AFiskOceanScene::BeginPlay()
         auto* Drop=Part(*FString::Printf(TEXT("Rain%d"),I),Cylinder,FVector::ZeroVector,FVector(.012,.012,1.7),FLinearColor(.36f,.57f,.67f));
         Drop->SetCastShadow(false);Drop->SetVisibility(false);Rain.Add(Drop);
     }
+    for(int32 I=0;I<FiskAtlas::Count;++I)
+    {
+        const auto& Mark=*FiskAtlas::Find(I);const FVector P=Mark.Point+FVector(0,400,0);
+        Part(*FString::Printf(TEXT("AtlasBuoy%d"),I),Sphere,P+FVector(0,0,30),FVector(.8,.8,.8),FLinearColor(1,.52f,.08f));
+        Part(*FString::Printf(TEXT("AtlasPole%d"),I),Cylinder,P+FVector(0,0,135),FVector(.07,.07,2),FLinearColor(.85f,.85f,.72f));
+        auto* Label=NewObject<UTextRenderComponent>(this);AddInstanceComponent(Label);Label->SetupAttachment(RootComponent);Label->SetRelativeLocation(P+FVector(0,0,265));
+        Label->SetText(FText::FromString(FString::Printf(TEXT("%d  %s"),I+1,Mark.Name)));Label->SetWorldSize(35);Label->SetHorizontalAlignment(EHTA_Center);Label->SetTextRenderColor(FColor(255,218,140));Label->RegisterComponent();
+    }
+    Part(TEXT("LighthouseBase"),Cylinder,FVector(-800,1800,350),FVector(2.8,2.8,6),FLinearColor(.9f,.85f,.66f));
+    Part(TEXT("LighthouseRoof"),Sphere,FVector(-800,1800,680),FVector(3.2,3.2,.8),FLinearColor(.8f,.18f,.08f));
+    Part(TEXT("LighthouseLantern"),Cylinder,FVector(-800,1800,605),FVector(1.9,1.9,1.0),FLinearColor(1,.8f,.25f));
+    for(int32 I=0;I<18;++I) { auto* W=Part(*FString::Printf(TEXT("Wake%d"),I),Sphere,FVector::ZeroVector,FVector(2,.1,.02),FLinearColor(.55f,.76f,.77f));W->SetCastShadow(false);Wake.Add(W); }
+    for(int32 I=0;I<3;++I)
+    {
+        auto* Hull=Part(*FString::Printf(TEXT("DistantBoat%d"),I),Cube,FVector::ZeroVector,FVector(7,2,1),FLinearColor(.46f,.6f,.64f));Hull->SetCastShadow(false);Traffic.Add(Hull);
+        auto* Cabin=Part(*FString::Printf(TEXT("DistantCabin%d"),I),Cube,FVector::ZeroVector,FVector(2,1.6,1.3),FLinearColor(.8f,.82f,.75f));Cabin->SetCastShadow(false);Traffic.Add(Cabin);
+    }
 }
 
 void AFiskOceanScene::Tick(float DeltaSeconds)
@@ -144,6 +163,18 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     const FVector Center = Boats ? Boats->GetActorLocation() : FVector::ZeroVector;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const double Time = Day ? Day->GetElapsedRealSeconds() : GetWorld()->GetTimeSeconds();
+    const bool Moving=Boats && Boats->IsTravelling();
+    for(int32 I=0;I<Wake.Num();++I)
+    {
+        Wake[I]->SetVisibility(Moving);if(!Moving) { continue; }const int32 N=I/2;const double Side=I%2?1:-1;
+        const FVector Local(-500-N*170,Side*(130+N*48),-3+FMath::Sin(Time*3+I));Wake[I]->SetRelativeLocation(Boats->GetActorTransform().TransformPosition(Local));
+        Wake[I]->SetRelativeRotation(FRotator(0,Boats->GetActorRotation().Yaw+Side*15,0));Wake[I]->SetRelativeScale3D(FVector(2.2+N*.3,.1,.02));
+    }
+    for(int32 I=0;I<3;++I)
+    {
+        const FVector P(15000+FMath::Fmod(Time*70+I*27000,120000.0),-95000+I*15000,70);
+        Traffic[I*2]->SetRelativeLocation(P);Traffic[I*2+1]->SetRelativeLocation(P+FVector(0,0,95));
+    }
     TActorIterator<AFiskExpeditionState> E(GetWorld());const int32 Weather=E?E->GetPlan().Weather:0;
     const auto* GI=Cast<UFiskGameInstance>(GetWorld()->GetGameInstance());const bool Low=GI && GI->FrameRate==30;
     if(ReportedWeather!=Weather)

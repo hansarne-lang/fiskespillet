@@ -27,7 +27,7 @@ void UFiskJourneyAudio::TickComponent(float Delta,ELevelTick Type,FActorComponen
     TActorIterator<AFiskExpeditionState> Expedition(GetWorld());const int32 Weather=Expedition?Expedition->GetPlan().Weather:0;
     if(!bReported && Moving && Audio->IsPlaying() && Queued>static_cast<uint64>(Wave->GetAvailableAudioByteCount())+4096)
     { bReported=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNEY_AUDIO_CONSUMED"));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_WEATHER_AUDIO_CONSUMED weather=%d"),Weather); }
-    while(Wave->GetAvailableAudioByteCount()<8192)
+    while(Wave->GetAvailableAudioByteCount()<24576)
     {
         TArray<int16> Samples;Samples.SetNumUninitialized(1024);
         for(int32 I=0;I<1024;++I,++Offset)

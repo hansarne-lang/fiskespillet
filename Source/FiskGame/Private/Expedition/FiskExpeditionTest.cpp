@@ -77,6 +77,8 @@ bool FFiskExpeditionCorruptTest::RunTest(const FString& Parameters)
     ExpeditionTest::FFiles F;const FGuid Profile=FGuid::NewGuid();FFiskExpeditionRecord R;R.DayId=FGuid::NewGuid();TArray<FFiskExpeditionRecord> A={R};
     TestTrue(TEXT("Initial backup"),FiskExpeditionStore::Save(F.Path,Profile,A));FFileHelper::SaveStringToFile(TEXT("bad data"),*F.Path);TArray<FFiskExpeditionRecord> B;
     TestTrue(TEXT("Valid backup recovers corrupt main"),FiskExpeditionStore::Load(F.Path,Profile,B));TestTrue(TEXT("Repair from backup"),FiskExpeditionStore::Save(F.Path,Profile,B));
+    FFileHelper::SaveStringToFile(FString::Printf(TEXT("[Fiskelaget.Expeditions]\nVersion=1\nProfile=%s\nGeneration=2147483647\nCount=9999\n"),*Profile.ToString(EGuidFormats::Digits)),*F.Path);
+    TestTrue(TEXT("Invalid main generation cannot block valid backup repair"),FiskExpeditionStore::Save(F.Path,Profile,B));
     FFileHelper::SaveStringToFile(TEXT("[Fiskelaget.Expeditions]\nVersion=2\n"),*F.Path);TestFalse(TEXT("Future format preserved"),FiskExpeditionStore::Save(F.Path,Profile,B));
     FString Text;FFileHelper::LoadFileToString(Text,*F.Path);TestTrue(TEXT("Future bytes unchanged"),Text.Contains(TEXT("Version=2")));
     B.Reset();for(int32 I=0;I<FiskExpeditions::Capacity;++I) { R.DayId=FGuid::NewGuid();B.Add(R); }R.DayId=FGuid::NewGuid();TestFalse(TEXT("No silent eviction at capacity"),FiskExpeditionStore::Merge(B,{R}));return true;

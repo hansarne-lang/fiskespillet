@@ -16,7 +16,7 @@ bool Integer(const FConfigFile& Config,const TCHAR* Section,const TCHAR* Key,int
 }
 void Put(FConfigFile& Config,const TCHAR* Section,const TCHAR* Key,int32 Value)
 { Config.SetString(Section,Key,*FString::FromInt(Value)); }
-bool Preservable(const FString& File)
+bool JournalPreservable(const FString& File)
 {
     for(const FString& Path:{File,File+TEXT(".bak")})
     {
@@ -88,7 +88,7 @@ bool FFiskJournalStore::Write(const FString& File,const FFiskJournalModel& Model
 EFiskJournalLoad FFiskJournalStore::Load(const FString& File,FFiskJournalModel& Model)
 {
     FSystemWideCriticalSection Lock(LockName(File),FTimespan::FromSeconds(1));
-    if(!Lock.IsValid() || !Preservable(File)) { return EFiskJournalLoad::Unavailable; }
+    if(!Lock.IsValid() || !JournalPreservable(File)) { return EFiskJournalLoad::Unavailable; }
     FFiskJournalModel Main,Backup;int32 MainGeneration=0,BackupGeneration=0;
     const bool GoodMain=Read(File,Main,MainGeneration),GoodBackup=Read(File+TEXT(".bak"),Backup,BackupGeneration);
     if(GoodMain && (!GoodBackup || MainGeneration>=BackupGeneration)) { Model=MoveTemp(Main);return EFiskJournalLoad::Loaded; }
@@ -99,7 +99,7 @@ EFiskJournalLoad FFiskJournalStore::Load(const FString& File,FFiskJournalModel& 
 bool FFiskJournalStore::Save(const FString& File,FFiskJournalModel& Model)
 {
     FSystemWideCriticalSection Lock(LockName(File),FTimespan::FromSeconds(1));
-    if(!Lock.IsValid() || !Preservable(File)) { return false; }
+    if(!Lock.IsValid() || !JournalPreservable(File)) { return false; }
     FFiskJournalModel Main,Backup;int32 MainGeneration=0,BackupGeneration=0;
     const bool GoodMain=Read(File,Main,MainGeneration),GoodBackup=Read(File+TEXT(".bak"),Backup,BackupGeneration);
     const bool HadMain=IFileManager::Get().FileExists(*File),HadBackup=IFileManager::Get().FileExists(*(File+TEXT(".bak")));

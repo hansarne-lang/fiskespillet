@@ -139,7 +139,7 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     }
     const FFiskFishingGround* Ground=FiskGrounds::Find(Boat?Boat->GetGroundId():-1);
     const bool RigValid=Ground && FFiskRigRules::IsValid(Rod->GetRig().Bait,Rod->GetRig().Depth,Rod->GetRig().Program,Ground->BottomDepth);
-    if(Aboard && Boat->IsTravelling()) { Text(FString::Printf(TEXT("V: reisevisning %d/%d har valgt"),Boat->GetTravelVoteCount(),Boat->GetCrewCount()),400,44,1.f,Teal); }
+    if(Aboard && Boat->IsTravelling()) { Rect(385,28,460,45);Text(FString::Printf(TEXT("V: reisevisning %d/%d har valgt"),Boat->GetTravelVoteCount(),Boat->GetCrewCount()),400,44,1.f,Teal); }
     Rect(20,20,330,420);Text(TEXT("FISKELAGET"),38,36,1.7f,Teal);
     Text(Ground?Ground->Name:TEXT("Marina"),38,81,1.1f);
     Text(FString::Printf(TEXT("%s | %d/%d om bord | Kaptein: %s"),Boat && Boat->GetKind()==1?TEXT("Offshore"):TEXT("Startbåt"),Boat?Boat->GetCrewCount():0,Boat?Boat->GetCapacity():2,Captain?TEXT("deg"):!Boat || Boat->GetCaptainId()==INDEX_NONE?TEXT("ingen"):TEXT("medspiller")),38,116,.8f,Muted);

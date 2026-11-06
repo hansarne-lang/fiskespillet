@@ -16,6 +16,7 @@
 #include "Misc/Paths.h"
 #include "UnrealClient.h"
 #include "TimerManager.h"
+#include "Voyage/FiskVoyagePlan.h"
 
 void AFiskBoardingController::RunExplorationSmoke()
 {
@@ -53,7 +54,11 @@ void AFiskBoardingController::RunExplorationSmoke()
     {
         if(B->UsesTravelCard()) { Fail(TEXT("travel_card_survived_arrival"));return; }
         if(!bExplorationRejected && GetRodAt(0)->GetState()==EFiskRodState::Fishing)
-        { ExplorationRevision=B->GetRouteRevision();ServerSelectSeaPoint(ExplorationRevision,FiskAtlas::Find(5)->Point);ServerTravelVote(ExplorationLeg-1,true);bExplorationRejected=true;ExplorationAt=Real; }
+        {
+            ExplorationRevision=B->GetRouteRevision();ServerSelectSeaPoint(ExplorationRevision,FiskAtlas::Find(5)->Point);ServerTravelVote(ExplorationLeg-1,true);
+            if(!SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+            bExplorationRejected=true;ExplorationAt=Real;
+        }
         if(bExplorationRejected && Real-ExplorationAt>=2)
         { if(B->GetRouteRevision()!=ExplorationRevision) { Fail(TEXT("active_rod_or_foreign_move_accepted"));return; }ExplorationStage=6; }
     }
@@ -63,7 +68,11 @@ void AFiskBoardingController::RunExplorationSmoke()
         {
             bool All=true;for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
             { const auto* P=Cast<AFiskBoardingController>(It->Get());if(P && P->PlayerState && B->IsAboard(P->PlayerState->GetPlayerId()) && P->GetRodAt(0)->GetTestLandingCount()!=1) { All=false; } }
-            if(All) { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(5)->Point); }
+            if(All)
+            {
+                if(!SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+                else { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(5)->Point); }
+            }
         }
         if(B->GetLegSerial()>ExplorationLeg && B->IsTravelling())
         { if(B->GetTravelVoteCount()!=0 || B->UsesTravelCard()) { Fail(TEXT("votes_survived_new_leg"));return; }ExplorationLeg=B->GetLegSerial();Shot(TEXT("moving-between-grounds"));ExplorationStage=7; }
@@ -78,7 +87,8 @@ void AFiskBoardingController::RunExplorationSmoke()
         // Leave enough time for remote half-second probes to observe arrival before the next leg.
         if(Host)
         {
-            ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point);
+            if(!SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+            else { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point); }
             if(B->GetLegSerial()<=ExplorationLeg || B->GetDestination()!=FiskAtlas::Find(7)->Point) { Fail(TEXT("second_transfer_not_started"));return; }
         }
         ExplorationAt=Real;ExplorationStage=70;

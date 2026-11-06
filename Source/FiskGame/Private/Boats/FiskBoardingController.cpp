@@ -29,6 +29,7 @@
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskMarinaHub.h"
 #include "UI/FiskExpeditionPanel.h"
+#include "UI/FiskSkipperPanel.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -45,11 +46,13 @@ AFiskBoardingController::AFiskBoardingController()
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
+    SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(SkipperPanel->IsVisible()) { return SkipperPanel->HandleKey(Params); }
     if(ExpeditionPanel->HandleKey(Params)) { return true; }
     if(MarinaPanel->HandleKey(Params)) { return true; }
     if(HandleCareerKey(Params)) { return true; }
@@ -100,6 +103,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
+    if(SkipperPanel->HandleKey(Params)) { return true; }
     if(Press && Params.Key==EKeys::V)
     {
         const auto* B=FindStarterBoat();if(B && PlayerState) { ServerTravelVote(B->GetLegSerial(),!B->HasTravelVote(PlayerState->GetPlayerId())); }return true;
@@ -142,6 +146,13 @@ void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); Reques
 void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
+#if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSkipperSmoke="),SkipperMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),SkipperDir);
+        GetWorldTimerManager().SetTimer(SkipperTimer,this,&AFiskBoardingController::RunSkipperSmoke,.5f,true,2.f);
+    }
+#endif
     // Remote server controllers have no PlayerInput and never receive PlayerTick.
     // Settlement and durable snapshot retries must run for every connection.
     GetWorldTimerManager().SetTimer(CareerTimer,this,&AFiskBoardingController::TickCareer,.5f,true);

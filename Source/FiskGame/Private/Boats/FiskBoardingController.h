@@ -20,6 +20,7 @@ class UFiskDeckPanel;
 class AFiskStarterBoat;
 class UFiskMarinaPanel;
 class UFiskExpeditionPanel;
+class UFiskSkipperPanel;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -41,6 +42,9 @@ class AFiskBoardingController final : public APlayerController
 
 public:
     AFiskBoardingController();
+    UFiskSkipperPanel* GetSkipperPanel() const { return SkipperPanel; }
+    UFUNCTION(Server,Reliable) void ServerVoyageReplace(int32 Day,int32 Revision,const TArray<FVector>& Points);
+    UFUNCTION(Server,Reliable) void ServerVoyageNext(int32 Day,int32 Revision,int32 BoatRevision);
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
     UFUNCTION(Server,Reliable) void ServerMarinaIdentity(FGuid Profile,FFiskMarinaIdentity Identity);
@@ -80,6 +84,11 @@ public:
     bool IsRodSelectionPending() const { return PendingRod>=0; }
     int32 GetCameraView() const { return CameraView; }
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunSkipperSmoke();
+    FString SkipperMode,SkipperDir;
+    FTimerHandle SkipperTimer;
+    int32 SkipperStage=0;
+    double SkipperAt=0;
     int32 GetRejectedCaptainRequests() const { return RejectedCaptainRequests; }
 #endif
     void RequestRodSelection(int32 Slot);
@@ -116,6 +125,7 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    UPROPERTY() TObjectPtr<UFiskSkipperPanel> SkipperPanel;
     UPROPERTY() TObjectPtr<UFiskExpeditionPanel> ExpeditionPanel;
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
     double LastMarinaMessage=-10;

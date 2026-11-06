@@ -15,6 +15,7 @@
 #include "UI/FiskUserSettings.h"
 #include "Misc/Paths.h"
 #include "Expedition/FiskExpeditionState.h"
+#include "Voyage/FiskVoyagePlan.h"
 
 AFiskBootstrapGameMode::AFiskBootstrapGameMode()
 {
@@ -37,6 +38,7 @@ void AFiskBootstrapGameMode::InitGameState()
     StarterBoat = GetWorld()->SpawnActor<AFiskStarterBoat>();
     Settlement = GetWorld()->SpawnActor<AFiskDaySettlement>();
     Expedition=GetWorld()->SpawnActor<AFiskExpeditionState>();
+    GetWorld()->SpawnActor<AFiskVoyagePlan>();
     GetWorld()->SpawnActor<AFiskMarinaZone>();
     GetWorld()->SpawnActor<AFiskOceanScene>();
     GetWorld()->SpawnActor<AFiskMarinaHub>();

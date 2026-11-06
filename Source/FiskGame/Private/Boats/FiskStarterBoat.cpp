@@ -16,12 +16,14 @@
 #include "FiskVoyageRules.h"
 #include "Fishing/FiskPrototypeRod.h"
 #include "GameFramework/PlayerState.h"
+#include "UI/FiskSkipperPanel.h"
 
 void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
 {
     Super::CalcCamera(DeltaTime,OutResult);
     const AFiskBoardingController* PC=GetWorld()?Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController()):nullptr;
     if(!PC || !PC->IsLocalController()) { return; }
+    if(PC->GetSkipperPanel()->IsPhoto()) { PC->GetSkipperPanel()->PhotoCamera(GetActorTransform(),OutResult);return; }
     const int32 View=PC->GetCameraView();
     const FVector Eye=View==2?FVector(-1700,-200,1000):FVector(-1250,View==1?1200:-1200,550);
     const FVector Focus=View==2?FVector(-200,0,130):View==1?FVector(-250,150,120):FVector(-100,-600,110);

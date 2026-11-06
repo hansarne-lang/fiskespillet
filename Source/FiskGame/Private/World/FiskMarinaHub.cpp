@@ -71,7 +71,7 @@ void AFiskMarinaHub::Rebuild()
         Part(Cube,P+FVector(0,0,100),FVector(13,12,.4),FLinearColor(.34f,.22f,.12f));
         Part(Cube,P+FVector(0,260,365),FVector(10,.35,5),Colors[V.Color]);Part(Cube,P+FVector(-490,0,365),FVector(.35,6,5),Colors[V.Color]);Part(Cube,P+FVector(490,0,365),FVector(.35,6,5),Colors[V.Color]);
         Part(Cube,P+FVector(0,0,630),FVector(11,8,.3),FLinearColor(.12f,.22f,.27f));
-        if(V.Style==1) { for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*250,0,710),FVector(5.8,8.5,.25),FLinearColor(.28f,.19f,.13f))->SetRelativeRotation(FRotator(Side*22,0,0)); } }
+        if(V.Style==1) { for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*250,0,710),FVector(5.8,8.5,.25),FLinearColor(.28f,.19f,.13f))->SetRelativeRotation(FRotator(-Side*22,0,0)); } }
         if(V.Style==2) { Part(Cube,P+FVector(0,-390,560),FVector(12,5,.2),FLinearColor(.82f,.65f,.37f));for(int32 Side:{-1,1}) { Part(Cylinder,P+FVector(Side*520,-580,330),FVector(.2,.2,4.5),FLinearColor(.75f,.7f,.55f)); } }
         for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*530,-520,170),FVector(.2,1.2,1),FLinearColor(.25f,.17f,.1f)); }
         Text(R?V.HouseName:TEXT("LEDIG NAUST"),P+FVector(0,-310,590),48,FColor(255,232,170));

@@ -5,6 +5,7 @@
 #include "Fishing/FiskRodSelection.h"
 #include "FiskCareerProfile.h"
 #include "FiskMarinaTypes.h"
+#include "UI/FiskJournalModel.h"
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
@@ -42,6 +43,9 @@ public:
     UFUNCTION(Client,Reliable) void ClientMarinaIdentity(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason);
     UFUNCTION(Server,Reliable) void ServerMarinaRecords(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records);
     UFUNCTION(Server,Reliable) void ServerMarinaSay(int32 Code);
+    UFUNCTION(Client,Reliable) void ClientJournalBatch(FGuid Profile,int32 Serial,const TArray<FFiskJournalEntry>& Entries);
+    UFUNCTION(Server,Reliable) void ServerJournalAck(FGuid Profile,int32 Serial);
+    void TickJournalRecovery();
     bool IsCareerReady() const { return bCareerReady; }
     bool IsCareerSynced() const { return bCareerReady && CareerAck>=ServerCareer.Revision; }
     const FFiskCareerProfile& GetServerCareer() const { return ServerCareer; }
@@ -104,6 +108,9 @@ protected:
 private:
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
     double LastMarinaMessage=-10;
+    FFiskJournalModel RecoverySnapshot;
+    int32 RecoveryRevision=-1,RecoveryOffset=0,RecoverySerial=0,RecoverySentCount=0,ClientRecoverySerial=0;
+    bool bRecoveryAwaiting=false,bRecoveryReported=false;
     FFiskCareerProfile ServerCareer,PendingCareer;
     int32 CareerAck=0,ShopRow=0;
     bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;

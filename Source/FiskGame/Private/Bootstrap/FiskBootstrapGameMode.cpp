@@ -11,6 +11,9 @@
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskSessionRules.h"
 #include "GameFramework/GameSession.h"
+#include "Career/FiskJournalAuthority.h"
+#include "UI/FiskUserSettings.h"
+#include "Misc/Paths.h"
 
 AFiskBootstrapGameMode::AFiskBootstrapGameMode()
 {
@@ -72,7 +75,7 @@ bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 Ex
     AFiskDayState* Day = GetGameState<AFiskDayState>();
     const bool Host = Requester && Requester->IsLocalController() && GetNetMode() == NM_ListenServer;
     if (!Day || !StarterBoat || !Settlement || !FiskSession::CanAdvance(Host, Day->GetDayNumber(), ExpectedDay,
-        Day->GetElapsedMilliseconds(), Settlement->GetView().bRevealed)) { return false; }
+        Day->GetElapsedMilliseconds(), Settlement->GetView().bRevealed) || ArchivedDay!=Settlement->GetView().DayId) { return false; }
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
     { const AFiskBoardingController* P=Cast<AFiskBoardingController>(It->Get());if(P && (!P->IsCareerSynced() || !P->GetServerCareer().Receipts.ContainsByPredicate([&](const FFiskCareerReceipt& R){return R.Id==Settlement->GetView().DayId && R.Kind==2;}))) { return false; } }
     // All resets run in this one server frame before the fresh clock starts.
@@ -90,4 +93,14 @@ int64 AFiskBootstrapGameMode::CareerIncome(const FGuid& Profile) const
     for(const FFiskDayResult& Row:Settlement->GetView().Results)
     { const FGuid* BoundProfile=DayProfiles.Find(Row.PlayerId);if(BoundProfile && *BoundProfile==Profile) { Sum+=static_cast<int64>(Row.SessionBalance)*100; } }
     return Sum;
+}
+bool AFiskBootstrapGameMode::ArchiveConfirmedDay()
+{
+    const AFiskDayState* Day=GetGameState<AFiskDayState>();
+    if(!Day || !Settlement || !Settlement->GetView().bRevealed) { return false; }
+    if(ArchivedDay==Settlement->GetView().DayId) { return true; }
+    const double Now=GetWorld()->GetRealTimeSeconds();if(Now<ArchiveRetryAt) { return false; }ArchiveRetryAt=Now+2;
+    if(!FiskJournalAuthority::Commit(FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Authority")),Settlement->GetView(),Day->GetElapsedMilliseconds(),DayProfiles)) { return false; }
+    ArchivedDay=Settlement->GetView().DayId;++ArchiveRevision;
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_AUTHORITY_ARCHIVED day=%d profiles=%d"),Day->GetDayNumber(),DayProfiles.Num());return true;
 }

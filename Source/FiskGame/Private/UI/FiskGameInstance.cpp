@@ -113,6 +113,16 @@ FString UFiskGameInstance::RigPresetFile() const
 {
     return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetRigPresets.ini"));
 }
+bool UFiskGameInstance::AcceptRecoveredJournal(const FGuid& Profile,const TArray<FFiskJournalEntry>& Entries)
+{
+    if(Profile!=Career.Id || Entries.Num()>16) { return false; }
+    FFiskJournalModel Incoming;if(!Incoming.Restore(Entries)) { return false; }
+    FFiskJournalModel Candidate=Journal;if(!Candidate.Merge(Incoming)) { JournalMessage=TEXT("Journalgjenhenting venter: full journal eller motstridende fangst-ID. Filene bevares.");return false; }
+    const bool Changed=Candidate.GetEntries().Num()!=Journal.GetEntries().Num();Journal=MoveTemp(Candidate);
+    if(Changed) { ++JournalRevision; }
+    if(!RetryJournalSave()) { return false; }
+    JournalMessage=TEXT("Bekreftede fangster er hentet fra verten og lagret. Ingen dobbel fangst eller utbetaling.");return true;
+}
 bool UFiskGameInstance::SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig)
 {
     const bool Saved=RigPresets.Save(Slot,Rig,RigPresetFile());

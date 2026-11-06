@@ -26,13 +26,13 @@ TArray<FFiskTripSummary> FiskTripBook::Days(const FFiskJournalModel& J)
 }
 TArray<int32> FiskTripBook::Rows(const FFiskJournalModel& J,const FGuid& Day)
 { TArray<int32> Out;for(int32 I:J.Select(EFiskJournalSort::Date,0,-1)) { if(J.GetEntries()[I].IsValid() && J.GetEntries()[I].DayId==Day) { Out.Add(I); } }return Out; }
-namespace { FString Esc(FString V) { return V.Replace(TEXT("&"),TEXT("&amp;")).Replace(TEXT("<"),TEXT("&lt;")).Replace(TEXT(">"),TEXT("&gt;")).Replace(TEXT("\""),TEXT("&quot;")); } }
+namespace { FString TripBookEscape(FString V) { return V.Replace(TEXT("&"),TEXT("&amp;")).Replace(TEXT("<"),TEXT("&lt;")).Replace(TEXT(">"),TEXT("&gt;")).Replace(TEXT("\""),TEXT("&quot;")); } }
 FString FiskTripBook::Html(const FFiskJournalModel& J,const FGuid& Day)
 {
     const auto Summaries=Days(J);const auto* D=Summaries.FindByPredicate([&](const auto& S){return S.Id==Day;});if(!D) { return {}; }
     FString S=TEXT("<!doctype html><html lang=\"nb\"><meta charset=\"utf-8\"><title>FISKELAGET – turrapport</title><style>body{font:17px system-ui;max-width:1100px;margin:40px auto;padding:20px;color:#123e47;background:#f4f8f7}table{border-collapse:collapse;width:100%}td,th{padding:12px;text-align:left;border-bottom:1px solid #abc}h1{color:#095c68}</style><h1>Min bekreftede fisketur</h1>");
-    S+=FString::Printf(TEXT("<p>Dag %d · %s UTC</p><p>%d landet · %d solgt · %d tapt ved retur · %.1f kg landet · %lld fiskepenger</p><table><tr><th>Art</th><th>kg</th><th>cm</th><th>Status</th><th>Habitat</th><th>Agn / dybde</th><th>Kamp</th></tr>"),D->Number,*Esc(D->Utc.Left(19)),D->Count,D->Sold,D->Lost,D->Grams/1000.0,static_cast<long long>(D->Income));
-    for(int32 I:Rows(J,Day)) { const auto& E=J.GetEntries()[I];S+=FString::Printf(TEXT("<tr><td>%s</td><td>%.1f</td><td>%.1f</td><td>%s</td><td>%s</td><td>%s / %d m</td><td>%.1f s</td></tr>"),*Esc(FiskCatches::Find(E.Fish.Species)->Name),E.Fish.WeightGrams/1000.0,E.Fish.LengthMm/10.0,E.bSold?TEXT("Solgt"):TEXT("Tapt ved retur"),*Esc(FiskGrounds::Find(E.Context.Ground)->Name),*Esc(FFiskRigRules::BaitName(E.Context.Bait)),E.Context.Depth,E.Context.FightMs/1000.0); }
+    S+=FString::Printf(TEXT("<p>Dag %d · %s UTC</p><p>%d landet · %d solgt · %d tapt ved retur · %.1f kg landet · %lld fiskepenger</p><table><tr><th>Art</th><th>kg</th><th>cm</th><th>Status</th><th>Habitat</th><th>Agn / dybde</th><th>Kamp</th></tr>"),D->Number,*TripBookEscape(D->Utc.Left(19)),D->Count,D->Sold,D->Lost,D->Grams/1000.0,static_cast<long long>(D->Income));
+    for(int32 I:Rows(J,Day)) { const auto& E=J.GetEntries()[I];S+=FString::Printf(TEXT("<tr><td>%s</td><td>%.1f</td><td>%.1f</td><td>%s</td><td>%s</td><td>%s / %d m</td><td>%.1f s</td></tr>"),*TripBookEscape(FiskCatches::Find(E.Fish.Species)->Name),E.Fish.WeightGrams/1000.0,E.Fish.LengthMm/10.0,E.bSold?TEXT("Solgt"):TEXT("Tapt ved retur"),*TripBookEscape(FiskGrounds::Find(E.Context.Ground)->Name),*TripBookEscape(FFiskRigRules::BaitName(E.Context.Bait)),E.Context.Depth,E.Context.FightMs/1000.0); }
     return S+TEXT("</table><p>Bare egen bekreftet journal. Ingen andre spilleres fangster eller uoppgjorte resultater. Landet vekt inkluderer fangst som gikk tapt ved retur; inntekt gjelder bare solgt fisk.</p></html>");
 }
 bool FiskTripBook::Export(const FString& Dir,const FFiskJournalModel& J,const FGuid& Day,FString& File)

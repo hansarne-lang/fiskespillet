@@ -67,6 +67,8 @@ public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
+    // The owning controller prepares every rig first, then commits a validated bundle in one server frame.
+    friend class AFiskBoardingController;
     UPROPERTY(ReplicatedUsing = OnRep_View) FFiskRodView View;
     UPROPERTY(Replicated) FFiskRigSettings Rig;
     UFUNCTION() void OnRep_View();

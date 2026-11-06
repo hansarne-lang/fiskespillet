@@ -71,6 +71,11 @@ void AFiskBoardingController::RunExplorationSmoke()
     else if(ExplorationStage==7 && Progress==100)
     {
         if(FVector::Dist2D(B->GetActorLocation(),FiskAtlas::Find(5)->Point)>5) { Fail(TEXT("transfer_arrived_wrong_point"));return; }
+        ExplorationAt=Real;ExplorationStage=71;
+    }
+    else if(ExplorationStage==71 && Real-ExplorationAt>=3)
+    {
+        // Leave enough time for remote half-second probes to observe arrival before the next leg.
         if(Host) { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point); }ExplorationAt=Real;ExplorationStage=70;
     }
     else if(ExplorationStage==70 && B->IsTravelling() && B->GetTripProgress()<100 && Real-ExplorationAt>=2)

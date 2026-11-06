@@ -76,6 +76,7 @@ void UFiskMarinaPanel::RunSmoke()
     {
         if(Identity.DisplayName!=Name || Identity.HouseName!=TEXT("PALMEHYTTA 8") || Identity.Color!=1 || Identity.Style!=1 || Identity.Decor!=1 || GI->Career.Cash!=SmokeCash) { Fail(TEXT("typed_shortcuts_save_or_wallet_changed"));return; }
         FFiskMarinaIdentity Disk;if(FFiskMarinaStore::Load(File(),LoadedProfile,Disk)==EFiskMarinaLoad::Blocked || !(Disk==Identity)) { Fail(TEXT("cosmetics_not_on_disk"));return; }
+        FVector2D Screen;if(!PC->ProjectWorldLocationToScreen(AFiskMarinaHub::HousePosition(HouseIndex)+FVector(0,0,350),Screen) || Screen.X<650 || Screen.X>1230 || Screen.Y<50 || Screen.Y>650) { Fail(TEXT("selected_house_hidden_by_ui"));return; }
         Shot(TEXT("naust-eget"));SmokeAt=Now;SmokeStage=2;
     }
     else if(SmokeStage==2 && Now-SmokeAt>=2)

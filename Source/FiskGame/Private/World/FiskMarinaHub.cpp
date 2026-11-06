@@ -55,7 +55,7 @@ void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
     Super::CalcCamera(DeltaTime,Out);const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
     const FVector Target=Bar?FVector(-4200,-1900,230):HousePosition(Panel?Panel->GetHouseIndex():0)+FVector(0,0,300);
-    Out.Location=Target+(Bar?FVector(1400,-1400,650):FVector(350,-1600,550));Out.Rotation=(Target+FVector(-650,0,0)-Out.Location).Rotation();Out.FOV=65;
+    Out.Location=Target+(Bar?FVector(1400,-1400,650):FVector(350,-1600,550));Out.Rotation=(Target+FVector(650,0,0)-Out.Location).Rotation();Out.FOV=65;
 }
 void AFiskMarinaHub::Rebuild()
 {

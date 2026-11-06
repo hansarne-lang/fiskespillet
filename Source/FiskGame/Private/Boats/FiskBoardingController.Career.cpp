@@ -2,6 +2,7 @@
 #include "Boats/FiskStarterBoat.h"
 #include "Bootstrap/FiskBootstrapGameMode.h"
 #include "Career/FiskCareerStore.h"
+#include "Career/FiskJournalAuthority.h"
 #include "UI/FiskGameInstance.h"
 #include "UI/FiskUserSettings.h"
 #include "UI/FiskFrontEnd.h"
@@ -38,6 +39,7 @@ void AFiskBoardingController::ServerCareerHello_Implementation(FFiskCareerProfil
     if(Status==EFiskCareerLoad::Blocked || ((Status==EFiskCareerLoad::Loaded || Status==EFiskCareerLoad::Recovered) && !P.Extends(Known) && !Known.Extends(P)))
     { ServerCareer=FFiskCareerProfile();ClientActionFeedback(TEXT("Vertens profilkopi er skadet eller i konflikt. Filene er bevart."));return; }
     if(Known.IsValid() && Known.Revision>P.Revision) { P=Known; }
+    if(!FiskJournalAuthority::RecoverIncome(FPaths::GetPath(CareerAuthorityFile()),P)) { ClientActionFeedback(TEXT("Vertens bekreftede journal/inntekt kan ikke leses. Eksisterende data er bevart."));return; }
     if(!SaveServerCareer(P,TEXT("Karriere bekreftet av verten."))) { return; }
     bCareerReady=true;
     if(AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>()) { Mode->BindCareer(PlayerState->GetPlayerId(),P.Id); }
@@ -68,6 +70,7 @@ void AFiskBoardingController::TickCareer()
     if(IsLocalController() && PendingCareer.IsValid())
     { UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());if(GI->AcceptCareer(PendingCareer)) { if(!HasAuthority()) { bCareerReady=true; }ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); } }
     if(!HasAuthority() || !bCareerReady) { return; }
+    TickJournalRecovery();
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const AFiskDaySettlement* Settlement=Mode?Mode->GetSettlement():nullptr;
     if(Day && Settlement && Day->GetElapsedMilliseconds()>=1020000 && Settlement->GetView().bRevealed)

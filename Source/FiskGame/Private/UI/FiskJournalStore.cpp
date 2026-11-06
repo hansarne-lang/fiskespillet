@@ -16,6 +16,14 @@ bool Integer(const FConfigFile& Config,const TCHAR* Section,const TCHAR* Key,int
 }
 void Put(FConfigFile& Config,const TCHAR* Section,const TCHAR* Key,int32 Value)
 { Config.SetString(Section,Key,*FString::FromInt(Value)); }
+bool JournalPreservable(const FString& File)
+{
+    for(const FString& Path:{File,File+TEXT(".bak")})
+    {
+        const int64 Size=IFileManager::Get().FileSize(*Path);if(Size>FFiskJournalStore::MaxBytes) { return false; }
+        if(Size>=0) { FConfigFile C;C.Read(Path);int32 Version=0;if(C.GetInt(Meta,TEXT("Version"),Version) && Version>1) { return false; } }
+    }return true;
+}
 }
 FString FFiskJournalStore::LockName(const FString& File)
 {
@@ -48,6 +56,12 @@ bool FFiskJournalStore::Read(const FString& File,FFiskJournalModel& Model,int32&
         FString Optional;
         if(Config.GetString(Section,TEXT("BoatKind"),Optional) && !Integer(Config,Section,TEXT("BoatKind"),E.Context.BoatKind)) { return false; }
         if(Config.GetString(Section,TEXT("Equipment"),Optional) && !Integer(Config,Section,TEXT("Equipment"),E.Context.Equipment)) { return false; }
+        if(Config.GetString(Section,TEXT("HasSeaPoint"),Optional))
+        {
+            int32 Has=0,X=0,Y=0;
+            if(!Integer(Config,Section,TEXT("HasSeaPoint"),Has) || Has!=1 || !Integer(Config,Section,TEXT("SeaX"),X) || !Integer(Config,Section,TEXT("SeaY"),Y)) { return false; }
+            E.Context.bHasSeaPoint=true;E.Context.SeaPoint=FVector(X,Y,0);
+        }
         E.bSold=Sold==1;Entries.Add(E);
     }
     return Entries.Num()==Count && Model.Restore(Entries);
@@ -66,6 +80,7 @@ bool FFiskJournalStore::Write(const FString& File,const FFiskJournalModel& Model
         Put(Config,S,TEXT("Depth"),E.Context.Depth);Put(Config,S,TEXT("Program"),E.Context.Program);Put(Config,S,TEXT("FightMs"),E.Context.FightMs);
         Put(Config,S,TEXT("LandedAtMs"),E.Context.LandedAtMs);Config.SetString(S,TEXT("LandedUtc"),*E.Context.LandedUtc);
         Put(Config,S,TEXT("BoatKind"),E.Context.BoatKind);Put(Config,S,TEXT("Equipment"),E.Context.Equipment);
+        if(E.Context.bHasSeaPoint) { Put(Config,S,TEXT("HasSeaPoint"),1);Put(Config,S,TEXT("SeaX"),FMath::RoundToInt(E.Context.SeaPoint.X));Put(Config,S,TEXT("SeaY"),FMath::RoundToInt(E.Context.SeaPoint.Y)); }
     }
     Config.Dirty=true;
     return Config.Write(File) && IFileManager::Get().FileSize(*File)<=MaxBytes;
@@ -73,7 +88,7 @@ bool FFiskJournalStore::Write(const FString& File,const FFiskJournalModel& Model
 EFiskJournalLoad FFiskJournalStore::Load(const FString& File,FFiskJournalModel& Model)
 {
     FSystemWideCriticalSection Lock(LockName(File),FTimespan::FromSeconds(1));
-    if(!Lock.IsValid()) { return EFiskJournalLoad::Unavailable; }
+    if(!Lock.IsValid() || !JournalPreservable(File)) { return EFiskJournalLoad::Unavailable; }
     FFiskJournalModel Main,Backup;int32 MainGeneration=0,BackupGeneration=0;
     const bool GoodMain=Read(File,Main,MainGeneration),GoodBackup=Read(File+TEXT(".bak"),Backup,BackupGeneration);
     if(GoodMain && (!GoodBackup || MainGeneration>=BackupGeneration)) { Model=MoveTemp(Main);return EFiskJournalLoad::Loaded; }
@@ -84,7 +99,7 @@ EFiskJournalLoad FFiskJournalStore::Load(const FString& File,FFiskJournalModel& 
 bool FFiskJournalStore::Save(const FString& File,FFiskJournalModel& Model)
 {
     FSystemWideCriticalSection Lock(LockName(File),FTimespan::FromSeconds(1));
-    if(!Lock.IsValid()) { return false; }
+    if(!Lock.IsValid() || !JournalPreservable(File)) { return false; }
     FFiskJournalModel Main,Backup;int32 MainGeneration=0,BackupGeneration=0;
     const bool GoodMain=Read(File,Main,MainGeneration),GoodBackup=Read(File+TEXT(".bak"),Backup,BackupGeneration);
     const bool HadMain=IFileManager::Get().FileExists(*File),HadBackup=IFileManager::Get().FileExists(*(File+TEXT(".bak")));

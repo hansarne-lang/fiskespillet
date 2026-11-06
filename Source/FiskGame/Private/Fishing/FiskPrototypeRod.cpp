@@ -137,6 +137,8 @@ void UFiskPrototypeRod::Land()
     Context.BoatKind=Boat->GetKind();const AFiskBoardingController* OwnerPC=::Cast<AFiskBoardingController>(GetOwner());Context.Equipment=OwnerPC?OwnerPC->GetServerCareer().Owned&7:0;
     Context.LandedAtMs=Day->GetElapsedMilliseconds();Context.FightMs=FMath::Max(0,Context.LandedAtMs-FirstRunAtMs);
     Context.LandedUtc=FDateTime::UtcNow().ToIso8601();
+    Context.bHasSeaPoint=true;const FVector Point=Boat->GetDestination();
+    Context.SeaPoint=FVector(FMath::RoundToDouble(Point.X),FMath::RoundToDouble(Point.Y),0);
     if (!Mode->GetSettlement()->RegisterCatch(CatchId, PC->PlayerState->GetPlayerId(),CatchData,Context)) { return; }
     LandedAtMs = Day->GetElapsedMilliseconds();
     Cycle.FinishLanding(View.CastId, LandedAtMs);

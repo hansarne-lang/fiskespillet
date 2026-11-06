@@ -28,6 +28,7 @@
 #include "FiskBoatLayout.h"
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskMarinaHub.h"
+#include "UI/FiskExpeditionPanel.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -43,11 +44,13 @@ AFiskBoardingController::AFiskBoardingController()
     DeckPanel = CreateDefaultSubobject<UFiskDeckPanel>(TEXT("DeckPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
+    ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(ExpeditionPanel->HandleKey(Params)) { return true; }
     if(MarinaPanel->HandleKey(Params)) { return true; }
     if(HandleCareerKey(Params)) { return true; }
     if(DeckPanel->IsVisible()) { return DeckPanel->HandleKey(Params); }
@@ -140,6 +143,11 @@ void AFiskBoardingController::BeginPlay()
     GetWorldTimerManager().SetTimer(CareerTimer,this,&AFiskBoardingController::TickCareer,.5f,true);
 
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExpeditionSmoke="),ExpeditionSmokeMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ExpeditionSmokeDir);
+        GetWorldTimerManager().SetTimer(ExpeditionSmokeTimer,this,&AFiskBoardingController::RunExpeditionSmoke,.5f,true,2.f);
+    }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCareerReleaseSmoke="),CareerSmokeMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CareerSmokeDir);
@@ -430,7 +438,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             }
         }
     }
-    if(!bAutoResultsSeen && !MarinaPanel->IsVisible() && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
+    if(!bAutoResultsSeen && !ExpeditionPanel->IsVisible() && !MarinaPanel->IsVisible() && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
         && !SeaChart->IsVisible() && !RigPanel->IsVisible())
     {
         for(TActorIterator<AFiskDaySettlement> Settlement(GetWorld());Settlement;++Settlement)

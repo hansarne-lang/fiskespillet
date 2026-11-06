@@ -128,7 +128,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     }
     else if(CareerSmokeStage==122 && Boat->GetCaptainId()==Self) { CareerSmokeStage=13; }
     else if(CareerSmokeStage==13)
-    { if(Host && Progress==-1 && Now>=120) { Key(EKeys::R); }if(Progress==100) { Key(EKeys::F);CareerSmokeStage=14; } }
+    { if(Host && Progress==-1 && Now>=120 && (ExpeditionSmokeMode.IsEmpty() || ExpeditionSmokeStage>=6)) { Key(EKeys::R); }if(Progress==100) { Key(EKeys::F);CareerSmokeStage=14; } }
     else if(CareerSmokeStage==14 && First->GetState()==EFiskRodState::Fishing)
     { if(GetRodCapacity()>1) { Key(EKeys::Two);CareerSmokeStage=15; }else { Shot(TEXT("passive-rods"));CareerSmokeStage=19; } }
     else if(CareerSmokeStage==15 && GetSelectedRod()==1 && !IsRodSelectionPending())

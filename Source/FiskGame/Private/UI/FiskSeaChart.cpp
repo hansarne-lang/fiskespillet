@@ -1,4 +1,6 @@
 #include "UI/FiskSeaChart.h"
+#include "Expedition/FiskExpeditionState.h"
+#include "EngineUtils.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskRigPanel.h"
 #include "UI/FiskGameInstance.h"
@@ -160,6 +162,8 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     HUD.DrawText(FString::Printf(TEXT("Punkt %.0f, %.0f m | Reise %d s"),Boat->GetDestination().X/100,Boat->GetDestination().Y/100,Boat->GetTravelMs()/1000),FLinearColor::White,52*S,519*S,nullptr,.9f*S);
     HUD.DrawText(bHome?TEXT("Båten er tilbake i marinaen."):FString::Printf(TEXT("Returfrist 17:00 | Margin ca. %s%d:%02d"),Margin<0?TEXT("-"):TEXT(""),FMath::Abs(Margin)/60,FMath::Abs(Margin)%60),Risk,610*S,575*S,nullptr,1.2f*S);
     HUD.DrawText(TEXT("Klikk i sjøen for eget punkt. Øyer og marina avvises."),Muted,610*S,611*S,nullptr,0.85f*S);
+    TActorIterator<AFiskExpeditionState> Expedition(GetWorld());
+    if(Expedition) { HUD.DrawText(FString::Printf(TEXT("Vær: %s | J: avreiseplan"),FiskExpeditions::WeatherName(Expedition->GetPlan().Weather)),Teal,610*S,641*S,nullptr,.95f*S); }
     const FString Hint=!Message.IsEmpty()?Message:Boat->GetTripProgress()!=AFiskStarterBoat::AtDock?TEXT("Ruten er låst. Lukk kartet før R for retur."):TEXT("Piler: velg rad. Enter eller klikk: velg plass.");
     HUD.DrawText(Hint,FLinearColor(1,0.85f,0.5f),52*S,559*S,nullptr,0.95f*S);
     Buttons.Add(FBox2D(FVector2D(52*S,615*S),FVector2D(550*S,651*S)));

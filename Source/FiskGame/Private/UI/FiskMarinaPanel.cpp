@@ -22,6 +22,7 @@
 #include "GameFramework/HUD.h"
 #include "GameFramework/PlayerState.h"
 #include "Misc/Paths.h"
+#include "Fishing/FiskPrototypeRod.h"
 
 UFiskMarinaPanel::UFiskMarinaPanel() { PrimaryComponentTick.bCanEverTick=true;PrimaryComponentTick.TickInterval=.5f; }
 FString UFiskMarinaPanel::File() const { return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetMarina-")+LoadedProfile.ToString(EGuidFormats::Digits)+TEXT(".ini")); }
@@ -84,16 +85,16 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
     AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());const bool Press=A.Event==IE_Pressed || A.Event==IE_Repeat;
     if(!Page)
     {
-        if(!Press || (A.Key!=EKeys::H && A.Key!=EKeys::B && A.Key!=EKeys::I)) { return false; }
+        if(!Press || (A.Key!=EKeys::H && A.Key!=EKeys::B && A.Key!=EKeys::I && A.Key!=EKeys::U)) { return false; }
         if(PC->GetFrontEnd()->IsVisible() || PC->GetSeaChart()->IsVisible() || PC->GetCrewPanel()->IsVisible() || PC->GetRigPanel()->IsVisible() || PC->GetJournalPanel()->IsVisible() || PC->GetDeckPanel()->IsVisible() || PC->IsCareerVisible() || PC->IsHelpVisible() || PC->IsResultsVisible() || PC->IsHistoryVisible()) { return false; }
         if(A.Key!=EKeys::I && !IsAtDock()) { PC->ClientActionFeedback(TEXT("Naust og strandbar brukes ved marinaen."));return true; }
-        Show(A.Key==EKeys::H?1:A.Key==EKeys::B?2:3);return true;
+        Show(A.Key==EKeys::H?1:A.Key==EKeys::B?2:A.Key==EKeys::U?4:3);return true;
     }
     if(!Press) { return true; }
     if(bEditing)
     {
         if(A.Key==EKeys::Escape) { bEditing=false;return true; }
-        if(A.Key==EKeys::Enter) { if(FFiskCareerProfile::ValidName(EditText)) { if(Row==0) { Draft.DisplayName=EditText; }else { Draft.HouseName=EditText; }bEditing=false; }return true; }
+        if(A.Key==EKeys::Enter) { if(FFiskCareerProfile::ValidName(EditText)) { if(Page==4) { Status=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->RenameRigPreset(PresetSlot,EditText)?TEXT("Oppsettsnavnet er lagret."):TEXT("Kunne ikke lagre navnet. Filene er bevart."); }else if(Row==0) { Draft.DisplayName=EditText; }else { Draft.HouseName=EditText; }bEditing=false; }return true; }
         if(A.Key==EKeys::BackSpace) { EditText=EditText.LeftChop(1);return true; }
         FString C=A.Key.GetFName().ToString();if(A.Key==EKeys::SpaceBar) { C=TEXT(" "); }if(A.Key==EKeys::Hyphen) { C=TEXT("-"); }
         const FKey Digits[]={EKeys::Zero,EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five,EKeys::Six,EKeys::Seven,EKeys::Eight,EKeys::Nine};
@@ -101,7 +102,21 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
         for(int32 I=0;I<10;++I) { if(A.Key==Digits[I] || A.Key==Pad[I]) { C=FString::FromInt(I); } }
         if(C.Len()==1 && (FChar::IsAlnum(C[0]) || C==TEXT(" ") || C==TEXT("-")) && EditText.Len()<24) { EditText+=C.ToUpper(); }return true;
     }
-    if(A.Key==EKeys::Escape || (Page==1 && A.Key==EKeys::H) || (Page==2 && A.Key==EKeys::B) || (Page==3 && A.Key==EKeys::I)) { Show(0);return true; }
+    if(A.Key==EKeys::Escape || (Page==1 && A.Key==EKeys::H) || (Page==2 && A.Key==EKeys::B) || (Page==3 && A.Key==EKeys::I) || (Page==4 && A.Key==EKeys::U)) { Show(0);return true; }
+    if(Page==1 && A.Key==EKeys::U) { Show(4);return true; }
+    if(Page==4)
+    {
+        auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const FKey Slots[]={EKeys::One,EKeys::Two,EKeys::Three};
+        for(int32 I=0;I<3;++I) { if(A.Key==Slots[I]) { PresetSlot=I; } }
+        if(A.Key==EKeys::H) { Show(1);return true; }const auto* Saved=GI->RigPresets.Get(PresetSlot);
+        if(A.Key==EKeys::F2 && Saved && Saved->bExists) { bEditing=true;EditText=Saved->Name; }
+        if(A.Key==EKeys::F5) { Status=PC->GetRod() && GI->SaveRigPreset(PresetSlot,PC->GetRod()->GetRig())?TEXT("Bekreftet stangoppsett er lagret."):TEXT("Kunne ikke lagre oppsettet. Filene er bevart."); }
+        if(A.Key==EKeys::F9 && Saved && Saved->bExists)
+        {
+            if(PC->CanOpenRig()) { PC->RequestRig(Saved->Rig.Bait,Saved->Rig.Depth,Saved->Rig.Program);Status=TEXT("Sendt til verten. Se bekreftede valg i G."); }
+            else { Status=TEXT("Gå om bord og velg en ledig egen stang før du henter oppsett."); }
+        }return true;
+    }
     const AFiskMarinaHub* Hub=FindHub();
     if(Page==3) { if(A.Key==EKeys::Right || A.Key==EKeys::Down || A.Key==EKeys::PageDown) { Species=(Species+1)%FiskCatches::Count; }if(A.Key==EKeys::Left || A.Key==EKeys::Up || A.Key==EKeys::PageUp) { Species=(Species+FiskCatches::Count-1)%FiskCatches::Count; }return true; }
     const FKey Numbers[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};
@@ -124,7 +139,25 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const FLinearColor Teal(.5f,.9f,.84f),Gold(1,.8f,.4f);
     auto T=[&](const FString& Text,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){HUD.DrawText(Text,Color,X*S,Y*S,nullptr,Size*S);};
     const UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const AFiskMarinaHub* Hub=FindHub();
-    HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.97f),24*S,28*S,(Page==3?1232:610)*S,650*S);
+    HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.97f),24*S,28*S,(Page==3 || Page==4?1232:610)*S,650*S);
+    if(Page==4)
+    {
+        T(TEXT("DITT UTSTYRSROM"),48,58,2);T(TEXT("Eid utstyr og tre personlige oppsett. P viser butikk og priser."),48,112,1.f,Teal);
+        T(TEXT("Saldo: ")+GI->Career.Money(),48,160,1.2f,Gold);
+        for(int32 I=0;I<4;++I) { T(FFiskCareerProfile::ItemName(I)+TEXT(": ")+(GI->Career.Has(I)?TEXT("EID"):TEXT("Ikke kjøpt")),48,207+35*I,1.f); }
+        int32 Found=0;for(int32 I=0;I<FiskCatches::Count;++I) { Found+=GI->GetJournal().Best(I)?1:0; }
+        T(FString::Printf(TEXT("Artsfunn %d/%d | I: artsbok utenfor panelet"),Found,FiskCatches::Count),48,375,.95f,Teal);
+        T(TEXT("Startbåten er alltid tilgjengelig."),48,415,.95f);T(TEXT("Offshorebåten krever eget kjøp og nok plass."),48,451,.9f,Teal);
+        const auto* PC=CastChecked<AFiskBoardingController>(GetOwner());T(FString::Printf(TEXT("Valgt egen stang: %d"),PC->GetSelectedRod()+1),650,160,1.15f,Gold);
+        for(int32 I=0;I<3;++I)
+        {
+            const auto* Saved=GI->RigPresets.Get(I);HUD.DrawRect(I==PresetSlot?FLinearColor(.14f,.34f,.36f):FLinearColor(.03f,.12f,.15f),640*S,(204+92*I)*S,570*S,82*S);
+            T(FString::Printf(TEXT("%d  %s"),I+1,*(bEditing && I==PresetSlot?EditText:Saved->Name)),654,219+92*I,1.1f);
+            T(Saved->bExists?FString::Printf(TEXT("%s | %d m | %s"),FFiskRigRules::BaitName(Saved->Rig.Bait),Saved->Rig.Depth,FFiskRigRules::ProgramName(Saved->Rig.Program)):TEXT("Tom plass. F5 lagrer valgte stangs bekreftede oppsett."),654,252+92*I,.85f,Teal);
+        }
+        T(bEditing?TEXT("Skriv navn, Enter: lagre. Escape: avbryt."):TEXT("1/2/3: plass | F2: navn | F5: lagre | F9: hent til egen stang"),48,525,.95f,Teal);
+        T(Status,48,568,.9f,Gold);T(TEXT("U / Escape: lukk | H: naust | Klokken fortsetter. Hentede valg kontrolleres av verten."),48,635,.9f,Teal);return;
+    }
     if(Page==3)
     {
         T(TEXT("ARTSBOK OG ARTSJAKT"),52,60,2);int32 Discovered=0;for(int32 I=0;I<FiskCatches::Count;++I) { if(GI->GetJournal().Best(I)) { ++Discovered; } }

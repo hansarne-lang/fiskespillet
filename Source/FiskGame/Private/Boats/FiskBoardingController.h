@@ -3,8 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Fishing/FiskRodSelection.h"
+#include "Fishing/FiskRigSettings.h"
 #include "FiskCareerProfile.h"
 #include "FiskMarinaTypes.h"
+#include "UI/FiskJournalModel.h"
+#include "Expedition/FiskExpeditionModel.h"
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
@@ -16,6 +19,7 @@ class UFiskJournalPanel;
 class UFiskDeckPanel;
 class AFiskStarterBoat;
 class UFiskMarinaPanel;
+class UFiskExpeditionPanel;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -38,10 +42,19 @@ class AFiskBoardingController final : public APlayerController
 public:
     AFiskBoardingController();
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
+    UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
     UFUNCTION(Server,Reliable) void ServerMarinaIdentity(FGuid Profile,FFiskMarinaIdentity Identity);
     UFUNCTION(Client,Reliable) void ClientMarinaIdentity(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason);
     UFUNCTION(Server,Reliable) void ServerMarinaRecords(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records);
     UFUNCTION(Server,Reliable) void ServerMarinaSay(int32 Code);
+    UFUNCTION(Client,Reliable) void ClientJournalBatch(FGuid Profile,int32 Serial,const TArray<FFiskJournalEntry>& Entries);
+    UFUNCTION(Server,Reliable) void ServerJournalAck(FGuid Profile,int32 Serial);
+    void TickJournalRecovery();
+    UFUNCTION(Client,Reliable) void ClientExpeditionBatch(FGuid Profile,int32 Serial,const TArray<FFiskExpeditionRecord>& Entries);
+    UFUNCTION(Server,Reliable) void ServerExpeditionAck(FGuid Profile,int32 Serial);
+    UFUNCTION(Server,Reliable) void ServerExpeditionChoose(int32 Revision,int32 Goal);
+    UFUNCTION(Server,Reliable) void ServerExpeditionReady(int32 Revision,bool Ready);
+    UFUNCTION(Server,Reliable) void ServerExpeditionSay(int32 Code);
     bool IsCareerReady() const { return bCareerReady; }
     bool IsCareerSynced() const { return bCareerReady && CareerAck>=ServerCareer.Revision; }
     const FFiskCareerProfile& GetServerCareer() const { return ServerCareer; }
@@ -102,8 +115,17 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    UPROPERTY() TObjectPtr<UFiskExpeditionPanel> ExpeditionPanel;
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
     double LastMarinaMessage=-10;
+    FFiskJournalModel RecoverySnapshot;
+    TArray<FFiskExpeditionRecord> ExpeditionSnapshot;
+    int32 ExpeditionOffset=0,ExpeditionSerial=0,ExpeditionSentCount=0,ClientExpeditionSerial=0;
+    bool bExpeditionAwaiting=false;
+    double LastExpeditionMessage=-10;
+    void TickExpeditionRecovery();
+    int32 RecoveryRevision=-1,RecoveryOffset=0,RecoverySerial=0,RecoverySentCount=0,ClientRecoverySerial=0;
+    bool bRecoveryAwaiting=false,bRecoveryReported=false;
     FFiskCareerProfile ServerCareer,PendingCareer;
     int32 CareerAck=0,ShopRow=0;
     bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;
@@ -159,6 +181,13 @@ private:
 
 #if WITH_DEV_AUTOMATION_TESTS
     int32 RejectedCaptainRequests=0;
+    FString ExpeditionSmokeMode,ExpeditionSmokeDir;
+    int32 ExpeditionSmokeStage=0;
+    double ExpeditionSmokeAt=0;
+    FTimerHandle ExpeditionSmokeTimer;
+    FFiskRigSettings ExpeditionSmokeRig;
+    bool bTestJournalAckDropped=false;
+    void RunExpeditionSmoke();
     void RunCareerReleaseSmoke();
     FString CareerSmokeMode,CareerSmokeDir;
     FTimerHandle CareerSmokeTimer;

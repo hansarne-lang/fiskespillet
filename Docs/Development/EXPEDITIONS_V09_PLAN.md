@@ -1,6 +1,6 @@
-# Forslag til v0.9 – Ekspedisjoner og fiskeforhold
+# v0.9 – Ekspedisjoner og fiskeforhold
 
-Planlagt etter prosjekteierens bestilling 6. november 2026, [GitHub77](https://github.com/hansarne-lang/fiskespillet/issues/77). Dette dokumentet er et forslag, ikke en beskrivelse av leverte funksjoner eller godkjente nye økonomiregler. GitHub-oppgaven for pakken følger den samme planen; eksisterende idébank og kravspesifikasjon erstattes ikke.
+Bestilt implementert av prosjekteieren 6. november 2026 gjennom «gjør 2 og 3», [GitHub77](https://github.com/hansarne-lang/fiskespillet/issues/77). Utviklingen følges i #85 og deloppgavene #80–#84. Dokumentet beskriver omfang og kontrakter; ferdigstatus og faktisk verifikasjon føres i leveransens testresultater. Eksisterende idébank og kravspesifikasjon erstattes ikke.
 
 ## Målet for spilleren
 
@@ -18,12 +18,20 @@ Hver fiskedag får et tydelig ekspedisjonsmål og mer variasjon i havmiljøet. M
 
 Del1 bør ferdigstilles først fordi den lukker en kjent begrensning i v0.8. Del2–5 gir den nye innholdspakken. Hver del får egen underoppgave og en demonstrerbar leveranse før neste integreres.
 
-## Foreslåtte valg som må fastsettes før implementasjon
+## Fastlagte valg i denne pakken
 
 - Oppdrag gir først medaljer og historikk. Et eventuelt pengebonussystem må få konkrete beløp, grenser og kvitteringsregler før det bygges. Forslag: ingen nye pengebonuser i første ekspedisjonspakke.
 - Vær endrer først bare presentasjonen. Eventuell påvirkning på napp, kamp eller båtfart vurderes som en separat balanseendring; ingen skjulte multiplikatorer.
 - Ett aktivt felles ekspedisjonsmål per dag, valgt av kapteinen ved brygga. Solospill bruker mål som kan fullføres alene; flerspillermål krever flere fiskere bare når de deltar.
 - Journalgjenhenting krever en avgrenset vertskopi og migreringsplan. Lagringsgrense, kvitteringsgrense og sletting av gamle data skal være uttrykkelige; eksisterende filer skal ikke tømmes automatisk.
+
+Konkrete kontrakter: journalarkiv per profil har maks 4096 fangster / 4 MiB; medaljehistorikk per profil har maks 512 ekspedisjoner / 1 MiB. Eksisterende karrieregrense på 512 kvitteringer beholdes. Ingen automatisk sletting eller utrulling av gamle data. Når arkivering ikke kan fullføres, venter neste dag. Ukjente nyere filformater og to ugyldige filkopier bevares. Journalformat 1 beholder gamle poster uten sjøpunkt; nye poster kan ha valgfrie koordinater. Stangoppsettformat 1 får valgfrie navn og leser eldre navnløse oppsett. Medaljefilen har format 1 og er bundet til profilens GUID.
+
+Det finnes ett mål per dag. Habitatmålet krever én levert fisk av arten med høyest habitatandel ved valgt plass. Artsmålet krever to ulike leverte arter. Mannskapsmålet krever fangst fra to ulike profiler når flere dro ut, ellers én. Rekordmålet sammenligner levert fisk med samme profils tidligere bekreftede artsrekorder i denne vertens arkiv, fanget ved avreise. Første bekreftede fangst kan bli rekord. Sjøpunktmålet krever levert fisk landet innen fem meter fra valgt sjøpunkt. Avreisemannskapet får samme medalje ved fullføring; ingen ny pengebonus. Dagens faktiske fangstart, størrelse og resultat vises først ved 17:00; selve oppdragsteksten er synlig før avreise.
+
+Været velges av verten og går rolig sjø → passatvind → tropisk regn over dager. Bare bølger, regn, lys, dis og lyd påvirkes. 30 FPS-valget halverer regnelementene. Klar-markering er frivillig og endrer ikke avreiserett, klokke eller fisketid. J åpner plan, T markerer klar, 6/7/8 sender faste meldinger med to sekunders mellomrom. U åpner eget utstyrsrom; 1/2/3 velger oppsett, F2 navngir, F5 lagrer bekreftet rigg og F9 ber verten bruke den på valgt egen stang. Lukk panelet før R.
+
+Nettverksfamilie 9 brukes fordi nye replikerte strukturer og meldinger inngår. Alle i samme økt må bruke v0.9; v0.8.0/v0.8.1 og eldre skal avvises, mens lagrede data kan videreføres. Verten importerer aldri klientjournaler som grunnlag for betaling eller medaljer. Gjenhenting sendes i maksimalt 16 poster om gangen og kvitteres først etter varig lokal lagring.
 
 ## Kontroller og leveranse
 

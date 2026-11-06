@@ -6,6 +6,7 @@
 #include "UI/FiskJournalStore.h"
 #include "UI/FiskNavigationNotebook.h"
 #include "FiskCareerProfile.h"
+#include "Expedition/FiskExpeditionModel.h"
 #include "FiskGameInstance.generated.h"
 class UNetDriver;
 UCLASS()
@@ -25,6 +26,10 @@ public:
     bool AcceptCareer(const FFiskCareerProfile& Profile);
     FString CareerFile() const;
     FFiskRigPresets RigPresets;
+    TArray<FFiskExpeditionRecord> Expeditions;
+    bool AcceptExpeditions(const FGuid& Profile,const TArray<FFiskExpeditionRecord>& Entries);
+    FString ExpeditionMessage;
+    bool RenameRigPreset(int32 Slot,const FString& Name);
     bool SaveRigPreset(int32 Slot,const FFiskRigSettings& Rig);
     FFiskNavigationNotebook Places;
     FString PlacesMessage;
@@ -37,6 +42,7 @@ public:
     bool IsJournalPending() const { return bJournalPending; }
     bool WasJournalRecovered() const { return bJournalRecovered; }
     bool RetryJournalSave();
+    bool AcceptRecoveredJournal(const FGuid& Profile,const TArray<FFiskJournalEntry>& Entries);
     void ObserveJournal(const struct FFiskSettlementView& View,int32 OwnPlayerId,int32 NowMs);
 #if WITH_DEV_AUTOMATION_TESTS
     int32 MenuSmokeStep = 0;

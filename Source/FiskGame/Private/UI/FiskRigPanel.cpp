@@ -145,7 +145,7 @@ void UFiskRigPanel::Draw(AHUD& HUD,UCanvas& Canvas)
     }
     HUD.DrawText(FFiskRigRules::QualityName(Rig, Ground),FLinearColor(0.65f,0.95f,0.75f),X,500*S,nullptr,1.1f*S);
     const FFiskSavedRig* Saved=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->RigPresets.Get(PresetSlot);
-    HUD.DrawText(FString::Printf(TEXT("Oppsett %d: %s  |  1 / 2 / 3: velg"),PresetSlot+1,Saved && Saved->bExists?TEXT("lagret"):TEXT("tomt")),FLinearColor::White,X,532*S,nullptr,0.9f*S);
+    HUD.DrawText(FString::Printf(TEXT("%s: %s | 1/2/3: velg"),Saved?*Saved->Name:TEXT("Oppsett"),Saved && Saved->bExists?TEXT("lagret"):TEXT("tomt")),FLinearColor::White,X,532*S,nullptr,0.9f*S);
     HUD.DrawText(TEXT("F5: lagre bekreftede valg. F9: hent lagret oppsett."),FLinearColor::White,X,558*S,nullptr,0.85f*S);
     HUD.DrawText(Message,FLinearColor(1,0.85f,0.5f),X,586*S,nullptr,0.82f*S);
     HUD.DrawText(TEXT("Piler: velg/endre. G / Escape: lukk. Klokken fortsetter."),FLinearColor(0.7f,0.8f,0.8f),X,622*S,nullptr,0.8f*S);

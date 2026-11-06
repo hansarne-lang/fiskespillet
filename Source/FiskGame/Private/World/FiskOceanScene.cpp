@@ -14,6 +14,9 @@
 #include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
 #include "FiskRouteGeometry.h"
+#include "Expedition/FiskExpeditionState.h"
+#include "Components/ExponentialHeightFogComponent.h"
+#include "UI/FiskGameInstance.h"
 
 AFiskOceanScene::AFiskOceanScene()
 {
@@ -22,6 +25,7 @@ AFiskOceanScene::AFiskOceanScene()
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.TickInterval = 1.0f / 20.0f;
     SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("OceanRoot")));
+    Fog=CreateDefaultSubobject<UExponentialHeightFogComponent>(TEXT("WeatherHaze"));Fog->SetupAttachment(RootComponent);Fog->SetFogDensity(.002f);
     USkyAtmosphereComponent* Sky = CreateDefaultSubobject<USkyAtmosphereComponent>(TEXT("Sky"));
     Sky->SetupAttachment(RootComponent);
     UDirectionalLightComponent* Sun = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("Sun"));
@@ -126,6 +130,11 @@ void AFiskOceanScene::BeginPlay()
         UStaticMeshComponent* Fish=Part(*FString::Printf(TEXT("FlyingFish%d"),I),Sphere,FVector::ZeroVector,FVector(.6,.08,.1),FLinearColor(.34f,.6f,.68f));
         Fish->SetCastShadow(false);Flyers.Add(Fish);
     }
+    for(int32 I=0;I<96;++I)
+    {
+        auto* Drop=Part(*FString::Printf(TEXT("Rain%d"),I),Cylinder,FVector::ZeroVector,FVector(.012,.012,1.7),FLinearColor(.36f,.57f,.67f));
+        Drop->SetCastShadow(false);Drop->SetVisibility(false);Rain.Add(Drop);
+    }
 }
 
 void AFiskOceanScene::Tick(float DeltaSeconds)
@@ -135,13 +144,28 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     const FVector Center = Boats ? Boats->GetActorLocation() : FVector::ZeroVector;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const double Time = Day ? Day->GetElapsedRealSeconds() : GetWorld()->GetTimeSeconds();
+    TActorIterator<AFiskExpeditionState> E(GetWorld());const int32 Weather=E?E->GetPlan().Weather:0;
+    const auto* GI=Cast<UFiskGameInstance>(GetWorld()->GetGameInstance());const bool Low=GI && GI->FrameRate==30;
+    if(ReportedWeather!=Weather)
+    {
+        ReportedWeather=Weather;Fog->SetFogDensity(Weather==2?.025f:Weather==1?.008f:.002f);
+        Fog->SetFogInscatteringColor(Weather==2?FLinearColor(.23f,.31f,.37f):FLinearColor(.55f,.69f,.71f));
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_WEATHER_PRESENTED day=%d weather=%d"),E?E->GetPlan().DayNumber:0,Weather);
+    }
+    for(int32 I=0;I<Rain.Num();++I)
+    {
+        const bool Show=Weather==2 && (!Low || I<48);Rain[I]->SetVisibility(Show);if(!Show) { continue; }
+        const double Phase=FMath::Fmod(Time*1.4+I*.618,1.0);
+        Rain[I]->SetRelativeLocation(Center+FVector(FMath::Sin(I*7.31)*2400+Phase*380,FMath::Cos(I*3.27)*2400,1900-Phase*2100));
+        Rain[I]->SetRelativeRotation(FRotator(12,0,0));
+    }
     if(Daylight)
     {
         const double Progress=Day && Day->HasStarted()?FMath::Clamp(Time/1200.0,0.0,1.0):.2;
         const float Height=FMath::Sin(Progress*PI);
         Daylight->SetRelativeRotation(FRotator(-15-45*Height,-70+130*Progress,0));
-        Daylight->SetIntensity(5.f+3.f*Height);
-        Daylight->SetLightColor(FMath::Lerp(FLinearColor(1,.73f,.47f),FLinearColor(1,.96f,.87f),Height));
+        Daylight->SetIntensity((5.f+3.f*Height)*(Weather==2?.36f:Weather==1?.8f:1.f));
+        Daylight->SetLightColor(Weather==2?FLinearColor(.63f,.74f,.85f):FMath::Lerp(FLinearColor(1,.73f,.47f),FLinearColor(1,.96f,.87f),Height));
     }
     for(int32 I=0;I<Birds.Num();++I)
     {
@@ -158,8 +182,8 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     {
         const double X = (Index % 8 - 4) * 900.0 + FMath::Sin(Index * 7.3) * 250.0;
         const double Y = (Index / 8 - 4) * 900.0 + FMath::Sin(Index * 3.1) * 300.0;
-        const double Wave = FMath::Sin(Time * 1.1 + Index * 1.8);
-        Ripples[Index]->SetRelativeLocation(FVector(Center.X + X, Center.Y + Y, -7 + Wave * 1.5));
-        Ripples[Index]->SetRelativeScale3D(FVector(4.0 + Wave, 0.12, 0.02));
+        const double Wave = FMath::Sin(Time * (Weather==0?1.1:Weather==1?1.7:2.2) + Index * 1.8);
+        Ripples[Index]->SetRelativeLocation(FVector(Center.X + X, Center.Y + Y, -7 + Wave * (Weather==0?1.5:Weather==1?4.5:7.0)));
+        Ripples[Index]->SetRelativeScale3D(FVector(4.0 + Wave*(Weather+1), 0.12+Weather*.08, 0.02));
     }
 }

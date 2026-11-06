@@ -36,7 +36,8 @@ void AFiskDaySettlement::ResetForDay(int32 DayNumber)
 void AFiskDaySettlement::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    if (!HasAuthority() || View.bRevealed) { return; }
+    if (!HasAuthority()) { return; }
+    if(View.bRevealed) { if(AFiskBootstrapGameMode* ReadyMode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();ReadyMode && ReadyMode->ArchiveConfirmedDay()) { SetActorTickEnabled(false); }return; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     if (!Day || !Day->HasStarted() || !Mode || !Mode->GetStarterBoat()) { return; }
@@ -51,7 +52,7 @@ void AFiskDaySettlement::Tick(float DeltaSeconds)
         View.bRevealed = true;
         OnRep_View();
         ForceNetUpdate();
-        SetActorTickEnabled(false);
+        if(AFiskBootstrapGameMode* ArchiveMode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();ArchiveMode && ArchiveMode->ArchiveConfirmedDay()) { SetActorTickEnabled(false); }
     }
 }
 

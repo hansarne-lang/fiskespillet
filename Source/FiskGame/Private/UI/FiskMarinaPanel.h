@@ -18,7 +18,7 @@ public:
     bool HandleKey(const FInputKeyEventArgs& Args);
     void Draw(AHUD& HUD,UCanvas& Canvas);
     bool IsVisible() const { return Page!=0; }
-    bool WantsCamera() const { return Page==1 || Page==2; }
+    bool WantsCamera() const { return Page==1 || Page==2 || Page==4; }
     int32 GetPage() const { return Page; }
     int32 GetHouseIndex() const { return HouseIndex; }
     AFiskMarinaHub* FindHub() const;
@@ -32,6 +32,7 @@ private:
     bool bBlocked=false,bSent=false,bPendingSave=false,bSending=false,bEditing=false;
     FString EditText,Status;
     int32 Page=0,Row=0,Species=0,HouseIndex=0,SentJournalRevision=-1;
+    int32 PresetSlot=0;
     double NextUpdate=0;
     FString File() const;
     void Show(int32 NewPage);

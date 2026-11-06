@@ -1,14 +1,18 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Economy/FiskDayLedger.h"
+#include "FiskJournalModel.generated.h"
 
+USTRUCT()
 struct FFiskJournalEntry
 {
-    FGuid CatchId,DayId;
-    int32 DayNumber=0;
-    FFiskCatchData Fish;
-    FFiskCatchContext Context;
-    bool bSold=false;
+    GENERATED_BODY()
+    UPROPERTY() FGuid CatchId;
+    UPROPERTY() FGuid DayId;
+    UPROPERTY() int32 DayNumber=0;
+    UPROPERTY() FFiskCatchData Fish;
+    UPROPERTY() FFiskCatchContext Context;
+    UPROPERTY() bool bSold=false;
     bool IsValid() const;
     bool operator==(const FFiskJournalEntry& Other) const;
 };

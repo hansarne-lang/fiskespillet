@@ -87,7 +87,9 @@ bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 Ex
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
     { if(const AFiskBoardingController* P=Cast<AFiskBoardingController>(It->Get());P && P->PlayerState && P->IsCareerReady()) { BindCareer(P->PlayerState->GetPlayerId(),P->GetServerCareer().Id); } }
     StarterBoat->ResetForDay(); Settlement->ResetForDay(ExpectedDay + 1);
-    return Day->AdvanceDay();
+    const bool Advanced=Day->AdvanceDay();
+    if(Advanced && Expedition) { Expedition->Refresh(); }
+    return Advanced;
 }
 int64 AFiskBootstrapGameMode::CareerIncome(const FGuid& Profile) const
 {

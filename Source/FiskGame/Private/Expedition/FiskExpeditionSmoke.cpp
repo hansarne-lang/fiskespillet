@@ -98,7 +98,7 @@ void AFiskBoardingController::RunExpeditionSmoke()
         Key(EKeys::J);Shot(TEXT("expedition-result"));ExpeditionSmokeAt=Real;ExpeditionSmokeStage=8;
     }
     else if(ExpeditionSmokeStage==8 && Real-ExpeditionSmokeAt>=1) { Key(EKeys::J);ExpeditionSmokeStage=9; }
-    if(Solo && Day->GetDayNumber()==1 && Now>=1200 && ExpeditionSmokeStage==9) { Key(EKeys::N); }
+    if(Solo && Day->GetDayNumber()==1 && Now>=1200 && ExpeditionSmokeStage==9) { Key(EKeys::N);return; }
     if(Day->GetDayNumber()==2 && Now>=35 && ExpeditionSmokeStage==9)
     {
         if(P.bEvaluated || P.bCompleted || P.bLocked || !P.Ready.IsEmpty() || GI->Expeditions.Num()!=1 || GI->GetJournal().GetEntries().Num()!=1)

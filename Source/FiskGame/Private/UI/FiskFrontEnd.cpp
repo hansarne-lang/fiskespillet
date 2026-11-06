@@ -13,6 +13,7 @@
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "TimerManager.h"
+#include "UI/FiskAnglerPanel.h"
 
 UFiskFrontEnd::UFiskFrontEnd() { PrimaryComponentTick.bCanEverTick = true; }
 void UFiskFrontEnd::BeginPlay()
@@ -100,6 +101,8 @@ bool UFiskFrontEnd::HandleKey(const FInputKeyEventArgs& Args)
     if (!bLocalFrontEnd) { return false; }
     const FKey Key = Args.Key;
     const bool bPressed = Args.Event == IE_Pressed || Args.Event == IE_Repeat;
+    if(Model.Page==EFiskMenuPage::Home && Args.Event==IE_Pressed && Key==EKeys::F6)
+    { PC->GetAnglerPanel()->OpenSchool();return true; }
     if (Key == EKeys::Escape && Args.Event == IE_Pressed)
     {
         if (!IsVisible())
@@ -136,6 +139,14 @@ bool UFiskFrontEnd::HandleKey(const FInputKeyEventArgs& Args)
 }
 void UFiskFrontEnd::Click(FVector2D Position)
 {
+    if(Model.Page==EFiskMenuPage::Home)
+    {
+        if(const auto* V=GetWorld()->GetGameViewport())
+        {
+            FVector2D Size;V->GetViewportSize(Size);const float S=FMath::Min(Size.X/1280.f,Size.Y/720.f);
+            if(FBox2D(FVector2D(560*S,220*S),FVector2D(1230*S,480*S)).IsInside(Position)) { CastChecked<AFiskBoardingController>(GetOwner())->GetAnglerPanel()->OpenSchool();return; }
+        }
+    }
     for (int32 I = 0; I < Buttons.Num(); ++I)
     {
         if (Buttons[I].IsInside(Position))
@@ -214,5 +225,13 @@ void UFiskFrontEnd::Draw(AHUD& HUD, UCanvas& Canvas)
     if (GetNetMode() != NM_Standalone) { HUD.DrawText(TEXT("Spillet fortsetter mens menyen er åpen."),FLinearColor(1,0.8f,0.5f),X,582*S,nullptr,0.9f*S); }
     else { HUD.DrawText(TEXT("F4: Din lagrede fangstjournal og artsrekorder"),FLinearColor(0.5f,0.9f,0.8f),X,582*S,nullptr,0.9f*S); }
     HUD.DrawText(TEXT("Mus eller piltaster / Tab   Enter: velg   Esc: tilbake"),FLinearColor(0.65f,0.78f,0.80f),X,626*S,nullptr,0.85f*S);
+    if(Model.Page==EFiskMenuPage::Home)
+    {
+        HUD.DrawRect(FLinearColor(.015f,.055f,.075f,.96f),560*S,220*S,670*S,260*S);
+        HUD.DrawText(TEXT("FISKESKOLEN"),FLinearColor(.5f,.9f,.84f),590*S,251*S,nullptr,2.f*S);
+        HUD.DrawText(TEXT("Lær pumpetak, brems og utras før første fiskedag."),FLinearColor::White,590*S,313*S,nullptr,1.08f*S);
+        HUD.DrawText(TEXT("Øv mot sju arter uten å endre karrieren."),FLinearColor::White,590*S,350*S,nullptr,1.08f*S);
+        HUD.DrawText(TEXT("F6 eller klikk her: åpne fiskeskolen"),FLinearColor(1,.8f,.4f),590*S,413*S,nullptr,1.2f*S);
+    }
     if (!bReadyReported) { bReadyReported = true; UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MENU_READY")); }
 }

@@ -30,6 +30,7 @@
 #include "World/FiskMarinaHub.h"
 #include "UI/FiskExpeditionPanel.h"
 #include "UI/FiskSkipperPanel.h"
+#include "UI/FiskAnglerPanel.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -47,11 +48,13 @@ AFiskBoardingController::AFiskBoardingController()
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
+    AnglerPanel=CreateDefaultSubobject<UFiskAnglerPanel>(TEXT("AnglerPanel"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(AnglerPanel->IsVisible()) { return AnglerPanel->HandleKey(Params); }
     if(SkipperPanel->IsVisible()) { return SkipperPanel->HandleKey(Params); }
     if(ExpeditionPanel->HandleKey(Params)) { return true; }
     if(MarinaPanel->HandleKey(Params)) { return true; }
@@ -103,6 +106,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if (SeaChart && SeaChart->HandleKey(Params)) { return true; }
     if (RigPanel && RigPanel->HandleKey(Params)) { return true; }
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
+    if(AnglerPanel->HandleKey(Params)) { return true; }
     if(SkipperPanel->HandleKey(Params)) { return true; }
     if(Press && Params.Key==EKeys::V)
     {
@@ -146,6 +150,13 @@ void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); Reques
 void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
+#if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskAnglerSmoke="),AnglerMode))
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),AnglerDir);
+        GetWorldTimerManager().SetTimer(AnglerTimer,this,&AFiskBoardingController::RunAnglerSmoke,.5f,true,2.f);
+    }
+#endif
 #if WITH_DEV_AUTOMATION_TESTS
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSkipperSmoke="),SkipperMode))
     {

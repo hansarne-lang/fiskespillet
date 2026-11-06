@@ -8,6 +8,7 @@
 #include "FiskMarinaTypes.h"
 #include "UI/FiskJournalModel.h"
 #include "Expedition/FiskExpeditionModel.h"
+#include "Angler/FiskAnglerModel.h"
 #include "FiskBoardingController.generated.h"
 
 class UFiskPrototypeRod;
@@ -21,6 +22,7 @@ class AFiskStarterBoat;
 class UFiskMarinaPanel;
 class UFiskExpeditionPanel;
 class UFiskSkipperPanel;
+class UFiskAnglerPanel;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -43,6 +45,10 @@ class AFiskBoardingController final : public APlayerController
 public:
     AFiskBoardingController();
     UFiskSkipperPanel* GetSkipperPanel() const { return SkipperPanel; }
+    UFiskAnglerPanel* GetAnglerPanel() const { return AnglerPanel; }
+    FFiskRigBundle MakeRigBundle(const TArray<FFiskRigSettings>& Rigs) const;
+    UFUNCTION(Server,Reliable) void ServerApplyRigBundle(FFiskRigBundle Bundle);
+    UFUNCTION(Client,Reliable) void ClientRigBundleReply(bool Accepted);
     UFUNCTION(Server,Reliable) void ServerVoyageReplace(int32 Day,int32 Revision,const TArray<FVector>& Points);
     UFUNCTION(Server,Reliable) void ServerVoyageNext(int32 Day,int32 Revision,int32 BoatRevision);
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
@@ -84,6 +90,14 @@ public:
     bool IsRodSelectionPending() const { return PendingRod>=0; }
     int32 GetCameraView() const { return CameraView; }
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunAnglerSmoke();
+    FString AnglerMode,AnglerDir;
+    FTimerHandle AnglerTimer;
+    int32 AnglerStage=0,AnglerInitialJournal=0,AnglerInitialMedals=0;
+    double AnglerAt=0;
+    bool bAnglerActiveProbe=false,bAnglerActiveChecked=false;
+    FFiskCareerProfile AnglerInitialCareer;
+    TArray<FFiskRigSettings> AnglerOriginalRigs,AnglerChangedRigs,AnglerFishingRigs;
     void RunSkipperSmoke();
     FString SkipperMode,SkipperDir;
     FTimerHandle SkipperTimer;
@@ -125,6 +139,7 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    UPROPERTY() TObjectPtr<UFiskAnglerPanel> AnglerPanel;
     UPROPERTY() TObjectPtr<UFiskSkipperPanel> SkipperPanel;
     UPROPERTY() TObjectPtr<UFiskExpeditionPanel> ExpeditionPanel;
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;

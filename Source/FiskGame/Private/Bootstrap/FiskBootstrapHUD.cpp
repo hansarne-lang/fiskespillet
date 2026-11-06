@@ -20,6 +20,7 @@
 #include "UI/FiskJournalPanel.h"
 #include "UI/FiskDeckPanel.h"
 #include "UI/FiskSkipperPanel.h"
+#include "UI/FiskAnglerPanel.h"
 
 namespace
 {
@@ -43,7 +44,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
             TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),
             TEXT("H/U/B/I: naust, utstyrsrom, strandbar og artsbok. J: ekspedisjon. L: sjøpass."),
-            TEXT("O: turplan | Y: dagbok | F9: foto | M + A: atlas | V: reisevisning")};
+            TEXT("Q: fiskeassistent | O: turplan | Y: dagbok | F9: foto | M + A: atlas")};
         for(int32 I=0;I<Lines.Num();++I) { HUD.DrawText(Lines[I],FLinearColor::White,52*S,(126+36*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(TEXT("F1 / Escape: lukk. Dagen slutter ved 20:00."),FLinearColor(0.5f,0.9f,0.8f),52*S,620*S,nullptr,1.0f*S);
         return;
@@ -132,6 +133,7 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if(PC->GetAnglerPanel()->IsVisible()) { PC->GetAnglerPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetSkipperPanel()->IsVisible()) { PC->GetSkipperPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetExpeditionPanel()->IsVisible()) { PC->GetExpeditionPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetMarinaPanel()->IsVisible()) { PC->GetMarinaPanel()->Draw(*this,*Canvas);return; }
@@ -167,5 +169,5 @@ void AFiskBootstrapHUD::DrawHUD()
         }
     }
     if(const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetOwningPlayerController()))
-    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC); }
+    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas); }
 }

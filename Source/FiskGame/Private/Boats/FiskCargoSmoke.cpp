@@ -80,7 +80,7 @@ void AFiskBoardingController::RunCargoSmoke()
     }
     else if(CargoStage==40 && Real-CargoAt>=1)
     { if(GetRod()->GetState()!=EFiskRodState::Fishing) { Fail(TEXT("cannot_continue_after_untransportable_fish"));return; }Key(EKeys::X);Key(EKeys::R);Key(EKeys::F11);Shot(TEXT("cargo-discard-hidden"));CargoAt=Real;CargoStage=42; }
-    else if(CargoStage==42 && Real-CargoAt>=1) { Key(EKeys::F11);Key(EKeys::F9);Shot(TEXT("cargo-visible-return"));CargoAt=Real;CargoStage=43; }
+    else if(CargoStage==42 && Real-CargoAt>=1) { Key(EKeys::F11);Key(EKeys::F9);for(int32 I=0;I<5;++I) { Key(EKeys::Right); }for(int32 I=0;I<3;++I) { Key(EKeys::Up); }Key(EKeys::PageDown);Key(EKeys::PageDown);Key(EKeys::H);Shot(TEXT("cargo-visible-return"));CargoAt=Real;CargoStage=43; }
     else if(CargoStage==43 && Real-CargoAt>=1) { Key(EKeys::F9);CargoStage=5; }
     else if(CargoStage==50 && B->GetTripProgress()==100)
     {
@@ -91,7 +91,7 @@ void AFiskBoardingController::RunCargoSmoke()
     {
         const auto State=GetRod()->GetState();if(B->GetCargoView().Mode!=static_cast<uint8>(EFiskCargoMode::Towing)) { Fail(TEXT("observer_missing_shared_tow"));return; }
         if(State==EFiskRodState::Fishing || State==EFiskRodState::Fighting || State==EFiskRodState::InitialRun || State==EFiskRodState::ReadyToLand) { if(Now<960) { return; }Fail(TEXT("passenger_rod_not_stowed"));return; }
-        Key(EKeys::F9);Shot(TEXT("cargo-observer-tow"));CargoAt=Real;CargoStage=51;
+        Key(EKeys::F9);for(int32 I=0;I<5;++I) { Key(EKeys::Right); }for(int32 I=0;I<3;++I) { Key(EKeys::Up); }Key(EKeys::PageDown);Key(EKeys::PageDown);Key(EKeys::H);Shot(TEXT("cargo-observer-tow"));CargoAt=Real;CargoStage=51;
     }
     else if(CargoStage==51 && Real-CargoAt>=1) { Key(EKeys::F9);CargoStage=5; }
     else if(CargoStage==5 && B->GetTripProgress()==200) { CargoStage=6; }
@@ -104,6 +104,7 @@ void AFiskBoardingController::RunCargoSmoke()
         Key(EKeys::F11);Shot(TEXT("cargo-after17"));CargoAt=Real;CargoStage=7;
     }
     else if(CargoStage==7 && Real-CargoAt>=1) { Key(EKeys::F11);CargoStage=8; }
+    else if(CargoStage==8 && HasAuthority() && D->GetDayNumber()==1 && Now>=1200) { Key(EKeys::N); }
     else if(CargoStage==8 && D->GetDayNumber()==2 && Now>=5)
     { if(B->GetCargoView().Mode!=0 || B->GetCargoView().bReturning || B->GetCargoView().RevealedGrams!=-1) { Fail(TEXT("cargo_not_reset_for_new_day"));return; }Done(); }
 }

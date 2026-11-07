@@ -194,5 +194,5 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     }
     const FString Feedback=PC.GetActionFeedback();
     if(!Feedback.IsEmpty())
-    { Rect(370,178,890,62);Text(Feedback,390,199,.95f,Gold); }
+    { Rect(370,330,890,62);Text(Feedback,390,351,.95f,Gold); }
 }

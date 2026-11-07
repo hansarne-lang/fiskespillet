@@ -6,6 +6,8 @@
 #include "DayCycle/FiskDayState.h"
 #include "Fishing/FiskPrototypeRod.h"
 #include "Fishing/FiskCombatFeedback.h"
+#include "Fishing/FiskFishingHelp.h"
+#include "Fishing/FiskBiteAlert.h"
 #include "Economy/FiskDaySettlement.h"
 #include "HAL/PlatformTime.h"
 #include "UI/FiskFrontEnd.h"
@@ -47,6 +49,8 @@ AFiskBoardingController::AFiskBoardingController()
     JournalPanel = CreateDefaultSubobject<UFiskJournalPanel>(TEXT("JournalPanel"));
     DeckPanel = CreateDefaultSubobject<UFiskDeckPanel>(TEXT("DeckPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
+    CreateDefaultSubobject<UFiskBiteAlert>(TEXT("BiteAlert"));
+    FishingHelp=CreateDefaultSubobject<UFiskFishingHelp>(TEXT("FishingHelp"));
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
     PierWalk=CreateDefaultSubobject<UFiskPierWalk>(TEXT("PierWalk"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
@@ -116,6 +120,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if (FrontEnd && FrontEnd->HandleKey(Params)) { return true; }
     if(AnglerPanel->HandleKey(Params)) { return true; }
     if(SkipperPanel->HandleKey(Params)) { return true; }
+    if(FishingHelp->HandleKey(Params)) { return true; }
     if(Press && Params.Key==EKeys::V)
     {
         const auto* B=FindStarterBoat();if(B && PlayerState) { ServerTravelVote(B->GetLegSerial(),!B->HasTravelVote(PlayerState->GetPlayerId())); }return true;

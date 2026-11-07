@@ -27,6 +27,7 @@ class UFiskSkipperPanel;
 class UFiskAnglerPanel;
 class UFiskCollectionPanel;
 class UFiskPierWalk;
+class UFiskFishingHelp;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -48,6 +49,8 @@ class AFiskBoardingController final : public APlayerController
 
 public:
     AFiskBoardingController();
+    UFiskFishingHelp* GetFishingHelp() const { return FishingHelp; }
+    UFUNCTION(Server,Reliable) void ServerReturnToMarina(int32 Revision,int32 Day,int32 Leg);
     UFiskPierWalk* GetPierWalk() const { return PierWalk; }
     UFUNCTION(Server,Reliable) void ServerPierMode(FGuid Profile,bool Enabled);
     UFUNCTION(Server,Unreliable) void ServerPierInput(FGuid Profile,int32 Generation,int32 Serial,FVector2D Axis,bool Sprint);
@@ -173,6 +176,8 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    friend class UFiskFishingHelp;
+    UPROPERTY() TObjectPtr<UFiskFishingHelp> FishingHelp;
     UPROPERTY(Replicated) TObjectPtr<AFiskStarterBoat> SelectedFleetBoat;
     bool bFleetVisible=false;
     int32 FleetRow=0;

@@ -13,6 +13,7 @@
 #include "Boats/FiskStarterBoat.h"
 #include "Boats/FiskBoardingController.h"
 #include "Fishing/FiskPrototypeRod.h"
+#include "Fishing/FiskFishingHelp.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskDayState.h"
@@ -41,8 +42,8 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("1/2/3: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
             TEXT("P: marinabutikk, lagret saldo, utstyr og båtvalg. Kjøp ved brygga."),
             TEXT("Kamp: løft med venstre mus, slipp for å senke. Sveiv med høyre mus."),
-            TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
-            TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),
+            TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander. Å: AI-testhjelp etter napp."),
+            TEXT("R / Tilbake til marina: kapteinens retur. Klikk knappen i spillvisningen. K: mannskap."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
             TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),
             TEXT("H/U/B/I: naust, utstyrsrom, strandbar og artsbok. J: ekspedisjon. L: sjøpass."),
@@ -174,5 +175,5 @@ void AFiskBootstrapHUD::DrawHUD()
         }
     }
     if(const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetOwningPlayerController()))
-    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas); }
+    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetFishingHelp()->Draw(*this,*Canvas);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas); }
 }

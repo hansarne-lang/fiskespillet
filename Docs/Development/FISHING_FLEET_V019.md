@@ -16,7 +16,7 @@ Alle bruker samme normale 20-minuttersdøgn. Hver båt har egen kaptein, stangfo
 
 Før 17:00 er nøyaktig fangst, vekt og verdi skjult. Flåtetavlen viser bare offentlig eier, båttype, mannskap og reisestatus. Ved 17:00 avgjøres hver fangst etter om båten som tok imot den krysset marinaen innen fristen. En sen båt påvirker ikke inntekten til en tidlig båt. Bare egen kvalifisert fangst gir inntekt.
 
-Bytt båt eller mannskap ved startbrygga før avreise. Etter at båten har reist, er mannskapet bundet til turen til neste døgn, også etter hjemkomst. Naust og strandbar kan brukes etter hjemkomst. Frakobling fjerner spilleren fra mannskapet; båt, last og oppgjørsgrunnlag blir hos verten. En gjenoppkoblet karriere beholder eierskap, men går ikke om bord på sjøen. Bekreftet journal/inntekt hentes fra vertens arkiv. Uoppgjort last overlever fortsatt ikke vertskrasj.
+Bytt båt eller mannskap ved startbrygga før avreise. Etter at båten har reist, er mannskapet bundet til turen til neste døgn, også etter hjemkomst. Naust og strandbar kan brukes etter hjemkomst. Frakobling fjerner spilleren fra mannskapet; båt, last og oppgjørsgrunnlag blir hos verten. En gjenoppkoblet karriere beholder eierskap. Har profilen reist i dette døgnet, kan den ikke gå om bord i en annen båt før neste dag, heller ikke via E eller ved å hente egen båt. Dette hindrer motstridende ekspedisjoner/oppgjør for samme profil og døgn. Bekreftet journal/inntekt hentes fra vertens arkiv. Uoppgjort last overlever fortsatt ikke vertskrasj.
 
 Verten starter neste døgn med N etter 20:00 og ferdig lagret oppgjør for tilkoblede spillere. Alle båter, lager og ekspedisjoner nullstilles samtidig; utstyr, valgte båttyper, mannskap og ruteoppsett beholdes.
 

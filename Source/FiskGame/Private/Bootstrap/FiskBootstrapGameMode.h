@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "FiskFleetMembership.h"
 #include "FiskBootstrapGameMode.generated.h"
 
 class AFiskStarterBoat;
@@ -24,6 +25,8 @@ public:
     AFiskStarterBoat* GetBoatForPlayer(int32 Player) const;
     AFiskStarterBoat* CreateOwnedBoat(AFiskBoardingController* PC);
     void RegisterFleetCareer(int32 Player,const FGuid& Profile);
+    bool CanJoinFleet(const FGuid& Profile) const { return FleetMembership.CanJoin(Profile); }
+    void LockBoatCrew(const AFiskStarterBoat* Boat);
     const TArray<TObjectPtr<AFiskStarterBoat>>& GetFleet() const { return Fleet; }
     AFiskDaySettlement* GetSettlement() const { return Settlement; }
     AFiskExpeditionState* GetExpedition() const { return Expedition; }
@@ -38,6 +41,7 @@ private:
     AFiskStarterBoat* SpawnFleetBoat(int32 Player);
     UPROPERTY() TArray<TObjectPtr<AFiskStarterBoat>> Fleet;
     TMap<FGuid,int32> OwnedFleet;
+    FFiskFleetMembership FleetMembership;
     UPROPERTY() TObjectPtr<AFiskExpeditionState> Expedition;
     TMap<int32,FGuid> DayProfiles;
     FGuid ArchivedDay;

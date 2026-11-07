@@ -157,7 +157,7 @@ void AFiskBoardingController::BeginPlay()
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFleetRole="),FleetRole) && FleetRole>=0 && FleetRole<12)
-    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FleetDir);GetWorldTimerManager().SetTimer(FleetTimer,this,&AFiskBoardingController::RunFleetSmoke,.5f,true,3.f); }
+    { bFleetResume=FParse::Param(FCommandLine::Get(),TEXT("FiskFleetResume"));FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FleetDir);GetWorldTimerManager().SetTimer(FleetTimer,this,&AFiskBoardingController::RunFleetSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCargoSmoke="),CargoMode))
     { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CargoDir);GetWorldTimerManager().SetTimer(CargoTimer,this,&AFiskBoardingController::RunCargoSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),CollectionMode))
@@ -246,6 +246,7 @@ void AFiskBoardingController::ServerBoardStarterBoat_Implementation()
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
     {
+        if(!bCareerReady || !Mode->CanJoinFleet(ServerCareer.Id)) { ClientActionFeedback(TEXT("Karrieren må være klar. Har profilen reist i dag, venter ombordstigning til neste døgn – også etter gjenoppkobling."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_BOARD_LOCKED player=%d"),PlayerState->GetPlayerId());return; }
         auto* B=Mode->GetBoatForPlayer(PlayerState->GetPlayerId());B->Board(PlayerState->GetPlayerId());
         if(!B->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Denne båten er full eller har reist. Tab åpner flåten; C henter din egen båt ved brygga.")); }
     }

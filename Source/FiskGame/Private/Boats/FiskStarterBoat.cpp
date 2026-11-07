@@ -191,8 +191,9 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
         ReturnHome(Now);return;
     }
     if(TripProgress!=AtDock || Day->GetPhase(Day->GetElapsedSeconds())!=EFiskDayPhase::FishingAndReturn) { return; }
-    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     if(!Mode || !Expedition || !Expedition->Depart()) { return; }
+    Mode->LockBoatCrew(this);
     BeginLeg(FVector::ZeroVector,Route.Destination,GetTravelMs(),Now,false);
 }
 void AFiskStarterBoat::Tick(float DeltaSeconds)

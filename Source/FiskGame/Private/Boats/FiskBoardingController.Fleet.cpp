@@ -41,7 +41,7 @@ void AFiskBoardingController::ServerFleetSelect_Implementation(int32 Index,bool 
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* D=GetWorld()->GetGameState<AFiskDayState>();
     const int32 PlayerId=PlayerState?PlayerState->GetPlayerId():-1;auto* Old=M?M->GetBoatForPlayer(PlayerId):nullptr;
     auto Reject=[&](){ClientActionFeedback(TEXT("Båtbytte avvist. Velg en ledig båt ved brygga før avreise; etter turen venter du til neste dag."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECT_REJECTED player=%d index=%d"),PlayerId,Index);};
-    if(!M || !D || !D->HasStarted() || !IsCareerSynced() || PlayerId<0 || D->GetElapsedMilliseconds()>=1020000
+    if(!M || !D || !D->HasStarted() || !IsCareerSynced() || !M->CanJoinFleet(ServerCareer.Id) || PlayerId<0 || D->GetElapsedMilliseconds()>=1020000
         || (Old && Old->IsAboard(PlayerId) && Old->GetTripProgress()!=-1)) { Reject();return; }
     for(int32 Slot=0;Slot<3;++Slot) { if(!GetRodAt(Slot)->CanConfigure()) { Reject();return; } }
     AFiskStarterBoat* Target=CreateOwn?M->CreateOwnedBoat(this):M->GetFleet().IsValidIndex(Index)?M->GetFleet()[Index].Get():nullptr;

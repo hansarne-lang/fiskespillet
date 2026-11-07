@@ -100,7 +100,7 @@ public:
     FTimerHandle FleetTimer;
     double FleetAt=0;
     int64 FleetBaseCash=0;
-    bool bFleetPrivacyLogged=false,bFleetAttackSent=false;
+    bool bFleetPrivacyLogged=false,bFleetAttackSent=false,bFleetResume=false;
     void RunCargoSmoke();
     FString CargoMode,CargoDir;FTimerHandle CargoTimer;
     int32 CargoStage=0,CargoLandings=0;double CargoAt=0;int64 CargoPaidCash=0;

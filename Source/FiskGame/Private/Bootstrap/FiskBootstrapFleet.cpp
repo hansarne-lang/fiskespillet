@@ -32,3 +32,10 @@ AFiskStarterBoat* AFiskBootstrapGameMode::CreateOwnedBoat(AFiskBoardingControlle
     if(const int32* Slot=OwnedFleet.Find(Id);Slot && Fleet.IsValidIndex(*Slot)) { return Fleet[*Slot]; }
     if(auto* B=SpawnFleetBoat(PC->PlayerState->GetPlayerId())) { OwnedFleet.Add(Id,B->GetFleetIndex());return B; }return nullptr;
 }
+
+void AFiskBootstrapGameMode::LockBoatCrew(const AFiskStarterBoat* Boat)
+{
+    if(!HasAuthority() || !Boat) { return; }TArray<FGuid> Profiles;
+    for(int32 Seat=0;Seat<Boat->GetCrewCount();++Seat) { if(const auto* Profile=DayProfiles.Find(Boat->GetCrewMemberId(Seat))) { Profiles.AddUnique(*Profile); } }
+    FleetMembership.Depart(Profiles);
+}

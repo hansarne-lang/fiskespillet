@@ -44,6 +44,7 @@ struct FISKCORE_API FFiskMarinaResident
     UPROPERTY() FGuid Profile;
     UPROPERTY() int32 PlayerId=-1;
     UPROPERTY() FFiskMarinaIdentity Identity;
+    UPROPERTY() int32 Place=0; // 0 marina, 1 naust, 2 bar, 3 at sea (server-derived)
     UPROPERTY() TArray<FFiskMarinaTrophy> Trophies;
 };
 USTRUCT()

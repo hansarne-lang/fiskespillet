@@ -1,4 +1,9 @@
 #include "World/FiskMarinaHub.h"
+#include "World/FiskHarbourLife.h"
+#include "World/FiskHarbourSound.h"
+#include "Boats/FiskStarterBoat.h"
+#include "FiskHarbourRules.h"
+#include "EngineUtils.h"
 #include "World/FiskVisualPrimitives.h"
 #include "Boats/FiskBoardingController.h"
 #include "UI/FiskMarinaPanel.h"
@@ -13,6 +18,8 @@ AFiskMarinaHub::AFiskMarinaHub()
 {
     bReplicates=true;bAlwaysRelevant=true;PrimaryActorTick.bCanEverTick=true;PrimaryActorTick.TickInterval=.5f;
     SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("MarinaRoot")));
+    CreateDefaultSubobject<UFiskHarbourLife>(TEXT("HarbourLife"));
+    CreateDefaultSubobject<UFiskHarbourSound>(TEXT("HarbourSound"));
     ConstructorHelpers::FObjectFinder<UStaticMesh> A(TEXT("/Engine/BasicShapes/Cube.Cube")),B(TEXT("/Engine/BasicShapes/Sphere.Sphere")),C(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
     ConstructorHelpers::FObjectFinder<UMaterialInterface> M(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));Cube=A.Object;Sphere=B.Object;Cylinder=C.Object;Material=M.Object;
 }
@@ -46,20 +53,46 @@ void AFiskMarinaHub::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);if(!HasAuthority()) { return; }TSet<int32> Active;
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It) { const APlayerController* PC=It->Get();if(PC && PC->PlayerState) { Active.Add(PC->PlayerState->GetPlayerId()); } }
-    bool Changed=false;for(FFiskMarinaResident& R:Residents) { if(R.PlayerId>=0 && !Active.Contains(R.PlayerId)) { R.PlayerId=-1;Changed=true; } }
+    bool Changed=false;for(FFiskMarinaResident& R:Residents)
+    {
+        if(R.PlayerId>=0 && !Active.Contains(R.PlayerId)) { PlaceChoices.Remove(R.PlayerId);R.PlayerId=-1;Changed=true; }
+        bool Sea=false;for(TActorIterator<AFiskStarterBoat> B(GetWorld());B;++B) { if(R.PlayerId>=0 && B->IsAboard(R.PlayerId) && B->GetTripProgress()!=-1 && B->GetTripProgress()!=200) { Sea=true;break; } }
+        const int32 Place=FiskHarbour::PublicPlace(R.PlayerId>=0,Sea,PlaceChoices.FindRef(R.PlayerId));if(R.Place!=Place) { R.Place=Place;Changed=true; }
+    }
     if(Changed) { OnRep_Residents();ForceNetUpdate(); }
 }
-void AFiskMarinaHub::OnRep_Residents() { if(HasActorBegunPlay()) { Rebuild(); } }
+bool AFiskMarinaHub::SetPlace(int32 Player,int32 Place)
+{
+    if(!HasAuthority() || Player<0 || Place<0 || Place>2 || !Residents.ContainsByPredicate([&](const FFiskMarinaResident& R){return R.PlayerId==Player;})) { return false; }
+    PlaceChoices.Add(Player,Place);return true;
+}
+void AFiskMarinaHub::OnRep_Residents()
+{
+    if(!HasActorBegunPlay()) { return; }bool Build=BuiltResidents.Num()!=Residents.Num();
+    for(int32 I=0;!Build && I<Residents.Num();++I) { Build=BuiltResidents[I].Profile!=Residents[I].Profile || !(BuiltResidents[I].Identity==Residents[I].Identity) || BuiltResidents[I].Trophies!=Residents[I].Trophies; }
+    if(Build) { Rebuild(); }
+}
 void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
 {
     Super::CalcCamera(DeltaTime,Out);const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
+    if(Panel && Panel->IsGallery())
+    {
+        const FVector Focus(-10000,-6000,650);Out.Location=Focus+FVector(-450,-1500*Panel->GetGalleryZoom(),180);Out.Rotation=(Focus+FVector(-450,0,0)-Out.Location).Rotation();Out.FOV=55;return;
+    }
+    if(Bar && Panel->GetHarbourView()>0)
+    {
+        const auto* Follow=Panel->FollowBoat();const bool Track=Panel->GetHarbourView()==2 && Follow;
+        const FVector Focus=Track?Follow->GetActorLocation()+FVector(-350,0,160):FVector(2000,2200,150);
+        Out.Location=Track?Follow->GetActorLocation()+FVector(-2600,-3100,1700):FVector(-3600,-5200,1800);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=65;return;
+    }
     const FVector Target=Bar?FVector(-4200,-1900,230):HousePosition(Panel?Panel->GetHouseIndex():0)+FVector(0,0,300);
-    Out.Location=Target+(Bar?FVector(1400,-1400,650):FVector(350,-1600,550));Out.Rotation=(Target+FVector(650,0,0)-Out.Location).Rotation();Out.FOV=65;
+    Out.Location=Target+(Bar?FVector(1500,-2500,1100):FVector(350,-1600,550));Out.Rotation=(Target+FVector(650,0,0)-Out.Location).Rotation();Out.FOV=65;
     if(Panel && Panel->GetPage()==5) { const FVector P=HousePosition(Panel->GetHouseIndex());Out.Location=P+(Panel->IsHomePreview()?FVector(1450,-3200,2050):FVector(350,-2350,1000));Out.Rotation=(P+(Panel->IsHomePreview()?FVector(0,-450,220):FVector(850,-200,330))-Out.Location).Rotation();Out.FOV=Panel->IsHomePreview()?70:65; }
 }
 void AFiskMarinaHub::Rebuild()
 {
+    BuiltResidents=Residents;
     for(USceneComponent* P:DetailParts) { if(P) { P->DestroyComponent(); } }DetailParts.Reset();
     for(UStaticMeshComponent* P:Parts) { if(P) { P->DestroyComponent(); } }for(UTextRenderComponent* S:Signs) { if(S) { S->DestroyComponent(); } }Parts.Reset();Signs.Reset();++BuildRevision;
     auto Part=[&](UStaticMesh* Mesh,FVector P,FVector Scale,FLinearColor Color)

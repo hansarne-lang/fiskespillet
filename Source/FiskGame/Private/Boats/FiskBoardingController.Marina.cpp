@@ -1,6 +1,7 @@
 #include "Boats/FiskBoardingController.h"
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskMarinaHub.h"
+#include "FiskHarbourRules.h"
 #include "Fishing/FiskCatchCatalog.h"
 #include "Economy/FiskDaySettlement.h"
 #include "DayCycle/FiskDayState.h"
@@ -45,4 +46,11 @@ void AFiskBoardingController::ServerMarinaSay_Implementation(int32 Code)
     const bool Accepted=bCareerReady && PlayerState && Day && Hub && Code>=0 && Code<5 && MarinaPanel->IsAtDock() && Now-LastMarinaMessage>=2 && Hub->Say(PlayerState->GetPlayerId(),Code,Day->GetElapsedMilliseconds());
     if(Accepted) { LastMarinaMessage=Now; }else { ClientActionFeedback(TEXT("Melding avvist. Vent 2 sekunder og bruk strandbaren ved marinaen.")); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_MESSAGE accepted=%d player=%d code=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Code);
+}
+
+void AFiskBoardingController::ServerHarbourPlace_Implementation(FGuid Profile,int32 Place)
+{
+    TActorIterator<AFiskMarinaHub> Hub(GetWorld());
+    const bool Accepted=Hub && PlayerState && FiskHarbour::CanChoose(bCareerReady,Profile==ServerCareer.Id,MarinaPanel->IsAtDock(),Place) && Hub->SetPlace(PlayerState->GetPlayerId(),Place);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HARBOUR_PRESENCE accepted=%d player=%d place=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Place);
 }

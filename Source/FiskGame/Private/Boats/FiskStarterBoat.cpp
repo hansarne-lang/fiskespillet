@@ -2,6 +2,7 @@
 #include "Components/SceneComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Boats/FiskBoatPresentation.h"
+#include "Boats/FiskCrewFigures.h"
 #include "Boats/FiskBoardingController.h"
 #include "Fishing/FiskFishPresentation.h"
 #include "DayCycle/FiskDayState.h"
@@ -50,6 +51,7 @@ AFiskStarterBoat::AFiskStarterBoat()
     Camera->SetRelativeRotation((FVector(-100, -600, 110) - CameraPosition).Rotation());
     Camera->FieldOfView = 75.0f;
     CreateDefaultSubobject<UFiskBoatPresentation>(TEXT("BoatPresentation"));
+    CreateDefaultSubobject<UFiskCrewFigures>(TEXT("CrewFigures"));
     CreateDefaultSubobject<UFiskFishPresentation>(TEXT("FishPresentation"));
     CreateDefaultSubobject<UFiskJourneyAudio>(TEXT("JourneyAudio"));
 

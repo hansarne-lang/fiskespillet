@@ -67,8 +67,8 @@ void UFiskMarinaPanel::ReceiveIdentity(const FFiskMarinaIdentity& Value)
 }
 void UFiskMarinaPanel::Show(int32 NewPage)
 {
-    Page=NewPage;bShopPreview=false;ShopCategory=0;ShopLevel=0;bEditing=false;Row=0;Draft=Identity;AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
-    PC->ReleaseRodInputsForMenu();PC->bShowMouseCursor=Page!=0;
+    Page=NewPage;bGallery=false;HarbourView=0;bShopPreview=false;ShopCategory=0;ShopLevel=0;bEditing=false;Row=0;Draft=Identity;AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
+    PC->ReleaseRodInputsForMenu();PC->ServerHarbourPlace(LoadedProfile,Page==2?2:(Page==1 || Page==4 || Page==5)?1:0);PC->bShowMouseCursor=Page!=0;
     if(Page) { PC->SetInputMode(FInputModeGameAndUI()); }else { PC->SetInputMode(FInputModeGameOnly()); }
     if(Page==1 || Page==5) { if(const AFiskMarinaHub* H=FindHub()) { const int32 Own=H->GetResidents().IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});HouseIndex=FMath::Max(0,Own); } }
     if(PC->PlayerCameraManager) { PC->PlayerCameraManager->SetGameCameraCutThisFrame(); }
@@ -128,9 +128,23 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
         }return true;
     }
     const AFiskMarinaHub* Hub=FindHub();
-    if(Page==3) { if(A.Key==EKeys::Right || A.Key==EKeys::Down || A.Key==EKeys::PageDown) { Species=(Species+1)%FiskCatches::Count; }if(A.Key==EKeys::Left || A.Key==EKeys::Up || A.Key==EKeys::PageUp) { Species=(Species+FiskCatches::Count-1)%FiskCatches::Count; }return true; }
+    if(Page==3)
+    {
+        if(A.Key==EKeys::V && A.Event==IE_Pressed) { if(IsAtDock()) { bGallery=!bGallery; }else { Status=TEXT("3D-galleriet brukes ved marinaen. Artsboken er tilgjengelig her."); } }
+        if(A.Key==EKeys::Right || A.Key==EKeys::Down || A.Key==EKeys::PageDown) { Species=(Species+1)%FiskCatches::Count; }
+        if(A.Key==EKeys::Left || A.Key==EKeys::Up || A.Key==EKeys::PageUp) { Species=(Species+FiskCatches::Count-1)%FiskCatches::Count; }
+        if(A.Key==EKeys::A) { GalleryYaw-=15; }if(A.Key==EKeys::D) { GalleryYaw+=15; }
+        if(A.Key==EKeys::MouseScrollUp) { GalleryZoom=FMath::Clamp(GalleryZoom-.1f,.7f,1.8f); }if(A.Key==EKeys::MouseScrollDown) { GalleryZoom=FMath::Clamp(GalleryZoom+.1f,.7f,1.8f); }
+        if(A.Key==EKeys::Home) { GalleryYaw=0;GalleryZoom=1; }return true;
+    }
     const FKey Numbers[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};
-    if(Page==2) { for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->ServerMarinaSay(I); } }return true; }
+    if(Page==2)
+    {
+        if(A.Key==EKeys::V && A.Event==IE_Pressed) { HarbourView=(HarbourView+1)%3; }
+        if(A.Key==EKeys::M && A.Event==IE_Pressed) { bHarbourMusic=!bHarbourMusic; }
+        const int32 Count=PC->FleetBoats().Num();if(Count>0) { if(A.Key==EKeys::PageDown || A.Key==EKeys::Right) { FollowIndex=(FollowIndex+1)%Count; }if(A.Key==EKeys::PageUp || A.Key==EKeys::Left) { FollowIndex=(FollowIndex+Count-1)%Count; } }
+        for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->ServerMarinaSay(I); } }return true;
+    }
     if(Page==1 && Hub && !Hub->GetResidents().IsEmpty() && (A.Key==EKeys::PageDown || A.Key==EKeys::PageUp))
     { HouseIndex=(HouseIndex+(A.Key==EKeys::PageDown?1:Hub->GetResidents().Num()-1))%Hub->GetResidents().Num();Draft=Identity;Row=0;return true; }
     for(int32 I=0;I<4;++I) { if(A.Key==Numbers[I] && Hub && Hub->GetResidents().IsValidIndex(I)) { HouseIndex=I;Draft=Identity;Row=0; } }
@@ -173,6 +187,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     }
     if(Page==3)
     {
+        if(bGallery) { const_cast<UFiskMarinaPanel*>(this)->DrawGallery(HUD,C);return; }
         T(TEXT("ARTSBOK OG ARTSJAKT"),52,60,2);int32 Discovered=0;for(int32 I=0;I<FiskCatches::Count;++I) { if(GI->GetJournal().Best(I)) { ++Discovered; } }
         T(FString::Printf(TEXT("Oppdaget %d/%d arter | Dagens nye funn vises først ved 17:00"),Discovered,FiskCatches::Count),52,112,1.05f,Teal);
         for(int32 I=(Species/8)*8;I<FMath::Min((Species/8+1)*8,FiskCatches::Count);++I) { if(I==Species) { HUD.DrawRect(FLinearColor(.14f,.34f,.36f),44*S,(165+44*(I%8))*S,370*S,38*S); }T(FString::Printf(TEXT("%s %s"),GI->GetJournal().Best(I)?TEXT("+"):TEXT("-"),FiskCatches::Find(I)->Name),58,173+44*(I%8),1.03f); }
@@ -180,7 +195,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
         T(FString::Printf(TEXT("Størrelse: %.1f–%.1f kg | Verdi $%d/kg"),V.MinGrams/1000.0,V.MaxGrams/1000.0,V.PricePerKg),450,337,1.f);
         const FFiskJournalEntry* Best=GI->GetJournal().Best(Species);T(Best?FString::Printf(TEXT("Din rekord: %.1f kg / %.1f cm"),Best->Fish.WeightGrams/1000.0,Best->Fish.LengthMm/10.0):TEXT("Ingen bekreftet fangst av denne arten ennå."),450,392,1.1f,Gold);
         T(FString::Printf(TEXT("Habitatfordeling: rev %d%% | skrent %d%% | hav %d%% | mangrove %d%% | dyphav %d%%"),FiskCatches::HabitatChance(0,Species),FiskCatches::HabitatChance(1,Species),FiskCatches::HabitatChance(2,Species),FiskCatches::HabitatChance(3,Species),FiskCatches::HabitatChance(4,Species)),450,450,.8f,Teal);
-        T(TEXT("Tips gjelder habitat og rigg. Ingen rigg eller reise garanterer en bestemt art."),52,575,.95f);T(TEXT("Piler / PgUp/PgDn: velg blant 15 arter | I / Escape: lukk | F4 utenfor panelet: journal"),52,630,.95f,Teal);return;
+        T(TEXT("Tips gjelder habitat og rigg. Ingen rigg eller reise garanterer en bestemt art."),52,575,.95f);T(TEXT("Piler: 15 arter | V: 3D-galleri ved marinaen | I / Escape: lukk | F4: journal"),52,630,.95f,Teal);return;
     }
     if(Page==2)
     {
@@ -200,7 +215,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
         if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("Spiller %d | %d levert | $%lld"),R.PlayerId,R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,425+(I%4)*24,.75f,Gold);++I; } }
         else { T(TEXT("Dagens tavle åpner ved 17:00. Tab viser flåten utenfor baren."),46,440,.85f,Gold); }
-        for(int32 I=0;I<5;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46,535+20*I,.73f); }T(TEXT("2 s mellom meldinger. B / Escape: tilbake. Klokken går."),46,652,.78f,Teal);return;
+        for(int32 I=0;I<5;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46,535+20*I,.73f); }T(FString::Printf(TEXT("V: %s | PgUp/PgDn: båt | M: musikk %s"),HarbourView==0?TEXT("BAR"):HarbourView==1?TEXT("HAVN"):TEXT("FØLG BÅT"),bHarbourMusic?TEXT("PÅ"):TEXT("AV")),46,628,.76f,Gold);T(TEXT("2 s mellom meldinger. B / Escape: tilbake. Klokken går."),46,652,.78f,Teal);return;
     }
     T(TEXT("NAUST OG TROFÉVEGG"),46,55,1.65f);T(TEXT("PgUp/PgDn: alle 12 | 1–4: besøk | N: naustbutikk"),46,105,.85f,Teal);
     const FFiskMarinaResident* R=Hub && Hub->GetResidents().IsValidIndex(HouseIndex)?&Hub->GetResidents()[HouseIndex]:nullptr;

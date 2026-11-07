@@ -57,7 +57,7 @@ bool FFiskMarinaRevisionRecoveryTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskSevenSpeciesTest,"Fiskelaget.Content.AllSpeciesCoverage",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskSevenSpeciesTest::RunTest(const FString& Parameters)
 {
-    TSet<int32> Seen;for(int32 Ground=0;Ground<4;++Ground) { for(int32 Seed=0;Seed<10000;++Seed) { const FFiskCatchData Fish=FiskCatches::Roll(Seed,Ground);if(!FiskCatches::IsValid(Fish)) { AddError(TEXT("Invalid generated fish"));return false; }Seen.Add(Fish.Species); } }
-    TestEqual(TEXT("All eleven species generated"),Seen.Num(),FiskCatches::Count);TestEqual(TEXT("Legacy snapper price retained"),FiskCatches::Find(0)->PricePerKg,5);TestEqual(TEXT("Legacy tuna price retained"),FiskCatches::Find(2)->PricePerKg,12);TestNull(TEXT("Unknown species"),FiskCatches::Find(FiskCatches::Count));return true;
+    TSet<int32> Seen;for(int32 Ground=0;Ground<5;++Ground) { for(int32 Seed=0;Seed<10000;++Seed) { const FFiskCatchData Fish=FiskCatches::Roll(Seed,Ground);if(!FiskCatches::IsValid(Fish)) { AddError(TEXT("Invalid generated fish"));return false; }Seen.Add(Fish.Species); } }
+    TestEqual(TEXT("All fifteen species generated"),Seen.Num(),FiskCatches::Count);TestEqual(TEXT("Legacy snapper price retained"),FiskCatches::Find(0)->PricePerKg,5);TestEqual(TEXT("Legacy tuna price retained"),FiskCatches::Find(2)->PricePerKg,12);TestNull(TEXT("Unknown species"),FiskCatches::Find(FiskCatches::Count));return true;
 }
 #endif

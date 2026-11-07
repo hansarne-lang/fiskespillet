@@ -17,7 +17,7 @@ void AFiskBoardingController::RunCollectionSmoke()
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_COLLECTION_FAILED mode=%s stage=%d %s"),*CollectionMode,CollectionStage,Why);GetWorldTimerManager().ClearTimer(CollectionTimer);};
     auto Done=[&](){UE_LOG(LogTemp,Display,TEXT("FISKELAGET_COLLECTION_PASSED mode=%s journal=%d cash=%lld"),*CollectionMode,J.GetEntries().Num(),static_cast<long long>(GI->Career.Cash));GetWorldTimerManager().ClearTimer(CollectionTimer);};
     auto Shot=[&](const TCHAR* Name){const FString File=FPaths::Combine(CollectionDir,FString(Name)+TEXT(".png"));FTimerHandle T;GetWorldTimerManager().SetTimer(T,FTimerDelegate::CreateWeakLambda(this,[File](){if(!FScreenshotRequest::IsScreenshotRequested()) { FScreenshotRequest::RequestScreenshot(File,false,false); }}),.25f,false);};
-    auto PinsOk=[&](){return CollectionPanel->GetPins().Values==TArray<int32>({29,1,26});};
+    auto PinsOk=[&](){return CollectionPanel->GetPins().Values==TArray<int32>({FiskCollections::Count-1,1,26});};
     if(CollectionMode==TEXT("reload"))
     {
         if(J.GetEntries().Num()!=1 || Real<15) { return; }
@@ -27,7 +27,7 @@ void AFiskBoardingController::RunCollectionSmoke()
     if(CollectionStage==0 && (Library?GetFrontEnd()->IsVisible():(D->HasStarted() && CareerSmokeStage==13 && Now>=80 && Now<120)))
     {
         if(J.GetEntries().Num()!=(Library?1:0)) { Fail(TEXT("unexpected_initial_confirmed_journal"));return; }Key(EKeys::Z);if(!CollectionPanel->IsVisible()) { Fail(TEXT("panel_not_open"));return; }
-        Key(EKeys::End);if(CollectionPanel->GetSelected()!=29) { Fail(TEXT("thirtieth_goal_inaccessible"));return; }Key(EKeys::One);Key(EKeys::Home);Key(EKeys::Down);Key(EKeys::Two);if(!PinsOk()) { Fail(TEXT("pin_selection_not_saved"));return; }Key(EKeys::F10);Shot(TEXT("collection-initial"));CollectionAt=Real;CollectionStage=1;
+        if(Library && CollectionPanel->GetPins().Values!=TArray<int32>({29,1,26})) { Fail(TEXT("legacy_pins_changed_before_save"));return; }Key(EKeys::End);if(CollectionPanel->GetSelected()!=FiskCollections::Count-1) { Fail(TEXT("last_goal_inaccessible"));return; }Key(EKeys::One);Key(EKeys::Home);Key(EKeys::Down);Key(EKeys::Two);if(!PinsOk()) { Fail(TEXT("pin_selection_not_saved"));return; }Key(EKeys::F10);Shot(TEXT("collection-initial"));CollectionAt=Real;CollectionStage=1;
     }
     else if(CollectionStage==1 && Real-CollectionAt>=1)
     { Key(EKeys::Tab);Shot(TEXT("collection-pinned"));CollectionAt=Real;CollectionStage=2; }

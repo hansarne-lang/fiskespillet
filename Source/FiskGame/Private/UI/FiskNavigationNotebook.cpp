@@ -25,7 +25,7 @@ bool FFiskNavigationNotebook::Read(const FString& File,FFiskNavigationNotebook& 
         const FString Section=FString::Printf(TEXT("Place%d"),I+1);
         if(!Config.Contains(Section)) { continue; }
         FString Ground,Name;
-        if(!Config.GetString(*Section,TEXT("Ground"),Ground) || (Ground!=TEXT("0") && Ground!=TEXT("1") && Ground!=TEXT("2") && Ground!=TEXT("3"))
+        if(!Config.GetString(*Section,TEXT("Ground"),Ground) || (Ground!=TEXT("0") && Ground!=TEXT("1") && Ground!=TEXT("2") && Ground!=TEXT("3") && Ground!=TEXT("4"))
             || !Config.GetString(*Section,TEXT("Name"),Name) || !ValidName(Name)) { return false; }
         Candidate.Slots[I]={FCString::Atoi(*Ground),Name};
         Candidate.Slots[I].Point=FiskGrounds::Find(Candidate.Slots[I].Ground)->Position;

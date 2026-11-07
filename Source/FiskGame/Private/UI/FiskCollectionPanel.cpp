@@ -47,7 +47,7 @@ void UFiskCollectionPanel::Draw(AHUD& H,UCanvas& C)
     const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const auto& J=GI->GetJournal();const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const FLinearColor Teal(.5f,.9f,.84f),Gold(1,.8f,.4f);
     auto T=[&](const FString& V,float X,float Y,float Z=1.f,FLinearColor Color=FLinearColor::White){H.DrawText(V,Color,X*S,Y*S,nullptr,Z*S);};
     H.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);T(TEXT("FANGSTJAKTEN"),48,55,2.1f);int32 Done=0;for(int32 I=0;I<FiskCollections::Count;++I) { Done+=FiskCollections::Progress(J,I)>=FiskCollections::Catalog()[I].Target; }
-    T(FString::Printf(TEXT("%d av 30 samlinger | Bare dine bekreftede fangster etter oppgjøret"),Done),48,108,1.05f,Teal);
+    T(FString::Printf(TEXT("%d av 36 samlinger | Bare dine bekreftede fangster etter oppgjøret"),Done),48,108,1.05f,Teal);
     const TCHAR* Tabs[]={TEXT("SAMLINGER"),TEXT("MINE TRE MÅL"),TEXT("FANGSTSØK"),TEXT("OVERSIKT")};T(FString::Printf(TEXT("Tab: %s | Z / Escape: lukk | F5: lagre mål | F10: HTML + CSV"),Tabs[Page]),48,148,.98f);
     if(Page<2)
     {
@@ -75,7 +75,7 @@ void UFiskCollectionPanel::Draw(AHUD& H,UCanvas& C)
     {
         const auto A=J.Stats();TSet<int32> Species,Grounds;TSet<FGuid> Days;int32 Sold=0;int64 Fight=0;
         for(const auto& E:J.GetEntries()) { Species.Add(E.Fish.Species);Grounds.Add(E.Context.Ground);Days.Add(E.DayId);Sold+=E.bSold;Fight+=E.Context.FightMs; }
-        const FString Values[]={FString::Printf(TEXT("%lld landinger | %d solgt | %lld tapt ved retur"),static_cast<long long>(A.Count),Sold,static_cast<long long>(A.Count-Sold)),FString::Printf(TEXT("%.1f kg landet | Største fisk %.1f kg"),A.WeightGrams/1000.0,A.BestGrams/1000.0),FString::Printf(TEXT("%lld fiskepenger fra solgt fangst"),static_cast<long long>(A.Income)),FString::Printf(TEXT("%d / 11 arter | %d / 4 habitater | %d fangstdager"),Species.Num(),Grounds.Num(),Days.Num()),FString::Printf(TEXT("Samlet kamptid %.1f min | Snitt %.1f s per landing"),Fight/60000.0,A.Count?Fight/1000.0/A.Count:0)};
+        const FString Values[]={FString::Printf(TEXT("%lld landinger | %d solgt | %lld tapt ved retur"),static_cast<long long>(A.Count),Sold,static_cast<long long>(A.Count-Sold)),FString::Printf(TEXT("%.1f kg landet | Største fisk %.1f kg"),A.WeightGrams/1000.0,A.BestGrams/1000.0),FString::Printf(TEXT("%lld fiskepenger fra solgt fangst"),static_cast<long long>(A.Income)),FString::Printf(TEXT("%d / 15 arter | %d / 5 habitater | %d fangstdager"),Species.Num(),Grounds.Num(),Days.Num()),FString::Printf(TEXT("Samlet kamptid %.1f min | Snitt %.1f s per landing"),Fight/60000.0,A.Count?Fight/1000.0/A.Count:0)};
         for(int32 I=0;I<5;++I) { T(Values[I],48,222+62*I,1.3f,I%2?FLinearColor::White:Teal); }
     }
     T(Message,48,603,.88f,Gold);T(TEXT("Fangstjakten gir ingen penger eller fangstbonus. Øving, andres fangster og skjult dagsfiske teller ikke."),48,645,.87f,Teal);

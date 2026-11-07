@@ -14,6 +14,8 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Misc/Paths.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "UnrealClient.h"
 #include "TimerManager.h"
 #include "Voyage/FiskVoyagePlan.h"
@@ -32,7 +34,7 @@ void AFiskBoardingController::RunExplorationSmoke()
     {
         if(Host) { TActorIterator<AFiskExpeditionState> E(GetWorld());if(E) { ServerExpeditionChoose(E->GetPlan().Revision,2); } }
         if(!GI->SaveRigPreset(0,GetRod()->GetRig()) || !GI->RenameRigPreset(0,TEXT("REVFISKE 9"))) { Fail(TEXT("preset_storage"));return; }
-        Key(EKeys::M);Key(EKeys::A);if(!SeaChart->IsAtlas()) { Fail(TEXT("atlas_not_open"));return; }Shot(TEXT("ocean-atlas"));ExplorationAt=Real;ExplorationStage=1;
+        Key(EKeys::M);Key(EKeys::A);if(!SeaChart->IsAtlas()) { Fail(TEXT("atlas_not_open"));return; }if(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))) { Key(EKeys::End); }Shot(TEXT("ocean-atlas"));ExplorationAt=Real;ExplorationStage=1;
     }
     else if(ExplorationStage==1 && Real-ExplorationAt>=1)
     { Key(EKeys::M);Key(EKeys::L);if(!JournalPanel->IsPassport()) { Fail(TEXT("passport_not_open"));return; }Shot(TEXT("passport-before17"));Key(EKeys::F10);ExplorationAt=Real;ExplorationStage=2; }

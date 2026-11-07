@@ -106,15 +106,15 @@ void UFiskJournalPanel::DrawPassport(AHUD& HUD,UCanvas& C)
     auto T=[&](const FString& V,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){HUD.DrawText(V,Color,X*S,Y*S,nullptr,Size*S);};
     HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);T(TEXT("MITT SJØPASS"),48,55,2.1f);
     int32 Done=0;for(const auto& R:Rows) { Done+=R.Complete()?1:0; }
-    T(FString::Printf(TEXT("%d av 14 milepæler | Bekreftede opplevelser, ingen pengebonus"),Done),48,108,1.1f,Teal);
+    T(FString::Printf(TEXT("%d av 16 milepæler | Bekreftede opplevelser, ingen pengebonus"),Done),48,108,1.1f,Teal);
     T(TEXT("Dagens nye fremgang vises først etter oppgjøret 17:00."),48,143,.95f);
     for(int32 I=0;I<Rows.Num();++I)
     {
-        const auto& R=Rows[I];const float X=48+(I/7)*600,Y=184+(I%7)*56;
-        HUD.DrawRect(R.Complete()?FLinearColor(.12f,.3f,.29f):FLinearColor(.03f,.12f,.15f),X*S,Y*S,568*S,51*S);
+        const auto& R=Rows[I];const float X=48+(I/8)*600,Y=184+(I%8)*49;
+        HUD.DrawRect(R.Complete()?FLinearColor(.12f,.3f,.29f):FLinearColor(.03f,.12f,.15f),X*S,Y*S,568*S,45*S);
         const FString Progress=I==4?FString::Printf(TEXT("%.1f / 100 kg"),FMath::Min(R.Current,R.Target)/1000.0):FString::Printf(TEXT("%lld / %lld"),static_cast<long long>(FMath::Min(R.Current,R.Target)),static_cast<long long>(R.Target));
-        T(FString(R.Complete()?TEXT("+ "):TEXT("  "))+R.Name,X+12,Y+6,.97f,R.Complete()?Gold:Teal);T(Progress,X+420,Y+8,.85f);
-        T(R.Detail,X+12,Y+29,.78f);
+        T(FString(R.Complete()?TEXT("+ "):TEXT("  "))+R.Name,X+12,Y+4,.94f,R.Complete()?Gold:Teal);T(Progress,X+420,Y+8,.85f);
+        T(R.Detail,X+12,Y+26,.72f);
     }
     T(ExportMessage,48,598,.9f,Gold);T(TEXT("L / F4 / Escape: lukk | F10: eksporter bekreftet journal | Gamle poster uten sjøpunkt gir ingen atlasmerker"),48,638,.85f,Teal);
 }

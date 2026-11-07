@@ -13,7 +13,7 @@ struct FFiskFishingGround
 };
 namespace FiskGrounds
 {
-    constexpr int32 Count = 4;
+    constexpr int32 Count = 5;
     FISKGAME_API const FFiskFishingGround* Find(int32 Id);
     FISKGAME_API int32 CrossingMs(int32 ReturnStartMs, int32 Id);
     FISKGAME_API int32 ReturnMarginMs(int32 NowMs, int32 Progress, int32 Id);

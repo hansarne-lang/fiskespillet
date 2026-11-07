@@ -17,6 +17,10 @@ struct FFiskFightProfile
         if(Species==8) { return {1.25f,1.4f,.72f,.85f}; }
         if(Species==9) { return {1.1f,.7f,1.2f,1.1f}; }
         if(Species==10) { return {.95f,.9f,1.05f,1.f}; }
+        if(Species==11) { return {1.2f,1.15f,.85f,.95f}; }
+        if(Species==12) { return {1.5f,.7f,1.f,1.05f}; }
+        if(Species==13) { return {1.15f,1.25f,.8f,.9f}; }
+        if(Species==14) { return {.9f,.8f,1.15f,1.1f}; }
         return {};
     }
 };

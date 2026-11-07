@@ -52,7 +52,7 @@ void UFiskPierWalk::RunSmoke()
     if(!Tour)
     {
         if(SmokeStage==30)
-        { const FVector Target=SmokeWaypoint==0?FVector(-1300,-2900,130):FVector(-4800+Role*400,-2900,130);if(Go(Target)) { if(++SmokeWaypoint==2) { SmokeAt=Now;SmokeStage=31; } }return; }
+        { const FVector Target=SmokeWaypoint==0?FVector(-1300,-2900,130):FVector(-4650+Role*300,-2900,130);if(Go(Target)) { if(++SmokeWaypoint==2) { SmokeAt=Now;SmokeStage=31; } }return; }
         if(SmokeStage==31)
         {
             int32 N=0;for(const auto& R:H->GetResidents()) { if(R.PlayerId>=0 && R.bWalking && FiskPier::Inside(R.WalkPosition) && R.WalkPosition.Y<-2750) { ++N; } }

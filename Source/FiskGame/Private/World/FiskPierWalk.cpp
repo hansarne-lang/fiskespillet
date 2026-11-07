@@ -19,7 +19,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 UFiskPierWalk::UFiskPierWalk() { PrimaryComponentTick.bCanEverTick=true;PrimaryComponentTick.TickInterval=.05f;SetIsReplicatedByDefault(true); }
-void UFiskPierWalk::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const { Super::GetLifetimeReplicatedProps(Out);DOREPLIFETIME_CONDITION(UFiskPierWalk,bEnabled,COND_OwnerOnly);DOREPLIFETIME_CONDITION(UFiskPierWalk,Position,COND_OwnerOnly); }
+void UFiskPierWalk::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const { Super::GetLifetimeReplicatedProps(OutLifetimeProps);DOREPLIFETIME_CONDITION(UFiskPierWalk,bEnabled,COND_OwnerOnly);DOREPLIFETIME_CONDITION(UFiskPierWalk,Position,COND_OwnerOnly); }
 void UFiskPierWalk::ClearKeys() { bUp=bDown=bLeft=bRight=bSprint=false; }
 bool UFiskPierWalk::HasMenu() const
 {
@@ -49,7 +49,7 @@ void UFiskPierWalk::TickComponent(float Delta,ELevelTick Type,FActorComponentTic
     Super::TickComponent(Delta,Type,Tick);auto* P=CastChecked<AFiskBoardingController>(GetOwner());const double Now=GetWorld()->GetRealTimeSeconds();
     if(P->HasAuthority() && bEnabled)
     {
-        const auto* B=P->FindStarterBoat();if(!P->IsCareerReady() || !P->PlayerState || (B && B->IsAboard(P->PlayerState->GetPlayerId()))) { ServerMode(P->GetServerCareer().Id,false);return; }
+        const auto* B=P->FindStarterBoat();if(!P->IsCareerReady() || !P->PlayerState || (B && B->IsAboard(P->PlayerState->GetPlayerId()))) { bEnabled=false;++Generation;ServerAxis=FVector2D::ZeroVector;Speed=0;if(auto* H=P->GetMarinaPanel()->FindHub();H && P->PlayerState) { H->SetWalking(P->PlayerState->GetPlayerId(),false,Position,Facing,0); }P->ClientPierMode(false,Position,Generation);P->ForceNetUpdate();UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PIER_AUTO_STOP"));return; }
         const FVector Old=Position;const FVector2D A=Now-LastInputAt<=.4?ServerAxis:FVector2D::ZeroVector;Position=FiskPier::Step(Position,A,Delta,bServerSprint);Speed=Delta>0?FVector::Dist2D(Old,Position)/Delta:0;
         if(Speed>1) { Facing=FMath::RadiansToDegrees(FMath::Atan2(Position.Y-Old.Y,Position.X-Old.X)); }
         if(auto* H=P->GetMarinaPanel()->FindHub()) { H->SetWalking(P->PlayerState->GetPlayerId(),true,Position,Facing,Speed); }

@@ -61,7 +61,7 @@ void UFiskMarinaPanel::RunHarbourSmoke()
     if(HarbourStage==0 && Elapsed>=250) { HarbourInitialCash=GI->Career.Cash;Key(EKeys::B);HarbourAt=Real;HarbourStage=1; }
     else if(HarbourStage==1 && Elapsed>=267 && Real-HarbourAt>=3)
     {
-        const int32 Bar=Hub->GetResidents().CountByPredicate([](const FFiskMarinaResident& R){return R.PlayerId>=0 && R.Place==2;});
+        int32 Bar=0;for(const auto& R:Hub->GetResidents()) { if(R.PlayerId>=0 && R.Place==2) { ++Bar; } }
         if(Bar<4 || Own->Place!=2 || Life->GetVisiblePeople()<4) { if(Elapsed>300) { Fail(TEXT("four_people_missing_at_bar")); }return; }
         Key(EKeys::One);if(!Meet) { Shot(TEXT("four-fishers-at-bar")); }HarbourAt=Real;HarbourStage=2;
     }

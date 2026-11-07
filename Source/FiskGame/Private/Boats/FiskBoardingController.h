@@ -61,6 +61,7 @@ public:
     UFUNCTION(Client,Reliable) void ClientMarinaIdentity(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason);
     UFUNCTION(Server,Reliable) void ServerMarinaRecords(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records);
     UFUNCTION(Server,Reliable) void ServerMarinaSay(int32 Code);
+    UFUNCTION(Server,Reliable) void ServerHarbourPlace(FGuid Profile,int32 Place);
     UFUNCTION(Client,Reliable) void ClientJournalBatch(FGuid Profile,int32 Serial,const TArray<FFiskJournalEntry>& Entries);
     UFUNCTION(Server,Reliable) void ServerJournalAck(FGuid Profile,int32 Serial);
     void TickJournalRecovery();
@@ -100,7 +101,7 @@ public:
     FTimerHandle FleetTimer;
     double FleetAt=0;
     int64 FleetBaseCash=0;
-    bool bFleetPrivacyLogged=false,bFleetAttackSent=false,bFleetResume=false;
+    bool bFleetPrivacyLogged=false,bFleetAttackSent=false,bFleetResume=false,bFleetHouseVisited=false;
     void RunCargoSmoke();
     FString CargoMode,CargoDir;FTimerHandle CargoTimer;
     int32 CargoStage=0,CargoLandings=0;double CargoAt=0;int64 CargoPaidCash=0;

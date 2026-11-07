@@ -6,7 +6,7 @@ FISKELAGET er et planlagt realistisk, sosialt fiskespill for Windows PC. Inntil 
 
 Spillbar UE5.8-utviklingsversjon med én spiller eller inntil tolv over LAN, egne eller delte båter,15 arter, fem habitater,20-minuttersdager og lagret karriere. Fysisk LAN og ytelse på flere PC-er må fortsatt prøves.
 
-v0.19 gir en selvstendig fiskeflåte: Tab viser inntil tolv båter, C henter egen båt, og Enter går om bord. Hver båt har egen kaptein, turplan, ekspedisjon, fangstlager/slep og retur. En sen båt mister bare sin egen fangstinntekt. Tolv naustplasser og en større strandbartavle følger med. Se [spillguiden](Docs/Development/FISHING_FLEET_V019.md). Tidligere fiskeinnhold, naustbutikk, turplanlegging, foto, dagbok, fangstmål og fiskeskole beholdes. Modellene er fortsatt forenklede.
+v0.20 gir en levende havn med synlige fiskere, vinkebevegelser, original havneatmosfære og bar-/havne-/følg-båt-kamera. Artsboken får et 3D-galleri med15egne artsmodeller. B/V viser havnen; I/V ved marinaen viser galleriet. Se [spillguiden](Docs/Development/LIVING_HARBOUR_V020.md). Flåten med12båter/spillere, naustbutikk, fiskeinnhold, turplan/foto og lagringer beholdes. Modeller og figurer er fortsatt stiliserte; ferdig realistisk grafikk påstås ikke.
 
 Windows-pakken startes fra BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra02:00 og F ved fiskeplassen. Alle LAN-deltakere må bruke samme versjon. Kildeutvikling bruker Unreal5.8.4 og verktøyene i DEVELOPMENT.md. Pakken inneholder faktisk test-SHA, kontrollsummer, resultater og kjente begrensninger. Lagringer er lokale; GitHub synkroniserer ikke spillprofiler mellom PC-er.
 

@@ -28,6 +28,7 @@ private:
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Wake;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> TowFish;
     UPROPERTY() TObjectPtr<UStaticMeshComponent> TowRope;
+    bool bReportedTow=false;
     FVector SmoothedWorldPosition = FVector::ZeroVector;
 #if WITH_DEV_AUTOMATION_TESTS
     FString ScreenshotDirectory;

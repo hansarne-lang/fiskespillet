@@ -70,7 +70,7 @@ void AFiskStarterBoat::SetOwnerPlayer(int32 PlayerId)
 void AFiskStarterBoat::ResetForDay()
 {
     if (!HasAuthority()) { return; }
-    Cargo=FFiskCargoModel();CargoView=FFiskCargoView();bCargoReturnPending=false;
+    Cargo=FFiskCargoModel();CargoView=FFiskCargoView();OnRep_CargoView();bCargoReturnPending=false;
     SetActorTickEnabled(false); LegStartedMs = ReturnStartedMs = MarinaArrivalMs = -1;
     TripProgress = AtDock; ++Route.Revision;++LegSerial;TravelVotes.Reset();LegOrigin=FVector::ZeroVector;LegDestination=Route.Destination;LegTravelMs=GetTravelMs();
     PortRodActivity = StarboardRodActivity = 0;
@@ -321,10 +321,10 @@ void AFiskStarterBoat::SetHolderVisuals(const TArray<uint8>& Activities,const TA
 
 void AFiskStarterBoat::AcceptCargo(const FFiskCargoModel& Candidate)
 {
-    if(!HasAuthority()) { return; }Cargo=Candidate;CargoView=Cargo.View();bCargoReturnPending=Cargo.bMustReturn;ForceNetUpdate();if(bCargoReturnPending) { SetActorTickEnabled(true); }
+    if(!HasAuthority()) { return; }Cargo=Candidate;CargoView=Cargo.View();OnRep_CargoView();bCargoReturnPending=Cargo.bMustReturn;ForceNetUpdate();if(bCargoReturnPending) { SetActorTickEnabled(true); }
 }
 void AFiskStarterBoat::RevealCargo()
-{ if(HasAuthority()) { CargoView=Cargo.View(true);ForceNetUpdate(); } }
+{ if(HasAuthority()) { CargoView=Cargo.View(true);OnRep_CargoView();ForceNetUpdate(); } }
 bool AFiskStarterBoat::ReturnHome(int32 Now)
 {
     const FVector Origin=PositionAt(Now);const auto Path=FiskRouteGeometry::Between(Origin,FVector::ZeroVector);if(Path.IsEmpty()) { return false; }
@@ -343,3 +343,6 @@ void AFiskStarterBoat::ForceCargoReturn(int32 Now)
     }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_RETURN mode=%d duration=%d"),CargoView.Mode,LegTravelMs);
 }
+
+void AFiskStarterBoat::OnRep_CargoView()
+{ UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_VIEW mode=%d revealed=%d"),CargoView.Mode,CargoView.RevealedGrams>=0); }

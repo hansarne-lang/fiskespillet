@@ -97,7 +97,8 @@ public:
 
 private:
     FFiskCargoModel Cargo;
-    UPROPERTY(Replicated) FFiskCargoView CargoView;
+    UPROPERTY(ReplicatedUsing=OnRep_CargoView) FFiskCargoView CargoView;
+    UFUNCTION() void OnRep_CargoView();
     bool bCargoReturnPending=false;
     bool ReturnHome(int32 NowMs);
     void ForceCargoReturn(int32 NowMs);

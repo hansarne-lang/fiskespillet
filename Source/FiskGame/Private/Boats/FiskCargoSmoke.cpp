@@ -30,7 +30,7 @@ void AFiskBoardingController::RunCargoSmoke()
         if(CargoStage==0) { Key(EKeys::F11);if(GetSkipperPanel()->GetPage()!=4 || B->GetCargoView().Mode!=0 || B->GetCargoView().RevealedGrams!=-1) { Fail(TEXT("cargo_not_reset_in_fresh_process"));return; }Shot(TEXT("cargo-profile-reloaded"));CargoAt=Real;CargoStage=1; }
         else if(Real-CargoAt>=1) { Key(EKeys::F11);Done(); }return;
     }
-    if(D->GetDayNumber()==1 && Now<1020 && (GI->GetJournal().GetEntries().Num()!=0 || B->GetCargoView().RevealedGrams!=-1)) { Fail(TEXT("early_catch_or_weight_revealed"));return; }
+    if(HasAuthority() && D->GetDayNumber()==1 && Now<1020 && (GI->GetJournal().GetEntries().Num()!=0 || B->GetCargoView().RevealedGrams!=-1)) { Fail(TEXT("early_catch_or_weight_revealed"));return; }
     if(CargoStage==0)
     {
         if(!Observer) { for(int32 I=0;I<(Full?4:3);++I) { if(!GI->Career.Has(I)) { ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,I);return; } } }

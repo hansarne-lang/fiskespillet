@@ -62,7 +62,7 @@ FFiskMarineMesh FiskMarine::Water(double Time,double Strength)
 }
 UProceduralMeshComponent* FiskMarine::Add(AActor* Owner,USceneComponent* Parent,FName Name,const FFiskMarineMesh& M,UMaterialInterface* Material,FLinearColor Color,float Roughness)
 {
-    check(M.Valid());auto* C=NewObject<UProceduralMeshComponent>(Owner,Name);Owner->AddInstanceComponent(C);C->SetupAttachment(Parent);C->SetMobility(EComponentMobility::Movable);C->SetCollisionEnabled(ECollisionEnabled::NoCollision);C->bUseAsyncCooking=true;
+    check(M.Valid());UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINE_MESH name=%s vertices=%d triangles=%d"),*Name.ToString(),M.Vertices.Num(),M.Triangles.Num()/3);auto* C=NewObject<UProceduralMeshComponent>(Owner,Name);Owner->AddInstanceComponent(C);C->SetupAttachment(Parent);C->SetMobility(EComponentMobility::Movable);C->SetCollisionEnabled(ECollisionEnabled::NoCollision);C->bUseAsyncCooking=true;
     if(Material) { auto* Tint=UMaterialInstanceDynamic::Create(Material,C);TArray<FMaterialParameterInfo> Params;TArray<FGuid> Ids;Material->GetAllVectorParameterInfo(Params,Ids);for(const auto& P:Params) { Tint->SetVectorParameterValue(P.Name,Color); }Params.Reset();Ids.Reset();Material->GetAllScalarParameterInfo(Params,Ids);for(const auto& P:Params) { Tint->SetScalarParameterValue(P.Name,Roughness); }C->SetMaterial(0,Tint); }
     C->RegisterComponent();C->CreateMeshSection_LinearColor(0,M.Vertices,M.Triangles,M.Normals,M.UV,{}, {},false);return C;
 }

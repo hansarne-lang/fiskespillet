@@ -149,6 +149,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
     }
 
     const bool Towing=Boat->GetCargoView().Mode==static_cast<uint8>(EFiskCargoMode::Towing);
+    if(Towing && !bReportedTow) { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TOW_VISIBLE")); }bReportedTow=Towing;
     TowFish->SetVisibility(Towing);TowRope->SetVisibility(Towing);
     if(Towing) { const FVector Fish(-1040,30*FMath::Sin(Time*.7),-5+FMath::Sin(Time*1.8)*4);TowFish->SetRelativeLocation(Fish);TowFish->SetRelativeRotation(FRotator(0,FMath::Sin(Time*.7)*3,3));const FVector Stern=VisualRoot->GetRelativeTransform().TransformPosition(FVector(-345,0,102));FiskVisual::SetCylinder(TowRope,Stern,TowFish->GetRelativeTransform().TransformPosition(FVector(207,0,0)),2.6); }
     TArray<uint8> Activities;Activities.Init(0,6);

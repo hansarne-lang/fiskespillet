@@ -24,7 +24,8 @@ int64 FiskCollections::Progress(const FFiskJournalModel& J,int32 Goal)
     if(!Catalog().IsValidIndex(Goal)) { return 0; }const auto& G=Catalog()[Goal];int64 N=0;TSet<int32> Species;
     for(const auto& E:J.GetEntries())
     {
-        if(!E.IsValid()) { continue; }Species.Add(E.Fish.Species);
+        // Journal admission already validates each immutable entry.
+        Species.Add(E.Fish.Species);
         switch(G.Rule)
         {
         case EFiskCollectionRule::Species:N+=E.Fish.Species==G.Value;break;
@@ -44,7 +45,7 @@ bool FFiskCatchQuery::Valid() const
 TArray<int32> FiskCollections::Search(const FFiskJournalModel& J,const FFiskCatchQuery& Q)
 {
     TArray<int32> Rows;if(!Q.Valid()) { return Rows; }const auto& E=J.GetEntries();
-    for(int32 I=0;I<E.Num();++I) { const auto& A=E[I];if(A.IsValid() && (Q.Species<0 || A.Fish.Species==Q.Species) && (Q.Ground<0 || A.Context.Ground==Q.Ground) && (Q.Status==0 || (Q.Status==1?A.bSold:!A.bSold)) && A.Fish.WeightGrams>=Q.MinGrams) { Rows.Add(I); } }
+    for(int32 I=0;I<E.Num();++I) { const auto& A=E[I];if((Q.Species<0 || A.Fish.Species==Q.Species) && (Q.Ground<0 || A.Context.Ground==Q.Ground) && (Q.Status==0 || (Q.Status==1?A.bSold:!A.bSold)) && A.Fish.WeightGrams>=Q.MinGrams) { Rows.Add(I); } }
     Rows.Sort([&](int32 A,int32 B){const auto& X=E[A];const auto& Y=E[B];
         if(Q.Sort==1 && X.Fish.WeightGrams!=Y.Fish.WeightGrams) { return X.Fish.WeightGrams>Y.Fish.WeightGrams; }
         if(Q.Sort==2 && X.Fish.Value!=Y.Fish.Value) { return X.Fish.Value>Y.Fish.Value; }

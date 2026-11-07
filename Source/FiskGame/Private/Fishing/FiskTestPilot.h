@@ -32,7 +32,8 @@ namespace FiskQuickControls
 {
     inline bool IsAssistKey(const FKey& Key)
     {
-        if(Key.ToString().Equals(TEXT("Å"),ESearchCase::IgnoreCase)) { return true; }
+        const FString Name=Key.ToString();
+        if(Name==TEXT("Å") || Name==TEXT("å")) { return true; }
         const uint32 *Virtual=nullptr,*Character=nullptr;
         FInputKeyManager::Get().GetCodesFromKey(Key,Virtual,Character);
         return Character && (*Character==0x00c5 || *Character==0x00e5);

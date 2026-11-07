@@ -31,6 +31,7 @@
 #include "UI/FiskExpeditionPanel.h"
 #include "UI/FiskSkipperPanel.h"
 #include "UI/FiskAnglerPanel.h"
+#include "UI/FiskCollectionPanel.h"
 
 AFiskBoardingController::AFiskBoardingController()
 {
@@ -48,12 +49,15 @@ AFiskBoardingController::AFiskBoardingController()
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
+    CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));
     AnglerPanel=CreateDefaultSubobject<UFiskAnglerPanel>(TEXT("AnglerPanel"));
 }
 
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(CollectionPanel->IsVisible()) { return CollectionPanel->HandleKey(Params); }
+    if(Press && Params.Key==EKeys::Z && !AnglerPanel->IsVisible() && !SkipperPanel->IsVisible() && !MarinaPanel->IsVisible() && !ExpeditionPanel->IsVisible() && !JournalPanel->IsVisible() && !SeaChart->IsVisible() && !RigPanel->IsVisible() && !CrewPanel->IsVisible() && !DeckPanel->IsVisible() && !IsCareerVisible() && !bHelpVisible && !bResultsVisible && !bHistoryVisible) { CollectionPanel->Open();return true; }
     if(AnglerPanel->IsVisible()) { return AnglerPanel->HandleKey(Params); }
     if(SkipperPanel->IsVisible()) { return SkipperPanel->HandleKey(Params); }
     if(ExpeditionPanel->HandleKey(Params)) { return true; }
@@ -151,6 +155,8 @@ void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),CollectionMode))
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CollectionDir);GetWorldTimerManager().SetTimer(CollectionTimer,this,&AFiskBoardingController::RunCollectionSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskAnglerSmoke="),AnglerMode))
     {
         FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),AnglerDir);

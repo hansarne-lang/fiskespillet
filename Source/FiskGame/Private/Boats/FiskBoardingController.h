@@ -23,6 +23,7 @@ class UFiskMarinaPanel;
 class UFiskExpeditionPanel;
 class UFiskSkipperPanel;
 class UFiskAnglerPanel;
+class UFiskCollectionPanel;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -45,6 +46,7 @@ class AFiskBoardingController final : public APlayerController
 public:
     AFiskBoardingController();
     UFiskSkipperPanel* GetSkipperPanel() const { return SkipperPanel; }
+    UFiskCollectionPanel* GetCollectionPanel() const { return CollectionPanel; }
     UFiskAnglerPanel* GetAnglerPanel() const { return AnglerPanel; }
     FFiskRigBundle MakeRigBundle(const TArray<FFiskRigSettings>& Rigs) const;
     UFUNCTION(Server,Reliable) void ServerApplyRigBundle(FFiskRigBundle Bundle);
@@ -90,6 +92,10 @@ public:
     bool IsRodSelectionPending() const { return PendingRod>=0; }
     int32 GetCameraView() const { return CameraView; }
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunCollectionSmoke();
+    FString CollectionMode,CollectionDir;
+    FTimerHandle CollectionTimer;
+    int32 CollectionStage=0;double CollectionAt=0;
     void RunAnglerSmoke();
     FString AnglerMode,AnglerDir;
     FTimerHandle AnglerTimer;
@@ -139,6 +145,7 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    UPROPERTY() TObjectPtr<UFiskCollectionPanel> CollectionPanel;
     UPROPERTY() TObjectPtr<UFiskAnglerPanel> AnglerPanel;
     UPROPERTY() TObjectPtr<UFiskSkipperPanel> SkipperPanel;
     UPROPERTY() TObjectPtr<UFiskExpeditionPanel> ExpeditionPanel;

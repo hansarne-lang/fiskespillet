@@ -21,6 +21,7 @@
 #include "UI/FiskDeckPanel.h"
 #include "UI/FiskSkipperPanel.h"
 #include "UI/FiskAnglerPanel.h"
+#include "UI/FiskCollectionPanel.h"
 
 namespace
 {
@@ -133,6 +134,7 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if(PC->GetCollectionPanel()->IsVisible()) { PC->GetCollectionPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetAnglerPanel()->IsVisible()) { PC->GetAnglerPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetSkipperPanel()->IsVisible()) { PC->GetSkipperPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetExpeditionPanel()->IsVisible()) { PC->GetExpeditionPanel()->Draw(*this,*Canvas);return; }

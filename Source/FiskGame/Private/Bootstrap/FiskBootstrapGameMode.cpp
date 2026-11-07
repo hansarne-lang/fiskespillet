@@ -87,7 +87,7 @@ bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 Ex
     FleetMembership.ResetForDay();
     for(auto B:Fleet) { B->ResetForDay(); } Settlement->ResetForDay(ExpectedDay + 1);
     const bool Advanced=Day->AdvanceDay();
-    if(Advanced) { for(auto B:Fleet) { B->GetExpedition()->Refresh(); } }
+    if(Advanced) { for(auto B:Fleet) { B->GetVoyage()->Refresh();B->GetExpedition()->Refresh(); } }
     return Advanced;
 }
 int64 AFiskBootstrapGameMode::CareerIncome(const FGuid& Profile) const

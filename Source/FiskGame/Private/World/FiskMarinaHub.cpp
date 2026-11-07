@@ -3,6 +3,8 @@
 #include "World/FiskHarbourSound.h"
 #include "Boats/FiskStarterBoat.h"
 #include "FiskHarbourRules.h"
+#include "FiskPierRules.h"
+#include "World/FiskPierWalk.h"
 #include "EngineUtils.h"
 #include "World/FiskVisualPrimitives.h"
 #include "Boats/FiskBoardingController.h"
@@ -55,7 +57,7 @@ void AFiskMarinaHub::Tick(float DeltaSeconds)
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It) { const APlayerController* PC=It->Get();if(PC && PC->PlayerState) { Active.Add(PC->PlayerState->GetPlayerId()); } }
     bool Changed=false;for(FFiskMarinaResident& R:Residents)
     {
-        if(R.PlayerId>=0 && !Active.Contains(R.PlayerId)) { PlaceChoices.Remove(R.PlayerId);R.PlayerId=-1;Changed=true; }
+        if(R.PlayerId>=0 && !Active.Contains(R.PlayerId)) { PlaceChoices.Remove(R.PlayerId);R.PlayerId=-1;R.bWalking=false;Changed=true; }
         bool Sea=false;for(TActorIterator<AFiskStarterBoat> B(GetWorld());B;++B) { if(R.PlayerId>=0 && B->IsAboard(R.PlayerId) && B->GetTripProgress()!=-1 && B->GetTripProgress()!=200) { Sea=true;break; } }
         const int32 Place=FiskHarbour::PublicPlace(R.PlayerId>=0,Sea,PlaceChoices.FindRef(R.PlayerId));if(R.Place!=Place) { R.Place=Place;Changed=true; }
     }
@@ -65,6 +67,13 @@ bool AFiskMarinaHub::SetPlace(int32 Player,int32 Place)
 {
     if(!HasAuthority() || Player<0 || Place<0 || Place>2 || !Residents.ContainsByPredicate([&](const FFiskMarinaResident& R){return R.PlayerId==Player;})) { return false; }
     PlaceChoices.Add(Player,Place);return true;
+}
+bool AFiskMarinaHub::SetWalking(int32 Player,bool Enabled,FVector Position,float Yaw,float Speed)
+{
+    if(!HasAuthority() || !FiskPier::Inside(Position) || !FMath::IsFinite(Yaw) || !FMath::IsFinite(Speed)) { return false; }
+    auto* R=Residents.FindByPredicate([&](const FFiskMarinaResident& V){return V.PlayerId==Player && Player>=0;});if(!R) { return false; }
+    const bool Changed=R->bWalking!=Enabled || !R->WalkPosition.Equals(Position,.1) || !FMath::IsNearlyEqual(R->WalkYaw,Yaw,.1f) || !FMath::IsNearlyEqual(R->WalkSpeed,Speed,1.f);
+    R->bWalking=Enabled;R->WalkPosition=Position;R->WalkYaw=Yaw;R->WalkSpeed=Speed;if(Changed) { ForceNetUpdate(); }return true;
 }
 void AFiskMarinaHub::OnRep_Residents()
 {
@@ -76,6 +85,8 @@ void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
 {
     Super::CalcCamera(DeltaTime,Out);const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
+    if(PC && PC->GetPierWalk()->IsEnabled() && Panel && !Panel->IsVisible())
+    { const auto* W=PC->GetPierWalk();const FVector Focus=W->GetPosition()+FVector(0,0,110);Out.Location=Focus+FRotator(0,W->GetCameraYaw(),0).RotateVector(FVector(-750,-1050,720))*W->GetZoom();Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=60;return; }
     if(Panel && Panel->IsGallery())
     {
         const FVector Focus(-10000,-6000,650);Out.Location=Focus+FVector(450,-1800*Panel->GetGalleryZoom(),180);Out.Rotation=(Focus+FVector(450,0,0)-Out.Location).Rotation();Out.FOV=55;return;

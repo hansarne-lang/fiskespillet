@@ -1,5 +1,6 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
 #include "UI/FiskMarinaPanel.h"
+#include "World/FiskPierWalk.h"
 #include "UI/FiskExpeditionPanel.h"
 #include "Engine/Canvas.h"
 #include "UI/FiskFrontEnd.h"
@@ -34,7 +35,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
     {
         HUD.DrawText(TEXT("HJELP OG KONTROLLER"),FLinearColor::White,52*S,60*S,nullptr,2.1f*S);
         Lines={TEXT("Spill starter dagen alene. Opptil tolv spillere i samme LAN-økt. Tab: flåte. B/V: havnekamera. I/V ved marinaen: 3D-arter."),
-            TEXT("E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
+            TEXT("T i land: bryggeliv / WASD / Shift / E i nærheten. E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
             TEXT("G: agn, dybde og agnprogram. 1/2/3 velger lagringsplass i oppsettspanelet."),
             TEXT("F5 lagrer bekreftet oppsett på PC-en. F9 henter det til servervalidering."),
             TEXT("1/2/3: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
@@ -140,6 +141,7 @@ void AFiskBootstrapHUD::DrawHUD()
         if(PC->GetSkipperPanel()->IsVisible()) { PC->GetSkipperPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetExpeditionPanel()->IsVisible()) { PC->GetExpeditionPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetMarinaPanel()->IsVisible()) { PC->GetMarinaPanel()->Draw(*this,*Canvas);return; }
+        if(PC->GetPierWalk()->Draw(*this,*Canvas)) { return; }
         const FString Feedback=PC->GetActionFeedback();
         if(!Feedback.IsEmpty() && !PC->IsCareerVisible())
         {

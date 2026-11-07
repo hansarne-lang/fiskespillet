@@ -20,6 +20,7 @@
 #include "TimerManager.h"
 #include "EngineUtils.h"
 #include "World/FiskOceanScene.h"
+#include "World/FiskPierWalk.h"
 #include "FiskFishingGround.h"
 #include "DayCycle/FiskSessionRules.h"
 #include "UI/FiskJournalPanel.h"
@@ -47,6 +48,7 @@ AFiskBoardingController::AFiskBoardingController()
     DeckPanel = CreateDefaultSubobject<UFiskDeckPanel>(TEXT("DeckPanel"));
     CreateDefaultSubobject<UFiskCombatFeedback>(TEXT("CombatFeedback"));
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
+    PierWalk=CreateDefaultSubobject<UFiskPierWalk>(TEXT("PierWalk"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
     CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));
@@ -63,6 +65,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if(SkipperPanel->IsVisible()) { return SkipperPanel->HandleKey(Params); }
     if(ExpeditionPanel->HandleKey(Params)) { return true; }
     if(MarinaPanel->HandleKey(Params)) { return true; }
+    if(PierWalk->HandleKey(Params)) { return true; }
     if(HandleCareerKey(Params)) { return true; }
     if(DeckPanel->IsVisible()) { return DeckPanel->HandleKey(Params); }
     if(Press && (Params.Key==EKeys::F7 || Params.Key==EKeys::F8))
@@ -493,6 +496,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             { bAutoResultsSeen=true;bResultsVisible=true;ResultPage=0;ReleaseRodInputsForMenu();break; }
         }
     }
+    if(PierWalk->IsEnabled() && !PierWalk->HasMenu()) { if(auto* Hub=MarinaPanel->FindHub()) { if(GetViewTarget()!=Hub) { SetViewTarget(Hub); }return; } }
     if(MarinaPanel->WantsCamera()) { if(AFiskMarinaHub* Hub=MarinaPanel->FindHub()) { if(GetViewTarget()!=Hub) { SetViewTarget(Hub); }return; } }
     for (TActorIterator<AFiskOceanScene> Scene(GetWorld()); Scene; ++Scene)
     {

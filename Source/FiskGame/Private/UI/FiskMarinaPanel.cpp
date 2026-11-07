@@ -166,6 +166,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     auto T=[&](const FString& Text,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){HUD.DrawText(Text,Color,X*S,Y*S,nullptr,Size*S);};
     const UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const AFiskMarinaHub* Hub=FindHub();
     if(Page==5) { if(!bShopPreview) { HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.97f),24*S,28*S,610*S,650*S); }DrawHomeShop(HUD,C);return; }
+    if(Page==3 && bGallery) { DrawGallery(HUD,C);return; }
     HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.97f),24*S,28*S,(Page==3 || Page==4?1232:610)*S,650*S);
     if(Page==4)
     {
@@ -187,7 +188,6 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     }
     if(Page==3)
     {
-        if(bGallery) { const_cast<UFiskMarinaPanel*>(this)->DrawGallery(HUD,C);return; }
         T(TEXT("ARTSBOK OG ARTSJAKT"),52,60,2);int32 Discovered=0;for(int32 I=0;I<FiskCatches::Count;++I) { if(GI->GetJournal().Best(I)) { ++Discovered; } }
         T(FString::Printf(TEXT("Oppdaget %d/%d arter | Dagens nye funn vises først ved 17:00"),Discovered,FiskCatches::Count),52,112,1.05f,Teal);
         for(int32 I=(Species/8)*8;I<FMath::Min((Species/8+1)*8,FiskCatches::Count);++I) { if(I==Species) { HUD.DrawRect(FLinearColor(.14f,.34f,.36f),44*S,(165+44*(I%8))*S,370*S,38*S); }T(FString::Printf(TEXT("%s %s"),GI->GetJournal().Best(I)?TEXT("+"):TEXT("-"),FiskCatches::Find(I)->Name),58,173+44*(I%8),1.03f); }

@@ -1,6 +1,6 @@
 # FISKELAGET v0.14 – Fangstjakten
 
-J åpner den nye fangstsentralen både fra hovedmenyen og under vanlig spilling. Lukk andre paneler først. Fangstsentralen bruker bare din egen bekreftede journal; dagens fangster teller først etter oppgjøret 17:00. Spillklokken fortsetter når panelet er åpent.
+Z åpner den nye fangstsentralen både fra hovedmenyen og under vanlig spilling. Lukk andre paneler først. Fangstsentralen bruker bare din egen bekreftede journal; dagens fangster teller først etter oppgjøret 17:00. Spillklokken fortsetter når panelet er åpent.
 
 ## Tretti samlinger
 

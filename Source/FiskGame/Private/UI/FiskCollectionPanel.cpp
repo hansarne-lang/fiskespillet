@@ -20,7 +20,7 @@ void UFiskCollectionPanel::SavePins()
 bool UFiskCollectionPanel::HandleKey(const FInputKeyEventArgs& A)
 {
     if(!bVisible) { return false; }if(A.Event!=IE_Pressed && A.Event!=IE_Repeat) { return true; }const FKey K=A.Key;
-    if(K==EKeys::Escape || K==EKeys::J) { bVisible=false;return true; }
+    if(K==EKeys::Escape || K==EKeys::Z) { bVisible=false;return true; }
     if(K==EKeys::Tab) { Page=(Page+1)%4;ResultPage=0;return true; }
     if(K==EKeys::F5) { SavePins();return true; }
     if(K==EKeys::F10) { const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());FString Path;Message=FiskCollections::Export(FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Exports")),GI->GetJournal(),Page==2?Query:FFiskCatchQuery(),Pins.Values,Path)?TEXT("HTML og CSV er lagret i Fiskelaget/Exports. Søkefiltrene brukes i søkefanen."):TEXT("Rapport kunne ikke lagres.");return true; }
@@ -48,7 +48,7 @@ void UFiskCollectionPanel::Draw(AHUD& H,UCanvas& C)
     auto T=[&](const FString& V,float X,float Y,float Z=1.f,FLinearColor Color=FLinearColor::White){H.DrawText(V,Color,X*S,Y*S,nullptr,Z*S);};
     H.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);T(TEXT("FANGSTJAKTEN"),48,55,2.1f);int32 Done=0;for(int32 I=0;I<FiskCollections::Count;++I) { Done+=FiskCollections::Progress(J,I)>=FiskCollections::Catalog()[I].Target; }
     T(FString::Printf(TEXT("%d av 30 samlinger | Bare dine bekreftede fangster etter oppgjøret"),Done),48,108,1.05f,Teal);
-    const TCHAR* Tabs[]={TEXT("SAMLINGER"),TEXT("MINE TRE MÅL"),TEXT("FANGSTSØK"),TEXT("OVERSIKT")};T(FString::Printf(TEXT("Tab: %s | J / Escape: lukk | F5: lagre mål | F10: HTML + CSV"),Tabs[Page]),48,148,.98f);
+    const TCHAR* Tabs[]={TEXT("SAMLINGER"),TEXT("MINE TRE MÅL"),TEXT("FANGSTSØK"),TEXT("OVERSIKT")};T(FString::Printf(TEXT("Tab: %s | Z / Escape: lukk | F5: lagre mål | F10: HTML + CSV"),Tabs[Page]),48,148,.98f);
     if(Page<2)
     {
         const int32 First=Page==0?(Row/6)*6:0,Number=Page==0?6:3;

@@ -231,7 +231,7 @@ void UFiskFrontEnd::Draw(AHUD& HUD, UCanvas& Canvas)
         HUD.DrawText(TEXT("FISKESKOLEN"),FLinearColor(.5f,.9f,.84f),590*S,251*S,nullptr,2.f*S);
         HUD.DrawText(TEXT("Lær pumpetak, brems og utras før første fiskedag."),FLinearColor::White,590*S,313*S,nullptr,1.08f*S);
         HUD.DrawText(TEXT("Øv mot elleve arter uten å endre karrieren."),FLinearColor::White,590*S,350*S,nullptr,1.08f*S);
-        HUD.DrawText(TEXT("F6: fiskeskole | J: fangstjakt og egne mål"),FLinearColor(1,.8f,.4f),590*S,413*S,nullptr,1.2f*S);
+        HUD.DrawText(TEXT("F6: fiskeskole | Z: fangstjakt og egne mål"),FLinearColor(1,.8f,.4f),590*S,413*S,nullptr,1.2f*S);
     }
     if (!bReadyReported) { bReadyReported = true; UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MENU_READY")); }
 }

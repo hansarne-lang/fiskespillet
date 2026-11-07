@@ -42,7 +42,11 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("1/2/3: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
             TEXT("P: marinabutikk, lagret saldo, utstyr og båtvalg. Kjøp ved brygga."),
             TEXT("Kamp: løft med venstre mus, slipp for å senke. Sveiv med høyre mus."),
+#if !UE_BUILD_SHIPPING
             TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander. Å: AI-testhjelp etter napp."),
+#else
+            TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander når klart."),
+#endif
             TEXT("R / Tilbake til marina: kapteinens retur. Klikk knappen i spillvisningen. K: mannskap."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
             TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),

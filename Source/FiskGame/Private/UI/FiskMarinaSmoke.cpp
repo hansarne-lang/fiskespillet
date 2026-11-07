@@ -17,6 +17,11 @@
 #include "TimerManager.h"
 void UFiskMarinaPanel::BeginPlay()
 {
+#if WITH_DEV_AUTOMATION_TESTS
+    if(CastChecked<AFiskBoardingController>(GetOwner())->IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskHarbourSmoke="),HarbourMode))
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),HarbourDirectory);GetWorld()->GetTimerManager().SetTimer(HarbourTimer,this,&UFiskMarinaPanel::RunHarbourSmoke,.5f,true,3.25f); }
+#endif
+
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
     if(CastChecked<AFiskBoardingController>(GetOwner())->IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskMarinaSmoke="),SmokeMode))

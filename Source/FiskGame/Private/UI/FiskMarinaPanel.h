@@ -55,6 +55,12 @@ private:
     void Show(int32 NewPage);
     void Choose();
 #if WITH_DEV_AUTOMATION_TESTS
+    FString HarbourMode,HarbourDirectory;
+    FTimerHandle HarbourTimer;
+    int32 HarbourStage=0,HarbourSpecies=0;
+    double HarbourAt=0;
+    int64 HarbourInitialCash=0;
+    void RunHarbourSmoke();
     FString SmokeMode,SmokeDirectory;
     FTimerHandle SmokeTimer;
     int32 SmokeStage=0;

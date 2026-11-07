@@ -24,9 +24,9 @@ void AFiskBoardingController::RunFleetSmoke()
     auto Key=[&](FKey K){Input(K,IE_Pressed);Input(K,IE_Released);};
     auto Shot=[&](const TCHAR* Name){const FString File=FPaths::Combine(FleetDir,FString(Name)+TEXT(".png"));FTimerHandle T;GetWorldTimerManager().SetTimer(T,FTimerDelegate::CreateWeakLambda(this,[File](){if(!FScreenshotRequest::IsScreenshotRequested()) { FScreenshotRequest::RequestScreenshot(File,false,false); }}),.3f,false);};
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_FLEET_FAILED role=%d stage=%d %s"),FleetRole,FleetStage,Why);GetWorldTimerManager().ClearTimer(FleetTimer);};
-    auto OwnedBy=[&](int32 Role)->AFiskStarterBoat*
+    auto OwnedBy=[&](int32 RoleIndex)->AFiskStarterBoat*
     {
-        const FString Name=FString::Printf(TEXT("FLEET%02d"),Role);int32 Id=-1;
+        const FString Name=FString::Printf(TEXT("FLEET%02d"),RoleIndex);int32 Id=-1;
         for(const auto& P:D->PlayerArray) { if(P && P->GetPlayerName()==Name) { Id=P->GetPlayerId();break; } }
         for(auto* Boat:FleetBoats()) { if(Id>=0 && Boat->GetOwnerId()==Id) { return Boat; } }return nullptr;
     };
@@ -116,7 +116,7 @@ void AFiskBoardingController::RunFleetSmoke()
         }
         if(FleetRole==8 && Now>=220 && !bFleetPrivacyLogged)
         { if(B->IsAboard(SelfId)) { Fail(TEXT("shore_player_dragged_to_sea"));return; }Key(EKeys::B);Shot(TEXT("shore-bar-during-voyages"));bFleetPrivacyLogged=true;FleetAt=Real; }
-        if(FleetRole==8 && GetMarinaPanel()->GetPage()==2 && Real-FleetAt>=2) { Key(EKeys::B);Key(EKeys::H);for(int32 I=0;I<11;++I) { Key(EKeys::PageDown); }Shot(TEXT("twelfth-naust"));FleetStage=41;FleetAt=Real; }
+        if(FleetRole==8 && GetMarinaPanel()->GetPage()==2 && Real-FleetAt>=2) { Key(EKeys::B);Key(EKeys::H);for(int32 I=0;I<12 && GetMarinaPanel()->GetHouseIndex()!=11;++I) { Key(EKeys::PageDown); }if(GetMarinaPanel()->GetHouseIndex()!=11) { Fail(TEXT("twelfth_naust_unreachable"));return; }Shot(TEXT("twelfth-naust"));FleetStage=41;FleetAt=Real; }
         if(Now<1080) { return; }
         FleetStage=42;
     }
@@ -126,7 +126,7 @@ void AFiskBoardingController::RunFleetSmoke()
         const int32 Expected=Fishing?1:0;const auto& J=GI->GetJournal();if(J.GetEntries().Num()!=Expected) { Fail(TEXT("wrong_own_catch_count"));return; }
         for(const auto& Entry:J.GetEntries()) { if(Entry.bSold!=(FleetRole!=6)) { Fail(TEXT("wrong_independent_delivery_result"));return; } }
         if(GI->Career.Cash!=FleetBaseCash+J.Stats().Income*100) { Fail(TEXT("wallet_not_equal_own_income"));return; }
-        for(int32 Role=0;Role<12;++Role) { const auto* Boat=OwnedBy(Role);if(!Boat || Boat->GetCargoView().RevealedGrams!=((Role==0 || Role==2 || Role==6)?150000:0)) { Fail(TEXT("fleet_cargo_reveal_wrong"));return; } }
+        for(int32 RoleIndex=0;RoleIndex<12;++RoleIndex) { const auto* Boat=OwnedBy(RoleIndex);if(!Boat || Boat->GetCargoView().RevealedGrams!=((RoleIndex==0 || RoleIndex==2 || RoleIndex==6)?150000:0)) { Fail(TEXT("fleet_cargo_reveal_wrong"));return; } }
         const auto* OwnExp=FindExpedition();if(Fishing && (!OwnExp || OwnExp->GetPlan().Goal!=(FleetRole==0?3:FleetRole==2?2:4) || OwnExp->GetPlan().bCompleted!=(FleetRole==0))) { Fail(TEXT("expedition_leaked_between_boats"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_PAID role=%d cash=%lld catches=%d income=%lld"),FleetRole,static_cast<long long>(GI->Career.Cash),J.GetEntries().Num(),static_cast<long long>(J.Stats().Income));
         FleetStage=43;

@@ -246,7 +246,8 @@ void AFiskBoardingController::ServerBoardStarterBoat_Implementation()
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
     {
-        Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->Board(PlayerState->GetPlayerId());
+        auto* B=Mode->GetBoatForPlayer(PlayerState->GetPlayerId());B->Board(PlayerState->GetPlayerId());
+        if(!B->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Denne båten er full eller har reist. Tab åpner flåten; C henter din egen båt ved brygga.")); }
     }
 }
 

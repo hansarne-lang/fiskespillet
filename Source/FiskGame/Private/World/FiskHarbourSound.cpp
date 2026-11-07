@@ -1,6 +1,8 @@
 #include "World/FiskHarbourSound.h"
 #include "Boats/FiskBoardingController.h"
 #include "UI/FiskMarinaPanel.h"
+#include "World/FiskPierWalk.h"
+#include "FiskPierRules.h"
 #include "UI/FiskGameInstance.h"
 #include "Components/AudioComponent.h"
 #include "Sound/SoundWaveProcedural.h"
@@ -32,8 +34,9 @@ void UFiskHarbourSound::TickComponent(float Delta,ELevelTick Type,FActorComponen
 {
     Super::TickComponent(Delta,Type,Tick);const auto* PC=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());const auto* GI=Cast<UFiskGameInstance>(GetWorld()->GetGameInstance());
     if(!Wave || !Audio || !PC || !PC->IsLocalController()) { return; }const auto* Panel=PC->GetMarinaPanel();
-    if(!GI || !GI->bSound || Panel->GetPage()!=2) { if(Audio->IsPlaying()) { Audio->Stop();Wave->ResetAudio();Queued=0; }return; }
-    if(bMusic!=Panel->IsHarbourMusic()) { bMusic=Panel->IsHarbourMusic();Wave->ResetAudio();Queued=0;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HARBOUR_MUSIC enabled=%d"),bMusic); }
+    const bool Walking=PC->GetPierWalk()->IsEnabled(),Bar=Panel->GetPage()==2 || (Walking && FiskPier::NearBar(PC->GetPierWalk()->GetPosition()));
+    if(!GI || !GI->bSound || (!Walking && Panel->GetPage()!=2)) { if(Audio->IsPlaying()) { Audio->Stop();Wave->ResetAudio();Queued=0; }return; }
+    if(bMusic!=(Bar && Panel->IsHarbourMusic())) { bMusic=Bar && Panel->IsHarbourMusic();Wave->ResetAudio();Queued=0;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HARBOUR_MUSIC enabled=%d"),bMusic); }
     if(!bReported && Audio->IsPlaying() && Queued>static_cast<uint64>(Wave->GetAvailableAudioByteCount())+4096) { bReported=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HARBOUR_AUDIO_CONSUMED")); }
     while(Wave->GetAvailableAudioByteCount()<24576)
     { TArray<int16> Samples;Samples.SetNumUninitialized(1024);for(int32 I=0;I<1024;++I,++Offset) { Samples[I]=static_cast<int16>(FiskHarbourAudio::Sample(Offset,bMusic)*32767); }Wave->QueueAudio(reinterpret_cast<uint8*>(Samples.GetData()),Samples.Num()*sizeof(int16));Queued+=Samples.Num()*sizeof(int16); }

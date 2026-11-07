@@ -45,6 +45,10 @@ struct FISKCORE_API FFiskMarinaResident
     UPROPERTY() int32 PlayerId=-1;
     UPROPERTY() FFiskMarinaIdentity Identity;
     UPROPERTY() int32 Place=0; // 0 marina, 1 naust, 2 bar, 3 at sea (server-derived)
+    UPROPERTY() bool bWalking=false;
+    UPROPERTY() FVector WalkPosition=FVector(-1300,0,130);
+    UPROPERTY() float WalkYaw=0;
+    UPROPERTY() float WalkSpeed=0;
     UPROPERTY() TArray<FFiskMarinaTrophy> Trophies;
 };
 USTRUCT()

@@ -20,6 +20,7 @@ public:
     bool Upsert(const FGuid& Profile,int32 Player,const FFiskMarinaIdentity& Identity,const TArray<FFiskMarinaTrophy>& Trophies);
     bool Say(int32 Player,int32 Code,int32 AtMs);
     bool SetPlace(int32 Player,int32 Place);
+    bool SetWalking(int32 Player,bool Enabled,FVector Position,float Yaw,float Speed);
     const TArray<FFiskMarinaResident>& GetResidents() const { return Residents; }
     const TArray<FFiskMarinaMessage>& GetMessages() const { return Messages; }
     static const TCHAR* Phrase(int32 Code);

@@ -32,6 +32,7 @@ public:
     int32 GetHarbourView() const { return HarbourView; }
     const AFiskStarterBoat* FollowBoat() const;
     bool IsHarbourMusic() const { return bHarbourMusic; }
+    void ToggleHarbourMusic() { bHarbourMusic=!bHarbourMusic; }
     void ReceiveIdentity(const FFiskMarinaIdentity& Value);
     void RejectIdentity(const FString& Reason) { bSending=false;bSent=false;Status=Reason; }
     const FFiskMarinaIdentity& GetIdentity() const { return Identity; }

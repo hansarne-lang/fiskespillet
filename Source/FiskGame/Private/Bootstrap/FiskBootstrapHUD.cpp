@@ -1,5 +1,6 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
 #include "UI/FiskMarinaPanel.h"
+#include "World/FiskPierWalk.h"
 #include "UI/FiskExpeditionPanel.h"
 #include "Engine/Canvas.h"
 #include "UI/FiskFrontEnd.h"
@@ -12,6 +13,7 @@
 #include "Boats/FiskStarterBoat.h"
 #include "Boats/FiskBoardingController.h"
 #include "Fishing/FiskPrototypeRod.h"
+#include "Fishing/FiskFishingHelp.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "DayCycle/FiskDayState.h"
@@ -34,14 +36,18 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
     {
         HUD.DrawText(TEXT("HJELP OG KONTROLLER"),FLinearColor::White,52*S,60*S,nullptr,2.1f*S);
         Lines={TEXT("Spill starter dagen alene. Opptil tolv spillere i samme LAN-økt. Tab: flåte. B/V: havnekamera. I/V ved marinaen: 3D-arter."),
-            TEXT("E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
+            TEXT("T i land: bryggeliv / WASD / Shift / E i nærheten. E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
             TEXT("G: agn, dybde og agnprogram. 1/2/3 velger lagringsplass i oppsettspanelet."),
             TEXT("F5 lagrer bekreftet oppsett på PC-en. F9 henter det til servervalidering."),
             TEXT("1/2/3: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
             TEXT("P: marinabutikk, lagret saldo, utstyr og båtvalg. Kjøp ved brygga."),
             TEXT("Kamp: løft med venstre mus, slipp for å senke. Sveiv med høyre mus."),
-            TEXT("Musehjul: brems. Slipp sveiva under utras. Mellomrom lander når klart."),
-            TEXT("R: kapteinens retur. K: mannskap og kapteinsbytte. Lukk paneler før R."),
+#if !UE_BUILD_SHIPPING
+            TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander. Å: AI-testhjelp etter napp."),
+#else
+            TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander når klart."),
+#endif
+            TEXT("R / Tilbake til marina: kapteinens retur. Klikk knappen i spillvisningen. K: mannskap."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
             TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),
             TEXT("H/U/B/I: naust, utstyrsrom, strandbar og artsbok. J: ekspedisjon. L: sjøpass."),
@@ -140,6 +146,7 @@ void AFiskBootstrapHUD::DrawHUD()
         if(PC->GetSkipperPanel()->IsVisible()) { PC->GetSkipperPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetExpeditionPanel()->IsVisible()) { PC->GetExpeditionPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetMarinaPanel()->IsVisible()) { PC->GetMarinaPanel()->Draw(*this,*Canvas);return; }
+        if(PC->GetPierWalk()->Draw(*this,*Canvas)) { return; }
         const FString Feedback=PC->GetActionFeedback();
         if(!Feedback.IsEmpty() && !PC->IsCareerVisible())
         {
@@ -172,5 +179,5 @@ void AFiskBootstrapHUD::DrawHUD()
         }
     }
     if(const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetOwningPlayerController()))
-    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas); }
+    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetFishingHelp()->Draw(*this,*Canvas);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas); }
 }

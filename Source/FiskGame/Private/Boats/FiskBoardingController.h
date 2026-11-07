@@ -26,6 +26,8 @@ class UFiskExpeditionPanel;
 class UFiskSkipperPanel;
 class UFiskAnglerPanel;
 class UFiskCollectionPanel;
+class UFiskPierWalk;
+class UFiskFishingHelp;
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -47,6 +49,12 @@ class AFiskBoardingController final : public APlayerController
 
 public:
     AFiskBoardingController();
+    UFiskFishingHelp* GetFishingHelp() const { return FishingHelp; }
+    UFUNCTION(Server,Reliable) void ServerReturnToMarina(int32 Revision,int32 Day,int32 Leg);
+    UFiskPierWalk* GetPierWalk() const { return PierWalk; }
+    UFUNCTION(Server,Reliable) void ServerPierMode(FGuid Profile,bool Enabled);
+    UFUNCTION(Server,Unreliable) void ServerPierInput(FGuid Profile,int32 Generation,int32 Serial,FVector2D Axis,bool Sprint);
+    UFUNCTION(Client,Reliable) void ClientPierMode(bool Enabled,FVector Position,int32 Generation);
     UFiskSkipperPanel* GetSkipperPanel() const { return SkipperPanel; }
     UFiskCollectionPanel* GetCollectionPanel() const { return CollectionPanel; }
     UFiskAnglerPanel* GetAnglerPanel() const { return AnglerPanel; }
@@ -168,6 +176,8 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    friend class UFiskFishingHelp;
+    UPROPERTY() TObjectPtr<UFiskFishingHelp> FishingHelp;
     UPROPERTY(Replicated) TObjectPtr<AFiskStarterBoat> SelectedFleetBoat;
     bool bFleetVisible=false;
     int32 FleetRow=0;
@@ -176,6 +186,7 @@ private:
     UPROPERTY() TObjectPtr<UFiskSkipperPanel> SkipperPanel;
     UPROPERTY() TObjectPtr<UFiskExpeditionPanel> ExpeditionPanel;
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskPierWalk> PierWalk;
     double LastMarinaMessage=-10;
     FFiskJournalModel RecoverySnapshot;
     TArray<FFiskExpeditionRecord> ExpeditionSnapshot;

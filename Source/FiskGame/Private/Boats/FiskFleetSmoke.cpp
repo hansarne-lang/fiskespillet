@@ -125,11 +125,11 @@ void AFiskBoardingController::RunFleetSmoke()
         }
         if(FleetRole==8 && Now>=220 && !bFleetPrivacyLogged)
         { if(B->IsAboard(SelfId)) { Fail(TEXT("shore_player_dragged_to_sea"));return; }Key(EKeys::B);Shot(TEXT("shore-bar-during-voyages"));bFleetPrivacyLogged=true;FleetAt=Real; }
-        if(FleetRole==8 && GetMarinaPanel()->GetPage()==2 && Real-FleetAt>=2) { Key(EKeys::B);Key(EKeys::H);for(int32 I=0;I<12 && GetMarinaPanel()->GetHouseIndex()!=11;++I) { Key(EKeys::PageDown); }if(GetMarinaPanel()->GetHouseIndex()!=11) { Fail(TEXT("twelfth_naust_unreachable"));return; }Shot(TEXT("twelfth-naust"));FleetStage=41;FleetAt=Real; }
+        if(FleetRole==8 && !bFleetHouseVisited && GetMarinaPanel()->GetPage()==2 && Real-FleetAt>=2) { Key(EKeys::B);Key(EKeys::H);for(int32 I=0;I<12 && GetMarinaPanel()->GetHouseIndex()!=11;++I) { Key(EKeys::PageDown); }if(GetMarinaPanel()->GetHouseIndex()!=11) { Fail(TEXT("twelfth_naust_unreachable"));return; }Shot(TEXT("twelfth-naust"));FleetStage=41;FleetAt=Real; }
         if(Now<1080) { return; }
         FleetStage=42;
     }
-    else if(FleetStage==41 && Real-FleetAt>=2) { Key(EKeys::H);FleetStage=40; }
+    else if(FleetStage==41 && Real-FleetAt>=2) { Key(EKeys::H);bFleetHouseVisited=true;FleetStage=40; }
     if(FleetStage==42)
     {
         const int32 Expected=Fishing?1:0;const auto& J=GI->GetJournal();if(J.GetEntries().Num()!=Expected) { Fail(TEXT("wrong_own_catch_count"));return; }

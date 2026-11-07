@@ -18,7 +18,9 @@ void AFiskBoardingController::RunCollectionSmoke()
     auto PinsOk=[&](){return CollectionPanel->GetPins().Values==TArray<int32>({29,1,26});};
     if(CollectionMode==TEXT("reload"))
     {
-        if(J.GetEntries().Num()!=1) { return; }Key(EKeys::J);if(!CollectionPanel->IsVisible() || !PinsOk()) { Fail(TEXT("pins_or_panel_not_reloaded"));return; }Shot(TEXT("collection-reloaded"));Key(EKeys::J);Done();return;
+        if(J.GetEntries().Num()!=1) { return; }
+        if(CollectionStage==0) { Key(EKeys::J);if(!CollectionPanel->IsVisible() || !PinsOk()) { Fail(TEXT("pins_or_panel_not_reloaded"));return; }Shot(TEXT("collection-reloaded"));CollectionAt=Real;CollectionStage=7; }
+        else if(Real-CollectionAt>=1) { Key(EKeys::J);Done(); }return;
     }
     if(CollectionStage==0 && (Library?GetFrontEnd()->IsVisible():(D->HasStarted() && CareerSmokeStage==13 && Now>=80 && Now<120)))
     {

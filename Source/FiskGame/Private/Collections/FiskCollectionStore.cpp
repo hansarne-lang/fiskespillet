@@ -7,7 +7,7 @@ namespace
 {
 const TCHAR* CollectionDiskSection=TEXT("Fiskelaget.Collections");
 bool CollectionDiskFuture(const FString& P)
-{ FConfigFile C;C.Read(P);int32 V=0;return IFileManager::Get().FileSize(*P)>8192 || (C.GetInt(CollectionDiskSection,TEXT("Version"),V) && V>1); }
+{ if(IFileManager::Get().FileSize(*P)>8192) { return true; }FConfigFile C;C.Read(P);int32 V=0;return C.GetInt(CollectionDiskSection,TEXT("Version"),V) && V>1; }
 FString CollectionDiskLock(const FString& P) { return FString::Printf(TEXT("FiskelagetCollections-%08X"),GetTypeHash(FPaths::ConvertRelativePathToFull(P).ToLower())); }
 bool CollectionDiskRead(const FString& P,const FGuid& Id,FFiskCollectionPins& Out)
 {

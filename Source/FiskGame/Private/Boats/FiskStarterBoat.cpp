@@ -209,7 +209,7 @@ bool AFiskStarterBoat::VoteTravel(int32 Player,int32 ExpectedLeg,bool Vote)
 bool AFiskStarterBoat::Relocate(int32 Player,int32 Revision,FVector Point,FString& Message)
 {
     int32 Habitat=0,HomeMs=0;const bool Valid=FiskGrounds::MakeSeaPoint(Point,Habitat,HomeMs);
-    const auto* Day=GetWorld()->GetGameState<AFiskDayState>();bool Safe=true;
+    const auto* Day=GetWorld()->GetGameState<AFiskDayState>();bool Safe=!Cargo.bMustReturn;
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
     {
         const auto* PC=Cast<AFiskBoardingController>(It->Get());if(!PC || !PC->PlayerState || !IsAboard(PC->PlayerState->GetPlayerId())) { continue; }

@@ -56,7 +56,17 @@ void AFiskBoardingController::RunCargoSmoke()
         const auto* R=GetRod();const auto State=R->GetState();
         if(State==EFiskRodState::Lost) { Fail(TEXT("controlled_normal_time_fight_lost"));return; }
         if(State==EFiskRodState::Fighting) { const bool Lift=!R->IsSurging() && static_cast<int32>(Real/2)%2==0;Input(EKeys::LeftMouseButton,Lift?IE_Pressed:IE_Released);Input(EKeys::RightMouseButton,!R->IsSurging() && !Lift?IE_Pressed:IE_Released); }
-        if(State==EFiskRodState::ReadyToLand && (!Late || Now>=950)) { Key(EKeys::SpaceBar); }
+        if(State==EFiskRodState::ReadyToLand && (!Late || Now>=950))
+        {
+            Key(EKeys::SpaceBar);
+            if(HasAuthority() && B->GetCargo().bMustReturn && B->GetTripProgress()==100)
+            {
+                FString Why;const int32 Revision=B->GetRouteRevision(),Serial=B->GetLegSerial();
+                if(const_cast<AFiskStarterBoat*>(B)->Relocate(PlayerState->GetPlayerId(),Revision,B->GetDestination()+FVector(1000,0,0),Why) || B->GetRouteRevision()!=Revision || B->GetLegSerial()!=Serial)
+                { Fail(TEXT("pending_forced_return_bypassed_by_relocation"));return; }
+                UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_PENDING_RELOCATION_BLOCKED"));
+            }
+        }
         if(State==EFiskRodState::Landed) { ++CargoLandings;CargoAt=Real;CargoStage=4; }
     }
     else if(CargoStage==4 && Real-CargoAt>=2)

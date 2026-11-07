@@ -32,7 +32,7 @@ bool UFiskExpeditionPanel::HandleKey(const FInputKeyEventArgs& A)
     }
     if(!Press) { return true; }
     if(A.Key==EKeys::Escape || A.Key==EKeys::J) { bVisible=false;PC->bShowMouseCursor=false;PC->SetInputMode(FInputModeGameOnly());return true; }
-    TActorIterator<AFiskExpeditionState> E(GetWorld());if(!E || !PC->PlayerState) { return true; }const auto& P=E->GetPlan();
+    auto* E=PC->FindExpedition();if(!E || !PC->PlayerState) { return true; }const auto& P=E->GetPlan();
     const FKey Numbers[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};
     for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->ServerExpeditionChoose(P.Revision,I); } }
     if(A.Key==EKeys::T) { PC->ServerExpeditionReady(P.Revision,!P.Ready.Contains(PC->PlayerState->GetPlayerId())); }
@@ -51,7 +51,7 @@ bool UFiskExpeditionPanel::HandleKey(const FInputKeyEventArgs& A)
 void UFiskExpeditionPanel::Draw(AHUD& HUD,UCanvas& C)
 {
     const auto* PC=CastChecked<AFiskBoardingController>(GetOwner());const auto* B=PC->FindStarterBoat();const auto* Day=GetWorld()->GetGameState<AFiskDayState>();
-    TActorIterator<AFiskExpeditionState> E(GetWorld());if(!E || !B || !Day) { return; }const auto& P=E->GetPlan();
+    auto* E=PC->FindExpedition();if(!E || !B || !Day) { return; }const auto& P=E->GetPlan();
     const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);
     const FLinearColor Teal(.5f,.9f,.84f),Gold(1,.8f,.4f);auto T=[&](const FString& V,float X,float Y,float Size=1.f,FLinearColor Col=FLinearColor::White){HUD.DrawText(V,Col,X*S,Y*S,nullptr,Size*S);};
     HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);

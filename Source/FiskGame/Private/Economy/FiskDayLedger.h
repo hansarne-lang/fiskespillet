@@ -36,6 +36,7 @@ public:
     bool Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs);
     bool Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs, const FFiskCatchData& Fish, const FFiskCatchContext& Context=FFiskCatchContext(),bool bTransportable=true);
     bool Settle(int32 NowMs, int32 ArrivalMs);
+    bool SettleFleet(int32 NowMs,const TMap<FGuid,int32>& Arrivals);
     bool IsSettled() const { return bSettled; }
     const TArray<FFiskDayResult>& GetResults() const { return Results; }
 private:

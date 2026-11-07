@@ -30,6 +30,7 @@ public:
     virtual void Tick(float DeltaSeconds) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
+    TMap<FGuid,TWeakObjectPtr<class AFiskStarterBoat>> CatchBoats;
     FFiskDayLedger Ledger;
     FFiskSessionHistory History;
     UPROPERTY(Replicated) TArray<FFiskHistoryDay> HistoryView;

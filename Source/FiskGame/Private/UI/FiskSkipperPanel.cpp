@@ -99,7 +99,7 @@ bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
         if(K==EKeys::F10 && A.Event==IE_Pressed && Days.IsValidIndex(DayRow))
         { FString File;const bool OK=FiskTripBook::Export(FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Exports")),GI->GetJournal(),Days[DayRow].Id,File);Message=OK?TEXT("Valgt tur er eksportert til Fiskelaget/Exports som HTML."):TEXT("Rapport kunne ikke lagres.");UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TRIP_REPORT success=%d file=%s"),OK,*File); }return true;
     }
-    TActorIterator<AFiskVoyagePlan> P(GetWorld());if(!P) { return true; }const auto R=P->GetRoute();
+    auto* P=PC->FindVoyage();if(!P) { return true; }const auto R=P->GetRoute();
     if(K==EKeys::Up) { Mark=(Mark+FiskAtlas::Count-1)%FiskAtlas::Count; }if(K==EKeys::Down) { Mark=(Mark+1)%FiskAtlas::Count; }
     if(K==EKeys::Home) { Mark=0; }if(K==EKeys::End) { Mark=FiskAtlas::Count-1; }if(K==EKeys::PageDown) { Mark=FMath::Min(Mark+8,FiskAtlas::Count-1); }if(K==EKeys::PageUp) { Mark=FMath::Max(Mark-8,0); }
     if(K==EKeys::One || K==EKeys::Two || K==EKeys::Three) { Slot=K==EKeys::One?0:K==EKeys::Two?1:2; }
@@ -136,7 +136,7 @@ void UFiskSkipperPanel::Draw(AHUD& HUD,UCanvas& C)
 }
 void UFiskSkipperPanel::DrawPlan(AHUD& H,UCanvas& C)
 {
-    TActorIterator<AFiskVoyagePlan> P(GetWorld());if(!P) { return; }const auto& R=P->GetRoute();const auto* PC=CastChecked<AFiskBoardingController>(GetOwner());const auto* B=PC->FindStarterBoat();
+    const auto* PC=CastChecked<AFiskBoardingController>(GetOwner());auto* P=PC->FindVoyage();if(!P) { return; }const auto& R=P->GetRoute();const auto* B=PC->FindStarterBoat();
     const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const FLinearColor Teal(.5f,.9f,.84f),Gold(1,.8f,.4f);
     auto T=[&](const FString& V,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){H.DrawText(V,Color,X*S,Y*S,nullptr,Size*S);};
     H.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);T(TEXT("SKIPPERENS TURPLAN"),48,55,2.f);

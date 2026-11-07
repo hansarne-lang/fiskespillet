@@ -33,7 +33,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
     if(PC.IsHelpVisible())
     {
         HUD.DrawText(TEXT("HJELP OG KONTROLLER"),FLinearColor::White,52*S,60*S,nullptr,2.1f*S);
-        Lines={TEXT("Spill starter dagen alene. Opptil fire spillere i samme LAN-økt."),
+        Lines={TEXT("Spill starter dagen alene. Opptil tolv spillere i samme LAN-økt. Tab: flåte og egen båt."),
             TEXT("E: gå om bord. M: fiskeplass. R: avreise fra 02:00. C: tre faste kameravinkler."),
             TEXT("G: agn, dybde og agnprogram. 1/2/3 velger lagringsplass i oppsettspanelet."),
             TEXT("F5 lagrer bekreftet oppsett på PC-en. F9 henter det til servervalidering."),
@@ -105,7 +105,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
                 const FFiskSpecies* Species=FiskCatches::Find(Catch.Fish.Species);
                 Lines.Add(FString::Printf(TEXT("  %s | %.1f kg | %.1f cm | %d fiskepenger | %s"),Species?Species->Name:TEXT("Ukjent"),
                     Catch.Fish.WeightGrams/1000.0,Catch.Fish.LengthMm/10.0,Catch.bDelivered?Catch.Fish.Value:0,
-                    Catch.bDelivered?TEXT("LEVERT"):TEXT("TAPT - sen retur")));
+                    Catch.bDelivered?TEXT("LEVERT"):TEXT("IKKE SOLGT")));
             }
         }
         if(Lines.IsEmpty()) { Lines.Add(TEXT("Ingen fangster registrert denne dagen.")); }
@@ -134,6 +134,7 @@ void AFiskBootstrapHUD::DrawHUD()
 
     if (const AFiskBoardingController* PC = Cast<AFiskBoardingController>(GetOwningPlayerController()))
     {
+        if(PC->IsFleetVisible()) { const_cast<AFiskBoardingController*>(PC)->DrawFleet(*this,*Canvas);return; }
         if(PC->GetCollectionPanel()->IsVisible()) { PC->GetCollectionPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetAnglerPanel()->IsVisible()) { PC->GetAnglerPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetSkipperPanel()->IsVisible()) { PC->GetSkipperPanel()->Draw(*this,*Canvas);return; }

@@ -34,11 +34,10 @@ void AFiskBootstrapGameMode::StartPlay()
 void AFiskBootstrapGameMode::InitGameState()
 {
     Super::InitGameState();
-    if(GameSession) { GameSession->MaxPlayers=4; }
-    StarterBoat = GetWorld()->SpawnActor<AFiskStarterBoat>();
+    if(GameSession) { GameSession->MaxPlayers=12; }
+    StarterBoat = SpawnFleetBoat(INDEX_NONE);
     Settlement = GetWorld()->SpawnActor<AFiskDaySettlement>();
-    Expedition=GetWorld()->SpawnActor<AFiskExpeditionState>();
-    GetWorld()->SpawnActor<AFiskVoyagePlan>();
+    Expedition=StarterBoat->GetExpedition();
     GetWorld()->SpawnActor<AFiskMarinaZone>();
     GetWorld()->SpawnActor<AFiskOceanScene>();
     GetWorld()->SpawnActor<AFiskMarinaHub>();
@@ -66,10 +65,7 @@ void AFiskBootstrapGameMode::PostLogin(APlayerController* NewPlayer)
 
 void AFiskBootstrapGameMode::Logout(AController* Exiting)
 {
-    if (StarterBoat && Exiting->PlayerState)
-    {
-        StarterBoat->Leave(Exiting->PlayerState->GetPlayerId());
-    }
+    if(Exiting->PlayerState) { for(auto B:Fleet) { B->Leave(Exiting->PlayerState->GetPlayerId()); } }
 
     Super::Logout(Exiting);
 }
@@ -88,9 +84,10 @@ bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 Ex
     DayProfiles.Reset();
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
     { if(const AFiskBoardingController* P=Cast<AFiskBoardingController>(It->Get());P && P->PlayerState && P->IsCareerReady()) { BindCareer(P->PlayerState->GetPlayerId(),P->GetServerCareer().Id); } }
-    StarterBoat->ResetForDay(); Settlement->ResetForDay(ExpectedDay + 1);
+    FleetMembership.ResetForDay();
+    for(auto B:Fleet) { B->ResetForDay(); } Settlement->ResetForDay(ExpectedDay + 1);
     const bool Advanced=Day->AdvanceDay();
-    if(Advanced && Expedition) { Expedition->Refresh(); }
+    if(Advanced) { for(auto B:Fleet) { B->GetVoyage()->Refresh();B->GetExpedition()->Refresh(); } }
     return Advanced;
 }
 int64 AFiskBootstrapGameMode::CareerIncome(const FGuid& Profile) const
@@ -106,7 +103,7 @@ bool AFiskBootstrapGameMode::ArchiveConfirmedDay()
     if(!Day || !Settlement || !Settlement->GetView().bRevealed) { return false; }
     if(ArchivedDay==Settlement->GetView().DayId) { return true; }
     const double Now=GetWorld()->GetRealTimeSeconds();if(Now<ArchiveRetryAt) { return false; }ArchiveRetryAt=Now+2;
-    if(!Expedition || !Expedition->Archive(Settlement->GetView(),Day->GetElapsedMilliseconds())) { return false; }
+    for(auto B:Fleet) { if(!B->GetExpedition() || !B->GetExpedition()->Archive(Settlement->GetView(),Day->GetElapsedMilliseconds())) { return false; } }
     if(!FiskJournalAuthority::Commit(FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Authority")),Settlement->GetView(),Day->GetElapsedMilliseconds(),DayProfiles)) { return false; }
     ArchivedDay=Settlement->GetView().DayId;++ArchiveRevision;
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_AUTHORITY_ARCHIVED day=%d profiles=%d"),Day->GetDayNumber(),DayProfiles.Num());return true;

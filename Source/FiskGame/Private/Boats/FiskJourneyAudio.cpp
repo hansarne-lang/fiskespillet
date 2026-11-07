@@ -1,5 +1,6 @@
 #include "Boats/FiskJourneyAudio.h"
 #include "Boats/FiskStarterBoat.h"
+#include "Boats/FiskBoardingController.h"
 #include "Components/AudioComponent.h"
 #include "Sound/SoundWaveProcedural.h"
 #include "GameFramework/PlayerController.h"
@@ -23,8 +24,9 @@ void UFiskJourneyAudio::TickComponent(float Delta,ELevelTick Type,FActorComponen
     Super::TickComponent(Delta,Type,Tick);const APlayerController* PC=GetWorld()->GetFirstPlayerController();
     if(!Audio || !Wave || !PC || !PC->IsLocalController()) { return; }
     const AFiskStarterBoat* Boat=CastChecked<AFiskStarterBoat>(GetOwner());const int32 P=Boat->GetTripProgress();
+    const auto* Local=Cast<AFiskBoardingController>(PC);if(!Local || Local->FindStarterBoat()!=Boat) { Audio->Stop();return; }
     const bool Moving=P>=0 && P!=100 && P!=200;
-    TActorIterator<AFiskExpeditionState> Expedition(GetWorld());const int32 Weather=Expedition?Expedition->GetPlan().Weather:0;
+    auto* Expedition=Boat->GetExpedition();const int32 Weather=Expedition?Expedition->GetPlan().Weather:0;
     if(!bReported && Moving && Audio->IsPlaying() && Queued>static_cast<uint64>(Wave->GetAvailableAudioByteCount())+4096)
     { bReported=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_JOURNEY_AUDIO_CONSUMED"));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_WEATHER_AUDIO_CONSUMED weather=%d"),Weather); }
     while(Wave->GetAvailableAudioByteCount()<24576)

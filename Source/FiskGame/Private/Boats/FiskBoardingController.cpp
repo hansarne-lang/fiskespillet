@@ -56,6 +56,7 @@ AFiskBoardingController::AFiskBoardingController()
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    if(HandleFleetKey(Params)) { return true; }
     if(CollectionPanel->IsVisible()) { return CollectionPanel->HandleKey(Params); }
     if(Press && Params.Key==EKeys::Z && !AnglerPanel->IsVisible() && !SkipperPanel->IsVisible() && !MarinaPanel->IsVisible() && !ExpeditionPanel->IsVisible() && !JournalPanel->IsVisible() && !SeaChart->IsVisible() && !RigPanel->IsVisible() && !CrewPanel->IsVisible() && !DeckPanel->IsVisible() && !IsCareerVisible() && !bHelpVisible && !bResultsVisible && !bHistoryVisible) { CollectionPanel->Open();return true; }
     if(AnglerPanel->IsVisible()) { return AnglerPanel->HandleKey(Params); }
@@ -155,6 +156,8 @@ void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFleetRole="),FleetRole) && FleetRole>=0 && FleetRole<12)
+    { bFleetResume=FParse::Param(FCommandLine::Get(),TEXT("FiskFleetResume"));FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FleetDir);GetWorldTimerManager().SetTimer(FleetTimer,this,&AFiskBoardingController::RunFleetSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCargoSmoke="),CargoMode))
     { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CargoDir);GetWorldTimerManager().SetTimer(CargoTimer,this,&AFiskBoardingController::RunCargoSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),CollectionMode))
@@ -241,9 +244,11 @@ void AFiskBoardingController::RequestBoarding()
 void AFiskBoardingController::ServerBoardStarterBoat_Implementation()
 {
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if (Mode && Mode->GetStarterBoat() && PlayerState)
+    if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
     {
-        Mode->GetStarterBoat()->Board(PlayerState->GetPlayerId());
+        if(!bCareerReady || !Mode->CanJoinFleet(ServerCareer.Id)) { ClientActionFeedback(TEXT("Karrieren må være klar. Har profilen reist i dag, venter ombordstigning til neste døgn – også etter gjenoppkobling."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_BOARD_LOCKED player=%d"),PlayerState->GetPlayerId());return; }
+        auto* B=Mode->GetBoatForPlayer(PlayerState->GetPlayerId());B->Board(PlayerState->GetPlayerId());
+        if(!B->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Denne båten er full eller har reist. Tab åpner flåten; C henter din egen båt ved brygga.")); }
     }
 }
 
@@ -256,9 +261,9 @@ void AFiskBoardingController::RequestDeparture()
 void AFiskBoardingController::ServerStartBoatTrip_Implementation(int32 ExpectedRevision)
 {
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if (Mode && Mode->GetStarterBoat() && PlayerState)
+    if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
     {
-        AFiskStarterBoat* Boat=Mode->GetStarterBoat();
+        AFiskStarterBoat* Boat=Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE);
         const bool bAuthorized=Boat->CanCaptainCommand(PlayerState->GetPlayerId(),ExpectedRevision);
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRIP_%s player=%d expected=%d current=%d"),
             bAuthorized?TEXT("AUTHORIZED"):TEXT("REJECTED"),PlayerState->GetPlayerId(),ExpectedRevision,Boat->GetRouteRevision());
@@ -293,8 +298,8 @@ void AFiskBoardingController::ClientRigReply_Implementation(bool bAccepted) { Ri
 void AFiskBoardingController::ServerTransferCaptain_Implementation(int32 ExpectedRevision,int32 Target)
 {
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const bool bAccepted=Mode && Mode->GetStarterBoat() && PlayerState
-        && Mode->GetStarterBoat()->TransferCaptain(PlayerState->GetPlayerId(),ExpectedRevision,Target);
+    const bool bAccepted=Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState
+        && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->TransferCaptain(PlayerState->GetPlayerId(),ExpectedRevision,Target);
 #if WITH_DEV_AUTOMATION_TESTS
     if(!bAccepted) { ++RejectedCaptainRequests; }
 #endif
@@ -307,14 +312,16 @@ void AFiskBoardingController::ClientCaptainReply_Implementation(bool bAccepted)
 }
 const AFiskStarterBoat* AFiskBoardingController::FindStarterBoat() const
 {
+    if(PlayerState) { for(TActorIterator<AFiskStarterBoat> B(GetWorld());B;++B) { if(B->IsAboard(PlayerState->GetPlayerId())) { return *B; } } }
+    if(SelectedFleetBoat) { return SelectedFleetBoat; }
     TActorIterator<AFiskStarterBoat> Boat(GetWorld());return Boat?*Boat:nullptr;
 }
 void AFiskBoardingController::ServerSelectGround_Implementation(int32 ExpectedRevision,int32 GroundId)
 {
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     FString Message=TEXT("Båten er ikke klar.");
-    const bool bAccepted=Mode && Mode->GetStarterBoat() && PlayerState
-        && Mode->GetStarterBoat()->SelectGround(PlayerState->GetPlayerId(),ExpectedRevision,GroundId,Message);
+    const bool bAccepted=Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState
+        && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->SelectGround(PlayerState->GetPlayerId(),ExpectedRevision,GroundId,Message);
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CHART_%s player=%d requested=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,GroundId);
     ClientGroundReply(Message);
 }
@@ -368,7 +375,7 @@ bool AFiskBoardingController::CanUseRod() const
 {
     if(!bCareerReady) { return false; }
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const AFiskStarterBoat* Boat = Mode ? Mode->GetStarterBoat() : nullptr;
+    const AFiskStarterBoat* Boat = Mode ? Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) : nullptr;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     return Selection.Slot<GetRodCapacity() && Boat && PlayerState && Boat->IsAboard(PlayerState->GetPlayerId())
         && !Boat->GetCargo().bMustReturn && Boat->GetTripProgress() == AFiskStarterBoat::AtFishingSpot
@@ -477,7 +484,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
             }
         }
     }
-    if(!bAutoResultsSeen && !ExpeditionPanel->IsVisible() && !MarinaPanel->IsVisible() && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
+    if(!bAutoResultsSeen && !bFleetVisible && !ExpeditionPanel->IsVisible() && !MarinaPanel->IsVisible() && !bHelpVisible && !bHistoryVisible && !DeckPanel->IsVisible() && !JournalPanel->IsVisible() && !FrontEnd->IsVisible() && !CrewPanel->IsVisible()
         && !SeaChart->IsVisible() && !RigPanel->IsVisible())
     {
         for(TActorIterator<AFiskDaySettlement> Settlement(GetWorld());Settlement;++Settlement)
@@ -489,7 +496,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
     if(MarinaPanel->WantsCamera()) { if(AFiskMarinaHub* Hub=MarinaPanel->FindHub()) { if(GetViewTarget()!=Hub) { SetViewTarget(Hub); }return; } }
     for (TActorIterator<AFiskOceanScene> Scene(GetWorld()); Scene; ++Scene)
     {
-        TActorIterator<AFiskStarterBoat> Boat(GetWorld());
+        const auto* Boat=FindStarterBoat();
         if (Boat && !Boat->IsAboard(PlayerState->GetPlayerId()) && GetViewTarget() != *Scene)
         {
             SetViewTarget(*Scene);

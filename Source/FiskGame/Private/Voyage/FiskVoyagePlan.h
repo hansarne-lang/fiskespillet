@@ -25,6 +25,7 @@ public:
     bool Replace(int32 Player,int32 Day,int32 Revision,const TArray<FVector>& Points,FString& Message);
     bool NextStop(int32 Player,int32 Day,int32 Revision,int32 BoatRevision,FString& Message);
     void Refresh();
+    void InitializeRevision(int32 Base) { Route.Revision=Base; }
     virtual void Tick(float Delta) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
 private:

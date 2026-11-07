@@ -42,6 +42,7 @@ void AFiskBoardingController::ServerCareerHello_Implementation(FFiskCareerProfil
     if(!FiskJournalAuthority::RecoverIncome(FPaths::GetPath(CareerAuthorityFile()),P)) { ClientActionFeedback(TEXT("Vertens bekreftede journal/inntekt kan ikke leses. Eksisterende data er bevart."));return; }
     if(!SaveServerCareer(P,TEXT("Karriere bekreftet av verten."))) { return; }
     bCareerReady=true;
+    if(auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>()) { M->RegisterFleetCareer(PlayerState->GetPlayerId(),P.Id); }
     if(AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>()) { Mode->BindCareer(PlayerState->GetPlayerId(),P.Id); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAREER_READY player=%d revision=%d cash=%lld owned=%d"),PlayerState->GetPlayerId(),P.Revision,static_cast<long long>(P.Cash),P.Owned);
 }
@@ -98,7 +99,7 @@ void AFiskBoardingController::ServerBuyCareer_Implementation(FGuid Command,int32
 }
 void AFiskBoardingController::ServerChooseBoat_Implementation(int32 Revision,int32 Kind)
 {
-    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();AFiskStarterBoat* Boat=Mode?Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE):nullptr;
     const bool Accepted=bCareerReady && Boat && PlayerState && (Kind==0 || (Kind==1 && ServerCareer.Has(3))) && Boat->ChooseKind(PlayerState->GetPlayerId(),Revision,Kind);
     ClientActionFeedback(Accepted?TEXT("Båt valgt. Mannskap og stangfordeling er oppdatert."):TEXT("Båtvalg avvist. Bare eieren kan velge eid båt ved brygga, med plass til alle."));
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_BOAT_CHOICE accepted=%d kind=%d"),Accepted,Kind);
@@ -135,13 +136,13 @@ bool AFiskBoardingController::HandleCareerKey(const FInputKeyEventArgs& A)
 void AFiskBoardingController::ServerSelectSeaPoint_Implementation(int32 Revision,FVector_NetQuantize Point)
 {
     AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();FString Message;
-    if(Mode && Mode->GetStarterBoat() && PlayerState) { Mode->GetStarterBoat()->SelectPoint(PlayerState->GetPlayerId(),Revision,Point,Message); }
+    if(Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState) { Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->SelectPoint(PlayerState->GetPlayerId(),Revision,Point,Message); }
     ClientGroundReply(Message);
 }
 void AFiskBoardingController::ServerTravelVote_Implementation(int32 Leg,bool Vote)
 {
     auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const bool Accepted=bCareerReady && PlayerState && Mode && Mode->GetStarterBoat() && Mode->GetStarterBoat()->VoteTravel(PlayerState->GetPlayerId(),Leg,Vote);
+    const bool Accepted=bCareerReady && PlayerState && Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->VoteTravel(PlayerState->GetPlayerId(),Leg,Vote);
     if(!Accepted) { ClientActionFeedback(TEXT("Reisevisning kan velges av dem om bord mens båten er underveis.")); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TRAVEL_VOTE_REPLY accepted=%d"),Accepted);
 }

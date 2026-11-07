@@ -21,6 +21,8 @@ struct FFiskRouteView
     bool RefreshCaptain(const TArray<int32>& Crew,int32 OwnerId,bool bPreferOwner);
 };
 
+class AFiskVoyagePlan;
+class AFiskExpeditionState;
 UCLASS()
 class AFiskStarterBoat final : public AInfo
 {
@@ -33,6 +35,11 @@ public:
     static constexpr int32 AtMarina = 200;
 
     AFiskStarterBoat();
+    void InitializeFleet(int32 Index,AFiskExpeditionState* Expedition,AFiskVoyagePlan* Voyage);
+    int32 GetFleetIndex() const { return FleetIndex; }
+    AFiskVoyagePlan* GetVoyage() const { return Voyage; }
+    AFiskExpeditionState* GetExpedition() const { return Expedition; }
+    FVector DockPosition() const { return FVector(0,FleetIndex*1250,0); }
     const FFiskCargoModel& GetCargo() const { return Cargo; }
     const FFiskCargoView& GetCargoView() const { return CargoView; }
     void AcceptCargo(const FFiskCargoModel& Candidate);
@@ -96,6 +103,9 @@ public:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+    UPROPERTY(Replicated) int32 FleetIndex=0;
+    UPROPERTY(Replicated) TObjectPtr<AFiskVoyagePlan> Voyage;
+    UPROPERTY(Replicated) TObjectPtr<AFiskExpeditionState> Expedition;
     FFiskCargoModel Cargo;
     UPROPERTY(ReplicatedUsing=OnRep_CargoView) FFiskCargoView CargoView;
     UFUNCTION() void OnRep_CargoView();

@@ -4,7 +4,21 @@
   "Category": "Games",
   "Description": "FISKELAGET minimal Windows foundation",
   "Modules": [
-    { "Name": "FiskCore", "Type": "Runtime", "LoadingPhase": "PreDefault" },
-    { "Name": "FiskGame", "Type": "Runtime", "LoadingPhase": "Default" }
+    {
+      "Name": "FiskCore",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
+      "Name": "FiskGame",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "ProceduralMeshComponent",
+      "Enabled": true
+    }
   ]
 }

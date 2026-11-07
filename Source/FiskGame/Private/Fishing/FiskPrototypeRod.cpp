@@ -26,7 +26,7 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
     const FFiskFishingGround* Ground=Boat?FiskGrounds::Find(Boat->GetGroundId()):nullptr;
-    if (!Day || !Ground || !FFiskRigRules::IsValid(Rig.Bait,Rig.Depth,Rig.Program,Ground->BottomDepth)
+    if (!Day || !Ground || Boat->GetCargo().bMustReturn || !FFiskRigRules::IsValid(Rig.Bait,Rig.Depth,Rig.Program,Ground->BottomDepth)
         || !Cycle.TryStart(ExpectedId, Day->GetElapsedMilliseconds())) { return false; }
     View = FFiskRodView();
     View.CastId = Cycle.GetId();
@@ -36,6 +36,12 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     // CastId is visible to the owner. Catch entropy must never be derived from it.
     const FGuid PrivateEntropy=FGuid::NewGuid();
     CatchData=FiskCatches::Roll(static_cast<int32>(PrivateEntropy.A ^ PrivateEntropy.B ^ PrivateEntropy.C ^ PrivateEntropy.D),Boat->GetGroundId());
+#if WITH_DEV_AUTOMATION_TESTS
+    // Deterministic catalog fish for native cargo acceptance only. Bite clocks,
+    // fight simulation, input, landing and settlement still run normally.
+    if(RodOwner->CargoMode==TEXT("tow") || RodOwner->CargoMode==TEXT("late") || RodOwner->CargoMode==TEXT("full") || RodOwner->CargoMode==TEXT("discard"))
+    { CatchData.Species=6;CatchData.WeightGrams=RodOwner->CargoMode==TEXT("discard")?250000:150000;const auto& S=*FiskCatches::Find(6);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
+#endif
     FRandomStream BiteRandom(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().B ^ Cycle.GetId().C ^ Cycle.GetId().D));
     NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom, Ground);
     SetState(EFiskRodState::Fishing);

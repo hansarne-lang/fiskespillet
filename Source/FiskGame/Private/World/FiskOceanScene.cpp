@@ -1,4 +1,6 @@
 #include "World/FiskOceanScene.h"
+#include "World/FiskMarineMesh.h"
+#include "ProceduralMeshComponent.h"
 #include "World/FiskVisualPrimitives.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Camera/CameraComponent.h"
@@ -70,10 +72,11 @@ void AFiskOceanScene::BeginPlay()
         return FiskVisual::AddPart(this, RootComponent, Mesh, Material, Name, Position, Scale, Color);
     };
     UStaticMeshComponent* Water = FiskVisual::AddPart(this, RootComponent, Plane, Material, TEXT("Ocean"),
-        FVector(10000, 0, -10), FVector(10000, 10000, 1), FLinearColor(0.005f, 0.07f, 0.16f), 0.15f);
+        FVector(10000, 0, -65), FVector(10000, 10000, 1), FLinearColor(0.005f, 0.07f, 0.16f), 0.15f);
 
     Water->SetCastShadow(false);
-    Part(TEXT("ShallowWater"),Sphere,FVector(18000,0,-13),FVector(700,950,.03),FLinearColor(.015f,.32f,.38f))->SetCastShadow(false);
+    WaveSurface=FiskMarine::Add(this,RootComponent,TEXT("LiveWaveSurface"),FiskMarine::Water(0,1),Material,FLinearColor(.012f,.16f,.22f),.16f);WaveSurface->SetCastShadow(false);
+    Part(TEXT("ShallowWater"),Sphere,FVector(18000,0,-75),FVector(700,950,.03),FLinearColor(.015f,.32f,.38f))->SetCastShadow(false);
     for(int32 I=0;I<FiskRouteGeometry::IslandCount;++I)
     {
         const FVector P=FiskRouteGeometry::Island(I);const double R=FiskRouteGeometry::Radius(I);
@@ -129,13 +132,7 @@ void AFiskOceanScene::BeginPlay()
     }
     Part(TEXT("FishingBuoy"), Sphere, FVector(20000, 450, 25), FVector(0.6, 0.6, 0.6), FLinearColor(1.0f, 0.38f, 0.04f));
     Part(TEXT("BuoyPole"), Cylinder, FVector(20000, 450, 75), FVector(0.04, 0.04, 1.2), FLinearColor(0.8f, 0.8f, 0.7f));
-    for (int32 Index = 0; Index < 64; ++Index)
-    {
-        UStaticMeshComponent* Ripple = Part(*FString::Printf(TEXT("Ripple%d"), Index), Sphere,
-            FVector::ZeroVector, FVector(4.0, 0.12, 0.02), FLinearColor(0.16f, 0.48f, 0.51f));
-        Ripple->SetCastShadow(false);
-        Ripples.Add(Ripple);
-    }
+
     for(int32 I=0;I<12;++I)
     {
         UStaticMeshComponent* Bird=Part(*FString::Printf(TEXT("Seabird%d"),I),Sphere,FVector::ZeroVector,FVector(.5,1.8,.06),FLinearColor(.84f,.87f,.82f));
@@ -190,6 +187,7 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
         Traffic[I*2]->SetRelativeLocation(P);Traffic[I*2+1]->SetRelativeLocation(P+FVector(0,0,95));
     }
     TActorIterator<AFiskExpeditionState> E(GetWorld());const int32 Weather=E?E->GetPlan().Weather:0;
+    if(WaveSurface) { WaveSurface->SetRelativeLocation(FVector(Center.X,Center.Y,0));FiskMarine::UpdateWater(WaveSurface,Time,Weather==2?1.5:Weather==1?1.15:.65); }
     const auto* GI=Cast<UFiskGameInstance>(GetWorld()->GetGameInstance());const bool Low=GI && GI->FrameRate==30;
     if(ReportedWeather!=Weather)
     {
@@ -223,12 +221,5 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
         Flyers[I]->SetRelativeLocation(Center+FVector(1800-P*2400,600+I*220,FMath::Sin(FMath::Min(P/.65,1.0)*PI)*150));
         Flyers[I]->SetRelativeRotation(FRotator(FMath::Cos(P/.65*PI)*18,180,0));
     }
-    for (int32 Index = 0; Index < Ripples.Num(); ++Index)
-    {
-        const double X = (Index % 8 - 4) * 900.0 + FMath::Sin(Index * 7.3) * 250.0;
-        const double Y = (Index / 8 - 4) * 900.0 + FMath::Sin(Index * 3.1) * 300.0;
-        const double Wave = FMath::Sin(Time * (Weather==0?1.1:Weather==1?1.7:2.2) + Index * 1.8);
-        Ripples[Index]->SetRelativeLocation(FVector(Center.X + X, Center.Y + Y, -7 + Wave * (Weather==0?1.5:Weather==1?4.5:7.0)));
-        Ripples[Index]->SetRelativeScale3D(FVector(4.0 + Wave*(Weather+1), 0.12+Weather*.08, 0.02));
-    }
+
 }

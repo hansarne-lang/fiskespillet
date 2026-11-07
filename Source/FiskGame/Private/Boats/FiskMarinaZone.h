@@ -9,5 +9,5 @@ class AFiskMarinaZone final : public AActor
     GENERATED_BODY()
 public:
     AFiskMarinaZone();
-    virtual void Tick(float DeltaSeconds) override;
+    virtual void BeginPlay() override;
 };

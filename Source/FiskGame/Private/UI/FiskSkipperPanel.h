@@ -38,4 +38,5 @@ private:
     FString PresetFile() const;
     void DrawPlan(AHUD& HUD,UCanvas& Canvas);
     void DrawBook(AHUD& HUD,UCanvas& Canvas);
+    void DrawCargo(AHUD& HUD,UCanvas& Canvas);
 };

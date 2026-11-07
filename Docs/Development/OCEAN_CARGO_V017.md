@@ -6,7 +6,7 @@ Windows-pakken starter fra BAT uten Unreal Editor. Alle LAN-deltakere må bruke 
 
 Båtene har et formet skrog med smal baug og bred akterende, dekk med plankeskjøter, buede rekker, fendere, instrumentpanel og fiskeluke. Havet rundt båten har en bevegelig bølgeflate med overflatenormaler og værstyrt bølgehøyde. Fysiske bøyer markerer marinaen. En stor fisk på slep vises bak båten med slepetau og bevegelse i sjøen. Dette er fortsatt forenklet 3D, ikke ferdig realistisk grafikk.
 
-F9 åpner fotomodus om bord. Piler, PgUp/PgDn og musehjul styrer bildet. F5/F8 lagrer/henter én av tre egne fotovinkler valgt med1/2/3. G viser tredelingsrutenett; H skjuler både rutenett og tekst; F12 tar PNG. Spillklokken går videre.
+F9 åpner fotomodus om bord. Piler, PgUp/PgDn og musehjul styrer bildet. F5/F8 lagrer/henter én av tre egne fotovinkler valgt med1/2/3. G viser tredelingsrutenett; H skjuler både rutenett og tekst; F12 tar PNG. Spillklokken går videre. Ved sleping retter kameraene seg mot både båten og slepet.
 
 ## Felles fangstlager
 

@@ -42,7 +42,9 @@ void AFiskBoardingController::RunCargoSmoke()
         { TArray<FFiskRigSettings> R;for(int32 I=0;I<GetRodCapacity();++I) { auto V=GetRodAt(I)->GetRig();V.Bait=1;V.Depth=40;V.Program=1;R.Add(V); }ServerApplyRigBundle(MakeRigBundle(R));return; }
         CargoPaidCash=GI->Career.Cash;Key(EKeys::F11);Shot(TEXT("cargo-empty-hidden"));CargoAt=Real;CargoStage=1;
     }
-    else if(CargoStage==1 && Real-CargoAt>=1) { Key(EKeys::F11);Key(EKeys::F9);Shot(TEXT("marine-deck-preview"));CargoAt=Real;CargoStage=2; }
+    else if(CargoStage==1 && Real-CargoAt>=1) { Key(EKeys::F11);Key(EKeys::F9);Shot(TEXT("marine-deck-preview"));CargoAt=Real;CargoStage=15; }
+    else if(CargoStage==15 && Real-CargoAt>=1) { for(int32 I=0;I<6;++I) { Key(EKeys::Right); }for(int32 I=0;I<4;++I) { Key(EKeys::Up); }Shot(TEXT("marine-hull-profile"));CargoAt=Real;CargoStage=16; }
+    else if(CargoStage==16 && Real-CargoAt>=1) { Key(EKeys::Home);Key(EKeys::F9);CargoAt=Real;CargoStage=2; }
     else if(CargoStage==2)
     {
         if(Real-CargoAt<1) { return; }if(GetSkipperPanel()->IsPhoto()) { Key(EKeys::F9); }

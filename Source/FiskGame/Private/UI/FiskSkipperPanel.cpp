@@ -36,7 +36,7 @@ void UFiskSkipperPanel::Open(int32 V)
     Page=V;DetailPage=0;bRenaming=false;if(V==3) { bPhotoHud=true; }LoadPresets();CastChecked<AFiskBoardingController>(GetOwner())->ReleaseRodInputsForMenu();
 }
 void UFiskSkipperPanel::PhotoCamera(const FTransform& B,FMinimalViewInfo& Out) const
-{ const FVector Focus=B.TransformPosition(FVector(0,0,130));Out.Location=Focus+Photo.Offset(B.Rotator().Yaw);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=Photo.Fov; }
+{ const auto* Boat=CastChecked<AFiskBoardingController>(GetOwner())->FindStarterBoat();const bool Tow=Boat && Boat->GetCargoView().Mode==static_cast<uint8>(EFiskCargoMode::Towing);const FVector Focus=B.TransformPosition(Tow?FVector(-500,0,110):FVector(0,0,130));Out.Location=Focus+Photo.Offset(B.Rotator().Yaw);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=Photo.Fov; }
 bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
 {
     if(Page==0)

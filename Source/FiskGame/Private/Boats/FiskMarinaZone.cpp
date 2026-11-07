@@ -5,7 +5,7 @@
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
 AFiskMarinaZone::AFiskMarinaZone()
-{ SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("MarinaMarkers")));PrimaryActorTick.bCanEverTick=false; }
+{ SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("MarinaMarkers")));bReplicates=true;bAlwaysRelevant=true;PrimaryActorTick.bCanEverTick=false; }
 void AFiskMarinaZone::BeginPlay()
 {
     Super::BeginPlay();auto* Sphere=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Sphere.Sphere"));auto* Cylinder=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));auto* Material=LoadObject<UMaterialInterface>(nullptr,TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));

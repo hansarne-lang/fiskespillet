@@ -72,7 +72,7 @@ void UFiskBoatPresentation::BeginPlay()
         return FiskVisual::AddPart(Boat, VisualRoot, Mesh, Material, Name, Position, Scale, Color);
     };
     FiskMarine::Add(Boat,VisualRoot,TEXT("SculptedHull"),FiskMarine::Hull(),Material,White,.24f);
-    FiskMarine::Add(Boat,VisualRoot,TEXT("TeakDeck"),FiskMarine::Deck(),Material,FLinearColor(.49f,.32f,.16f),.68f);
+    FiskMarine::Add(Boat,VisualRoot,TEXT("TeakDeck"),FiskMarine::Deck(),Material,FLinearColor(.26f,.14f,.05f),.72f);
     FiskMarine::Add(Boat,VisualRoot,TEXT("NavySheerStripe"),FiskMarine::Gunwale(),Material,Navy,.22f);
     for(int32 I=0;I<23;++I) { const double X=-320+I*25,T=(X+335)/690.,W=128*FMath::Pow(FMath::Max(.001,1-FMath::Pow(T,3.6)),.65)-7;Part(*FString::Printf(TEXT("DeckSeam%d"),I),Cube,FVector(X,0,85.6),FVector(.013,FMath::Max(.02,W/50),.012),FLinearColor(.15f,.10f,.055f)); }
     for(int32 Side:{-1,1})
@@ -150,7 +150,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
 
     const bool Towing=Boat->GetCargoView().Mode==static_cast<uint8>(EFiskCargoMode::Towing);
     TowFish->SetVisibility(Towing);TowRope->SetVisibility(Towing);
-    if(Towing) { const FVector Fish(-1040,30*FMath::Sin(Time*.7),-5+FMath::Sin(Time*1.8)*4);TowFish->SetRelativeLocation(Fish);TowFish->SetRelativeRotation(FRotator(0,FMath::Sin(Time*.7)*3,3));const FVector Stern=VisualRoot->GetRelativeTransform().TransformPosition(FVector(-345,0,102));FiskVisual::SetCylinder(TowRope,Stern,Fish+FVector(207,0,0),2.6); }
+    if(Towing) { const FVector Fish(-1040,30*FMath::Sin(Time*.7),-5+FMath::Sin(Time*1.8)*4);TowFish->SetRelativeLocation(Fish);TowFish->SetRelativeRotation(FRotator(0,FMath::Sin(Time*.7)*3,3));const FVector Stern=VisualRoot->GetRelativeTransform().TransformPosition(FVector(-345,0,102));FiskVisual::SetCylinder(TowRope,Stern,TowFish->GetRelativeTransform().TransformPosition(FVector(207,0,0)),2.6); }
     TArray<uint8> Activities;Activities.Init(0,6);
     TArray<FFiskFishVisualState> FishStates;FishStates.SetNum(6);
     for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)

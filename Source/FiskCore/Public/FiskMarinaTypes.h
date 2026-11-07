@@ -19,8 +19,13 @@ struct FISKCORE_API FFiskMarinaIdentity
     UPROPERTY() int32 Color=0;
     UPROPERTY() int32 Style=0;
     UPROPERTY() int32 Decor=0;
-    bool IsValid() const { return FFiskCareerProfile::ValidName(DisplayName) && FFiskCareerProfile::ValidName(HouseName) && Color>=0 && Color<6 && Style>=0 && Style<3 && Decor>=0 && Decor<3; }
-    bool operator==(const FFiskMarinaIdentity& O) const { return DisplayName==O.DisplayName && HouseName==O.HouseName && Color==O.Color && Style==O.Style && Decor==O.Decor; }
+    UPROPERTY() int32 Lighting=0;
+    UPROPERTY() int32 Pier=0;
+    UPROPERTY() int32 Display=0;
+    static int32 PremiumItem(int32 Category,int32 Level) { return Category>=0 && Category<3 && Level>=1 && Level<=3?4+Category*3+Level-1:-1; }
+    bool IsOwnedBy(const FFiskCareerProfile& P) const { return IsValid() && (Lighting==0 || P.Has(PremiumItem(0,Lighting))) && (Pier==0 || P.Has(PremiumItem(1,Pier))) && (Display==0 || P.Has(PremiumItem(2,Display))); }
+    bool IsValid() const { return FFiskCareerProfile::ValidName(DisplayName) && FFiskCareerProfile::ValidName(HouseName) && Color>=0 && Color<6 && Style>=0 && Style<3 && Decor>=0 && Decor<3 && Lighting>=0 && Lighting<=3 && Pier>=0 && Pier<=3 && Display>=0 && Display<=3; }
+    bool operator==(const FFiskMarinaIdentity& O) const { return DisplayName==O.DisplayName && HouseName==O.HouseName && Color==O.Color && Style==O.Style && Decor==O.Decor && Lighting==O.Lighting && Pier==O.Pier && Display==O.Display; }
 };
 USTRUCT()
 struct FISKCORE_API FFiskMarinaTrophy

@@ -10,12 +10,12 @@
 
 void AFiskBoardingController::ServerMarinaIdentity_Implementation(FGuid Profile,FFiskMarinaIdentity Identity)
 {
-    TActorIterator<AFiskMarinaHub> Hub(GetWorld());const bool Allowed=bCareerReady && ServerCareer.Id==Profile && Identity.IsValid() && PlayerState && MarinaPanel->IsAtDock() && Hub;
+    TActorIterator<AFiskMarinaHub> Hub(GetWorld());const bool Allowed=bCareerReady && ServerCareer.Id==Profile && Identity.IsOwnedBy(ServerCareer) && PlayerState && MarinaPanel->IsAtDock() && Hub;
     TArray<FFiskMarinaTrophy> Records;
     if(Allowed) { if(const FFiskMarinaResident* R=Hub->GetResidents().FindByPredicate([&](const FFiskMarinaResident& V){return V.Profile==Profile;})) { Records=R->Trophies; } }
     const bool Accepted=Allowed && Hub->Upsert(Profile,PlayerState->GetPlayerId(),Identity,Records);
     if(Accepted) { PlayerState->SetPlayerName(Identity.DisplayName); }
-    ClientMarinaIdentity(Accepted,Identity,Accepted?TEXT("Naust og navn bekreftet."):TEXT("Naustendring avvist. Egen gyldig profil og marina kreves."));
+    ClientMarinaIdentity(Accepted,Identity,Accepted?TEXT("Naust og navn bekreftet."):TEXT("Naustendring avvist. Egen profil, kjøpt pynt og marina kreves."));
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_IDENTITY accepted=%d player=%d style=%d color=%d decor=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Identity.Style,Identity.Color,Identity.Decor);
 }
 void AFiskBoardingController::ClientMarinaIdentity_Implementation(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason)

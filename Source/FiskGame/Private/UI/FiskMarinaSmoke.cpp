@@ -21,6 +21,8 @@ void UFiskMarinaPanel::BeginPlay()
 #if WITH_DEV_AUTOMATION_TESTS
     if(CastChecked<AFiskBoardingController>(GetOwner())->IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskMarinaSmoke="),SmokeMode))
     { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),SmokeDirectory);GetWorld()->GetTimerManager().SetTimer(SmokeTimer,this,&UFiskMarinaPanel::RunSmoke,.5f,true,3.f); }
+if(CastChecked<AFiskBoardingController>(GetOwner())->IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskHomeSmoke="),HomeMode))
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),HomeDirectory);GetWorld()->GetTimerManager().SetTimer(HomeTimer,this,&UFiskMarinaPanel::RunHomeSmoke,.5f,true,3.f); }
 #endif
 }
 #if WITH_DEV_AUTOMATION_TESTS

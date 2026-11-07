@@ -7,11 +7,11 @@ bool FFiskCareerProfile::ValidName(const FString& Value)
     return true;
 }
 int64 FFiskCareerProfile::Price(int32 Item)
-{ static constexpr int64 Prices[]={25000,100000,150000,2500000};return Item>=0 && Item<4?Prices[Item]:-1; }
+{ static constexpr int64 Prices[]={25000,100000,150000,2500000,25000,75000,150000,50000,120000,250000,30000,90000,180000};return Item>=0 && Item<ItemCount?Prices[Item]:-1; }
 FString FFiskCareerProfile::ItemName(int32 Item)
 {
-    static const TCHAR* Names[]={TEXT("Bedre snøre"),TEXT("Bedre snelle"),TEXT("Bedre stang"),TEXT("Offshorebåt")};
-    return Item>=0 && Item<4?Names[Item]:TEXT("Ukjent vare");
+    static const TCHAR* Names[]={TEXT("Bedre snøre"),TEXT("Bedre snelle"),TEXT("Bedre stang"),TEXT("Offshorebåt"),TEXT("Vegglanterner"),TEXT("Bryggelys"),TEXT("Lysfest"),TEXT("Fiskebrygge"),TEXT("Rekkverk og fortøyning"),TEXT("Havterrasse"),TEXT("Troféhyller"),TEXT("Utstillingsskap"),TEXT("Gullutstilling")};
+    return Item>=0 && Item<ItemCount?Names[Item]:TEXT("Ukjent vare");
 }
 FFiskCareerProfile FFiskCareerProfile::Create(const FString& Value)
 {
@@ -22,7 +22,7 @@ FFiskCareerProfile FFiskCareerProfile::Create(const FString& Value)
 bool FFiskCareerProfile::IsValid() const
 {
     if(!Id.IsValid() || !ValidName(Name) || Revision!=Receipts.Num() || Revision<1 || Revision>MaxReceipts
-        || Cash<0 || Cash>MaxCash || Owned<0 || Owned>15) { return false; }
+        || Cash<0 || Cash>MaxCash || Owned<0 || Owned>OwnedMask) { return false; }
     int64 Balance=0;int32 Items=0;TSet<FGuid> Seen;
     for(int32 I=0;I<Receipts.Num();++I)
     {

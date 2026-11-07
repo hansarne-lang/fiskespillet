@@ -16,10 +16,10 @@
 void UFiskGameInstance::Init()
 {
     Super::Init();
-    FNetworkVersion::SetProjectVersion(TEXT("0.17.0"));
-    FNetworkVersion::SetGameNetworkProtocolVersion(17);
-    FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(17);
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=17 release=0.17.0"));
+    FNetworkVersion::SetProjectVersion(TEXT("0.18.0"));
+    FNetworkVersion::SetGameNetworkProtocolVersion(18);
+    FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(18);
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=18 release=0.18.0"));
     const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);
     bCareerBlocked=CareerLoad==EFiskCareerLoad::Blocked;
     if(CareerLoad==EFiskCareerLoad::Empty)

@@ -21,6 +21,7 @@ public:
     bool WantsCamera() const { return Page==1 || Page==2 || Page==4 || Page==5; }
     int32 GetPage() const { return Page; }
     int32 GetHouseIndex() const { return HouseIndex; }
+    bool IsHomePreview() const { return Page==5 && bShopPreview; }
     AFiskMarinaHub* FindHub() const;
     bool IsAtDock() const;
     void ReceiveIdentity(const FFiskMarinaIdentity& Value);

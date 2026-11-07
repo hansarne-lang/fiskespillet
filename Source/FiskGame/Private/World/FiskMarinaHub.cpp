@@ -56,7 +56,7 @@ void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
     const FVector Target=Bar?FVector(-4200,-1900,230):HousePosition(Panel?Panel->GetHouseIndex():0)+FVector(0,0,300);
     Out.Location=Target+(Bar?FVector(1400,-1400,650):FVector(350,-1600,550));Out.Rotation=(Target+FVector(650,0,0)-Out.Location).Rotation();Out.FOV=65;
-    if(Panel && Panel->GetPage()==5) { const FVector P=HousePosition(Panel->GetHouseIndex());Out.Location=P+FVector(350,-2350,1000);Out.Rotation=(P+FVector(850,-200,330)-Out.Location).Rotation();Out.FOV=65; }
+    if(Panel && Panel->GetPage()==5) { const FVector P=HousePosition(Panel->GetHouseIndex());Out.Location=P+(Panel->IsHomePreview()?FVector(1450,-3200,2050):FVector(350,-2350,1000));Out.Rotation=(P+(Panel->IsHomePreview()?FVector(0,-450,220):FVector(850,-200,330))-Out.Location).Rotation();Out.FOV=Panel->IsHomePreview()?70:65; }
 }
 void AFiskMarinaHub::Rebuild()
 {
@@ -79,7 +79,7 @@ void AFiskMarinaHub::Rebuild()
         Text(R?V.HouseName:TEXT("LEDIG NAUST"),P+FVector(0,-310,590),48,FColor(255,232,170));
         Text(R?V.DisplayName:TEXT("VELKOMMEN"),P+FVector(0,-315,525),33,FColor::White);
         Part(Cube,P+FVector(0,225,365),FVector(8,.1,2.6),FLinearColor(.14f,.11f,.08f));
-        if(R) { for(int32 I=0;I<R->Trophies.Num();++I) { const FFiskMarinaTrophy& T=R->Trophies[I];const FVector Q=P+FVector(-300+(I%4)*200,195,415-(I/4)*105);Part(Sphere,Q,FVector(1.1,.12,.35),FLinearColor(.9f,.65f,.17f));Text(FString::Printf(TEXT("%s %.1f kg"),FiskMarina::SpeciesName(T.Species),T.Grams/1000.0),Q+FVector(0,-10,-35),14,FColor::White); } }
+        if(R) { for(int32 I=0;I<R->Trophies.Num();++I) { const FFiskMarinaTrophy& T=R->Trophies[I];const FVector Q=P+FVector(-300+(I%4)*200,195,500-(I/4)*105);Part(Sphere,Q,FVector(1.1,.12,.35),FLinearColor(.9f,.65f,.17f));Text(FString::Printf(TEXT("%s %.1f kg"),FiskMarina::SpeciesName(T.Species),T.Grams/1000.0),Q+FVector(0,-10,-35),14,FColor::White); } }
         if(V.Decor==1) { for(int32 Side:{-1,1}) { Part(Cylinder,P+FVector(Side*520,-430,185),FVector(.8,.8,1),FLinearColor(.37f,.16f,.08f));Part(Sphere,P+FVector(Side*520,-430,290),FVector(1.3,1.3,1.5),FLinearColor(.14f,.42f,.15f)); } }
         if(V.Decor==2) { for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*280,-430,150),FVector(2.5,1.2,.2),FLinearColor(.62f,.43f,.24f));Part(Cube,P+FVector(Side*280,-380,210),FVector(2.5,.2,1.2),FLinearColor(.62f,.43f,.24f)); } }
     }

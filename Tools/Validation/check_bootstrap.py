@@ -25,9 +25,12 @@ def validate(root):
             errors.append('Both foundation modules must be Runtime')
         if project.get('EngineAssociation') != '5.8':
             errors.append('Expected portable UE 5.8 association')
+        renderer = [p for p in project.get('Plugins', []) if p.get('Name') == 'ProceduralMeshComponent']
+        if len(renderer) != 1 or renderer[0].get('Enabled') is not True:
+            errors.append('ProceduralMeshComponent must be explicitly enabled')
     except (OSError,ValueError,KeyError,TypeError):
         errors.append('Invalid or missing uproject')
-    expected = {'FiskCore':{'Core','CoreUObject'}, 'FiskGame':{'Core','CoreUObject','Engine','FiskCore','InputCore'}}
+    expected = {'FiskCore':{'Core','CoreUObject'}, 'FiskGame':{'Core','CoreUObject','Engine','FiskCore','InputCore','ProceduralMeshComponent'}}
     for name, allowed in expected.items():
         path = root/'Source'/name/(name+'.Build.cs')
         if not path.is_file():

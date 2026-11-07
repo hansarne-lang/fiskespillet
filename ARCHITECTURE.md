@@ -29,6 +29,8 @@ flowchart TD
 
 Pilene viser kompileringsavhengigheter. Funksjonsområdene har ingen direkte kompileringsavhengigheter til hverandre. UE-avhengigheter holdes minimale og listes eksplisitt i Build.cs ved opprettelse. En enkel grensekontroll i CI skal finne ulovlige includes; dette er en praktisk avgrensning, ikke et fullstendig språkbasert vern når områdene ligger i samme fysiske modul.
 
+v0.17 bruker motorens innebygde `ProceduralMeshComponent` i FiskGame for formet skrog, havflate og slepefisk. Pluginen aktiveres eksplisitt i prosjektfilen og er en privat renderingsavhengighet i FiskGame. FiskCore beholder bare Core/CoreUObject; ingen ny spillmodul, kjøpt ressurs eller tjeneste er innført. Bootstrapkontrollen håndhever den utvidede, eksplisitte avhengighetslisten.
+
 ## Kommunikasjon og serverautoritet
 
 Multiplayer oversetter en autentisert spillers forespørsel til en validert kommando hos eiermodulen. Eiermodulen godkjenner selv rettigheter og tilstand. Serveren eier spillutfallet; klienten viser repliserte lesemodeller. UI skriver aldri direkte i økonomi, båt eller profil.

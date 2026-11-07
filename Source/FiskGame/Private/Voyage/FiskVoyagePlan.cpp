@@ -25,7 +25,7 @@ void AFiskVoyagePlan::Tick(float Delta) { Super::Tick(Delta);Refresh(); }
 void AFiskVoyagePlan::Refresh()
 {
     if(!HasAuthority()) { return; }const auto* Day=GetWorld()->GetGameState<AFiskDayState>();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const auto* B=Mode?Mode->GetStarterBoat():nullptr;if(!Day || !B || Route.Revision==MAX_int32) { return; }bool Changed=false;
+    const auto* B=Cast<AFiskStarterBoat>(GetOwner());if(!Day || !B || Route.Revision==MAX_int32) { return; }bool Changed=false;
     if(Route.Day!=Day->GetDayNumber()) { Route.Day=Day->GetDayNumber();Route.Next=0;Route.Active=-1;Changed=true; }
     if(Route.Points.IsValidIndex(Route.Active))
     {
@@ -38,7 +38,7 @@ void AFiskVoyagePlan::Refresh()
 }
 bool AFiskVoyagePlan::Replace(int32 Player,int32 D,int32 R,const TArray<FVector>& Points,FString& Message)
 {
-    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Mode?Mode->GetStarterBoat():nullptr;
+    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
     const auto* Day=GetWorld()->GetGameState<AFiskDayState>();
     if(!HasAuthority() || !B || !Day || !Route.Matches(D,R) || B->GetCaptainId()!=Player || !B->IsAboard(Player)
         || B->GetTripProgress()!=-1 || Day->GetElapsedMilliseconds()>=1020000 || !FFiskVoyageRoute::Valid(Points))
@@ -48,7 +48,7 @@ bool AFiskVoyagePlan::Replace(int32 Player,int32 D,int32 R,const TArray<FVector>
 }
 bool AFiskVoyagePlan::NextStop(int32 Player,int32 D,int32 R,int32 BoatRevision,FString& Message)
 {
-    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();auto* B=Mode?Mode->GetStarterBoat():nullptr;
+    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();auto* B=Cast<AFiskStarterBoat>(GetOwner());
     if(!HasAuthority() || !B || !Route.Matches(D,R) || Route.Active>=0 || !Route.Points.IsValidIndex(Route.Next)
         || !B->CanCaptainCommand(Player,BoatRevision))
     { Message=TEXT("Neste stopp avvist. Kontroller kaptein, plan og dagsstatus.");return false; }

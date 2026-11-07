@@ -7,6 +7,7 @@
 class AFiskStarterBoat;
 class AFiskDaySettlement;
 class AFiskExpeditionState;
+class AFiskBoardingController;
 
 UCLASS()
 class AFiskBootstrapGameMode final : public AGameModeBase
@@ -20,6 +21,10 @@ public:
     virtual void PostLogin(APlayerController* NewPlayer) override;
     virtual void Logout(AController* Exiting) override;
     AFiskStarterBoat* GetStarterBoat() const { return StarterBoat; }
+    AFiskStarterBoat* GetBoatForPlayer(int32 Player) const;
+    AFiskStarterBoat* CreateOwnedBoat(AFiskBoardingController* PC);
+    void RegisterFleetCareer(int32 Player,const FGuid& Profile);
+    const TArray<TObjectPtr<AFiskStarterBoat>>& GetFleet() const { return Fleet; }
     AFiskDaySettlement* GetSettlement() const { return Settlement; }
     AFiskExpeditionState* GetExpedition() const { return Expedition; }
     bool StartNextDay(APlayerController* Requester, int32 ExpectedDay);
@@ -30,6 +35,9 @@ public:
     const TMap<int32,FGuid>& GetDayProfiles() const { return DayProfiles; }
 
 private:
+    AFiskStarterBoat* SpawnFleetBoat(int32 Player);
+    UPROPERTY() TArray<TObjectPtr<AFiskStarterBoat>> Fleet;
+    TMap<FGuid,int32> OwnedFleet;
     UPROPERTY() TObjectPtr<AFiskExpeditionState> Expedition;
     TMap<int32,FGuid> DayProfiles;
     FGuid ArchivedDay;

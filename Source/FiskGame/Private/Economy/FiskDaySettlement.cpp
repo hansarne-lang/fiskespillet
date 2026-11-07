@@ -21,17 +21,17 @@ void AFiskDaySettlement::BeginPlay()
 bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId,const FFiskCatchData& Fish,const FFiskCatchContext& Context)
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();auto* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();auto* Boat=Mode?Mode->GetBoatForPlayer(PlayerId):nullptr;
     if(!HasAuthority() || !Day || !Day->HasStarted() || !Boat || !Boat->IsAboard(PlayerId) || Boat->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot) { return false; }
     auto Candidate=Boat->GetCargo();const auto Result=Candidate.Add(Boat->GetKind(),CatchId,Fish.WeightGrams);
     if(Result==EFiskCargoResult::Rejected || !Ledger.Record(CatchId,PlayerId,Day->GetElapsedMilliseconds(),Fish,Context,Result!=EFiskCargoResult::Uncarryable)) { return false; }
-    Boat->AcceptCargo(Candidate);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_ACCEPT result=%d mode=%d"),static_cast<int32>(Result),static_cast<int32>(Candidate.Mode));return true;
+    CatchBoats.Add(CatchId,Boat);Boat->AcceptCargo(Candidate);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_ACCEPT result=%d mode=%d"),static_cast<int32>(Result),static_cast<int32>(Candidate.Mode));return true;
 }
 
 void AFiskDaySettlement::ResetForDay(int32 DayNumber)
 {
     if (!HasAuthority()) { return; }
-    Ledger = FFiskDayLedger(); View = FFiskSettlementView(); View.DayNumber = DayNumber;
+    CatchBoats.Reset();Ledger = FFiskDayLedger(); View = FFiskSettlementView(); View.DayNumber = DayNumber;
     View.DayId=FGuid::NewGuid();
     SetActorTickEnabled(true); ForceNetUpdate();
 }
@@ -46,10 +46,10 @@ void AFiskDaySettlement::Tick(float DeltaSeconds)
     if (!Day || !Day->HasStarted() || !Mode || !Mode->GetStarterBoat()) { return; }
     const int32 NowMs = Day->GetElapsedMilliseconds();
     // Calculate crossing before settlement, even when both occur in the same frame.
-    const int32 ArrivalMs = Mode->GetStarterBoat()->GetMarinaArrivalMs(NowMs);
-    if (Ledger.Settle(NowMs, ArrivalMs))
+    TMap<FGuid,int32> Arrivals;for(const auto& Pair:CatchBoats) { Arrivals.Add(Pair.Key,Pair.Value.IsValid()?Pair.Value->GetMarinaArrivalMs(NowMs):-1); }
+    if(Ledger.SettleFleet(NowMs,Arrivals))
     {
-        Mode->GetStarterBoat()->RevealCargo();
+        for(auto* B:Mode->GetFleet()) { B->RevealCargo(); }
         View.Results = Ledger.GetResults();
         View.DayNumber = Day->GetDayNumber();
         if (History.Append(View.DayNumber, NowMs, Ledger)) { HistoryView = History.GetDays(); }

@@ -22,11 +22,11 @@ void AFiskExpeditionState::Tick(float Delta) { Super::Tick(Delta);if(HasAuthorit
 void AFiskExpeditionState::Refresh()
 {
     const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* Day=GetWorld()->GetGameState<AFiskDayState>();
-    if(!HasAuthority() || !Mode || !Mode->GetSettlement() || !Mode->GetStarterBoat() || !Day) { return; }
-    const auto* Boat=Mode->GetStarterBoat();bool Changed=false;
+    if(!HasAuthority() || !Mode || !Mode->GetSettlement() || !Cast<AFiskStarterBoat>(GetOwner()) || !Day) { return; }
+    const auto* Boat=Cast<AFiskStarterBoat>(GetOwner());bool Changed=false;
     if(Plan.DayId!=Mode->GetSettlement()->GetView().DayId)
     {
-        Plan=FFiskExpeditionPlan();Plan.DayId=Mode->GetSettlement()->GetView().DayId;Plan.DayNumber=Day->GetDayNumber();
+        Plan=FFiskExpeditionPlan();Plan.Revision=Boat->GetFleetIndex()*1000000;Plan.DayId=Mode->GetSettlement()->GetView().DayId;Plan.DayNumber=Day->GetDayNumber();
         Plan.Weather=(Plan.DayNumber-1)%3;
 #if WITH_DEV_AUTOMATION_TESTS
         int32 Weather=-1;if(FParse::Value(FCommandLine::Get(),TEXT("FiskWeather="),Weather) && Weather>=0 && Weather<3) { Plan.Weather=Weather; }
@@ -44,26 +44,26 @@ void AFiskExpeditionState::Refresh()
 }
 bool AFiskExpeditionState::Choose(int32 Player,int32 Revision,int32 Goal)
 {
-    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Mode?Mode->GetStarterBoat():nullptr;
+    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
     if(!HasAuthority() || !B || Plan.bLocked || Plan.bEvaluated || Revision!=Plan.Revision || Goal<0 || Goal>=5
         || B->GetTripProgress()!=AFiskStarterBoat::AtDock || B->GetCaptainId()!=Player || !B->IsAboard(Player)) { return false; }
     Plan.Goal=Goal;Plan.Ready.Reset();++Plan.Revision;OnRep_Plan();ForceNetUpdate();return true;
 }
 bool AFiskExpeditionState::SetReady(int32 Player,int32 Revision,bool Ready)
 {
-    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Mode?Mode->GetStarterBoat():nullptr;
+    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
     if(!HasAuthority() || !B || Plan.bLocked || Plan.bEvaluated || Revision!=Plan.Revision || B->GetTripProgress()!=-1 || !B->IsAboard(Player)) { return false; }
     if(Ready) { Plan.Ready.AddUnique(Player); }else { Plan.Ready.Remove(Player); }OnRep_Plan();ForceNetUpdate();return true;
 }
 bool AFiskExpeditionState::Say(int32 Player,int32 Code)
 {
-    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Mode?Mode->GetStarterBoat():nullptr;
+    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
     if(!HasAuthority() || !B || !B->IsAboard(Player) || Code<0 || Code>=3) { return false; }
     Plan.MessagePlayer=Player;Plan.MessageCode=Code;++Plan.MessageSerial;ForceNetUpdate();return true;
 }
 bool AFiskExpeditionState::Depart()
 {
-    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Mode?Mode->GetStarterBoat():nullptr;
+    Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
     if(!HasAuthority() || !B || Plan.bLocked || Plan.bEvaluated || !Plan.DayId.IsValid()) { return false; }
     TArray<FGuid> Crew;TMap<FString,int32> Previous;
     for(int32 Seat=0;Seat<B->GetCrewCount();++Seat)

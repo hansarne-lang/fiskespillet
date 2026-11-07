@@ -17,6 +17,7 @@
 #include "Fishing/FiskPrototypeRod.h"
 #include "GameFramework/PlayerState.h"
 #include "UI/FiskSkipperPanel.h"
+#include "Voyage/FiskVoyagePlan.h"
 
 void AFiskStarterBoat::CalcCamera(float DeltaTime,FMinimalViewInfo& OutResult)
 {
@@ -58,9 +59,15 @@ AFiskStarterBoat::AFiskStarterBoat()
     PrimaryActorTick.bStartWithTickEnabled = false;
 }
 
+void AFiskStarterBoat::InitializeFleet(int32 Index,AFiskExpeditionState* E,AFiskVoyagePlan* V)
+{
+    if(!HasAuthority() || Index<0 || Index>=12) { return; }
+    FleetIndex=Index;Expedition=E;Voyage=V;Route.Revision=Index*1000000;
+    Voyage->InitializeRevision(Index*1000000);SetActorLocation(DockPosition());ForceNetUpdate();
+}
 void AFiskStarterBoat::SetOwnerPlayer(int32 PlayerId)
 {
-    if (HasAuthority() && OwnerId == INDEX_NONE)
+    if (HasAuthority() && PlayerId>=0)
     {
         OwnerId = PlayerId;
         RefreshCaptain();
@@ -76,7 +83,7 @@ void AFiskStarterBoat::ResetForDay()
     PortRodActivity = StarboardRodActivity = 0;
     PortFish = FFiskFishVisualState(); StarboardFish = FFiskFishVisualState();
     RodActivities.Init(0,6);FishVisuals.Init(FFiskFishVisualState(),6);
-    SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+    SetActorLocationAndRotation(DockPosition(), FRotator::ZeroRotator);
     OnRep_TripProgress(); OnRep_Route(); ForceNetUpdate();
 }
 
@@ -127,6 +134,7 @@ void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(AFiskStarterBoat,CargoView);
     DOREPLIFETIME(AFiskStarterBoat,Kind);DOREPLIFETIME(AFiskStarterBoat,RodActivities);DOREPLIFETIME(AFiskStarterBoat,FishVisuals);
     DOREPLIFETIME(AFiskStarterBoat, OwnerId);
+    DOREPLIFETIME(AFiskStarterBoat,FleetIndex);DOREPLIFETIME(AFiskStarterBoat,Voyage);DOREPLIFETIME(AFiskStarterBoat,Expedition);
     DOREPLIFETIME(AFiskStarterBoat, Route);
     DOREPLIFETIME(AFiskStarterBoat, Crew);
     DOREPLIFETIME(AFiskStarterBoat, TripProgress);
@@ -184,7 +192,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
     }
     if(TripProgress!=AtDock || Day->GetPhase(Day->GetElapsedSeconds())!=EFiskDayPhase::FishingAndReturn) { return; }
     const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!Mode || !Mode->GetExpedition() || !Mode->GetExpedition()->Depart()) { return; }
+    if(!Mode || !Expedition || !Expedition->Depart()) { return; }
     BeginLeg(FVector::ZeroVector,Route.Destination,GetTravelMs(),Now,false);
 }
 void AFiskStarterBoat::Tick(float DeltaSeconds)
@@ -197,7 +205,7 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     if(!Next.Equals(Position,.01)) { SetActorRotation((Next-Position).Rotation()); }SetActorLocation(Position);
     const bool Returning=TripProgress>AtFishingSpot;const int32 Percent=FMath::FloorToInt(Fraction*100);
     TripProgress=Returning?100+FMath::Max(1,Percent):Percent;
-    if(TripProgress==100 || TripProgress==200) { SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate(); }
+    if(TripProgress==100 || TripProgress==200) { if(TripProgress==200) { SetActorLocation(DockPosition()); }SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate(); }
 }
 bool AFiskStarterBoat::UsesTravelCard() const { return IsTravelling() && FiskVoyage::Unanimous(Crew,TravelVotes); }
 bool AFiskStarterBoat::VoteTravel(int32 Player,int32 ExpectedLeg,bool Vote)

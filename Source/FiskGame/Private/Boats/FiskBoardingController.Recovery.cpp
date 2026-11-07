@@ -74,18 +74,18 @@ void AFiskBoardingController::ServerExpeditionAck_Implementation(FGuid Profile,i
 void AFiskBoardingController::ServerExpeditionChoose_Implementation(int32 Revision,int32 Goal)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!bCareerReady || !PlayerState || !M || !M->GetExpedition() || !M->GetExpedition()->Choose(PlayerState->GetPlayerId(),Revision,Goal))
+    if(!bCareerReady || !PlayerState || !M || !FindExpedition() || !FindExpedition()->Choose(PlayerState->GetPlayerId(),Revision,Goal))
     { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPEDITION_CHOOSE_REJECTED"));ClientActionFeedback(TEXT("Bare kapteinen kan velge dagens mål ved brygga. Åpne J på nytt.")); }
 }
 void AFiskBoardingController::ServerExpeditionReady_Implementation(int32 Revision,bool Ready)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!bCareerReady || !PlayerState || !M || !M->GetExpedition() || !M->GetExpedition()->SetReady(PlayerState->GetPlayerId(),Revision,Ready))
+    if(!bCareerReady || !PlayerState || !M || !FindExpedition() || !FindExpedition()->SetReady(PlayerState->GetPlayerId(),Revision,Ready))
     { ClientActionFeedback(TEXT("Gå om bord ved brygga for å markere deg klar.")); }
 }
 void AFiskBoardingController::ServerExpeditionSay_Implementation(int32 Code)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const double Now=GetWorld()->GetRealTimeSeconds();
-    if(!bCareerReady || !PlayerState || !M || !M->GetExpedition() || Now-LastExpeditionMessage<2) { return; }
-    if(M->GetExpedition()->Say(PlayerState->GetPlayerId(),Code)) { LastExpeditionMessage=Now; }
+    if(!bCareerReady || !PlayerState || !M || !FindExpedition() || Now-LastExpeditionMessage<2) { return; }
+    if(FindExpedition()->Say(PlayerState->GetPlayerId(),Code)) { LastExpeditionMessage=Now; }
 }

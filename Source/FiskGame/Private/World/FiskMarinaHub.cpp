@@ -29,7 +29,7 @@ bool AFiskMarinaHub::Upsert(const FGuid& Profile,int32 Player,const FFiskMarinaI
     int32 Index=Residents.IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==Profile;});
     if(Index<0)
     {
-        if(Residents.Num()<4) { Index=Residents.AddDefaulted(); }
+        if(Residents.Num()<12) { Index=Residents.AddDefaulted(); }
         else { Index=Residents.IndexOfByPredicate([](const FFiskMarinaResident& R){return R.PlayerId<0;});if(Index<0) { return false; } }
     }
     FFiskMarinaResident& R=Residents[Index];
@@ -67,7 +67,7 @@ void AFiskMarinaHub::Rebuild()
     auto Text=[&](const FString& Label,FVector P,float Size,FColor Color)
     { UTextRenderComponent* S=NewObject<UTextRenderComponent>(this,*FString::Printf(TEXT("Sign%d_%d"),BuildRevision,Signs.Num()));AddInstanceComponent(S);S->SetupAttachment(RootComponent);S->SetRelativeLocation(P);S->SetRelativeRotation(FRotator(0,-90,0));S->SetHorizontalAlignment(EHTA_Center);S->SetWorldSize(Size);S->SetTextRenderColor(Color);S->SetText(FText::FromString(Label));S->RegisterComponent();Signs.Add(S); };
     const FLinearColor Colors[]={FLinearColor(.27f,.62f,.66f),FLinearColor(.72f,.34f,.22f),FLinearColor(.66f,.57f,.29f),FLinearColor(.35f,.53f,.28f),FLinearColor(.52f,.38f,.66f),FLinearColor(.76f,.75f,.62f)};
-    for(int32 Slot=0;Slot<4;++Slot)
+    for(int32 Slot=0;Slot<12;++Slot)
     {
         const FFiskMarinaResident* R=Residents.IsValidIndex(Slot)?&Residents[Slot]:nullptr;const FFiskMarinaIdentity V=R?R->Identity:FFiskMarinaIdentity();const FVector P=HousePosition(Slot);
         Part(Cube,P+FVector(0,0,100),FVector(13,12,.4),FLinearColor(.34f,.22f,.12f));
@@ -83,7 +83,7 @@ void AFiskMarinaHub::Rebuild()
         if(V.Decor==1) { for(int32 Side:{-1,1}) { Part(Cylinder,P+FVector(Side*520,-430,185),FVector(.8,.8,1),FLinearColor(.37f,.16f,.08f));Part(Sphere,P+FVector(Side*520,-430,290),FVector(1.3,1.3,1.5),FLinearColor(.14f,.42f,.15f)); } }
         if(V.Decor==2) { for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*280,-430,150),FVector(2.5,1.2,.2),FLinearColor(.62f,.43f,.24f));Part(Cube,P+FVector(Side*280,-380,210),FVector(2.5,.2,1.2),FLinearColor(.62f,.43f,.24f)); } }
     }
-    for(int32 Slot=0;Slot<4;++Slot) { BuildHouseDetails(Slot,Residents.IsValidIndex(Slot)?Residents[Slot].Identity:FFiskMarinaIdentity()); }
+    for(int32 Slot=0;Slot<12;++Slot) { BuildHouseDetails(Slot,Residents.IsValidIndex(Slot)?Residents[Slot].Identity:FFiskMarinaIdentity()); }
     const FVector Bar(-4200,-1900,0);Part(Cube,Bar+FVector(0,0,115),FVector(22,14,.4),FLinearColor(.54f,.35f,.17f));Part(Cube,Bar+FVector(0,250,220),FVector(14,2,2.1),FLinearColor(.45f,.25f,.1f));
     Part(Cube,Bar+FVector(0,0,700),FVector(23,15,.4),FLinearColor(.47f,.3f,.13f));
     for(int32 Side:{-1,1}) { for(int32 End:{-1,1}) { Part(Cylinder,Bar+FVector(Side*950,End*550,400),FVector(.22,.22,6),FLinearColor(.46f,.3f,.17f)); } }

@@ -24,7 +24,7 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     if (!GetOwner()->HasAuthority() || !RodOwner || Slot>=RodOwner->GetRodCapacity() || RodOwner->GetRodAt(Slot)!=this) { return false; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    const AFiskStarterBoat* Boat=Mode?Mode->GetBoatForPlayer(CastChecked<APlayerController>(GetOwner())->PlayerState?CastChecked<APlayerController>(GetOwner())->PlayerState->GetPlayerId():INDEX_NONE):nullptr;
     const FFiskFishingGround* Ground=Boat?FiskGrounds::Find(Boat->GetGroundId()):nullptr;
     if (!Day || !Ground || Boat->GetCargo().bMustReturn || !FFiskRigRules::IsValid(Rig.Bait,Rig.Depth,Rig.Program,Ground->BottomDepth)
         || !Cycle.TryStart(ExpectedId, Day->GetElapsedMilliseconds())) { return false; }
@@ -72,7 +72,7 @@ bool UFiskPrototypeRod::CanConfigure() const
 bool UFiskPrototypeRod::Configure(const FGuid& ExpectedId, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program)
 {
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const AFiskStarterBoat* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    const AFiskStarterBoat* Boat=Mode?Mode->GetBoatForPlayer(CastChecked<APlayerController>(GetOwner())->PlayerState?CastChecked<APlayerController>(GetOwner())->PlayerState->GetPlayerId():INDEX_NONE):nullptr;
     const FFiskFishingGround* Ground=Boat?FiskGrounds::Find(Boat->GetGroundId()):nullptr;
     if (!GetOwner()->HasAuthority() || !Ground || !CanConfigure() || ExpectedId != View.CastId
         || !FFiskRigRules::TryApply(Rig, ExpectedRevision, Bait, Depth, Program, Ground->BottomDepth)) { return false; }
@@ -138,7 +138,7 @@ void UFiskPrototypeRod::Land()
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     if (!Mode || !Mode->GetSettlement() || !PC->PlayerState || !Day) { return; }
     if (!CatchId.IsValid()) { CatchId = FGuid::NewGuid(); }
-    const AFiskStarterBoat* Boat=Mode->GetStarterBoat();if(!Boat) { return; }
+    const AFiskStarterBoat* Boat=Mode->GetBoatForPlayer(CastChecked<APlayerController>(GetOwner())->PlayerState?CastChecked<APlayerController>(GetOwner())->PlayerState->GetPlayerId():INDEX_NONE);if(!Boat) { return; }
     FFiskCatchContext Context;Context.Ground=Boat->GetGroundId();Context.Bait=Rig.Bait;Context.Depth=Rig.Depth;Context.Program=Rig.Program;
     Context.BoatKind=Boat->GetKind();const AFiskBoardingController* OwnerPC=::Cast<AFiskBoardingController>(GetOwner());Context.Equipment=OwnerPC?OwnerPC->GetServerCareer().Owned&7:0;
     Context.LandedAtMs=Day->GetElapsedMilliseconds();Context.FightMs=FMath::Max(0,Context.LandedAtMs-FirstRunAtMs);
@@ -164,7 +164,7 @@ void UFiskPrototypeRod::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     if (!GetOwner()->HasAuthority()) { return; }
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const AFiskStarterBoat* Boat = Mode ? Mode->GetStarterBoat() : nullptr;
+    const AFiskStarterBoat* Boat = Mode ? Mode->GetBoatForPlayer(CastChecked<APlayerController>(GetOwner())->PlayerState?CastChecked<APlayerController>(GetOwner())->PlayerState->GetPlayerId():INDEX_NONE) : nullptr;
     if (!Boat || Boat->GetTripProgress() != AFiskStarterBoat::AtFishingSpot
         || !Day || AFiskDayState::GetPhase(Day->GetElapsedSeconds()) != EFiskDayPhase::FishingAndReturn)
     {

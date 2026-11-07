@@ -19,6 +19,8 @@ class UFiskCrewPanel;
 class UFiskJournalPanel;
 class UFiskDeckPanel;
 class AFiskStarterBoat;
+class AFiskVoyagePlan;
+class AFiskExpeditionState;
 class UFiskMarinaPanel;
 class UFiskExpeditionPanel;
 class UFiskSkipperPanel;
@@ -135,6 +137,16 @@ public:
     UFUNCTION(Client,Reliable) void ClientCaptainReply(bool bAccepted);
     UFUNCTION(Server,Reliable) void ServerStartBoatTrip(int32 ExpectedRevision);
     const AFiskStarterBoat* FindStarterBoat() const;
+    AFiskStarterBoat* GetSelectedFleetBoat() const { return SelectedFleetBoat; }
+    AFiskVoyagePlan* FindVoyage() const;
+    AFiskExpeditionState* FindExpedition() const;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
+    UFUNCTION(Server,Reliable) void ServerFleetSelect(int32 Index,bool CreateOwn);
+    UFUNCTION(Server,Reliable) void ServerFleetLeave();
+    bool HandleFleetKey(const FInputKeyEventArgs& Args);
+    bool IsFleetVisible() const { return bFleetVisible; }
+    void DrawFleet(class AHUD& HUD,class UCanvas& Canvas);
+    TArray<AFiskStarterBoat*> FleetBoats() const;
     UFUNCTION(Server,Reliable) void ServerSelectGround(int32 ExpectedRevision,int32 GroundId);
     UFUNCTION(Client,Reliable) void ClientGroundReply(const FString& Message);
     bool CanOpenRig() const;
@@ -148,6 +160,9 @@ protected:
     virtual void PlayerTick(float DeltaTime) override;
 
 private:
+    UPROPERTY(Replicated) TObjectPtr<AFiskStarterBoat> SelectedFleetBoat;
+    bool bFleetVisible=false;
+    int32 FleetRow=0;
     UPROPERTY() TObjectPtr<UFiskCollectionPanel> CollectionPanel;
     UPROPERTY() TObjectPtr<UFiskAnglerPanel> AnglerPanel;
     UPROPERTY() TObjectPtr<UFiskSkipperPanel> SkipperPanel;

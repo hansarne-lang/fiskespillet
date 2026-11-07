@@ -39,8 +39,8 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
 #if WITH_DEV_AUTOMATION_TESTS
     // Deterministic catalog fish for native cargo acceptance only. Bite clocks,
     // fight simulation, input, landing and settlement still run normally.
-    if(RodOwner->CargoMode==TEXT("tow") || RodOwner->CargoMode==TEXT("late") || RodOwner->CargoMode==TEXT("full") || RodOwner->CargoMode==TEXT("discard"))
-    { CatchData.Species=6;CatchData.WeightGrams=RodOwner->CargoMode==TEXT("discard")?250000:150000;const auto& S=*FiskCatches::Find(6);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
+    if(RodOwner->CargoMode==TEXT("tow") || RodOwner->CargoMode==TEXT("late") || RodOwner->CargoMode==TEXT("full") || RodOwner->CargoMode==TEXT("discard") || RodOwner->CargoMode==TEXT("loaded"))
+    { CatchData.Species=6;CatchData.WeightGrams=RodOwner->CargoMode==TEXT("discard")?250000:RodOwner->CargoMode==TEXT("loaded")?200000:150000;const auto& S=*FiskCatches::Find(6);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
 #endif
     FRandomStream BiteRandom(static_cast<int32>(Cycle.GetId().A ^ Cycle.GetId().B ^ Cycle.GetId().C ^ Cycle.GetId().D));
     NextTransitionAt = Day->GetElapsedRealSeconds() + FFiskRigRules::BiteDelay(Rig, BiteRandom, Ground);

@@ -17,9 +17,9 @@ Lageret deles av hele båtens besetning, mens fisken fortsatt tilhører spillere
 | Startbåt | 100 kg | 10 kg | 200 kg |
 | Offshorebåt | 300 kg | 30 kg | 500 kg |
 
-Dette er foreløpige testkapasiteter fra spillplanen. Offshorebåtens slepegrense er over dagens største katalogfisk; den beholdes som kapasitet for videre innhold.
+Dette er foreløpige testkapasiteter fra spillplanen. Offshorebåtens slepegrense gir også rom for framtidig større katalogfisk.
 
-En fisk som får plass, sikres i lageret. Når lageret når vanlig kapasitet eller tillatt overlast, avsluttes fiskingen for alle om bord og båten starter normal hjemtur. En enkelt fisk som er større enn vanlig lager pluss overlast, men innen slepegrensen, sikres på slep. Tidligere last beholdes. Sleping avslutter fiskingen og starter hjemtur med65 prosent av vanlig båtfart. Avrunding av returtiden er konservativ.
+En fisk som får plass, sikres i lageret. Når lageret når vanlig kapasitet eller tillatt overlast, avsluttes fiskingen for alle om bord og båten starter normal hjemtur. En fisk som ikke får plass i gjenværende lager eller overlast, er tyngre enn halvparten av vanlig lagerkapasitet, og er innen slepegrensen, sikres på slep. Dette gjør sleping mulig også når offshorebåten allerede har last. Tidligere last beholdes. Sleping avslutter fiskingen og starter hjemtur med65 prosent av vanlig båtfart. Avrunding av returtiden er konservativ.
 
 Alle aktive stenger og kamper trekkes inn ved tvungen retur. Allerede registrerte landinger beholdes. Nye landinger kan ikke legges til etter at tvungen retur er bestemt.
 

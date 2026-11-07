@@ -12,7 +12,7 @@ EFiskCargoResult FFiskCargoModel::Add(int32 Kind,const FGuid& Id,int32 Grams)
         HoldGrams+=Grams;bMustReturn=HoldGrams>=L.Hold;Mode=HoldGrams>L.Hold?EFiskCargoMode::Overload:bMustReturn?EFiskCargoMode::Full:EFiskCargoMode::Stowed;
         return Mode==EFiskCargoMode::Overload?EFiskCargoResult::ReturnOverload:bMustReturn?EFiskCargoResult::ReturnFull:EFiskCargoResult::Stowed;
     }
-    if(Grams>L.Hold && Grams<=L.Tow && HoldGrams<=L.Hold)
+    if(Grams>L.Hold/2 && Grams<=L.Tow && HoldGrams<=L.Hold)
     { TowedGrams=Grams;bMustReturn=true;Mode=EFiskCargoMode::Towing;return EFiskCargoResult::Tow; }
     bLastDiscarded=true;bMustReturn=HoldGrams>0;return EFiskCargoResult::Uncarryable;
 }

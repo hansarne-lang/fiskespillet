@@ -17,7 +17,7 @@ void AFiskBoardingController::RunCargoSmoke()
 {
     const auto* D=GetWorld()->GetGameState<AFiskDayState>();const auto* B=FindStarterBoat();auto* GI=CastChecked<UFiskGameInstance>(GetGameInstance());
     if(!D || !B || !PlayerState || !IsCareerReady() || !D->HasStarted()) { return; }
-    const double Now=D->GetElapsedRealSeconds(),Real=GetWorld()->GetRealTimeSeconds();const bool Observer=CargoMode==TEXT("observer"),Full=CargoMode==TEXT("full"),Late=CargoMode==TEXT("late"),Discard=CargoMode==TEXT("discard");
+    const double Now=D->GetElapsedRealSeconds(),Real=GetWorld()->GetRealTimeSeconds();const bool Observer=CargoMode==TEXT("observer"),Loaded=CargoMode==TEXT("loaded"),Full=Loaded || CargoMode==TEXT("full"),Late=CargoMode==TEXT("late"),Discard=CargoMode==TEXT("discard");
     auto Input=[&](FKey K,EInputEvent Event){FInputKeyEventArgs A;A.InputDevice=FInputDeviceId::CreateFromInternalId(0);A.Key=K;A.Event=Event;InputKey(A);};
     auto Key=[&](FKey K){Input(K,IE_Pressed);Input(K,IE_Released);};
     auto Shot=[&](const TCHAR* Name){const FString File=FPaths::Combine(CargoDir,FString(Name)+TEXT(".png"));FTimerHandle T;GetWorldTimerManager().SetTimer(T,FTimerDelegate::CreateWeakLambda(this,[File](){if(!FScreenshotRequest::IsScreenshotRequested()) { FScreenshotRequest::RequestScreenshot(File,false,false); }}),.25f,false);};
@@ -64,8 +64,8 @@ void AFiskBoardingController::RunCargoSmoke()
         if(Full && CargoLandings<2) { if(Real-CargoAt<4) { return; }if(B->GetTripProgress()!=100 || B->GetCargoView().Mode!=1) { Fail(TEXT("first_half_load_forced_return"));return; }Key(EKeys::F);CargoStage=3;return; }
         if(Discard)
         { if(B->GetCargoView().bReturning || !B->GetCargoView().bDiscarded || B->GetTripProgress()!=100) { Fail(TEXT("untransportable_fish_state"));return; }Key(EKeys::F);CargoAt=Real;CargoStage=40;return; }
-        if(B->GetCargoView().Mode!=static_cast<uint8>(Full?EFiskCargoMode::Full:EFiskCargoMode::Towing) || B->GetTripProgress()<=100) { Fail(TEXT("automatic_return_missing"));return; }
-        const int32 Expected=FFiskCargoModel::ReturnDuration(B->GetTravelMs(),!Full);if(B->GetLegTravelMs()!=Expected) { Fail(TEXT("wrong_return_speed"));return; }
+        if(B->GetCargoView().Mode!=static_cast<uint8>(Full && !Loaded?EFiskCargoMode::Full:EFiskCargoMode::Towing) || B->GetTripProgress()<=100) { Fail(TEXT("automatic_return_missing"));return; }
+        const int32 Expected=FFiskCargoModel::ReturnDuration(B->GetTravelMs(),!Full || Loaded);if(B->GetLegTravelMs()!=Expected) { Fail(TEXT("wrong_return_speed"));return; }
         Key(EKeys::F11);Shot(TEXT("cargo-return-hidden"));CargoAt=Real;CargoStage=42;
     }
     else if(CargoStage==40 && Real-CargoAt>=1)
@@ -85,7 +85,7 @@ void AFiskBoardingController::RunCargoSmoke()
         const auto& J=GI->GetJournal();const int32 Expected=Observer?0:Full?2:1;if(J.GetEntries().Num()!=Expected) { Fail(TEXT("confirmed_journal_count_wrong"));return; }
         for(const auto& E:J.GetEntries()) { if(E.bSold!=( !Late && !Discard)) { Fail(TEXT("wrong_delivery_outcome"));return; } }
         if(GI->Career.Cash!=CargoPaidCash+J.Stats().Income*100) { Fail(TEXT("wrong_money_or_duplicate_payment"));return; }
-        if(B->GetCargoView().RevealedGrams!=(Full?300000:Discard?0:150000)) { Fail(TEXT("revealed_payload_wrong"));return; }
+        if(B->GetCargoView().RevealedGrams!=(Full?(Loaded?400000:300000):Discard?0:150000)) { Fail(TEXT("revealed_payload_wrong"));return; }
         Key(EKeys::F11);Shot(TEXT("cargo-after17"));CargoAt=Real;CargoStage=7;
     }
     else if(CargoStage==7 && Real-CargoAt>=1) { Key(EKeys::F11);CargoStage=8; }

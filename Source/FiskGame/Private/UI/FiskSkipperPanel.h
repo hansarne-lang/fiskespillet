@@ -4,6 +4,7 @@
 #include "InputKeyEventArgs.h"
 #include "Voyage/FiskSavedRoutes.h"
 #include "Voyage/FiskTripBook.h"
+#include "Voyage/FiskSkipperTools.h"
 #include "FiskSkipperPanel.generated.h"
 class AHUD;class UCanvas;struct FMinimalViewInfo;
 UCLASS()
@@ -19,6 +20,8 @@ public:
     void Draw(AHUD& HUD,UCanvas& Canvas);
     void PhotoCamera(const FTransform& Boat,FMinimalViewInfo& Out) const;
     const FFiskPhotoView& GetPhotoView() const { return Photo; }
+    int32 GetMark() const { return Mark; }
+    const FFiskPhotoPresets& GetPhotoPresets() const { return Cameras; }
     FString LastPhoto;
 private:
     int32 Page=0,Mark=0,Slot=0,DayRow=0,Tab=0,DetailPage=0;
@@ -27,6 +30,10 @@ private:
     FGuid LoadedProfile;
     FFiskSavedRoutes Presets;
     FFiskPhotoView Photo;
+    FFiskPhotoPresets Cameras;
+    int32 CameraSlot=0,TemplateRow=0,StopSeconds=180,CompareA=0,CompareB=1;
+    bool bPhotoGrid=false;
+    FString CameraFile() const;
     void LoadPresets();
     FString PresetFile() const;
     void DrawPlan(AHUD& HUD,UCanvas& Canvas);

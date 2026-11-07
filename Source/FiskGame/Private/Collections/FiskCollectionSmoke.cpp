@@ -27,7 +27,7 @@ void AFiskBoardingController::RunCollectionSmoke()
     if(CollectionStage==0 && (Library?GetFrontEnd()->IsVisible():(D->HasStarted() && CareerSmokeStage==13 && Now>=80 && Now<120)))
     {
         if(J.GetEntries().Num()!=(Library?1:0)) { Fail(TEXT("unexpected_initial_confirmed_journal"));return; }Key(EKeys::Z);if(!CollectionPanel->IsVisible()) { Fail(TEXT("panel_not_open"));return; }
-        if(Library && CollectionPanel->GetPins().Values!=TArray<int32>({29,1,26})) { Fail(TEXT("legacy_pins_changed_before_save"));return; }Key(EKeys::End);if(CollectionPanel->GetSelected()!=FiskCollections::Count-1) { Fail(TEXT("last_goal_inaccessible"));return; }Key(EKeys::One);Key(EKeys::Home);Key(EKeys::Down);Key(EKeys::Two);if(!PinsOk()) { Fail(TEXT("pin_selection_not_saved"));return; }Key(EKeys::F10);Shot(TEXT("collection-initial"));CollectionAt=Real;CollectionStage=1;
+        if(Library && CollectionPanel->GetPins().Values!=TArray<int32>({FiskCollections::Count-1,1,26})) { Fail(TEXT("legacy_pins_changed_before_save"));return; }Key(EKeys::End);if(CollectionPanel->GetSelected()!=FiskCollections::Count-1) { Fail(TEXT("last_goal_inaccessible"));return; }Key(EKeys::One);Key(EKeys::Home);Key(EKeys::Down);Key(EKeys::Two);if(!PinsOk()) { Fail(TEXT("pin_selection_not_saved"));return; }Key(EKeys::F10);Shot(TEXT("collection-initial"));CollectionAt=Real;CollectionStage=1;
     }
     else if(CollectionStage==1 && Real-CollectionAt>=1)
     { Key(EKeys::Tab);Shot(TEXT("collection-pinned"));CollectionAt=Real;CollectionStage=2; }

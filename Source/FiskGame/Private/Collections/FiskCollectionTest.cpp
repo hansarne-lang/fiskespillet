@@ -21,7 +21,7 @@ bool FFiskCollectionPrivacyTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCollectionLostTest,"Fiskelaget.Collections.LostCatchNeverPaysOrAdvancesDeliveredWeight",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskCollectionLostTest::RunTest(const FString& Parameters)
 {
-    FFiskJournalModel J;auto E=CollectionTest::Entry(9,3,false,10100);J.Restore({E});TestEqual(TEXT("Lost landing counts for species"),FiskCollections::Progress(J,9),int64(1));TestEqual(TEXT("Not sold"),FiskCollections::Progress(J,27),int64(0));TestEqual(TEXT("Not delivered weight"),FiskCollections::Progress(J,28),int64(0));TestEqual(TEXT("No sale income"),J.Stats().Income,int64(0));TestTrue(TEXT("Report does not claim sale price"),FiskCollections::Html(J,{},{}).Contains(TEXT("Tapt ved retur</td><td>0</td>")));return true;
+    FFiskJournalModel J;auto E=CollectionTest::Entry(9,3,false,10100);J.Restore({E});TestEqual(TEXT("Lost landing counts for species"),FiskCollections::Progress(J,9),int64(1));TestEqual(TEXT("Not sold"),FiskCollections::Progress(J,27),int64(0));TestEqual(TEXT("Not delivered weight"),FiskCollections::Progress(J,28),int64(0));TestEqual(TEXT("No sale income"),J.Stats().Income,int64(0));TestTrue(TEXT("Report does not claim sale price"),FiskCollections::Html(J,{},{}).Contains(TEXT("Ikke solgt</td><td>0</td>")));return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCollectionSearchTest,"Fiskelaget.Collections.CombinedFiltersAndStableSorting",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskCollectionSearchTest::RunTest(const FString& Parameters)

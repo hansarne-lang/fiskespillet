@@ -4,11 +4,13 @@ FISKELAGET er et planlagt realistisk, sosialt fiskespill for Windows PC. Inntil 
 
 ## Prosjektstatus
 
-Spillbar UE5.8-prototype med solo og fire LAN-spillere, fiskekamp,20minuttersdager, lagret karriere/butikk, to båttyper og frie sjøpunkter. v0.8-grenen legger til sju arter, artsbok, personlige naust, besøk, strandbar og dagslys. Arkitekturen bruker fortsatt FiskCore/FiskGame. Se [v0.8-kontrakten](Docs/Development/MARINA_DISCOVERY_V08.md) og [oppgave74](https://github.com/hansarne-lang/fiskespillet/issues/74) for faktisk utviklings-/teststatus; uintegrerte grener er ikke en godkjent hovedrelease.
+Spillbar UE5.8-utviklingsversjon med én spiller eller fire over LAN, én aktiv felles båt,15 arter, fem habitater,20-minuttersdager og lagret karriere. Fullversjonens opptil12 spillere og flere samtidige båter er videre arbeid.
 
-Windows-testpakker startes via medfølgende BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra spillklokken02:00 og F ved fiskeplassen. P: butikk, M: kart, H: naust, B: strandbar, I: artsbok. Kildeutvikling bruker lokal Unreal5.8.4 og C++-verktøyene i DEVELOPMENT.md. Gamle profiler kopieres med backup til den nye pakkens Saved/Config/Fiskelaget.
+v0.17 gir formet skrog/dekk, bevegelig havflate, maritime detaljer, felles fangstlager og synlig sleping med redusert returfart. Se [spillguiden](Docs/Development/OCEAN_CARGO_V017.md). F11 viser last/slep; K viser mannskap. Tidligere turplanlegging, fotovinkler, dagbok, fangstmål, fiskeskole, butikk og sosial marina følger med. Modellene er fortsatt forenklede; ferdig realistisk grafikk påstås ikke.
 
-v0.8.1 retter gjenoppretting av skadede naustrevisjoner, visning av serverbekreftede husvalg mens lokal lagring venter, og plasseringen av hjelpetekst. Se [kodegjennomgangen](Docs/Development/REVIEW_V08_STABILITY_V081.md). [Forslaget til v0.9](Docs/Development/EXPEDITIONS_V09_PLAN.md) om ekspedisjoner, værpresentasjon og journalgjenhenting er planlagt innhold, ikke implementert funksjonalitet.
+Windows-pakken startes fra BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra02:00 og F ved fiskeplassen. Alle LAN-deltakere må bruke samme versjon. Kildeutvikling bruker Unreal5.8.4 og verktøyene i DEVELOPMENT.md. Pakken inneholder faktisk test-SHA, kontrollsummer, resultater og kjente begrensninger. Lagringer er lokale; GitHub synkroniserer ikke spillprofiler mellom PC-er.
+
+GitHub Issues er oppgavelisten. Historiske åpne oppgaver avstemmes mot de integrerte leveransene i #100; nye restoppgaver skal beskrive det som faktisk gjenstår. Fysisk LAN mellom to PC-er må dokumenteres ved faktisk kjøring.
 
 Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengelighet gir ikke automatisk en åpen kildekodelisens; lisens og tredjepartsrettigheter må avklares før gjenbruk eller videre distribusjon.
 

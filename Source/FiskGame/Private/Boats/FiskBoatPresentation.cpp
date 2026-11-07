@@ -87,7 +87,7 @@ void UFiskBoatPresentation::BeginPlay()
     Part(TEXT("Console"), Cube, FVector(45, 0, 145), FVector(1.0, 0.85, 1.3), White);
     Part(TEXT("Windscreen"), Cube, FVector(85, 0, 214), FVector(0.08, 0.9, 0.55), FLinearColor(0.07f, 0.27f, 0.33f));
     Part(TEXT("InstrumentPanel"),Cube,FVector(-7,0,174),FVector(.05,.64,.33),Navy);
-    Part(TEXT("Plotter"),Cube,FVector(-10,-14,178),FVector(.015,.25,.16),FLinearColor(.02,.32,.37));
+    Part(TEXT("Plotter"),Cube,FVector(-10,-14,178),FVector(.015,.25,.16),FLinearColor(.02f,.32f,.37f));
     for(int32 I=0;I<3;++I) { auto* Gauge=Part(*FString::Printf(TEXT("Gauge%d"),I),Cylinder,FVector(-12,15+I*10,182),FVector(.065,.065,.02),White);Gauge->SetRelativeRotation(FRotator(90,0,0)); }
     Part(TEXT("Roof"), Cube, FVector(20, 0, 270), FVector(3.0, 2.0, 0.10), White);
     for (int32 Side = 0; Side < 6; ++Side)

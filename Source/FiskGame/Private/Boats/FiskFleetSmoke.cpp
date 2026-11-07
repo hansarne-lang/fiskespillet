@@ -65,7 +65,7 @@ void AFiskBoardingController::RunFleetSmoke()
     if(FleetStage==2)
     {
         const int32 Expected=FleetRole<=1?2:FleetRole<=5?4:FleetRole<=7?2:0;
-        if((Expected>0 && (!B->IsAboard(SelfId) || B->GetCrewCount()!=Expected)) || (Expected==0 && B->IsAboard(SelfId))) { if(Now>180) { Fail(TEXT("crew_assignment_wrong")); }return; }
+        if((Expected>0 && (!B->IsAboard(SelfId) || B->GetCrewCount()!=Expected)) || (Expected==0 && B->IsAboard(SelfId))) { if(Real-FleetAt>30) { Fail(TEXT("crew_assignment_wrong")); }return; }
         if(Fishing)
         {
             for(int32 Item=0;Item<3;++Item) { if(!GI->Career.Has(Item)) { ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }

@@ -26,7 +26,7 @@ void UFiskHarbourLife::BeginPlay()
     auto Part=[&](UStaticMesh* Mesh,FVector P,FVector Scale,FLinearColor Color){return FiskVisual::AddPart(GetOwner(),GetOwner()->GetRootComponent(),Mesh,Material,*FString::Printf(TEXT("HarbourLiving%d"),N++),P,Scale,Color,.75f);};
     const FVector Bar(-4200,-1900,0);
     for(int32 I=0;I<12;++I)
-    { const FVector P(-5000+(I%6)*300,-2280-(I/6)*380,0);Part(Cylinder,P+FVector(0,0,230),FVector(.6,.6,2.1),FLinearColor(.28,.19,.11));Part(Cylinder,P+FVector(0,0,342),FVector(.95,.95,.13),FLinearColor(.76,.51,.22)); }
+    { const FVector P(-5000+(I%6)*300,-2280-(I/6)*380,0);Part(Cylinder,P+FVector(0,0,180),FVector(.35,.35,.9),FLinearColor(.28,.19,.11));Part(Cylinder,P+FVector(0,0,232),FVector(.65,.65,.13),FLinearColor(.76,.51,.22)); }
     for(int32 I=0;I<5;++I)
     { const FVector P=Bar+FVector(-1200+I*600,-1250,0);Part(Cylinder,P+FVector(0,0,210),FVector(.13,.13,2),FLinearColor(.3,.23,.13));Part(Cylinder,P+FVector(0,0,319),FVector(2.5,2.5,.15),FLinearColor(.62,.42,.2));Part(Cylinder,P+FVector(0,0,345),FVector(.15,.15,.5),FLinearColor(.13,.56,.51)); }
     for(int32 I=0;I<7;++I)

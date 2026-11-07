@@ -78,13 +78,13 @@ void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
     if(Panel && Panel->IsGallery())
     {
-        const FVector Focus(-10000,-6000,650);Out.Location=Focus+FVector(-450,-1500*Panel->GetGalleryZoom(),180);Out.Rotation=(Focus+FVector(-450,0,0)-Out.Location).Rotation();Out.FOV=55;return;
+        const FVector Focus(-10000,-6000,650);Out.Location=Focus+FVector(450,-1800*Panel->GetGalleryZoom(),180);Out.Rotation=(Focus+FVector(450,0,0)-Out.Location).Rotation();Out.FOV=55;return;
     }
     if(Bar && Panel->GetHarbourView()>0)
     {
         const auto* Follow=Panel->FollowBoat();const bool Track=Panel->GetHarbourView()==2 && Follow;
-        const FVector Focus=Track?Follow->GetActorLocation()+FVector(-350,0,160):FVector(2000,2200,150);
-        Out.Location=Track?Follow->GetActorLocation()+FVector(-2600,-3100,1700):FVector(-3600,-5200,1800);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=65;return;
+        const FVector Focus=Track?Follow->GetActorTransform().TransformPosition(FVector(450,-650,160)):FVector(2000,2200,150);
+        Out.Location=Track?Follow->GetActorTransform().TransformPosition(FVector(-2600,-3100,1700)):FVector(-3600,-5200,1800);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=65;return;
     }
     const FVector Target=Bar?FVector(-4200,-1900,230):HousePosition(Panel?Panel->GetHouseIndex():0)+FVector(0,0,300);
     Out.Location=Target+(Bar?FVector(1500,-2500,1100):FVector(350,-1600,550));Out.Rotation=(Target+FVector(650,0,0)-Out.Location).Rotation();Out.FOV=65;
@@ -117,7 +117,7 @@ void AFiskMarinaHub::Rebuild()
         if(V.Decor==2) { for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*280,-430,150),FVector(2.5,1.2,.2),FLinearColor(.62f,.43f,.24f));Part(Cube,P+FVector(Side*280,-380,210),FVector(2.5,.2,1.2),FLinearColor(.62f,.43f,.24f)); } }
     }
     for(int32 Slot=0;Slot<12;++Slot) { BuildHouseDetails(Slot,Residents.IsValidIndex(Slot)?Residents[Slot].Identity:FFiskMarinaIdentity()); }
-    const FVector Bar(-4200,-1900,0);Part(Cube,Bar+FVector(0,0,115),FVector(22,14,.4),FLinearColor(.54f,.35f,.17f));Part(Cube,Bar+FVector(0,250,220),FVector(14,2,2.1),FLinearColor(.45f,.25f,.1f));
+    const FVector Bar(-4200,-1900,0);Part(Cube,Bar+FVector(0,0,115),FVector(22,24,.4),FLinearColor(.54f,.35f,.17f));Part(Cube,Bar+FVector(0,250,220),FVector(14,2,2.1),FLinearColor(.45f,.25f,.1f));
     Part(Cube,Bar+FVector(0,0,700),FVector(23,15,.4),FLinearColor(.47f,.3f,.13f));
     for(int32 Side:{-1,1}) { for(int32 End:{-1,1}) { Part(Cylinder,Bar+FVector(Side*950,End*550,400),FVector(.22,.22,6),FLinearColor(.46f,.3f,.17f)); } }
     for(int32 I=0;I<5;++I) { Part(Cylinder,Bar+FVector(-600+I*300,-40,230),FVector(.55,.55,2),FLinearColor(.21f,.22f,.14f));Part(Cylinder,Bar+FVector(-600+I*300,-40,335),FVector(.9,.9,.15),FLinearColor(.8f,.54f,.2f));Part(Cylinder,Bar+FVector(-600+I*300,250,365),FVector(.12,.12,.35),FLinearColor(.1f,.65f,.5f)); }

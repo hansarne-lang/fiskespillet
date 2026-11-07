@@ -21,6 +21,8 @@ struct FISKCORE_API FFiskCareerProfile
 {
     GENERATED_BODY()
     static constexpr int32 MaxReceipts=512;
+    static constexpr int32 ItemCount=13;
+    static constexpr int32 OwnedMask=(1<<ItemCount)-1;
     static constexpr int64 InitialCash=3000000;
     static constexpr int64 MaxCash=1000000000000LL;
     UPROPERTY() FGuid Id;
@@ -37,6 +39,6 @@ struct FISKCORE_API FFiskCareerProfile
     bool Extends(const FFiskCareerProfile& Older) const;
     bool Buy(const FGuid& Command,int32 ExpectedRevision,int32 Item);
     bool Credit(const FGuid& Settlement,int64 Amount);
-    bool Has(int32 Item) const { return Item>=0 && Item<4 && (Owned&(1<<Item))!=0; }
+    bool Has(int32 Item) const { return Item>=0 && Item<ItemCount && (Owned&(1<<Item))!=0; }
     FString Money() const;
 };

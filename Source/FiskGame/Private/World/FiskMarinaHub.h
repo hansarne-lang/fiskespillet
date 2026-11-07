@@ -32,6 +32,8 @@ private:
     UPROPERTY() TObjectPtr<UMaterialInterface> Material;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Parts;
     UPROPERTY() TArray<TObjectPtr<UTextRenderComponent>> Signs;
+    UPROPERTY() TArray<TObjectPtr<USceneComponent>> DetailParts;
+    void BuildHouseDetails(int32 Slot,const FFiskMarinaIdentity& Identity);
     int32 BuildRevision=0,MessageSerial=0;
     UFUNCTION() void OnRep_Residents();
     void Rebuild();

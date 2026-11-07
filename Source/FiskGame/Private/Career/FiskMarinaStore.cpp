@@ -10,17 +10,19 @@ FString LockName(const FString& File) { return FString::Printf(TEXT("FiskelagetM
 bool Read(const FString& File,const FGuid& Profile,FFiskMarinaIdentity& Out,int32& Revision,bool& Future)
 {
     const int64 Size=IFileManager::Get().FileSize(*File);if(Size<1 || Size>8192) { return false; }
-    FConfigFile C;C.Read(File);int32 Version=0;C.GetInt(Section,TEXT("Version"),Version);Future=Version>1;
+    FConfigFile C;C.Read(File);int32 Version=0;C.GetInt(Section,TEXT("Version"),Version);Future=Version>2;
     FString Id;FFiskMarinaIdentity V;int32 ValidatedRevision=0;
-    if(Version!=1 || C.Num()!=1 || !C.GetString(Section,TEXT("Profile"),Id) || Id!=Profile.ToString(EGuidFormats::Digits)
+    if((Version!=1 && Version!=2) || C.Num()!=1 || !C.GetString(Section,TEXT("Profile"),Id) || Id!=Profile.ToString(EGuidFormats::Digits)
         || !C.GetInt(Section,TEXT("Revision"),ValidatedRevision) || ValidatedRevision<1 || ValidatedRevision>=MAX_int32
         || !C.GetString(Section,TEXT("DisplayName"),V.DisplayName) || !C.GetString(Section,TEXT("HouseName"),V.HouseName)
         || !C.GetInt(Section,TEXT("Color"),V.Color) || !C.GetInt(Section,TEXT("Style"),V.Style) || !C.GetInt(Section,TEXT("Decor"),V.Decor) || !V.IsValid()) { return false; }
+    if(Version==2 && (!C.GetInt(Section,TEXT("Lighting"),V.Lighting) || !C.GetInt(Section,TEXT("Pier"),V.Pier) || !C.GetInt(Section,TEXT("Display"),V.Display) || !V.IsValid())) { return false; }
     Out=V;Revision=ValidatedRevision;return true;
 }
 bool Write(const FString& File,const FGuid& Profile,const FFiskMarinaIdentity& V,int32 Revision)
 {
-    FConfigFile C;C.SetString(Section,TEXT("Version"),TEXT("1"));C.SetString(Section,TEXT("Revision"),*FString::FromInt(Revision));
+    FConfigFile C;C.SetString(Section,TEXT("Version"),(V.Lighting || V.Pier || V.Display)?TEXT("2"):TEXT("1"));
+    if(V.Lighting || V.Pier || V.Display) { C.SetString(Section,TEXT("Lighting"),*FString::FromInt(V.Lighting));C.SetString(Section,TEXT("Pier"),*FString::FromInt(V.Pier));C.SetString(Section,TEXT("Display"),*FString::FromInt(V.Display)); }C.SetString(Section,TEXT("Revision"),*FString::FromInt(Revision));
     C.SetString(Section,TEXT("Profile"),*Profile.ToString(EGuidFormats::Digits));C.SetString(Section,TEXT("DisplayName"),*V.DisplayName);C.SetString(Section,TEXT("HouseName"),*V.HouseName);
     C.SetString(Section,TEXT("Color"),*FString::FromInt(V.Color));C.SetString(Section,TEXT("Style"),*FString::FromInt(V.Style));C.SetString(Section,TEXT("Decor"),*FString::FromInt(V.Decor));C.Dirty=true;
     return C.Write(File) && IFileManager::Get().FileSize(*File)<=8192;

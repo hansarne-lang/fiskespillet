@@ -56,9 +56,11 @@ void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
     const FVector Target=Bar?FVector(-4200,-1900,230):HousePosition(Panel?Panel->GetHouseIndex():0)+FVector(0,0,300);
     Out.Location=Target+(Bar?FVector(1400,-1400,650):FVector(350,-1600,550));Out.Rotation=(Target+FVector(650,0,0)-Out.Location).Rotation();Out.FOV=65;
+    if(Panel && Panel->GetPage()==5) { const FVector P=HousePosition(Panel->GetHouseIndex());Out.Location=P+(Panel->IsHomePreview()?FVector(1450,-3200,2050):FVector(350,-2350,1000));Out.Rotation=(P+(Panel->IsHomePreview()?FVector(0,-450,220):FVector(850,-200,330))-Out.Location).Rotation();Out.FOV=Panel->IsHomePreview()?70:65; }
 }
 void AFiskMarinaHub::Rebuild()
 {
+    for(USceneComponent* P:DetailParts) { if(P) { P->DestroyComponent(); } }DetailParts.Reset();
     for(UStaticMeshComponent* P:Parts) { if(P) { P->DestroyComponent(); } }for(UTextRenderComponent* S:Signs) { if(S) { S->DestroyComponent(); } }Parts.Reset();Signs.Reset();++BuildRevision;
     auto Part=[&](UStaticMesh* Mesh,FVector P,FVector Scale,FLinearColor Color)
     { UStaticMeshComponent* V=FiskVisual::AddPart(this,RootComponent,Mesh,Material,*FString::Printf(TEXT("Hub%d_%d"),BuildRevision,Parts.Num()),P,Scale,Color);Parts.Add(V);return V; };
@@ -77,10 +79,11 @@ void AFiskMarinaHub::Rebuild()
         Text(R?V.HouseName:TEXT("LEDIG NAUST"),P+FVector(0,-310,590),48,FColor(255,232,170));
         Text(R?V.DisplayName:TEXT("VELKOMMEN"),P+FVector(0,-315,525),33,FColor::White);
         Part(Cube,P+FVector(0,225,365),FVector(8,.1,2.6),FLinearColor(.14f,.11f,.08f));
-        if(R) { for(int32 I=0;I<R->Trophies.Num();++I) { const FFiskMarinaTrophy& T=R->Trophies[I];const FVector Q=P+FVector(-300+(I%4)*200,195,415-(I/4)*105);Part(Sphere,Q,FVector(1.1,.12,.35),FLinearColor(.9f,.65f,.17f));Text(FString::Printf(TEXT("%s %.1f kg"),FiskMarina::SpeciesName(T.Species),T.Grams/1000.0),Q+FVector(0,-10,-35),14,FColor::White); } }
+        if(R) { for(int32 I=0;I<R->Trophies.Num();++I) { const FFiskMarinaTrophy& T=R->Trophies[I];const FVector Q=P+FVector(-300+(I%4)*200,195,500-(I/4)*105);Part(Sphere,Q,FVector(1.1,.12,.35),FLinearColor(.9f,.65f,.17f));Text(FString::Printf(TEXT("%s %.1f kg"),FiskMarina::SpeciesName(T.Species),T.Grams/1000.0),Q+FVector(0,-10,-35),14,FColor::White); } }
         if(V.Decor==1) { for(int32 Side:{-1,1}) { Part(Cylinder,P+FVector(Side*520,-430,185),FVector(.8,.8,1),FLinearColor(.37f,.16f,.08f));Part(Sphere,P+FVector(Side*520,-430,290),FVector(1.3,1.3,1.5),FLinearColor(.14f,.42f,.15f)); } }
         if(V.Decor==2) { for(int32 Side:{-1,1}) { Part(Cube,P+FVector(Side*280,-430,150),FVector(2.5,1.2,.2),FLinearColor(.62f,.43f,.24f));Part(Cube,P+FVector(Side*280,-380,210),FVector(2.5,.2,1.2),FLinearColor(.62f,.43f,.24f)); } }
     }
+    for(int32 Slot=0;Slot<4;++Slot) { BuildHouseDetails(Slot,Residents.IsValidIndex(Slot)?Residents[Slot].Identity:FFiskMarinaIdentity()); }
     const FVector Bar(-4200,-1900,0);Part(Cube,Bar+FVector(0,0,115),FVector(22,14,.4),FLinearColor(.54f,.35f,.17f));Part(Cube,Bar+FVector(0,250,220),FVector(14,2,2.1),FLinearColor(.45f,.25f,.1f));
     Part(Cube,Bar+FVector(0,0,700),FVector(23,15,.4),FLinearColor(.47f,.3f,.13f));
     for(int32 Side:{-1,1}) { for(int32 End:{-1,1}) { Part(Cylinder,Bar+FVector(Side*950,End*550,400),FVector(.22,.22,6),FLinearColor(.46f,.3f,.17f)); } }

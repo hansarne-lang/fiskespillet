@@ -67,10 +67,10 @@ void UFiskMarinaPanel::ReceiveIdentity(const FFiskMarinaIdentity& Value)
 }
 void UFiskMarinaPanel::Show(int32 NewPage)
 {
-    Page=NewPage;bEditing=false;Row=0;Draft=Identity;AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
+    Page=NewPage;bShopPreview=false;ShopCategory=0;ShopLevel=0;bEditing=false;Row=0;Draft=Identity;AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
     PC->ReleaseRodInputsForMenu();PC->bShowMouseCursor=Page!=0;
     if(Page) { PC->SetInputMode(FInputModeGameAndUI()); }else { PC->SetInputMode(FInputModeGameOnly()); }
-    if(Page==1) { if(const AFiskMarinaHub* H=FindHub()) { const int32 Own=H->GetResidents().IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});HouseIndex=FMath::Max(0,Own); } }
+    if(Page==1 || Page==5) { if(const AFiskMarinaHub* H=FindHub()) { const int32 Own=H->GetResidents().IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});HouseIndex=FMath::Max(0,Own); } }
     if(PC->PlayerCameraManager) { PC->PlayerCameraManager->SetGameCameraCutThisFrame(); }
 }
 void UFiskMarinaPanel::Choose()
@@ -103,6 +103,16 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
         if(C.Len()==1 && (FChar::IsAlnum(C[0]) || C==TEXT(" ") || C==TEXT("-")) && EditText.Len()<24) { EditText+=C.ToUpper(); }return true;
     }
     if(A.Key==EKeys::Escape || (Page==1 && A.Key==EKeys::H) || (Page==2 && A.Key==EKeys::B) || (Page==3 && A.Key==EKeys::I) || (Page==4 && A.Key==EKeys::U)) { Show(0);return true; }
+    if(Page==1 && A.Key==EKeys::N) { Show(5);return true; }
+    if(Page==5)
+    {
+        if(A.Key==EKeys::H || A.Key==EKeys::N) { Show(1);return true; }
+        if(A.Key==EKeys::V) { bShopPreview=!bShopPreview;return true; }
+        if(A.Key==EKeys::Home) { ShopCategory=ShopLevel=0; }
+        if(A.Key==EKeys::Left) { ShopCategory=(ShopCategory+2)%3; }if(A.Key==EKeys::Right) { ShopCategory=(ShopCategory+1)%3; }
+        if(A.Key==EKeys::Up) { ShopLevel=(ShopLevel+3)%4; }if(A.Key==EKeys::Down || A.Key==EKeys::Tab) { ShopLevel=(ShopLevel+1)%4; }
+        if(A.Key==EKeys::Enter) { ChooseHomeItem(); }return true;
+    }
     if(Page==1 && A.Key==EKeys::U) { Show(4);return true; }
     if(Page==4)
     {
@@ -139,6 +149,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const FLinearColor Teal(.5f,.9f,.84f),Gold(1,.8f,.4f);
     auto T=[&](const FString& Text,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){HUD.DrawText(Text,Color,X*S,Y*S,nullptr,Size*S);};
     const UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const AFiskMarinaHub* Hub=FindHub();
+    if(Page==5) { if(!bShopPreview) { HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.97f),24*S,28*S,610*S,650*S); }DrawHomeShop(HUD,C);return; }
     HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.97f),24*S,28*S,(Page==3 || Page==4?1232:610)*S,650*S);
     if(Page==4)
     {
@@ -177,7 +188,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());if(Settlement && Settlement->GetView().bRevealed) { int32 Y=401;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("Spiller %d | %d levert | $%lld"),R.PlayerId,R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46,Y,.85f,Gold);Y+=26; } }else { T(TEXT("Dagens tavle åpner ved 17:00."),46,420,.95f,Gold); }
         for(int32 I=0;I<5;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46,535+20*I,.73f); }T(TEXT("2 s mellom meldinger. B / Escape: tilbake. Klokken går."),46,652,.78f,Teal);return;
     }
-    T(TEXT("NAUST OG TROFÉVEGG"),46,55,1.65f);T(TEXT("1–4: besøk naust | Egne valg er gratis kosmetikk"),46,105,.85f,Teal);
+    T(TEXT("NAUST OG TROFÉVEGG"),46,55,1.65f);T(TEXT("1–4: besøk | Gratis grunnvalg | N: naustbutikk"),46,105,.85f,Teal);
     const FFiskMarinaResident* R=Hub && Hub->GetResidents().IsValidIndex(HouseIndex)?&Hub->GetResidents()[HouseIndex]:nullptr;
     const bool Own=R && R->Profile==LoadedProfile;T(R?R->Identity.DisplayName:TEXT("Venter på naust ..."),46,150,1.2f,Gold);
     if(Own)
@@ -189,5 +200,5 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
     }
     else if(R) { T(R->Identity.HouseName,46,210,1.3f);T(TEXT("Du besøker en venn. Bare eieren kan endre naustet."),46,265,.82f,Teal);int32 Y=320;for(const FFiskMarinaTrophy& Trophy:R->Trophies) { T(FString::Printf(TEXT("%s: %.1f kg"),FiskCatches::Find(Trophy.Species)->Name,Trophy.Grams/1000.0),46,Y,.95f,Gold);Y+=32; } }
     if(bBlocked && !Own) { T(Status,46,548,.78f,Gold); }
-    T(TEXT("Troféveggen bruker bekreftede rekorder. Dagens"),46,600,.8f,Teal);T(TEXT("nye rekorder vises først ved 17:00. H / Escape: lukk."),46,624,.8f,Teal);
+    T(TEXT("N: kjøp/velg lys, brygge og troféutstilling. Dagens"),46,600,.8f,Teal);T(TEXT("nye rekorder vises først ved 17:00. H / Escape: lukk."),46,624,.8f,Teal);
 }

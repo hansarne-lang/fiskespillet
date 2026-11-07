@@ -18,9 +18,10 @@ public:
     bool HandleKey(const FInputKeyEventArgs& Args);
     void Draw(AHUD& HUD,UCanvas& Canvas);
     bool IsVisible() const { return Page!=0; }
-    bool WantsCamera() const { return Page==1 || Page==2 || Page==4; }
+    bool WantsCamera() const { return Page==1 || Page==2 || Page==4 || Page==5; }
     int32 GetPage() const { return Page; }
     int32 GetHouseIndex() const { return HouseIndex; }
+    bool IsHomePreview() const { return Page==5 && bShopPreview; }
     AFiskMarinaHub* FindHub() const;
     bool IsAtDock() const;
     void ReceiveIdentity(const FFiskMarinaIdentity& Value);
@@ -33,6 +34,11 @@ private:
     FString EditText,Status;
     int32 Page=0,Row=0,Species=0,HouseIndex=0,SentJournalRevision=-1;
     int32 PresetSlot=0;
+    int32 ShopCategory=0,ShopLevel=0,ShopBuyItem=-1;
+    FGuid ShopBuyCommand;
+    bool bShopPreview=false;
+    void ChooseHomeItem();
+    void DrawHomeShop(AHUD& HUD,UCanvas& Canvas);
     double NextUpdate=0;
     FString File() const;
     void Show(int32 NewPage);
@@ -44,5 +50,10 @@ private:
     double SmokeAt=0;
     int64 SmokeCash=0;
     void RunSmoke();
+    FString HomeMode,HomeDirectory;
+    FTimerHandle HomeTimer;
+    int32 HomeStage=0,HomeItem=4;
+    double HomeAt=0;
+    void RunHomeSmoke();
 #endif
 };

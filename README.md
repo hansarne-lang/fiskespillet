@@ -6,7 +6,7 @@ FISKELAGET er et planlagt realistisk, sosialt fiskespill for Windows PC. Inntil 
 
 Spillbar UE5.8-utviklingsversjon med én spiller eller fire over LAN, én aktiv felles båt,15 arter, fem habitater,20-minuttersdager og lagret karriere. Fullversjonens opptil12 spillere og flere samtidige båter er videre arbeid.
 
-v0.17 gir formet skrog/dekk, bevegelig havflate, maritime detaljer, felles fangstlager og synlig sleping med redusert returfart. Se [spillguiden](Docs/Development/OCEAN_CARGO_V017.md). F11 viser last/slep; K viser mannskap. Tidligere turplanlegging, fotovinkler, dagbok, fangstmål, fiskeskole, butikk og sosial marina følger med. Modellene er fortsatt forenklede; ferdig realistisk grafikk påstås ikke.
+v0.18 gir formet skrog/dekk, bevegelig havflate, maritime detaljer, felles fangstlager og synlig sleping med redusert returfart. Se [spillguiden](Docs/Development/OCEAN_CARGO_V017.md). F11 viser last/slep; K viser mannskap. Tidligere turplanlegging, fotovinkler, dagbok, fangstmål, fiskeskole, butikk og sosial marina følger med. Modellene er fortsatt forenklede; ferdig realistisk grafikk påstås ikke.
 
 Windows-pakken startes fra BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra02:00 og F ved fiskeplassen. Alle LAN-deltakere må bruke samme versjon. Kildeutvikling bruker Unreal5.8.4 og verktøyene i DEVELOPMENT.md. Pakken inneholder faktisk test-SHA, kontrollsummer, resultater og kjente begrensninger. Lagringer er lokale; GitHub synkroniserer ikke spillprofiler mellom PC-er.
 
@@ -30,3 +30,6 @@ Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengel
 Endringer går gjennom pull request og relevante kontroller. En oppgave er ikke Done før tester, godkjenning og integrasjon er bekreftet. CI i bootstrapfasen kontrollerer repositoryet; dette er ikke en Unreal-byggtest.
 
 Kjør den lokale repositorykontrollen med `python Tools/Validation/check_repository.py` fra repositoryroten. Kontrollen krever bare Python 3.11 eller nyere og standardbiblioteket.
+
+
+v0.18 Naustliv: H, deretter N, aapner naustbutikken med ni permanente lys-, brygge- og trofepakker. Gratis grunnvalg beholdes. Se [spillguiden](Docs/Development/HARBOUR_LIFE_V018.md).

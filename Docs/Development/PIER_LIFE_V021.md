@@ -12,7 +12,7 @@ Til testing: Å etter napp lar en lokal AI forsøke å lande én fisk med vanlig
 
 En tydelig original klokketone varsler napp på alle egne stenger, også den du ikke har valgt. Tre tonehøyder skiller stengene. Hvert kast varsles én gang; hovedinnstillingen for lyd gjelder, og gamle napp spilles ikke på nytt når lyd slås på.
 
-«Tilbake til marina [R]» er en klikkbar knapp i spillvisningen når du er om bord på sjøen. Kapteinen kan også trykke R. Knappen avbryter aktivt fiske og bruker eksisterende hjemreise med vanlig reisetid; den hopper ikke til oppgjøret. Dagens resultater og penger vises fortsatt først ved 17:00. Passasjerer kan ikke overstyre kapteinen. Gamle returvalg kan ikke starte en ny utreise fra brygga eller snu en hjemreise.
+«Tilbake til marina [R]» er en klikkbar knapp i spillvisningen når du er om bord på sjøen. Kapteinen kan også trykke R. Knappen avbryter aktivt fiske og bruker eksisterende hjemreise med vanlig reisetid; den hopper ikke til oppgjøret. Dagens resultater og penger vises fortsatt først ved 17:00. Passasjerer kan ikke overstyre kapteinen. Gamle returvalg kan ikke starte en ny utreise fra brygga eller snu en hjemreise. Når du lukker kart eller menyer om bord, flyttes pekeren til midten av spillbildet, slik at et gammelt menyklikk ikke blir et klikk på returknappen under fiskekampen.
 
 Gange og kamera er marinaspresentasjon. Ingen endringer i fangsteierskap, mannskap, sjøfart, utstyr, kapasitet, priser eller inntekt. Du må bruke eksisterende ombordstigning og reisevalg. De vanlige 20 minutters døgnene og oppgjøret 17:00 fortsetter mens du går. Ingen privat fangstinformasjon sendes med gangposisjonene. Gangposisjonen er midlertidig for økten; karriere, journal og naust bruker eksisterende lagringsformater.
 

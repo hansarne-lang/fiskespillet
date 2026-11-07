@@ -6,6 +6,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "UI/FiskGameInstance.h"
 #include "Engine/World.h"
+#include "Engine/GameViewportClient.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerState.h"
 #include "Misc/CommandLine.h"
@@ -81,6 +82,25 @@ void UFiskFishingHelp::RunSmoke()
         if(R->GetState()!=EFiskRodState::InitialRun && R->GetState()!=EFiskRodState::Fighting) { return; }
         if(Bell->GetAlertCount()!=1 || (!bSmokeMute && Bell->GetConsumedCount()!=1)) { return; }
         if(Solo && PC->GetSelectedRod()!=0) { Fail(TEXT("passive_bite_was_selected_early"));return; }
+        Key(EKeys::M);
+        int32 Width=0,Height=0;PC->GetViewportSize(Width,Height);const float Scale=FMath::Min(Width/1280.f,Height/720.f);
+        PC->SetMouseLocation(FMath::RoundToInt(1080*Scale),FMath::RoundToInt(195*Scale));
+        SmokeAt=Now;SmokeStage=41;return;
+    }
+    if(SmokeStage==41 && Now-SmokeAt>=.5)
+    {
+        if(HasGameView()) { Fail(TEXT("chart_did_not_open"));return; }
+        Key(EKeys::M);SmokeAt=Now;SmokeStage=42;return;
+    }
+    if(SmokeStage==42 && Now-SmokeAt>=.5)
+    {
+        auto* View=GetWorld()->GetGameViewport();FVector2D Mouse,Size;
+        if(!HasGameView() || !View || !View->GetMousePosition(Mouse)) { Fail(TEXT("chart_close_cursor_missing"));return; }
+        View->GetViewportSize(Size);const float Scale=FMath::Min(Size.X/1280.f,Size.Y/720.f);
+        if(FiskQuickControls::ReturnBox(Scale).IsInside(Mouse) || FiskQuickControls::AssistBox(Scale).IsInside(Mouse)) { Fail(TEXT("chart_cursor_left_on_game_button"));return; }
+        Key(EKeys::LeftMouseButton);
+        if(Boat->GetTripProgress()!=100) { Fail(TEXT("chart_cursor_returned_instead_of_pumping"));return; }
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HELP_CHART_CURSOR_PASSED mode=%s"),*SmokeMode);
         Key(Aa);SmokeAt=Now;SmokeStage=5;return;
     }
     if(SmokeStage==5 && Now-SmokeAt>=1)

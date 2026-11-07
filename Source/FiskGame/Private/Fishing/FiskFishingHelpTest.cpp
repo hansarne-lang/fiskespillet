@@ -83,6 +83,8 @@ bool FFiskReturnGuardTest::RunTest(const FString&)
     {
         TestTrue(TEXT("Return button scales"),FiskQuickControls::ReturnBox(S).IsInside(FVector2D(1080,195)*S));
         TestTrue(TEXT("Help button scales"),FiskQuickControls::AssistBox(S).IsInside(FVector2D(1080,270)*S));
+        TestFalse(TEXT("Post-menu cursor is outside return"),FiskQuickControls::ReturnBox(S).IsInside(FVector2D(640,360)*S));
+        TestFalse(TEXT("Post-menu cursor is outside assistance"),FiskQuickControls::AssistBox(S).IsInside(FVector2D(640,360)*S));
         TestFalse(TEXT("Return and help buttons do not overlap"),FiskQuickControls::ReturnBox(S).Intersect(FiskQuickControls::AssistBox(S)));
     }
     return true;

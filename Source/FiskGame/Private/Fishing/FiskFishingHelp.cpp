@@ -77,6 +77,7 @@ void UFiskFishingHelp::RequestReturn()
 bool UFiskFishingHelp::HandleKey(const FInputKeyEventArgs& Args)
 {
     const bool Press=Args.Event==IE_Pressed,Release=Args.Event==IE_Released;
+    if(Press && Args.Key==EKeys::LeftMouseButton) { bButtonHeld=false; }
     if(Release && Args.Key==EKeys::LeftMouseButton && bButtonHeld) { bButtonHeld=false;return true; }
     if(!HasGameView()) { return false; }
     auto* PC=CastChecked<AFiskBoardingController>(GetOwner());const auto* Boat=PC->FindStarterBoat();
@@ -114,10 +115,13 @@ void UFiskFishingHelp::TickComponent(float Delta,ELevelTick Type,FActorComponent
         {
             FInputModeGameAndUI Mode;Mode.SetHideCursorDuringCapture(false);Mode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
             PC->SetInputMode(Mode);PC->bShowMouseCursor=true;bManagedCursor=true;
+            // A chart click must not become a return-button click on the first pump.
+            int32 Width=0,Height=0;PC->GetViewportSize(Width,Height);
+            PC->SetMouseLocation(Width/2,Height/2);bButtonHeld=false;
         }
         else if(!Aboard && bManagedCursor) { PC->bShowMouseCursor=false;PC->SetInputMode(FInputModeGameOnly());bManagedCursor=false; }
     }
-    else { bManagedCursor=false; }
+    else { bManagedCursor=false;bButtonHeld=false; }
 #if !UE_BUILD_SHIPPING
     if(!bAssisting) { return; }
     const double Now=GetWorld()->GetRealTimeSeconds();

@@ -88,7 +88,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
         if(Boat->GetCrewCount()!=(Solo?1:4)) { return; }
         if(Host)
         {
-            Key(EKeys::M);const FVector Point=Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskMangrove"))?FVector(35000,-60000,0):FVector(26000,8000,0)):FVector(70000,85000,0);
+            Key(EKeys::M);const FVector Point=Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskMangrove"))?FVector(35000,-60000,0):(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?FVector(140000,85000,0):FVector(26000,8000,0))):FVector(70000,85000,0);
             int32 W=0,H=0;GetViewportSize(W,H);const double S=FMath::Min(W/1280.0,H/720.0);
             SetMouseLocation(FMath::RoundToInt((638+Point.X/150000*560)*S),FMath::RoundToInt((355-Point.Y/100000*180)*S));Key(EKeys::LeftMouseButton);
             Shot(TEXT("free-sea-route"));
@@ -97,25 +97,25 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     }
     else if(CareerSmokeStage==7 && Now-CareerSmokeAt>=2)
     {
-        if(Host && FVector::Dist2D(Boat->GetDestination(),Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskMangrove"))?FVector(35000,-60000,0):FVector(26000,8000,0)):FVector(70000,85000,0))>500) { Fail(TEXT("chart_click_did_not_choose_point"));return; }
+        if(Host && FVector::Dist2D(Boat->GetDestination(),Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskMangrove"))?FVector(35000,-60000,0):(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?FVector(140000,85000,0):FVector(26000,8000,0))):FVector(70000,85000,0))>500) { Fail(TEXT("chart_click_did_not_choose_point"));return; }
         if(!Solo && Boat->GetGroundId()!=1) { return; }
         if(Host) { Key(EKeys::M);GI->SaveSeaPlace(0,Boat->GetDestination(),TEXT("EGET SJOPUNKT")); }
         const int32 Expected=Boat->GetRodsFor(Self);
         if(GetRodCapacity()!=Expected || Expected<1 || Expected>3 || (Solo && Expected!=3)) { Fail(TEXT("offshore_allocation_wrong"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_OFFSHORE_ALLOCATION mode=%s player=%d seat=%d rods=%d crew=%d"),*CareerSmokeMode,Self,Boat->GetSeatIndex(Self),Expected,Boat->GetCrewCount());
-        RequestRig(0,Solo?30:80,0);CareerSmokeStage=8;
+        RequestRig(0,Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?90:30):80,0);CareerSmokeStage=8;
     }
-    else if(CareerSmokeStage==8 && First->GetRig().Depth==(Solo?30:80))
+    else if(CareerSmokeStage==8 && First->GetRig().Depth==(Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?90:30):80))
     { if(GetRodCapacity()>1) { Key(EKeys::Two);CareerSmokeStage=9; }else { CareerSmokeStage=12; } }
     else if(CareerSmokeStage==9 && GetSelectedRod()==1 && !IsRodSelectionPending())
-    { RequestRig(1,Solo?40:90,1);CareerSmokeStage=10; }
-    else if(CareerSmokeStage==10 && GetRodAt(1)->GetRig().Depth==(Solo?40:90))
+    { RequestRig(1,Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?100:40):90,1);CareerSmokeStage=10; }
+    else if(CareerSmokeStage==10 && GetRodAt(1)->GetRig().Depth==(Solo?(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?100:40):90))
     { if(GetRodCapacity()==3) { Key(EKeys::Three);CareerSmokeStage=11; }else { Key(EKeys::One);CareerSmokeStage=12; } }
     else if(CareerSmokeStage==11 && GetSelectedRod()==2 && !IsRodSelectionPending())
-    { RequestRig(2,50,2);Key(EKeys::One);CareerSmokeStage=12; }
+    { RequestRig(2,FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?110:50,2);Key(EKeys::One);CareerSmokeStage=12; }
     else if(CareerSmokeStage==12 && GetSelectedRod()==0 && !IsRodSelectionPending())
     {
-        if(Solo && GetRodAt(2)->GetRig().Depth!=50) { return; }
+        if(Solo && GetRodAt(2)->GetRig().Depth!=(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?110:50)) { return; }
         ServerSelectRod(Selection.Revision,Selection.Day,3);Shot(TEXT("offshore-ready"));CareerSmokeStage=120;
     }
     else if(CareerSmokeStage==120)

@@ -121,12 +121,12 @@ void UFiskSeaChart::Draw(AHUD& HUD,UCanvas& Canvas)
     for(int32 I=0;I<FiskGrounds::Count;++I)
     {
         const FFiskFishingGround& G=*FiskGrounds::Find(I);
-        const float Y=(164+77*I)*S;
-        Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(550*S,Y+72*S)));
-        HUD.DrawRect(I==Row?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,498*S,72*S);
-        HUD.DrawText(FString::Printf(TEXT("%s%s"),G.Name,I==Boat->GetGroundId()?(Boat->GetDestination().Equals(G.Position,1)?TEXT("  [VALGT]"):TEXT("  [HABITAT]")):TEXT("")),I==Boat->GetGroundId()?Teal:FLinearColor::White,68*S,Y+5*S,nullptr,1.15f*S);
-        HUD.DrawText(FString::Printf(TEXT("Reise %.1f s  |  Bunn %d m"),G.TravelMs/1000.0*(Boat->GetKind()==1?.8:1.0),G.BottomDepth),FLinearColor::White,68*S,Y+29*S,nullptr,1.0f*S);
-        HUD.DrawText(FString::Printf(TEXT("Fisketegn omtrent %d-%d m"),G.FishDepthMin,G.FishDepthMax),Muted,68*S,Y+51*S,nullptr,0.9f*S);
+        const float Y=(164+60*I)*S;
+        Buttons.Add(FBox2D(FVector2D(52*S,Y),FVector2D(550*S,Y+54*S)));
+        HUD.DrawRect(I==Row?FLinearColor(0.17f,0.39f,0.43f):FLinearColor(0.035f,0.12f,0.16f),52*S,Y,498*S,54*S);
+        HUD.DrawText(FString::Printf(TEXT("%s%s"),G.Name,I==Boat->GetGroundId()?(Boat->GetDestination().Equals(G.Position,1)?TEXT("  [VALGT]"):TEXT("  [HABITAT]")):TEXT("")),I==Boat->GetGroundId()?Teal:FLinearColor::White,68*S,Y+5*S,nullptr,1.f*S);
+        HUD.DrawText(FString::Printf(TEXT("Reise %.1f s  |  Bunn %d m"),G.TravelMs/1000.0*(Boat->GetKind()==1?.8:1.0),G.BottomDepth),FLinearColor::White,68*S,Y+23*S,nullptr,.85f*S);
+        HUD.DrawText(FString::Printf(TEXT("Fisketegn omtrent %d-%d m"),G.FishDepthMin,G.FishDepthMax),Muted,68*S,Y+40*S,nullptr,0.9f*S);
     }
     auto Point=[&](FVector Position){return FVector2D((638+Position.X/150000.0*560)*S,(355-Position.Y/100000.0*180)*S);};
     const FVector2D Marina=Point(FVector::ZeroVector);

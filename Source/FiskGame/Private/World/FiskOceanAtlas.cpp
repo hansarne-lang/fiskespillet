@@ -13,7 +13,11 @@ const FFiskAtlasMark* FiskAtlas::Find(int32 Index)
         {TEXT("Marlinryggen"),FVector(140000,-65000,0),TEXT("Ytterste punkt. Ingen garantifangst.")},
         {TEXT("Mangrovebanken"),FVector(35000,-60000,0),TEXT("Nytt habitat. Fire mangrovearter, fiske ved 20–50 m.")},
         {TEXT("Rotbukta"),FVector(52000,-82000,0),TEXT("Mangroveøyas utside. Ruten holder avstand til røttene.")},
-        {TEXT("Tarponrenna"),FVector(20000,-85000,0),TEXT("Mangrovehabitat. Lange utras krever rolig snørearbeid.")}
+        {TEXT("Tarponrenna"),FVector(20000,-85000,0),TEXT("Mangrovehabitat. Lange utras krever rolig snørearbeid.")},
+        {TEXT("Dyphavsbanken"),FVector(140000,85000,0),TEXT("400 m bunn. Prøv 80–120 m med oppgradert utstyr.")},
+        {TEXT("Tunfiskkanten"),FVector(140000,10000,0),TEXT("Dyphavshabitat øst for øya. Planlegg hjemreisen.")},
+        {TEXT("Sverdfiskryggen"),FVector(145000,65000,0),TEXT("Lang tur. Dype oppsett gir mye line ved første utras.")},
+        {TEXT("Norddjupet"),FVector(130000,95000,0),TEXT("Dyphavshabitat. Artsvalg er fortsatt uforutsigbart.")}
     };return Index>=0 && Index<Count?&Marks[Index]:nullptr;
 }
 int32 FiskAtlas::Nearest(FVector Point,double Radius)

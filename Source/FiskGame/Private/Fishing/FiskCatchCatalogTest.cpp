@@ -4,7 +4,7 @@
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCatchCatalogTest,"Fiskelaget.Content.SpeciesAndDeterminism",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskCatchCatalogTest::RunTest(const FString& Parameters)
 {
-    for(int32 Ground=0;Ground<4;++Ground)
+    for(int32 Ground=0;Ground<5;++Ground)
     {
         TSet<int32> Weights;int32 Counts[FiskCatches::Count]={};
         for(int32 Seed=0;Seed<1024;++Seed)

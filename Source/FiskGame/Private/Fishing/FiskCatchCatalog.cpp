@@ -13,23 +13,27 @@ const FFiskSpecies* FiskCatches::Find(int32 Species)
         {TEXT("Barrakuda"),4000,35000,600,1700,8},
         {TEXT("Tarpon"),12000,90000,800,2300,12},
         {TEXT("Permit"),2000,16000,300,900,9},
-        {TEXT("Snook"),3000,22000,400,1300,8}
+        {TEXT("Snook"),3000,22000,400,1300,8},
+        {TEXT("Storøyet tunfisk"),40000,180000,1200,2600,18},
+        {TEXT("Seilfisk"),15000,90000,1500,3000,16},
+        {TEXT("Sverdfisk"),50000,250000,1700,4000,24},
+        {TEXT("Escolar"),5000,45000,500,1500,11}
     };
     return Species>=0 && Species<Count ? &Catalog[Species] : nullptr;
 }
 int32 FiskCatches::HabitatChance(int32 Ground,int32 Species)
 {
-    static constexpr int32 Chances[FiskGrounds::Count][Count]={{50,10,2,28,8,2,0},{12,40,10,15,12,10,1},{3,15,42,2,12,21,5},{0,0,0,0,0,0,0,35,25,25,15}};
+    static constexpr int32 Chances[FiskGrounds::Count][Count]={{50,10,2,28,8,2,0},{12,40,10,15,12,10,1},{3,15,42,2,12,21,5},{0,0,0,0,0,0,0,35,25,25,15},{0,0,0,0,0,0,0,0,0,0,0,35,25,15,25}};
     return Ground>=0 && Ground<FiskGrounds::Count && Find(Species)?Chances[Ground][Species]:0;
 }
 const TCHAR* FiskCatches::HabitatTip(int32 Species)
 {
-    static const TCHAR* Tips[]={TEXT("Korallrev | 20-40 m | Naturlig agnfisk, rolig"),TEXT("Undervannsskrent | 60-90 m | Agnfisk / metalljigg"),TEXT("Åpent hav | 20-60 m | Blekksprut, pulserende"),TEXT("Rev og skrent | 30-90 m | Naturlig agnfisk, rolig"),TEXT("Revkant og åpent vann | 20-50 m | Blekksprut, aktivt"),TEXT("Åpent hav | 20-60 m | Metalljigg, aktivt"),TEXT("Sjeldent i åpent hav | 30-70 m | Blekksprut / agnfisk"),TEXT("Mangrovebanken | 20-50 m | Metalljigg, aktivt"),TEXT("Mangrovebanken | 20-50 m | Agnfisk, rolig"),TEXT("Mangrovebanken | 20-50 m | Blekksprut, pulserende"),TEXT("Mangrovebanken | 20-50 m | Agnfisk, rolig")};
+    static const TCHAR* Tips[]={TEXT("Korallrev | 20-40 m | Naturlig agnfisk, rolig"),TEXT("Undervannsskrent | 60-90 m | Agnfisk / metalljigg"),TEXT("Åpent hav | 20-60 m | Blekksprut, pulserende"),TEXT("Rev og skrent | 30-90 m | Naturlig agnfisk, rolig"),TEXT("Revkant og åpent vann | 20-50 m | Blekksprut, aktivt"),TEXT("Åpent hav | 20-60 m | Metalljigg, aktivt"),TEXT("Sjeldent i åpent hav | 30-70 m | Blekksprut / agnfisk"),TEXT("Mangrovebanken | 20-50 m | Metalljigg, aktivt"),TEXT("Mangrovebanken | 20-50 m | Agnfisk, rolig"),TEXT("Mangrovebanken | 20-50 m | Blekksprut, pulserende"),TEXT("Mangrovebanken | 20-50 m | Agnfisk, rolig"),TEXT("Dyphavsbanken | 80-120 m | Agnfisk / blekksprut"),TEXT("Dyphavsbanken | 80-120 m | Blekksprut, pulserende"),TEXT("Dyphavsbanken | 80-120 m | Agnfisk, rolig"),TEXT("Dyphavsbanken | 80-120 m | Metalljigg, aktivt")};
     return Find(Species)?Tips[Species]:TEXT("Ukjent art");
 }
 const TCHAR* FiskCatches::FightTip(int32 Species)
 {
-    static const TCHAR* Tips[]={TEXT("Korte utras og lett pumping"),TEXT("Kraftige dykk og jevn motstand"),TEXT("Lange utras og høy utholdenhet"),TEXT("Tunge, korte dykk; hold kontroll på slakk"),TEXT("Raske, hyppige retningsendringer"),TEXT("Svært raske, korte utras"),TEXT("Eksplosive, lange utras og hard motstand"),TEXT("Raske, korte utras; senk under rushet"),TEXT("Lange utras med høy utholdenhet"),TEXT("Hyppige korte utras; pump mellom dem"),TEXT("Jevne dykk med middels motstand")};
+    static const TCHAR* Tips[]={TEXT("Korte utras og lett pumping"),TEXT("Kraftige dykk og jevn motstand"),TEXT("Lange utras og høy utholdenhet"),TEXT("Tunge, korte dykk; hold kontroll på slakk"),TEXT("Raske, hyppige retningsendringer"),TEXT("Svært raske, korte utras"),TEXT("Eksplosive, lange utras og hard motstand"),TEXT("Raske, korte utras; senk under rushet"),TEXT("Lange utras med høy utholdenhet"),TEXT("Hyppige korte utras; pump mellom dem"),TEXT("Jevne dykk med middels motstand"),TEXT("Lange dykk og høy utholdenhet"),TEXT("Raske utras; senk stangen under rushet"),TEXT("Tunge utras og lang kamp"),TEXT("Korte, seige dykk; pump rolig")};
     return Find(Species)?Tips[Species]:TEXT("Ukjent kampmønster");
 }
 int32 FiskCatches::LengthForWeight(const FFiskSpecies& Species,int32 Grams)

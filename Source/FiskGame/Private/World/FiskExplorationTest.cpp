@@ -65,7 +65,7 @@ FFiskJournalEntry Entry(int32 Seed,int32 Species,int32 Ground)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPassportTest,"Fiskelaget.Exploration.ConfirmedPassportCollections",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FFiskPassportTest::RunTest(const FString& Parameters)
 {
-    FFiskJournalModel Empty;const auto None=FiskSeaPassport::Build(Empty,{});TestEqual(TEXT("Fourteen milestones"),None.Num(),14);for(const auto& R:None) { TestFalse(TEXT("No unconfirmed progress"),R.Complete()); }
+    FFiskJournalModel Empty;const auto None=FiskSeaPassport::Build(Empty,{});TestEqual(TEXT("Sixteen milestones"),None.Num(),16);for(const auto& R:None) { TestFalse(TEXT("No unconfirmed progress"),R.Complete()); }
     TArray<FFiskJournalEntry> Entries;for(int32 I=0;I<10;++I) { Entries.Add(PassportTest::Entry(I,I%7,I%3)); }
     FFiskJournalModel J;TestTrue(TEXT("Valid historic fixture"),J.Restore(Entries));TArray<FFiskExpeditionRecord> Records;
     for(int32 I=0;I<5;++I) { FFiskExpeditionRecord R;R.DayId=FGuid::NewGuid();R.Goal=I;R.Weather=I%3;R.bCompleted=true;Records.Add(R); }

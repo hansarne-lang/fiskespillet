@@ -14,7 +14,7 @@ struct FFiskCatchQuery
 };
 namespace FiskCollections
 {
-    constexpr int32 Count=30;
+    constexpr int32 Count=36;
     const TArray<FFiskCollectionGoal>& Catalog();
     int64 Progress(const FFiskJournalModel& Journal,int32 Goal);
     TArray<int32> Search(const FFiskJournalModel& Journal,const FFiskCatchQuery& Query);

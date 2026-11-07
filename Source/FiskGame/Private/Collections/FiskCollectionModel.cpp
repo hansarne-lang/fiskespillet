@@ -8,15 +8,19 @@
 const TArray<FFiskCollectionGoal>& FiskCollections::Catalog()
 {
     static const TArray<FFiskCollectionGoal> Goals=[](){TArray<FFiskCollectionGoal> G;
-        for(int32 I=0;I<FiskCatches::Count;++I) { G.Add({FString(FiskCatches::Find(I)->Name)+TEXT("-samler"),TEXT("Land tre bekreftede fisk av arten"),EFiskCollectionRule::Species,I,3}); }
-        for(int32 I=0;I<FiskGrounds::Count;++I) { G.Add({FiskGrounds::Find(I)->Name,TEXT("Land to bekreftede fisk fra habitatet"),EFiskCollectionRule::Ground,I,2}); }
+        for(int32 I=0;I<11;++I) { G.Add({FString(FiskCatches::Find(I)->Name)+TEXT("-samler"),TEXT("Land tre bekreftede fisk av arten"),EFiskCollectionRule::Species,I,3}); }
+        for(int32 I=0;I<4;++I) { G.Add({FiskGrounds::Find(I)->Name,TEXT("Land to bekreftede fisk fra habitatet"),EFiskCollectionRule::Ground,I,2}); }
         for(int32 I=0;I<3;++I) { G.Add({FFiskRigRules::BaitName(I),TEXT("Land tre bekreftede fisk med agnet"),EFiskCollectionRule::Bait,I,3}); }
         for(int32 I=0;I<3;++I) { G.Add({FString(TEXT("Program: "))+FFiskRigRules::ProgramName(I),TEXT("Land tre bekreftede fisk med programmet"),EFiskCollectionRule::Program,I,3}); }
         for(int32 W:{3000,10000,25000,50000,100000}) { G.Add({FString::Printf(TEXT("Minst %d kg"),W/1000),TEXT("Én bekreftet landet fisk over vektgrensen"),EFiskCollectionRule::Weight,W,1}); }
         G.Add({TEXT("Ti på kroken"),TEXT("Ti bekreftede landinger"),EFiskCollectionRule::Count,0,10});
         G.Add({TEXT("Trygt i havn"),TEXT("Ti bekreftede solgte fisk"),EFiskCollectionRule::Sold,0,10});
         G.Add({TEXT("Hundre kilo levert"),TEXT("100 kg bekreftet solgt fangst; fremgang i gram"),EFiskCollectionRule::DeliveredWeight,0,100000});
-        G.Add({TEXT("Alle elleve"),TEXT("Oppdag alle elleve arter i egen bekreftede journal"),EFiskCollectionRule::Diversity,0,11});return G;
+        G.Add({TEXT("Elleve arter"),TEXT("Oppdag elleve ulike arter i egen bekreftede journal"),EFiskCollectionRule::Diversity,0,11});
+        // Persisted IDs 0–29 from v0.14 never move when the species catalog grows.
+        for(int32 I=11;I<15;++I) { G.Add({FString(FiskCatches::Find(I)->Name)+TEXT("-samler"),TEXT("Land tre bekreftede fisk av arten"),EFiskCollectionRule::Species,I,3}); }
+        G.Add({TEXT("Dyphavsbanken"),TEXT("Land to bekreftede fisk fra dyphavet"),EFiskCollectionRule::Ground,4,2});
+        G.Add({TEXT("Alle femten"),TEXT("Oppdag alle femten arter i egen bekreftede journal"),EFiskCollectionRule::Diversity,0,15});return G;
     }();return Goals;
 }
 int64 FiskCollections::Progress(const FFiskJournalModel& J,int32 Goal)

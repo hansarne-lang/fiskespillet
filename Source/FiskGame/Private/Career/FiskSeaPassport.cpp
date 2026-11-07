@@ -7,10 +7,10 @@
 #include "HAL/FileManager.h"
 TArray<FFiskSeaMilestone> FiskSeaPassport::Build(const FFiskJournalModel& J,const TArray<FFiskExpeditionRecord>& Expeditions)
 {
-    TSet<int32> MangroveSpecies;TSet<int32> Species,Habitats,Baits,Marks,Goals,Weather;TSet<FGuid> Days;int64 Sold=0,Grams=0,Offshore=0,Upgraded=0;
+    TSet<int32> DeepSpecies;TSet<int32> MangroveSpecies;TSet<int32> Species,Habitats,Baits,Marks,Goals,Weather;TSet<FGuid> Days;int64 Sold=0,Grams=0,Offshore=0,Upgraded=0;
     for(const auto& E:J.GetEntries())
     {
-        if(!E.IsValid()) { continue; }Species.Add(E.Fish.Species);if(E.Fish.Species>=7) { MangroveSpecies.Add(E.Fish.Species); }Habitats.Add(E.Context.Ground);Baits.Add(E.Context.Bait);Days.Add(E.DayId);
+        if(!E.IsValid()) { continue; }Species.Add(E.Fish.Species);if(E.Fish.Species>=7 && E.Fish.Species<=10) { MangroveSpecies.Add(E.Fish.Species); }if(E.Fish.Species>=11) { DeepSpecies.Add(E.Fish.Species); }Habitats.Add(E.Context.Ground);Baits.Add(E.Context.Bait);Days.Add(E.DayId);
         Sold+=E.bSold?1:0;Grams+=E.bSold?E.Fish.WeightGrams:0;Offshore+=E.Context.BoatKind==1?1:0;Upgraded+=E.Context.Equipment==7?1:0;
         if(E.Context.bHasSeaPoint) { const int32 Mark=FiskAtlas::Nearest(E.Context.SeaPoint);if(Mark>=0) { Marks.Add(Mark); } }
     }
@@ -30,7 +30,9 @@ TArray<FFiskSeaMilestone> FiskSeaPassport::Build(const FFiskJournalModel& J,cons
         {TEXT("Ekspedisjonsveteran"),TEXT("Fem fullførte ekspedisjoner"),Medals,5},
         {TEXT("Allværsfisker"),TEXT("Fullført ekspedisjon i alle tre værtypene"),Weather.Num(),3},
         {TEXT("Mangroveutforsker"),TEXT("Alle fire mangroveartene oppdaget"),MangroveSpecies.Num(),4},
-        {TEXT("Hele havet"),TEXT("Bekreftet fangst fra fire habitater"),Habitats.Num(),4}
+        {TEXT("Hele havet"),TEXT("Bekreftet fangst fra fire habitater"),Habitats.Num(),4},
+        {TEXT("Dyphavsutforsker"),TEXT("Alle fire dyphavsartene oppdaget"),DeepSpecies.Num(),4},
+        {TEXT("Fem havmiljøer"),TEXT("Bekreftet fangst fra fem habitater"),Habitats.Num(),5}
     };
 }
 FString FiskSeaPassport::Csv(const FFiskJournalModel& J)

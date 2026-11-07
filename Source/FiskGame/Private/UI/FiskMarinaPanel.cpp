@@ -195,7 +195,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
                 T(R.Identity.DisplayName+TEXT(" | ")+(R.PlayerId<0?TEXT("Frakoblet"):Sea?TEXT("På sjøen"):TEXT("Ved marinaen")),46+(I/6)*285,158+(I%6)*26,.84f);++I;
             }
             const int32 Start=FMath::Max(0,Hub->GetMessages().Num()-3);
-            for(int32 I=Start;I<Hub->GetMessages().Num();++I) { const auto& M=Hub->GetMessages()[I];T(M.Name+TEXT(": ")+AFiskMarinaHub::Phrase(M.Code),46,328+(I-Start)*27,.72f,Teal); }
+            for(int32 MessageIndex=Start;MessageIndex<Hub->GetMessages().Num();++MessageIndex) { const auto& M=Hub->GetMessages()[MessageIndex];T(M.Name+TEXT(": ")+AFiskMarinaHub::Phrase(M.Code),46,328+(MessageIndex-Start)*27,.72f,Teal); }
         }
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
         if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("Spiller %d | %d levert | $%lld"),R.PlayerId,R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,425+(I%4)*24,.75f,Gold);++I; } }

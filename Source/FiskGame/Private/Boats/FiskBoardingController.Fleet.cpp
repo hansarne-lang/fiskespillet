@@ -39,17 +39,17 @@ TArray<AFiskStarterBoat*> AFiskBoardingController::FleetBoats() const
 void AFiskBoardingController::ServerFleetSelect_Implementation(int32 Index,bool CreateOwn)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* D=GetWorld()->GetGameState<AFiskDayState>();
-    const int32 Player=PlayerState?PlayerState->GetPlayerId():-1;auto* Old=M?M->GetBoatForPlayer(Player):nullptr;
-    auto Reject=[&](){ClientActionFeedback(TEXT("Båtbytte avvist. Velg en ledig båt ved brygga før avreise; etter turen venter du til neste dag."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECT_REJECTED player=%d index=%d"),Player,Index);};
-    if(!M || !D || !D->HasStarted() || !IsCareerSynced() || Player<0 || D->GetElapsedMilliseconds()>=1020000
-        || (Old && Old->IsAboard(Player) && Old->GetTripProgress()!=-1)) { Reject();return; }
+    const int32 PlayerId=PlayerState?PlayerState->GetPlayerId():-1;auto* Old=M?M->GetBoatForPlayer(PlayerId):nullptr;
+    auto Reject=[&](){ClientActionFeedback(TEXT("Båtbytte avvist. Velg en ledig båt ved brygga før avreise; etter turen venter du til neste dag."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECT_REJECTED player=%d index=%d"),PlayerId,Index);};
+    if(!M || !D || !D->HasStarted() || !IsCareerSynced() || PlayerId<0 || D->GetElapsedMilliseconds()>=1020000
+        || (Old && Old->IsAboard(PlayerId) && Old->GetTripProgress()!=-1)) { Reject();return; }
     for(int32 Slot=0;Slot<3;++Slot) { if(!GetRodAt(Slot)->CanConfigure()) { Reject();return; } }
     AFiskStarterBoat* Target=CreateOwn?M->CreateOwnedBoat(this):M->GetFleet().IsValidIndex(Index)?M->GetFleet()[Index].Get():nullptr;
-    if(!Target || Target->GetTripProgress()!=-1 || (!Target->IsAboard(Player) && Target->GetCrewCount()>=Target->GetCapacity())) { Reject();return; }
-    if(Old && Old!=Target && Old->IsAboard(Player)) { Old->Leave(Player); }
-    SelectedFleetBoat=Target;Target->Board(Player);ResetRodForDay(D->GetDayNumber());ForceNetUpdate();
+    if(!Target || Target->GetTripProgress()!=-1 || (!Target->IsAboard(PlayerId) && Target->GetCrewCount()>=Target->GetCapacity())) { Reject();return; }
+    if(Old && Old!=Target && Old->IsAboard(PlayerId)) { Old->Leave(PlayerId); }
+    SelectedFleetBoat=Target;Target->Board(PlayerId);ResetRodForDay(D->GetDayNumber());ForceNetUpdate();
     ClientActionFeedback(FString::Printf(TEXT("Om bord i båt %d. O: din båts turplan. J: ekspedisjon. R: avreise fra 02:00."),Target->GetFleetIndex()+1));
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECTED player=%d boat=%d owner=%d crew=%d"),Player,Target->GetFleetIndex(),Target->GetOwnerId(),Target->GetCrewCount());
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECTED player=%d boat=%d owner=%d crew=%d"),PlayerId,Target->GetFleetIndex(),Target->GetOwnerId(),Target->GetCrewCount());
 }
 void AFiskBoardingController::ServerFleetLeave_Implementation()
 {
@@ -93,11 +93,11 @@ void AFiskBoardingController::DrawFleet(AHUD& H,UCanvas& C)
     T(TEXT("Piler / klikk: velg | Enter: gå om bord | C: hent din egen båt | L: gå i land | Tab / Escape: lukk"),48,144,.92f);
     for(int32 I=0;I<Boats.Num();++I)
     {
-        const auto* B=Boats[I];FString Owner=TEXT("Frakoblet");if(D) { for(const auto* P:D->PlayerArray) { if(P && P->GetPlayerId()==B->GetOwnerId()) { Owner=P->GetPlayerName();break; } } }
+        const auto* B=Boats[I];FString OwnerName=TEXT("Frakoblet");if(D) { for(const auto& P:D->PlayerArray) { if(P && P->GetPlayerId()==B->GetOwnerId()) { OwnerName=P->GetPlayerName();break; } } }
         const int32 P=B->GetTripProgress();const TCHAR* Status=P==-1?TEXT("Ved brygga"):P<100?TEXT("På vei ut"):P==100?TEXT("Fisker"):P<200?TEXT("På vei hjem"):TEXT("Hjemme");
         const bool Here=PlayerState && B->IsAboard(PlayerState->GetPlayerId());const bool Own=PlayerState && B->GetOwnerId()==PlayerState->GetPlayerId();
         const float Y=176+34*I;H.DrawRect(I==FleetRow?FLinearColor(.14f,.34f,.36f):FLinearColor(.03f,.12f,.15f),40*S,Y*S,1195*S,31*S);
-        T(FString::Printf(TEXT("%02d  %s%s | %s | %d/%d om bord | %s%s"),B->GetFleetIndex()+1,*Owner,Own?TEXT(" [DIN]"):TEXT(""),B->GetKind()==1?TEXT("Offshore"):TEXT("Startbåt"),B->GetCrewCount(),B->GetCapacity(),Status,Here?TEXT(" [OM BORD]"):TEXT("")),52,Y+7,.96f,Here?Gold:Teal);
+        T(FString::Printf(TEXT("%02d  %s%s | %s | %d/%d om bord | %s%s"),B->GetFleetIndex()+1,*OwnerName,Own?TEXT(" [DIN]"):TEXT(""),B->GetKind()==1?TEXT("Offshore"):TEXT("Startbåt"),B->GetCrewCount(),B->GetCapacity(),Status,Here?TEXT(" [OM BORD]"):TEXT("")),52,Y+7,.96f,Here?Gold:Teal);
     }
     T(GetActionFeedback(),48,603,.9f,Gold);T(TEXT("Bytt mannskap ved startbrygga. Hver båt har egen rute, kaptein, last og returfrist."),48,637,.92f,Teal);
     T(TEXT("Vekt og verdi er skjult til 17:00. Den enkelte fangstens båt avgjør om den kommer frem i tide."),48,659,.85f,Teal);

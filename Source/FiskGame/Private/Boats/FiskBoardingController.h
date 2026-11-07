@@ -94,6 +94,13 @@ public:
     bool IsRodSelectionPending() const { return PendingRod>=0; }
     int32 GetCameraView() const { return CameraView; }
 #if WITH_DEV_AUTOMATION_TESTS
+    void RunFleetSmoke();
+    int32 FleetRole=-1,FleetStage=0;
+    FString FleetDir;
+    FTimerHandle FleetTimer;
+    double FleetAt=0;
+    int64 FleetBaseCash=0;
+    bool bFleetPrivacyLogged=false,bFleetAttackSent=false;
     void RunCargoSmoke();
     FString CargoMode,CargoDir;FTimerHandle CargoTimer;
     int32 CargoStage=0,CargoLandings=0;double CargoAt=0;int64 CargoPaidCash=0;

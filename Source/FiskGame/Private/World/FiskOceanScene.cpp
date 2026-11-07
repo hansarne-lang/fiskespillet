@@ -171,8 +171,8 @@ void AFiskOceanScene::BeginPlay()
 void AFiskOceanScene::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    const auto* Local=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
-    const auto* Boats=Local?Local->FindStarterBoat():nullptr;
+    const auto* LocalPC=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
+    const auto* Boats=LocalPC?LocalPC->FindStarterBoat():nullptr;
     const FVector Center = Boats ? Boats->GetActorLocation() : FVector::ZeroVector;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     const double Time = Day ? Day->GetElapsedRealSeconds() : GetWorld()->GetTimeSeconds();

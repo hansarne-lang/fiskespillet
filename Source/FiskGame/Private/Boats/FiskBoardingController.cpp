@@ -156,6 +156,8 @@ void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFleetRole="),FleetRole) && FleetRole>=0 && FleetRole<12)
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FleetDir);GetWorldTimerManager().SetTimer(FleetTimer,this,&AFiskBoardingController::RunFleetSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCargoSmoke="),CargoMode))
     { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CargoDir);GetWorldTimerManager().SetTimer(CargoTimer,this,&AFiskBoardingController::RunCargoSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),CollectionMode))

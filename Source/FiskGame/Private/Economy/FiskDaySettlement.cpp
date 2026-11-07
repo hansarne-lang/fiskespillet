@@ -49,7 +49,7 @@ void AFiskDaySettlement::Tick(float DeltaSeconds)
     TMap<FGuid,int32> Arrivals;for(const auto& Pair:CatchBoats) { Arrivals.Add(Pair.Key,Pair.Value.IsValid()?Pair.Value->GetMarinaArrivalMs(NowMs):-1); }
     if(Ledger.SettleFleet(NowMs,Arrivals))
     {
-        for(auto* B:Mode->GetFleet()) { B->RevealCargo(); }
+        for(auto B:Mode->GetFleet()) { B->RevealCargo(); }
         View.Results = Ledger.GetResults();
         View.DayNumber = Day->GetDayNumber();
         if (History.Append(View.DayNumber, NowMs, Ledger)) { HistoryView = History.GetDays(); }

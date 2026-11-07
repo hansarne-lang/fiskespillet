@@ -15,7 +15,7 @@ AFiskStarterBoat* AFiskBootstrapGameMode::SpawnFleetBoat(int32 Player)
 }
 AFiskStarterBoat* AFiskBootstrapGameMode::GetBoatForPlayer(int32 Player) const
 {
-    for(auto* B:Fleet) { if(B->IsAboard(Player)) { return B; } }
+    for(auto B:Fleet) { if(B->IsAboard(Player)) { return B.Get(); } }
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
     { const auto* PC=Cast<AFiskBoardingController>(It->Get());if(PC && PC->PlayerState && PC->PlayerState->GetPlayerId()==Player && PC->GetSelectedFleetBoat()) { return PC->GetSelectedFleetBoat(); } }
     return StarterBoat;
@@ -23,7 +23,7 @@ AFiskStarterBoat* AFiskBootstrapGameMode::GetBoatForPlayer(int32 Player) const
 void AFiskBootstrapGameMode::RegisterFleetCareer(int32 Player,const FGuid& Profile)
 {
     if(const int32* Slot=OwnedFleet.Find(Profile);Slot && Fleet.IsValidIndex(*Slot)) { Fleet[*Slot]->SetOwnerPlayer(Player);return; }
-    for(auto* B:Fleet) { if(B->GetOwnerId()==Player) { OwnedFleet.Add(Profile,B->GetFleetIndex());return; } }
+    for(auto B:Fleet) { if(B->GetOwnerId()==Player) { OwnedFleet.Add(Profile,B->GetFleetIndex());return; } }
 }
 AFiskStarterBoat* AFiskBootstrapGameMode::CreateOwnedBoat(AFiskBoardingController* PC)
 {

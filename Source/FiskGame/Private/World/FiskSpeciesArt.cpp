@@ -29,13 +29,13 @@ FFiskMarineMesh FiskSpeciesArt::Body(int32 Species)
     FFiskMarineMesh M;const auto* P=Find(Species);if(!P) { return M; }constexpr int32 Rings=22,Sides=20;
     for(int32 I=0;I<=Rings;++I)
     {
-        const double T=I/static_cast<double>(Rings),Radius=FMath::Max(.015,FMath::Pow(FMath::Sin(PI*T),.7));
+        const double T=I/static_cast<double>(Rings),Radius=FMath::Max(.015,FMath::Pow(FMath::Max(0.,FMath::Sin(PI*T)),.7));
         const double TailNarrow=T<.2?.28+T*3.6:1,Forehead=Species==4 && T>.65?1.2:1;
         for(int32 J=0;J<Sides;++J) { const double A=2*PI*J/Sides;V(M,FVector((T-.5)*P->Length,FMath::Cos(A)*P->Width*Radius*TailNarrow,FMath::Sin(A)*P->Height*Radius*TailNarrow*Forehead)); }
         if(I) { for(int32 J=0;J<Sides;++J) { const int32 A=(I-1)*Sides+J,B=(I-1)*Sides+(J+1)%Sides,C=I*Sides+(J+1)%Sides,D=I*Sides+J;Tri(M,A,B,C);Tri(M,A,C,D); } }
     }
     for(int32 End=0;End<2;++End) { const int32 C=V(M,FVector((End?.5:-.5)*P->Length,0,0)),Base=End?Rings*Sides:0;for(int32 J=0;J<Sides;++J) { if(End) { Tri(M,C,Base+J,Base+(J+1)%Sides); }else { Tri(M,C,Base+(J+1)%Sides,Base+J); } } }
-    if(P->Bill>0) { const int32 Base=M.Vertices.Num();for(int32 J=0;J<12;++J) { const double A=J*2*PI/12;V(M,FVector(P->Length*.45,FMath::Cos(A)*7,FMath::Sin(A)*(Species==13?3:7))); }const int32 Tip=V(M,FVector(P->Length*.5+P->Bill,0,0));for(int32 J=0;J<12;++J) { Tri(M,Base+J,Tip,Base+(J+1)%12); } }
+    if(P->Bill>0) { const int32 Base=M.Vertices.Num();for(int32 J=0;J<12;++J) { const double A=J*2*PI/12;V(M,FVector(P->Length*.45,FMath::Cos(A)*7,FMath::Sin(A)*(Species==13?3:7))); }const int32 Tip=V(M,FVector(P->Length*.5+P->Bill,0,0));for(int32 J=0;J<12;++J) { Tri(M,Base+J,Base+(J+1)%12,Tip); } }
     M.Finish();return M;
 }
 FFiskMarineMesh FiskSpeciesArt::Fins(int32 Species)

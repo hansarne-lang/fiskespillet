@@ -46,11 +46,12 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         const auto Identity=GetMarinaPanel()->GetIdentity();const FString Name=FString::Printf(TEXT("FLEET%02d"),FleetRole);
         if(Identity.DisplayName!=Name || PlayerState->GetPlayerName()!=Name) { auto Changed=Identity;Changed.DisplayName=Name;ServerMarinaIdentity(GI->Career.Id,Changed);return; }
-        if(bFleetResume && FleetRole==1) { ServerFleetSelect(-1,true);Key(EKeys::E);FleetAt=Real;FleetStage=60; }
+        if(bFleetResume && FleetRole==1) { FleetBaseCash=GI->Career.Cash;ServerFleetSelect(-1,true);Key(EKeys::E);FleetAt=Real;FleetStage=60; }
         else { Key(EKeys::Tab);Key(EKeys::C);Key(EKeys::Tab);FleetAt=Real;FleetStage=1; }
     }
     else if(FleetStage==60 && Real-FleetAt>=3)
     {
+        if(!OwnedBy(1) || D->PlayerArray.Num()!=12) { if(Real-FleetAt>30) { Fail(TEXT("reconnect_roster_missing")); }return; }
         for(auto* Boat:FleetBoats()) { if(Boat->IsAboard(SelfId)) { Fail(TEXT("reconnect_bypassed_voyage_lock"));return; } }
         if(!OwnedBy(1) || FleetBoats().Num()!=12) { Fail(TEXT("reconnect_lost_owned_boat"));return; }
         FleetBaseCash=GI->Career.Cash;FleetStage=40;

@@ -14,7 +14,21 @@ void UFiskSkipperPanel::DrawBook(AHUD& H,UCanvas& C)
     auto T=[&](const FString& V,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){H.DrawText(V,Color,X*S,Y*S,nullptr,Size*S);};
     H.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);T(TEXT("MIN FISKEDAGBOK"),48,55,2.f);
     T(FString::Printf(TEXT("%d fangstturer | %lld landet | %.1f kg landet | %lld fiskepenger fra solgt fangst"),Days.Num(),static_cast<long long>(All.Count),All.WeightGrams/1000.0,static_cast<long long>(All.Income)),48,106,1.05f,Teal);
-    const TCHAR* Tabs[]={TEXT("TURER"),TEXT("ARTER"),TEXT("HABITATER"),TEXT("AGN")};T(FString::Printf(TEXT("Tab: %s | Piler: velg tur | PgUp/PgDn: bla | F10: eksporter valgt tur"),Tabs[Tab]),48,148,.98f);
+    const TCHAR* Tabs[]={TEXT("TURER"),TEXT("ARTER"),TEXT("HABITATER"),TEXT("AGN"),TEXT("SAMMENLIGN")};T(FString::Printf(TEXT("Tab: %s | Piler: velg tur | PgUp/PgDn: bla | F10: eksporter valgt tur"),Tabs[Tab]),48,148,.98f);
+    if(Tab==4)
+    {
+        T(TEXT("Piler velger tur | 1 setter A | 2 setter B | F10 eksporterer sammenligning"),48,200,1.f,Gold);
+        if(Days.Num()<2) { T(TEXT("Du trenger to ulike bekreftede fangstturer. Nye fangster vises først etter 17:00."),48,280,1.05f,Teal); }
+        else
+        {
+            CompareA=FMath::Clamp(CompareA,0,Days.Num()-1);CompareB=FMath::Clamp(CompareB,0,Days.Num()-1);const auto& A=Days[CompareA];const auto& B=Days[CompareB];
+            T(FString::Printf(TEXT("Valgt rad %d: dag %d | A: dag %d (%d) | B: dag %d (%d)"),DayRow+1,Days[DayRow].Number,A.Number,CompareA+1,B.Number,CompareB+1),48,242,1.05f,Teal);
+            if(CompareA==CompareB) { T(TEXT("Velg to ulike turer med piler og 1/2."),48,292,1.1f,Gold); }
+            const FString Values[]={FString::Printf(TEXT("Landinger       %d                    %d"),A.Count,B.Count),FString::Printf(TEXT("Solgt / tapt    %d / %d               %d / %d"),A.Sold,A.Lost,B.Sold,B.Lost),FString::Printf(TEXT("Landet kg       %.1f                 %.1f"),A.Grams/1000.,B.Grams/1000.),FString::Printf(TEXT("Solgt inntekt   %lld                 %lld"),static_cast<long long>(A.Income),static_cast<long long>(B.Income)),FString::Printf(TEXT("Største kg      %.1f                 %.1f"),A.Best/1000.,B.Best/1000.),FString::Printf(TEXT("Arter/habitater %d / %d               %d / %d"),A.Species.Num(),A.Grounds.Num(),B.Species.Num(),B.Grounds.Num()),FString::Printf(TEXT("Kamp min        %.1f                 %.1f"),A.FightMs/60000.,B.FightMs/60000.)};
+            for(int32 I=0;I<7;++I) { T(Values[I],48,318+32*I,1.08f,I%2?FLinearColor::White:Teal); }
+        }
+        T(Message,48,601,.92f,Gold);T(TEXT("Y / Escape: lukk | Bare egen bekreftet journal; tapt fangst gir ingen inntekt"),48,644,.88f,Teal);return;
+    }
     if(Tab==0)
     {
         if(Days.IsEmpty()) { T(TEXT("Ingen bekreftede fangstturer ennå. Dagens nye fangster vises først etter oppgjøret 17:00."),48,222,1.08f); }

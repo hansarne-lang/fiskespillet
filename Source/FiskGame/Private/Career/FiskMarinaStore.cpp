@@ -22,7 +22,7 @@ bool Read(const FString& File,const FGuid& Profile,FFiskMarinaIdentity& Out,int3
 bool Write(const FString& File,const FGuid& Profile,const FFiskMarinaIdentity& V,int32 Revision)
 {
     FConfigFile C;C.SetString(Section,TEXT("Version"),(V.Lighting || V.Pier || V.Display)?TEXT("2"):TEXT("1"));
-    if(V.Lighting || V.Pier || V.Display) { C.SetInt(Section,TEXT("Lighting"),V.Lighting);C.SetInt(Section,TEXT("Pier"),V.Pier);C.SetInt(Section,TEXT("Display"),V.Display); }C.SetString(Section,TEXT("Revision"),*FString::FromInt(Revision));
+    if(V.Lighting || V.Pier || V.Display) { C.SetString(Section,TEXT("Lighting"),*FString::FromInt(V.Lighting));C.SetString(Section,TEXT("Pier"),*FString::FromInt(V.Pier));C.SetString(Section,TEXT("Display"),*FString::FromInt(V.Display)); }C.SetString(Section,TEXT("Revision"),*FString::FromInt(Revision));
     C.SetString(Section,TEXT("Profile"),*Profile.ToString(EGuidFormats::Digits));C.SetString(Section,TEXT("DisplayName"),*V.DisplayName);C.SetString(Section,TEXT("HouseName"),*V.HouseName);
     C.SetString(Section,TEXT("Color"),*FString::FromInt(V.Color));C.SetString(Section,TEXT("Style"),*FString::FromInt(V.Style));C.SetString(Section,TEXT("Decor"),*FString::FromInt(V.Decor));C.Dirty=true;
     return C.Write(File) && IFileManager::Get().FileSize(*File)<=8192;

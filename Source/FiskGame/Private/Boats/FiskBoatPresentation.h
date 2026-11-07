@@ -8,6 +8,7 @@ class UStaticMesh;
 class UStaticMeshComponent;
 class UMaterialInterface;
 class USceneComponent;
+class UProceduralMeshComponent;
 
 UCLASS()
 class UFiskBoatPresentation final : public UActorComponent
@@ -25,6 +26,9 @@ private:
     UPROPERTY() TObjectPtr<USceneComponent> VisualRoot;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> RodSections;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Wake;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> TowFish;
+    UPROPERTY() TObjectPtr<UStaticMeshComponent> TowRope;
+    bool bReportedTow=false;
     FVector SmoothedWorldPosition = FVector::ZeroVector;
 #if WITH_DEV_AUTOMATION_TESTS
     FString ScreenshotDirectory;

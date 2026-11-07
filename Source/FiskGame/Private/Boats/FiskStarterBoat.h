@@ -4,6 +4,7 @@
 #include "GameFramework/Info.h"
 #include "Fishing/FiskFishVisualState.h"
 #include "FiskBoatLayout.h"
+#include "Boats/FiskCargoModel.h"
 #include "FiskStarterBoat.generated.h"
 
 USTRUCT()
@@ -32,6 +33,11 @@ public:
     static constexpr int32 AtMarina = 200;
 
     AFiskStarterBoat();
+    const FFiskCargoModel& GetCargo() const { return Cargo; }
+    const FFiskCargoView& GetCargoView() const { return CargoView; }
+    void AcceptCargo(const FFiskCargoModel& Candidate);
+    void RevealCargo();
+    int32 GetReturnTravelMs() const { return FFiskCargoModel::ReturnDuration(GetTravelMs(),CargoView.Mode==static_cast<uint8>(EFiskCargoMode::Towing)); }
     int32 GetKind() const { return Kind; }
     int32 GetCapacity() const { return FiskBoatLayout::Seats(Kind); }
     int32 GetHolderCount() const { return FiskBoatLayout::Holders(Kind); }
@@ -90,6 +96,12 @@ public:
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+    FFiskCargoModel Cargo;
+    UPROPERTY(ReplicatedUsing=OnRep_CargoView) FFiskCargoView CargoView;
+    UFUNCTION() void OnRep_CargoView();
+    bool bCargoReturnPending=false;
+    bool ReturnHome(int32 NowMs);
+    void ForceCargoReturn(int32 NowMs);
     UPROPERTY(Replicated) int32 Kind=0;
     UPROPERTY(Replicated) TArray<uint8> RodActivities;
     UPROPERTY(Replicated) TArray<FFiskFishVisualState> FishVisuals;

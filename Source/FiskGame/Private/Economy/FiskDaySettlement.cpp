@@ -21,8 +21,11 @@ void AFiskDaySettlement::BeginPlay()
 bool AFiskDaySettlement::RegisterCatch(const FGuid& CatchId, int32 PlayerId,const FFiskCatchData& Fish,const FFiskCatchContext& Context)
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
-    return HasAuthority() && Day && Day->HasStarted()
-        && Ledger.Record(CatchId, PlayerId, Day->GetElapsedMilliseconds(),Fish,Context);
+    const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();auto* Boat=Mode?Mode->GetStarterBoat():nullptr;
+    if(!HasAuthority() || !Day || !Day->HasStarted() || !Boat || !Boat->IsAboard(PlayerId) || Boat->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot) { return false; }
+    auto Candidate=Boat->GetCargo();const auto Result=Candidate.Add(Boat->GetKind(),CatchId,Fish.WeightGrams);
+    if(Result==EFiskCargoResult::Rejected || !Ledger.Record(CatchId,PlayerId,Day->GetElapsedMilliseconds(),Fish,Context,Result!=EFiskCargoResult::Uncarryable)) { return false; }
+    Boat->AcceptCargo(Candidate);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_ACCEPT result=%d mode=%d"),static_cast<int32>(Result),static_cast<int32>(Candidate.Mode));return true;
 }
 
 void AFiskDaySettlement::ResetForDay(int32 DayNumber)
@@ -46,6 +49,7 @@ void AFiskDaySettlement::Tick(float DeltaSeconds)
     const int32 ArrivalMs = Mode->GetStarterBoat()->GetMarinaArrivalMs(NowMs);
     if (Ledger.Settle(NowMs, ArrivalMs))
     {
+        Mode->GetStarterBoat()->RevealCargo();
         View.Results = Ledger.GetResults();
         View.DayNumber = Day->GetDayNumber();
         if (History.Append(View.DayNumber, NowMs, Ledger)) { HistoryView = History.GetDays(); }

@@ -45,7 +45,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
             TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),
             TEXT("H/U/B/I: naust, utstyrsrom, strandbar og artsbok. J: ekspedisjon. L: sjøpass."),
-            TEXT("Q: fiskeassistent | O: turplan | Y: dagbok | F9: foto | M + A: atlas")};
+            TEXT("Q: fiskeassistent | O: turplan | Y: dagbok | F9: foto | F11: last/slep")};
         for(int32 I=0;I<Lines.Num();++I) { HUD.DrawText(Lines[I],FLinearColor::White,52*S,(126+36*I)*S,nullptr,1.05f*S); }
         HUD.DrawText(TEXT("F1 / Escape: lukk. Dagen slutter ved 20:00."),FLinearColor(0.5f,0.9f,0.8f),52*S,620*S,nullptr,1.0f*S);
         return;

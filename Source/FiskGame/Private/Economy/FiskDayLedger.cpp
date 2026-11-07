@@ -4,14 +4,14 @@ bool FFiskDayLedger::Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAt
 {
     return Record(CatchId,PlayerId,LandedAtMs,FFiskCatchData());
 }
-bool FFiskDayLedger::Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs,const FFiskCatchData& Fish,const FFiskCatchContext& Context)
+bool FFiskDayLedger::Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs,const FFiskCatchData& Fish,const FFiskCatchContext& Context,bool bTransportable)
 {
     if (bSettled || !CatchId.IsValid() || PlayerId < 0 || LandedAtMs < 0
         || LandedAtMs >= DeadlineMs || Catches.Contains(CatchId) || !FiskCatches::IsValid(Fish)
         || Catches.Num()>=10000 || !Context.IsValid(false)) { return false; }
     FFiskCatchContext Stored=Context;Stored.LandedAtMs=LandedAtMs;
     if(!Stored.IsValid(false)) { return false; }
-    Catches.Add(CatchId, FStoredCatch{PlayerId,Fish,Stored});
+    Catches.Add(CatchId, FStoredCatch{PlayerId,Fish,Stored,bTransportable});
     return true;
 }
 
@@ -29,14 +29,15 @@ bool FFiskDayLedger::Settle(int32 NowMs, int32 ArrivalMs)
             Results.Add(NewRow);
             Row = &Results.Last();
         }
-        if (bOnTime)
+        const bool bDelivered=bOnTime && Catch.Value.bTransportable;
+        if (bDelivered)
         {
             ++Row->DeliveredFish;
             Row->SessionBalance += Catch.Value.Fish.Value;
             Row->DeliveredWeightGrams += Catch.Value.Fish.WeightGrams;
         }
         else { ++Row->LostFish; }
-        FFiskCatchResult Detail;Detail.CatchId=Catch.Key;Detail.Fish=Catch.Value.Fish;Detail.bDelivered=bOnTime;
+        FFiskCatchResult Detail;Detail.CatchId=Catch.Key;Detail.Fish=Catch.Value.Fish;Detail.bDelivered=bDelivered;
         Detail.Context=Catch.Value.Context;
         Row->Catches.Add(Detail);
     }

@@ -34,12 +34,12 @@ public:
     static constexpr int32 DeadlineMs = 1020000;
     static constexpr int32 TestFishPrice = 10;
     bool Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs);
-    bool Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs, const FFiskCatchData& Fish, const FFiskCatchContext& Context=FFiskCatchContext());
+    bool Record(const FGuid& CatchId, int32 PlayerId, int32 LandedAtMs, const FFiskCatchData& Fish, const FFiskCatchContext& Context=FFiskCatchContext(),bool bTransportable=true);
     bool Settle(int32 NowMs, int32 ArrivalMs);
     bool IsSettled() const { return bSettled; }
     const TArray<FFiskDayResult>& GetResults() const { return Results; }
 private:
-    struct FStoredCatch { int32 PlayerId; FFiskCatchData Fish; FFiskCatchContext Context; };
+    struct FStoredCatch { int32 PlayerId; FFiskCatchData Fish; FFiskCatchContext Context; bool bTransportable=true; };
     TMap<FGuid, FStoredCatch> Catches;
     TArray<FFiskDayResult> Results;
     bool bSettled = false;

@@ -33,6 +33,17 @@ class BootstrapStructure(unittest.TestCase):
         p.write_text(p.read_text(encoding='utf-8')+'\nPrivateDependencyModuleNames.Add("Engine");',encoding='utf-8')
         self.assertIn('Invalid dependency direction/set: FiskCore',validate(self.root))
 
+    def test_disabled_procedural_renderer_rejected(self):
+        p=self.root/'FiskELaget.uproject'
+        data=json.loads(p.read_text(encoding='utf-8'));data['Plugins'][0]['Enabled']=False
+        p.write_text(json.dumps(data),encoding='utf-8')
+        self.assertIn('ProceduralMeshComponent must be explicitly enabled',validate(self.root))
+
+    def test_missing_game_renderer_dependency_rejected(self):
+        p=self.root/'Source/FiskGame/FiskGame.Build.cs'
+        p.write_text(p.read_text(encoding='utf-8').replace(', "ProceduralMeshComponent"',''),encoding='utf-8')
+        self.assertIn('Invalid dependency direction/set: FiskGame',validate(self.root))
+
     def test_game_target_cannot_be_editor_target(self):
         p=self.root/'Source/FiskELaget.Target.cs'
         p.write_text(p.read_text(encoding='utf-8').replace('TargetType.Game','TargetType.Editor'),encoding='utf-8')

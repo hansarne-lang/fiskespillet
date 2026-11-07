@@ -36,16 +36,16 @@ void UFiskSkipperPanel::Open(int32 V)
     Page=V;DetailPage=0;bRenaming=false;if(V==3) { bPhotoHud=true; }LoadPresets();CastChecked<AFiskBoardingController>(GetOwner())->ReleaseRodInputsForMenu();
 }
 void UFiskSkipperPanel::PhotoCamera(const FTransform& B,FMinimalViewInfo& Out) const
-{ const FVector Focus=B.TransformPosition(FVector(0,0,130));Out.Location=Focus+Photo.Offset(B.Rotator().Yaw);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=Photo.Fov; }
+{ const auto* Boat=CastChecked<AFiskBoardingController>(GetOwner())->FindStarterBoat();const bool Tow=Boat && Boat->GetCargoView().Mode==static_cast<uint8>(EFiskCargoMode::Towing);const FVector Focus=B.TransformPosition(Tow?FVector(-500,0,110):FVector(0,0,130));Out.Location=Focus+Photo.Offset(B.Rotator().Yaw);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=Photo.Fov; }
 bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
 {
     if(Page==0)
     {
         if(A.Event!=IE_Pressed) { return false; }
-        if(A.Key!=EKeys::O && A.Key!=EKeys::Y && A.Key!=EKeys::F9) { return false; }
+        if(A.Key!=EKeys::O && A.Key!=EKeys::Y && A.Key!=EKeys::F9 && A.Key!=EKeys::F11) { return false; }
         auto* PC=CastChecked<AFiskBoardingController>(GetOwner());const auto* B=PC->FindStarterBoat();
         if(A.Key==EKeys::F9 && (!B || !PC->PlayerState || !B->IsAboard(PC->PlayerState->GetPlayerId()))) { PC->ClientActionFeedback(TEXT("Gå om bord med E før du åpner fotomodus."));return true; }
-        Open(A.Key==EKeys::O?1:A.Key==EKeys::Y?2:3);return true;
+        Open(A.Key==EKeys::O?1:A.Key==EKeys::Y?2:A.Key==EKeys::F9?3:4);return true;
     }
     if(A.Event!=IE_Pressed && A.Event!=IE_Repeat) { return true; }const FKey K=A.Key;auto* PC=CastChecked<AFiskBoardingController>(GetOwner());
     if(bRenaming)
@@ -63,7 +63,8 @@ bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
             if(V.Len()==1 && FChar::IsAlnum(V[0]) && EditName.Len()<24) { EditName+=V.ToUpper(); }
         }return true;
     }
-    if(K==EKeys::Escape || (Page==1 && K==EKeys::O) || (Page==2 && K==EKeys::Y) || (Page==3 && K==EKeys::F9)) { Page=0;return true; }
+    if(K==EKeys::Escape || (Page==1 && K==EKeys::O) || (Page==2 && K==EKeys::Y) || (Page==3 && K==EKeys::F9) || (Page==4 && K==EKeys::F11)) { Page=0;return true; }
+    if(Page==4) { return true; }
     if(Page==3)
     {
         if(K==EKeys::Left) { Photo.Yaw-=10; }if(K==EKeys::Right) { Photo.Yaw+=10; }if(K==EKeys::Up) { Photo.Pitch+=5; }if(K==EKeys::Down) { Photo.Pitch-=5; }
@@ -123,6 +124,7 @@ bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
 }
 void UFiskSkipperPanel::Draw(AHUD& HUD,UCanvas& C)
 {
+    if(Page==4) { DrawCargo(HUD,C);return; }
     if(Page==1) { DrawPlan(HUD,C);return; }if(Page==2) { DrawBook(HUD,C);return; }if(Page!=3 || !bPhotoHud) { return; }
     const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const auto* D=GetWorld()->GetGameState<AFiskDayState>();const int32 Ms=D?D->GetElapsedMilliseconds():0;
     if(bPhotoGrid) { for(int32 I=1;I<3;++I) { const float X=C.ClipX*I/3,Y=C.ClipY*I/3;HUD.DrawLine(X,0,X,C.ClipY,FLinearColor(.7f,.9f,.8f,.65f),S);HUD.DrawLine(0,Y,C.ClipX,Y,FLinearColor(.7f,.9f,.8f,.65f),S); } }

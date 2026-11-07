@@ -155,6 +155,8 @@ void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCargoSmoke="),CargoMode))
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CargoDir);GetWorldTimerManager().SetTimer(CargoTimer,this,&AFiskBoardingController::RunCargoSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),CollectionMode))
     { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CollectionDir);GetWorldTimerManager().SetTimer(CollectionTimer,this,&AFiskBoardingController::RunCollectionSmoke,.5f,true,3.f); }
     if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskAnglerSmoke="),AnglerMode))
@@ -369,7 +371,7 @@ bool AFiskBoardingController::CanUseRod() const
     const AFiskStarterBoat* Boat = Mode ? Mode->GetStarterBoat() : nullptr;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
     return Selection.Slot<GetRodCapacity() && Boat && PlayerState && Boat->IsAboard(PlayerState->GetPlayerId())
-        && Boat->GetTripProgress() == AFiskStarterBoat::AtFishingSpot
+        && !Boat->GetCargo().bMustReturn && Boat->GetTripProgress() == AFiskStarterBoat::AtFishingSpot
         && Day && AFiskDayState::GetPhase(Day->GetElapsedSeconds()) == EFiskDayPhase::FishingAndReturn;
 }
 

@@ -46,7 +46,7 @@ void UFiskSkipperPanel::DrawBook(AHUD& H,UCanvas& C)
             for(int32 I=0;I<4 && DetailPage*4+I<Rows.Num();++I)
             {
                 const auto& E=J.GetEntries()[Rows[DetailPage*4+I]];const float Y=332+50*I;
-                T(FString::Printf(TEXT("%s | %.1f kg | %s"),FiskCatches::Find(E.Fish.Species)->Name,E.Fish.WeightGrams/1000.0,E.bSold?TEXT("Solgt"):TEXT("Tapt ved retur")),385,Y,1.02f);
+                T(FString::Printf(TEXT("%s | %.1f kg | %s"),FiskCatches::Find(E.Fish.Species)->Name,E.Fish.WeightGrams/1000.0,E.bSold?TEXT("Solgt"):TEXT("Ikke solgt")),385,Y,1.02f);
                 T(FString::Printf(TEXT("%s | %s / %d m | Kamp %.1f s"),FiskGrounds::Find(E.Context.Ground)->Name,FFiskRigRules::BaitName(E.Context.Bait),E.Context.Depth,E.Context.FightMs/1000.0),385,Y+24,.83f,Teal);
             }
             T(FString::Printf(TEXT("Fangstside %d/%d | Dags-ID %s"),DetailPage+1,Pages,*D.Id.ToString(EGuidFormats::Digits).Left(8)),385,558,.9f);

@@ -22,6 +22,9 @@
 #include "Materials/MaterialInterface.h"
 #include "UObject/ConstructorHelpers.h"
 #include "World/FiskVisualPrimitives.h"
+#include "World/FiskMarineMesh.h"
+#include "ProceduralMeshComponent.h"
+#include "UI/FiskSkipperPanel.h"
 
 UFiskBoatPresentation::UFiskBoatPresentation()
 {
@@ -68,14 +71,24 @@ void UFiskBoatPresentation::BeginPlay()
         if(Seat>=2 && (Label.StartsWith(TEXT("Seat")) || Label.StartsWith(TEXT("RoofPost")))) { Position.X+=(Seat/2)*110; }
         return FiskVisual::AddPart(Boat, VisualRoot, Mesh, Material, Name, Position, Scale, Color);
     };
-    Part(TEXT("Hull"), Sphere, FVector(0, 0, 20), FVector(7.2, 2.6, 1.2), White);
-    Part(TEXT("HullStripe"), Sphere, FVector(0, 0, 13), FVector(7.3, 2.65, 0.65), Navy);
-    Part(TEXT("Deck"), Cube, FVector(-20, 0, 76), FVector(5.5, 2.15, 0.12), Wood);
-    Part(TEXT("PortSide"), Cube, FVector(-35, -115, 100), FVector(5.5, 0.12, 0.6), White);
-    Part(TEXT("StarboardSide"), Cube, FVector(-35, 115, 100), FVector(5.5, 0.12, 0.6), White);
+    FiskMarine::Add(Boat,VisualRoot,TEXT("SculptedHull"),FiskMarine::Hull(),Material,White,.24f);
+    FiskMarine::Add(Boat,VisualRoot,TEXT("TeakDeck"),FiskMarine::Deck(),Material,FLinearColor(.26f,.14f,.05f),.72f);
+    FiskMarine::Add(Boat,VisualRoot,TEXT("NavySheerStripe"),FiskMarine::Gunwale(),Material,Navy,.22f);
+    for(int32 I=0;I<23;++I) { const double X=-320+I*25,T=(X+335)/690.,W=128*FMath::Pow(FMath::Max(.001,1-FMath::Pow(T,3.6)),.65)-7;Part(*FString::Printf(TEXT("DeckSeam%d"),I),Cube,FVector(X,0,85.6),FVector(.013,FMath::Max(.02,W/50),.012),FLinearColor(.15f,.10f,.055f)); }
+    for(int32 Side:{-1,1})
+    {
+        FVector Prev(50,Side*128,153);for(int32 I=0;I<8;++I) { const double T=I/7.,X=60+T*280,Y=Side*(128-110*FMath::Pow(T,1.5)),Z=153+T*28;const FVector Next(X,Y,Z);auto* Rail=Part(*FString::Printf(TEXT("BowRail%d_%d"),Side,I),Cylinder,FVector::ZeroVector,FVector::OneVector,Steel);FiskVisual::SetCylinder(Rail,Prev,Next,2.7);if(I%2==0) { auto* Post=Part(*FString::Printf(TEXT("BowStanchion%d_%d"),Side,I),Cylinder,FVector::ZeroVector,FVector::OneVector,Steel);FiskVisual::SetCylinder(Post,FVector(X,Y,115+FMath::Pow(T,5)*30),Next,2.3); }Prev=Next; }
+        for(int32 I=0;I<2;++I) { const FVector F(-210+I*160,Side*141,59);Part(*FString::Printf(TEXT("Fender%d_%d"),Side,I),Sphere,F,FVector(.25,.25,.7),FLinearColor(.85f,.87f,.81f));auto* Rope=Part(*FString::Printf(TEXT("FenderRope%d_%d"),Side,I),Cylinder,FVector::ZeroVector,FVector::OneVector,White);FiskVisual::SetCylinder(Rope,F,F+FVector(0,-Side*15,65),1.1); }
+    }
+    Part(TEXT("FishLocker"),Cube,FVector(-190,0,106),FVector(1.45,1.25,.38),White);
+    Part(TEXT("LockerLid"),Cube,FVector(-190,0,127),FVector(1.5,1.3,.045),FLinearColor(.73f,.78f,.75f));
+    Part(TEXT("LockerLatch"),Cube,FVector(-269,0,116),FVector(.035,.15,.12),Steel);
     Part(TEXT("Transom"), Cube, FVector(-305, 0, 92), FVector(0.12, 2.3, 0.45), White);
     Part(TEXT("Console"), Cube, FVector(45, 0, 145), FVector(1.0, 0.85, 1.3), White);
     Part(TEXT("Windscreen"), Cube, FVector(85, 0, 214), FVector(0.08, 0.9, 0.55), FLinearColor(0.07f, 0.27f, 0.33f));
+    Part(TEXT("InstrumentPanel"),Cube,FVector(-7,0,174),FVector(.05,.64,.33),Navy);
+    Part(TEXT("Plotter"),Cube,FVector(-10,-14,178),FVector(.015,.25,.16),FLinearColor(.02f,.32f,.37f));
+    for(int32 I=0;I<3;++I) { auto* Gauge=Part(*FString::Printf(TEXT("Gauge%d"),I),Cylinder,FVector(-12,15+I*10,182),FVector(.065,.065,.02),White);Gauge->SetRelativeRotation(FRotator(90,0,0)); }
     Part(TEXT("Roof"), Cube, FVector(20, 0, 270), FVector(3.0, 2.0, 0.10), White);
     for (int32 Side = 0; Side < 6; ++Side)
     {
@@ -99,6 +112,8 @@ void UFiskBoatPresentation::BeginPlay()
     Part(TEXT("OffshoreMotorPort"),Cube,FVector(-357,-65,55),FVector(.8,.6,1),Navy);
     Part(TEXT("OffshoreMotorStarboard"),Cube,FVector(-357,65,55),FVector(.8,.6,1),Navy);
     Part(TEXT("OffshoreRadar"),Sphere,FVector(20,0,305),FVector(.5,.5,.15),White);
+    TowFish=FiskMarine::Add(Boat,Boat->GetRootComponent(),TEXT("SecuredTowFish"),FiskMarine::Fish(),Material,FLinearColor(.29f,.39f,.43f),.22f);TowFish->SetVisibility(false);
+    TowRope=FiskVisual::AddPart(Boat,Boat->GetRootComponent(),Cylinder,Material,TEXT("TowBridle"),FVector::ZeroVector,FVector::OneVector,FLinearColor(.68f,.58f,.32f),.8f);TowRope->SetVisibility(false);
     for (int32 Index = 0; Index < 12; ++Index)
     {
         UStaticMeshComponent* Foam = FiskVisual::AddPart(Boat, Boat->GetRootComponent(), Sphere, Material,
@@ -133,6 +148,10 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             { const bool Holder=Name.StartsWith(TEXT("RodHolder")) || Name.StartsWith(TEXT("Reel"));Part->SetVisibility(Boat->GetKind()==1 && (Holder || I<4),true); } }
     }
 
+    const bool Towing=Boat->GetCargoView().Mode==static_cast<uint8>(EFiskCargoMode::Towing);
+    if(Towing && !bReportedTow) { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TOW_VISIBLE")); }bReportedTow=Towing;
+    TowFish->SetVisibility(Towing);TowRope->SetVisibility(Towing);
+    if(Towing) { const FVector Fish(-1040,30*FMath::Sin(Time*.7),-5+FMath::Sin(Time*1.8)*4);TowFish->SetRelativeLocation(Fish);TowFish->SetRelativeRotation(FRotator(0,FMath::Sin(Time*.7)*3,3));const FVector Stern=VisualRoot->GetRelativeTransform().TransformPosition(FVector(-345,0,102));FiskVisual::SetCylinder(TowRope,Stern,TowFish->GetRelativeTransform().TransformPosition(FVector(207,0,0)),2.6); }
     TArray<uint8> Activities;Activities.Init(0,6);
     TArray<FFiskFishVisualState> FishStates;FishStates.SetNum(6);
     for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
@@ -186,7 +205,7 @@ void UFiskBoatPresentation::TickComponent(float DeltaTime, ELevelTick TickType, 
             RodSections[Seat*6+Segment]->SetVisibility(Seat<Boat->GetHolderCount());
             Previous = Point;
         }
-        if (Seat == LocalSeat)
+        if (Seat == LocalSeat && !LocalPC->GetSkipperPanel()->IsPhoto())
         {
             DrawDebugString(GetWorld(), VisualRoot->GetComponentTransform().TransformPosition(Start + FVector(0, 0, 45)),
                 TEXT("VALGT STANG"), nullptr, FColor::Yellow, 0.07f, true, 0.8f);

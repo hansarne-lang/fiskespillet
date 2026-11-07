@@ -3,6 +3,7 @@
 #include "GameFramework/Actor.h"
 #include "FiskOceanScene.generated.h"
 
+class UProceduralMeshComponent;
 class UStaticMesh;
 class UStaticMeshComponent;
 class UMaterialInterface;
@@ -18,6 +19,7 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
 private:
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> WaveSurface;
     UPROPERTY() TObjectPtr<UDirectionalLightComponent> Daylight;
     UPROPERTY() TObjectPtr<UExponentialHeightFogComponent> Fog;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Rain;
@@ -27,7 +29,6 @@ private:
     UPROPERTY() TObjectPtr<UStaticMesh> Sphere;
     UPROPERTY() TObjectPtr<UStaticMesh> Cylinder;
     UPROPERTY() TObjectPtr<UMaterialInterface> Material;
-    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Ripples;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Birds;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Flyers;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Wake;

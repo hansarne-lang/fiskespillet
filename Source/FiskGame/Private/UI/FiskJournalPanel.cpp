@@ -75,7 +75,7 @@ void UFiskJournalPanel::Draw(AHUD& HUD,UCanvas& Canvas)
     {
         if(CachedRevision!=GI->GetJournalRevision())
         { Selected=Journal.Select(Sort,StatusFilter,SpeciesFilter);CachedRevision=GI->GetJournalRevision(); }
-        const TCHAR* Status=StatusFilter==0?TEXT("Alle"):StatusFilter==1?TEXT("Solgt"):TEXT("Tapt ved retur");
+        const TCHAR* Status=StatusFilter==0?TEXT("Alle"):StatusFilter==1?TEXT("Solgt"):TEXT("Ikke solgt");
         const TCHAR* Species=SpeciesFilter<0?TEXT("Alle arter"):FiskCatches::Find(SpeciesFilter)->Name;
         const TCHAR* SortName=Sort==EFiskJournalSort::Date?TEXT("Dato"):Sort==EFiskJournalSort::Species?TEXT("Art"):TEXT("Vekt");
         HUD.DrawText(FString::Printf(TEXT("1: Dato  2: Art  3: Vekt | Sortert: %s | 4: %s | 5: %s"),SortName,Status,Species),FLinearColor::White,52*S,154*S,nullptr,1.0f*S);

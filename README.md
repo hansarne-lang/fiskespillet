@@ -4,18 +4,19 @@ FISKELAGET er et planlagt realistisk, sosialt fiskespill for Windows PC. Inntil 
 
 ## Prosjektstatus
 
-Spillbar UE5.8-utviklingsversjon med én spiller eller inntil tolv over LAN, egne eller delte båter,15 arter, fem habitater,20-minuttersdager og lagret karriere. Fysisk LAN og ytelse på flere PC-er må fortsatt prøves.
+Spillbar Unreal Engine 5.8-utviklingsversjon, **v0.22**. Spill alene eller inntil tolv sammen over LAN, med egne eller delte båter, 15 arter i fem habitater, 20-minutters fiskedager og lagret karriere. Modeller og figurer er stiliserte; ferdig realistisk grafikk påstås ikke. Fysisk LAN og ytelse på flere PC-er må fortsatt prøves.
 
-v0.22 legger til F10-havneguide til båt, bar og tolv naust, møbel- og kantklaring på bryggene, tre gåkameraer, hilsener mens du går og rikere terreng på de tre øyene. Se [spillguiden](Docs/Development/ISLAND_HARBOUR_V022.md). v0.21 gir et gåbart bryggenett med serverstyrt gange/løping, minikart, nærhetsvalg, gåanimasjoner og levende klesfarger. T åpner bryggeliv i land; E bruker naust, bar eller båt i nærheten. Se [spillguiden](Docs/Development/PIER_LIFE_V021.md). v0.20 gir en levende havn med synlige fiskere, vinkebevegelser, original havneatmosfære og bar-/havne-/følg-båt-kamera. Artsboken får et 3D-galleri med15egne artsmodeller. B/V viser havnen; I/V ved marinaen viser galleriet. Se [spillguiden](Docs/Development/LIVING_HARBOUR_V020.md). Flåten med12båter/spillere, naustbutikk, fiskeinnhold, turplan/foto og lagringer beholdes. Modeller og figurer er fortsatt stiliserte; ferdig realistisk grafikk påstås ikke.
+- **Spille:** start Windows-pakken med `Start-FISKELAGET.bat`. Unreal Editor trengs ikke. Alle på LAN må bruke samme versjon. Taster og spillflyt står i [spillerguiden](Docs/PLAYER_GUIDE.md).
+- **Nytt i hver versjon:** [endringsloggen](CHANGELOG.md).
+- **Utvikle:** Unreal 5.8.4 og verktøyene i [DEVELOPMENT.md](DEVELOPMENT.md). Hver Windows-pakke inneholder faktisk test-SHA, kontrollsummer, resultater og kjente begrensninger.
 
-Windows-pakken startes fra BAT uten Unreal Editor. Velg Spill, E for ombordstigning, R fra02:00 og F ved fiskeplassen. En tydelig nappelyd varsler egne stenger. Å etter napp eller AI-knappen lar testhjelpen forsøke én vanlig kamp og landing; Å/manuelle kontroller tar over igjen. Kapteinen bruker R eller knappen «Tilbake til marina» for normal hjemreise. Alle LAN-deltakere må bruke samme versjon. Kildeutvikling bruker Unreal5.8.4 og verktøyene i DEVELOPMENT.md. Pakken inneholder faktisk test-SHA, kontrollsummer, resultater og kjente begrensninger. Lagringer er lokale; GitHub synkroniserer ikke spillprofiler mellom PC-er.
-
-GitHub Issues er oppgavelisten. Historiske åpne oppgaver avstemmes mot de integrerte leveransene i #100; nye restoppgaver skal beskrive det som faktisk gjenstår. Fysisk LAN mellom to PC-er må dokumenteres ved faktisk kjøring.
+Lagringer er lokale; GitHub synkroniserer ikke spillprofiler mellom PC-er.
 
 Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengelighet gir ikke automatisk en åpen kildekodelisens; lisens og tredjepartsrettigheter må avklares før gjenbruk eller videre distribusjon.
 
 ## Dokumentasjon
 
+- [Spillerguide](Docs/PLAYER_GUIDE.md) og [endringslogg](CHANGELOG.md)
 - [Gjeldende kravspesifikasjon v1.1](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.md) og [Word-utgave](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.docx)
 - [Samlet idébank](Docs/Requirements/FISKELAGET_Idebank_2026-11-03.md) og [tidligere krav v1.0](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.0.md)
 - [Arkitektur](ARCHITECTURE.md) og [modulkontrakter](MODULE_CONTRACTS.md)
@@ -31,5 +32,5 @@ Endringer går gjennom pull request og relevante kontroller. En oppgave er ikke 
 
 Kjør den lokale repositorykontrollen med `python Tools/Validation/check_repository.py` fra repositoryroten. Kontrollen krever bare Python 3.11 eller nyere og standardbiblioteket.
 
+Historiske åpne oppgaver avstemmes mot de integrerte leveransene i #100; nye restoppgaver skal beskrive det som faktisk gjenstår. Fysisk LAN mellom to PC-er må dokumenteres ved faktisk kjøring.
 
-v0.18 Naustliv: H, deretter N, aapner naustbutikken med ni permanente lys-, brygge- og trofepakker. Gratis grunnvalg beholdes. Se [spillguiden](Docs/Development/HARBOUR_LIFE_V018.md).

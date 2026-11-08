@@ -33,7 +33,7 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
             if(GetRodCapacity()!=1) { Fail(TEXT("shared_capacity_wrong"));return; }
             Key(EKeys::Two);ServerSelectRod(Selection.Revision,Selection.Day,1);
             FFiskRodSelection Forged=Selection;Forged.Slot=1;ServerCastSelectedRod(Forged,Second->GetCastId());
-            Smoke.FishingReleaseOldSelection=Selection;Smoke.FishingReleaseOldCast=First->GetCastId();
+            FishingReleaseOldSelection=Selection;Smoke.FishingReleaseOldCast=First->GetCastId();
             Capture(TEXT("shared-rod-capacity"));Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=1;
         }
         else if(Smoke.FishingReleaseStage==1 && Now-Smoke.FishingReleaseAt>=2)
@@ -53,7 +53,7 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
         {
             if(Selection.Day!=2 || Selection.Slot!=0 || Second->GetState()!=EFiskRodState::Ready || Second->GetRig().Depth!=30)
             { Fail(TEXT("extra_rod_day_reset"));return; }
-            ServerActOnSelectedRod(EFiskRodAction::Withdraw,Smoke.FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
+            ServerActOnSelectedRod(EFiskRodAction::Withdraw,FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
             Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=5;
         }
         else if(Smoke.FishingReleaseStage==5 && Now-Smoke.FishingReleaseAt>=1)
@@ -68,7 +68,7 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
         RequestRig(0,30,0);Smoke.FishingReleaseStage=1;
     }
     else if(Smoke.FishingReleaseStage==1 && First->GetRig().Depth==30)
-    { Smoke.FishingReleaseOldSelection=Selection;Key(EKeys::Two);Smoke.FishingReleaseStage=2; }
+    { FishingReleaseOldSelection=Selection;Key(EKeys::Two);Smoke.FishingReleaseStage=2; }
     else if(Smoke.FishingReleaseStage==2 && GetSelectedRod()==1 && !IsRodSelectionPending())
     { RequestRig(1,40,1);Smoke.FishingReleaseStage=3; }
     else if(Smoke.FishingReleaseStage==3 && Second->GetRig().Depth==40 && Second->GetRig().Bait==1)
@@ -103,8 +103,8 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
     {
         if(First->GetState()!=EFiskRodState::Fishing || First->GetCastId()==Second->GetCastId()) { Fail(TEXT("two_passive_rods_failed"));return; }
         Smoke.FishingReleaseOldCast=Second->GetCastId();
-        ServerCastSelectedRod(Smoke.FishingReleaseOldSelection,First->GetCastId());
-        ServerConfigureSelectedRod(Smoke.FishingReleaseOldSelection,First->GetCastId(),First->GetRig().Revision,2,10,2);
+        ServerCastSelectedRod(FishingReleaseOldSelection,First->GetCastId());
+        ServerConfigureSelectedRod(FishingReleaseOldSelection,First->GetCastId(),First->GetRig().Revision,2,10,2);
         Capture(TEXT("two-passive-rods"));Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=12;
     }
     else if(Smoke.FishingReleaseStage==12 && Now-Smoke.FishingReleaseAt>=2)
@@ -126,14 +126,14 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
     {
         if(Second->GetState()!=EFiskRodState::Cancelled) { return; }
         if(First->GetState()==EFiskRodState::Fighting)
-        { Smoke.FishingReleaseFightAt=Now;Smoke.FishingReleaseOldSelection=Selection;Smoke.FishingReleaseOldCast=First->GetCastId();RequestLift();Smoke.FishingReleaseStage=16; }
+        { Smoke.FishingReleaseFightAt=Now;FishingReleaseOldSelection=Selection;Smoke.FishingReleaseOldCast=First->GetCastId();RequestLift();Smoke.FishingReleaseStage=16; }
     }
     else if(Smoke.FishingReleaseStage==16 && First->IsRaised())
     { Key(EKeys::Two);Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=17; }
     else if(Smoke.FishingReleaseStage==17 && GetSelectedRod()==1 && Now-Smoke.FishingReleaseAt>=1)
     {
         if(First->IsRaised() || First->IsReeling()) { Fail(TEXT("old_input_held_after_switch"));return; }
-        ServerActOnSelectedRod(EFiskRodAction::Lift,Smoke.FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
+        ServerActOnSelectedRod(EFiskRodAction::Lift,FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
         Capture(TEXT("fight-input-released"));Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=18;
     }
     else if(Smoke.FishingReleaseStage==18 && Now-Smoke.FishingReleaseAt>=1)

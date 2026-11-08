@@ -107,6 +107,10 @@ public:
     int32 GetCameraView() const { return CameraView; }
 #if WITH_DEV_AUTOMATION_TESTS
     FFiskBoardingSmokeState Smoke; // Test-only state for the Run*Smoke scenarios
+    // Test-only fields with Fishing types; kept here so FiskBoardingSmokeState.h needs no Fishing include.
+    TArray<FFiskRigSettings> AnglerOriginalRigs,AnglerChangedRigs,AnglerFishingRigs;
+    FFiskRigSettings ExpeditionSmokeRig;
+    FFiskRodSelection FishingReleaseOldSelection;
     void RunFleetSmoke();
     void RunCargoSmoke();
     void RunCollectionSmoke();

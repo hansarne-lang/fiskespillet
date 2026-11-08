@@ -65,25 +65,25 @@ void AFiskBoardingController::RunAnglerSmoke()
     auto Equal=[&](const TArray<FFiskRigSettings>& A,bool Revisions){const auto Current=Rigs();if(Current.Num()!=A.Num()) { return false; }for(int32 I=0;I<A.Num();++I) { if(A[I].Bait!=Current[I].Bait || A[I].Depth!=Current[I].Depth || A[I].Program!=Current[I].Program || (Revisions && A[I].Revision!=Current[I].Revision)) { return false; } }return true;};
     if(Smoke.AnglerStage==0 && Smoke.CareerSmokeStage==13 && Now>=24 && Now<35)
     {
-        Smoke.AnglerOriginalRigs=Rigs();Key(EKeys::Q);if(GetAnglerPanel()->GetPage()!=1) { Fail(TEXT("workbench_not_open"));return; }
+        AnglerOriginalRigs=Rigs();Key(EKeys::Q);if(GetAnglerPanel()->GetPage()!=1) { Fail(TEXT("workbench_not_open"));return; }
         Key(EKeys::F5);Key(EKeys::F2);for(int32 I=0;I<24;++I) { Key(EKeys::BackSpace); }for(TCHAR C:FString(TEXT("FISKER"))) { Key(FKey(FName(*FString::Chr(C)))); }Key(EKeys::SpaceBar);Key(EKeys::One);Key(EKeys::Two);Key(EKeys::Enter);Key(EKeys::F5);
         if(!Stored(false)) { Fail(TEXT("named_loadout_not_saved"));return; }Shot(TEXT("angler-workbench"));Key(EKeys::G);Key(EKeys::Enter);Smoke.AnglerAt=Real;Smoke.AnglerStage=1;
     }
     else if(Smoke.AnglerStage==1 && Real-Smoke.AnglerAt>=2)
     {
-        if(GetRod()->GetRig().Bait!=1 || GetRod()->GetRig().Program!=1) { Fail(TEXT("advice_not_server_applied"));return; }Smoke.AnglerChangedRigs=Rigs();
-        auto Bad=MakeRigBundle(Smoke.AnglerChangedRigs);--Bad.Day;ServerApplyRigBundle(Bad);Bad=MakeRigBundle(Smoke.AnglerChangedRigs);Bad.Casts[0]=FGuid::NewGuid();ServerApplyRigBundle(Bad);Bad=MakeRigBundle(Smoke.AnglerChangedRigs);--Bad.Revisions.Last();ServerApplyRigBundle(Bad);
-        Bad=MakeRigBundle(Smoke.AnglerChangedRigs);Bad.Rigs[0].Bait=Bad.Rigs[0].Program=2;Bad.Rigs.Last().Depth=125;ServerApplyRigBundle(Bad);Smoke.AnglerAt=Real;Smoke.AnglerStage=2;
+        if(GetRod()->GetRig().Bait!=1 || GetRod()->GetRig().Program!=1) { Fail(TEXT("advice_not_server_applied"));return; }AnglerChangedRigs=Rigs();
+        auto Bad=MakeRigBundle(AnglerChangedRigs);--Bad.Day;ServerApplyRigBundle(Bad);Bad=MakeRigBundle(AnglerChangedRigs);Bad.Casts[0]=FGuid::NewGuid();ServerApplyRigBundle(Bad);Bad=MakeRigBundle(AnglerChangedRigs);--Bad.Revisions.Last();ServerApplyRigBundle(Bad);
+        Bad=MakeRigBundle(AnglerChangedRigs);Bad.Rigs[0].Bait=Bad.Rigs[0].Program=2;Bad.Rigs.Last().Depth=125;ServerApplyRigBundle(Bad);Smoke.AnglerAt=Real;Smoke.AnglerStage=2;
     }
     else if(Smoke.AnglerStage==2 && Real-Smoke.AnglerAt>=2)
-    { if(!Equal(Smoke.AnglerChangedRigs,true)) { Fail(TEXT("rejected_bundle_partially_changed_rigs"));return; }Key(EKeys::F8);Smoke.AnglerAt=Real;Smoke.AnglerStage=3; }
+    { if(!Equal(AnglerChangedRigs,true)) { Fail(TEXT("rejected_bundle_partially_changed_rigs"));return; }Key(EKeys::F8);Smoke.AnglerAt=Real;Smoke.AnglerStage=3; }
     else if(Smoke.AnglerStage==3 && Real-Smoke.AnglerAt>=2)
-    { if(!Equal(Smoke.AnglerOriginalRigs,false)) { Fail(TEXT("whole_loadout_not_restored"));return; }Shot(TEXT("angler-loadout-restored"));Smoke.AnglerAt=Real;Smoke.AnglerStage=4; }
+    { if(!Equal(AnglerOriginalRigs,false)) { Fail(TEXT("whole_loadout_not_restored"));return; }Shot(TEXT("angler-loadout-restored"));Smoke.AnglerAt=Real;Smoke.AnglerStage=4; }
     else if(Smoke.AnglerStage==4 && Real-Smoke.AnglerAt>=1) { Key(EKeys::Q);Smoke.AnglerStage=5; }
     if(Smoke.AnglerStage>=5 && !Smoke.bAnglerActiveProbe && GetRodAt(0)->GetState()==EFiskRodState::Fishing)
-    { Smoke.AnglerFishingRigs=Rigs();ServerApplyRigBundle(MakeRigBundle(Smoke.AnglerFishingRigs));Smoke.bAnglerActiveProbe=true;Smoke.AnglerAt=Real; }
+    { AnglerFishingRigs=Rigs();ServerApplyRigBundle(MakeRigBundle(AnglerFishingRigs));Smoke.bAnglerActiveProbe=true;Smoke.AnglerAt=Real; }
     if(Smoke.bAnglerActiveProbe && !Smoke.bAnglerActiveChecked && Real-Smoke.AnglerAt>=2)
-    { if(!Equal(Smoke.AnglerFishingRigs,true)) { Fail(TEXT("active_rod_bundle_changed_rigs"));return; }Smoke.bAnglerActiveChecked=true; }
+    { if(!Equal(AnglerFishingRigs,true)) { Fail(TEXT("active_rod_bundle_changed_rigs"));return; }Smoke.bAnglerActiveChecked=true; }
     if(Smoke.AnglerStage==5 && D->GetDayNumber()==2 && Now>=45)
     { if(!Smoke.bAnglerActiveChecked || !Stored(false)) { Fail(TEXT("active_probe_or_saved_loadout_missing"));return; }Done(); }
 }

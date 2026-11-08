@@ -63,22 +63,22 @@ void AFiskBoardingController::RunExpeditionSmoke()
     else if(Smoke.ExpeditionSmokeStage==20 && Real-Smoke.ExpeditionSmokeAt>=1)
     {
         Key(EKeys::J);Key(EKeys::U);if(MarinaPanel->GetPage()!=4) { Fail(TEXT("equipment_room_not_open"));return; }
-        Smoke.ExpeditionSmokeRig=GetRod()->GetRig();Key(EKeys::One);Key(EKeys::F5);Key(EKeys::F2);
+        ExpeditionSmokeRig=GetRod()->GetRig();Key(EKeys::One);Key(EKeys::F5);Key(EKeys::F2);
         for(int32 I=0;I<24;++I) { Key(EKeys::BackSpace); }
         for(TCHAR C:FString(TEXT("REVFISKE"))) { Key(FKey(FName(*FString::Chr(C)))); }Key(EKeys::SpaceBar);Key(EKeys::Nine);Key(EKeys::Enter);
         const auto* Saved=GI->RigPresets.Get(0);if(!Saved || Saved->Name!=TEXT("REVFISKE 9")) { Fail(TEXT("typed_name_not_saved"));return; }
         Shot(TEXT("equipment-named"));Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=3;
     }
     else if(Smoke.ExpeditionSmokeStage==3 && Real-Smoke.ExpeditionSmokeAt>=1)
-    { Key(EKeys::U);RequestRig(1,Smoke.ExpeditionSmokeRig.Depth+10,1);Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=4; }
+    { Key(EKeys::U);RequestRig(1,ExpeditionSmokeRig.Depth+10,1);Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=4; }
     else if(Smoke.ExpeditionSmokeStage==4 && Real-Smoke.ExpeditionSmokeAt>=1)
     {
-        if(GetRod()->GetRig().Depth!=Smoke.ExpeditionSmokeRig.Depth+10) { if(Real-Smoke.ExpeditionSmokeAt>8) { Fail(TEXT("changed_rig_not_confirmed")); }return; }
+        if(GetRod()->GetRig().Depth!=ExpeditionSmokeRig.Depth+10) { if(Real-Smoke.ExpeditionSmokeAt>8) { Fail(TEXT("changed_rig_not_confirmed")); }return; }
         Key(EKeys::U);Key(EKeys::F9);Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=5;
     }
     else if(Smoke.ExpeditionSmokeStage==5 && Real-Smoke.ExpeditionSmokeAt>=1)
     {
-        const auto& R=GetRod()->GetRig();if(R.Bait!=Smoke.ExpeditionSmokeRig.Bait || R.Depth!=Smoke.ExpeditionSmokeRig.Depth || R.Program!=Smoke.ExpeditionSmokeRig.Program)
+        const auto& R=GetRod()->GetRig();if(R.Bait!=ExpeditionSmokeRig.Bait || R.Depth!=ExpeditionSmokeRig.Depth || R.Program!=ExpeditionSmokeRig.Program)
         { if(Real-Smoke.ExpeditionSmokeAt>8) { Fail(TEXT("saved_rig_not_applied_to_own_rod")); }return; }
         Key(EKeys::U);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPEDITION_EQUIPMENT_PASSED player=%d"),Self);Smoke.ExpeditionSmokeStage=6;
     }

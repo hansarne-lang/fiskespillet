@@ -5,12 +5,11 @@
 #if WITH_DEV_AUTOMATION_TESTS
 #include "TimerManager.h"
 #include "FiskCareerProfile.h"
-#include "Fishing/FiskRigSettings.h"
-#include "Fishing/FiskRodSelection.h"
 
 // Test-only state for AFiskBoardingController's Run*Smoke scenarios (issue #113, step 1).
 // Kept out of the controller header so gameplay state and test bookkeeping are separate.
-// Fields and defaults are moved unchanged from FiskBoardingController.h.
+// Fields and defaults are moved unchanged from FiskBoardingController.h. Fields whose types
+// belong to the Fishing area stay in the controller, so this Boats header includes no other area.
 struct FFiskBoardingSmokeState
 {
     int32 FleetRole=-1,FleetStage=0;
@@ -30,7 +29,6 @@ struct FFiskBoardingSmokeState
     double AnglerAt=0;
     bool bAnglerActiveProbe=false,bAnglerActiveChecked=false;
     FFiskCareerProfile AnglerInitialCareer;
-    TArray<FFiskRigSettings> AnglerOriginalRigs,AnglerChangedRigs,AnglerFishingRigs;
     FString SkipperMode,SkipperDir;
     FTimerHandle SkipperTimer;
     int32 SkipperStage=0;
@@ -45,7 +43,6 @@ struct FFiskBoardingSmokeState
     int32 ExpeditionSmokeStage=0;
     double ExpeditionSmokeAt=0;
     FTimerHandle ExpeditionSmokeTimer;
-    FFiskRigSettings ExpeditionSmokeRig;
     bool bTestJournalAckDropped=false;
     FString CareerSmokeMode,CareerSmokeDir;
     FTimerHandle CareerSmokeTimer;
@@ -58,7 +55,6 @@ struct FFiskBoardingSmokeState
     int32 FishingReleaseStage=0;
     double FishingReleaseAt=0,FishingReleaseFightAt=0;
     FGuid FishingReleaseOldCast;
-    FFiskRodSelection FishingReleaseOldSelection;
     FString NavigationMode,NavigationCaptureDir;
     FTimerHandle NavigationTimer;
     int32 NavigationStage=0;

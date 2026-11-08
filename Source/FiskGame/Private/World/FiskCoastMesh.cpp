@@ -17,7 +17,11 @@ FFiskMarineMesh Strip(int32 Island,double Inner,double Outer,bool Foam)
         const double A=2*PI*J/FiskCoast::Sectors,Radius=R*Shore(A,Island)*T;
         M.Vertices.Add(FVector(Radius*FMath::Cos(A),Radius*FMath::Sin(A),Foam?-1+2*FMath::Sin(A*9):Height(T,A,Island)));M.UV.Add(FVector2D(J/static_cast<double>(FiskCoast::Sectors),T));
         if(Row && J) { const int32 B=Row*(FiskCoast::Sectors+1)+J,A0=B-FiskCoast::Sectors-2;M.Triangles.Append({A0,B,A0+1,A0,B-1,B}); }
-    } }M.Finish();return M;
+    } }M.Finish();
+    // UE renders clockwise front faces. Keep the upward shading normals computed above,
+    // then reverse the index order so the terrain is visible from above the sea.
+    for(int32 T=0;T<M.Triangles.Num();T+=3) { Swap(M.Triangles[T+1],M.Triangles[T+2]); }
+    return M;
 }
 }
 FFiskMarineMesh FiskCoast::Terrain(int32 I,int32 Band)

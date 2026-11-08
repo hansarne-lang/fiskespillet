@@ -21,7 +21,7 @@ void UFiskPierWalk::RunGuideSmoke()
     const double Now=GetWorld()->GetRealTimeSeconds();const bool Lan=FParse::Param(FCommandLine::Get(),TEXT("FiskGuideLan"));int32 Role=0;FParse::Value(FCommandLine::Get(),TEXT("FiskPierPeer="),Role);
     const auto* Own=H->GetResidents().FindByPredicate([&](const FFiskMarinaResident& R){return R.Profile==GI->Career.Id;});if(!Own) { return; }
     auto Key=[&](FKey K){FInputKeyEventArgs A;A.InputDevice=FInputDeviceId::CreateFromInternalId(0);A.Key=K;A.Event=IE_Pressed;P->InputKey(A);A.Event=IE_Released;P->InputKey(A);};
-    auto Shot=[&](const TCHAR* Name){const FString File=FPaths::Combine(SmokeDir,FString(Name)+TEXT(".png"));if(!FScreenshotRequest::IsScreenshotRequested()) { FScreenshotRequest::RequestScreenshot(File,false,false); }};
+    auto Shot=[&](const TCHAR* Name){const FString File=FPaths::Combine(SmokeDir,FString(Name)+TEXT(".png"));FTimerHandle T;GetWorld()->GetTimerManager().SetTimer(T,FTimerDelegate::CreateWeakLambda(this,[File](){if(!FScreenshotRequest::IsScreenshotRequested()) { FScreenshotRequest::RequestScreenshot(File,false,false); }}),.3f,false);};
     auto Fail=[&](const TCHAR* Why){ClearKeys();StopGuide(TEXT("Test stopped"));UE_LOG(LogTemp,Error,TEXT("FISKELAGET_GUIDE_FAILED stage=%d role=%d %s"),SmokeStage,Role,Why);GetWorld()->GetTimerManager().ClearTimer(SmokeTimer);};
     auto Select=[&](int32 Choice){Key(EKeys::F10);for(int32 N=0;N<14 && GuideChoice!=Choice;++N) { Key(EKeys::Down); }Key(EKeys::Enter);SmokeAt=Now;};
     if(SmokeStage>1 && !FiskPier::Inside(Position)) { Fail(TEXT("unsafe_server_position"));return; }
@@ -45,7 +45,7 @@ void UFiskPierWalk::RunGuideSmoke()
         if(FVector::Dist2D(Position,SmokeOrigin)>5) { Fail(TEXT("menu_kept_moving"));return; }Key(EKeys::H);Key(EKeys::C);if(CameraMode!=1) { Fail(TEXT("near_camera"));return; }Shot(TEXT("guide-camera-near"));SmokeStage=5;SmokeAt=Now;return;
     }
     if(SmokeStage==5 && Now-SmokeAt>.6) { Key(EKeys::C);if(CameraMode!=2) { Fail(TEXT("overview_camera"));return; }Shot(TEXT("guide-camera-overview"));SmokeStage=6;SmokeAt=Now;return; }
-    if(SmokeStage==6 && Now-SmokeAt>.6) { Key(EKeys::Home);if(CameraMode!=0) { Fail(TEXT("camera_reset"));return; }Key(EKeys::One);SmokeWaypoint=Lan?(Role?13:7):0;Select(SmokeWaypoint);Shot(TEXT("guide-route"));SmokeStage=7;return; }
+    if(SmokeStage==6 && Now-SmokeAt>.6) { Key(EKeys::Home);if(CameraMode!=0) { Fail(TEXT("camera_reset"));return; }Key(EKeys::One);SmokeWaypoint=Lan?(Role?13:7):0;if(!Lan) { SmokeCoast=0;SmokeStage=11;SmokeAt=Now;return; }Select(SmokeWaypoint);Shot(TEXT("guide-route"));SmokeStage=7;return; }
     if(SmokeStage==7)
     {
         if(bGuiding) { if(Now-SmokeAt>140) { Fail(TEXT("destination_timeout")); }return; }
@@ -67,9 +67,9 @@ void UFiskPierWalk::RunGuideSmoke()
         if(bGuiding) { if(Now-SmokeAt>140) { Fail(TEXT("return_to_boat_timeout")); }return; }
         if(!FiskPier::NearBoat(Position)) { Fail(TEXT("boarding_destination"));return; }Key(EKeys::E);SmokeStage=10;SmokeAt=Now;return;
     }
-    if(SmokeStage==14 && Now-SmokeAt>.75) { SmokeCoast=0;SmokeStage=11;SmokeAt=Now;return; }
+    if(SmokeStage==14 && Now-SmokeAt>.75) { Select(0);SmokeStage=9;return; }
     if(SmokeStage==11 && Now-SmokeAt>3) { Shot(*FString::Printf(TEXT("coast-island-%d"),SmokeCoast));SmokeStage=12;SmokeAt=Now;return; }
-    if(SmokeStage==12 && Now-SmokeAt>.75) { if(++SmokeCoast<3) { SmokeStage=11;SmokeAt=Now; }else { SmokeCoast=-1;Select(0);SmokeStage=9; }return; }
+    if(SmokeStage==12 && Now-SmokeAt>.75) { if(++SmokeCoast<3) { SmokeStage=11;SmokeAt=Now; }else { SmokeCoast=-1;Select(SmokeWaypoint);Shot(TEXT("guide-route"));SmokeStage=7; }return; }
     if(SmokeStage==10 && Now-SmokeAt>2)
     {
         const auto* Boat=P->FindStarterBoat();if(bEnabled || bGuiding || !Boat || !Boat->IsAboard(P->PlayerState->GetPlayerId())) { Fail(TEXT("normal_E_boarding_failed"));return; }

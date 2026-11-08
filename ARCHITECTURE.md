@@ -29,6 +29,20 @@ flowchart TD
 
 Pilene viser kompileringsavhengigheter. Funksjonsområdene har ingen direkte kompileringsavhengigheter til hverandre. UE-avhengigheter holdes minimale og listes eksplisitt i Build.cs ved opprettelse. En enkel grensekontroll i CI skal finne ulovlige includes; dette er en praktisk avgrensning, ikke et fullstendig språkbasert vern når områdene ligger i samme fysiske modul.
 
+### Include-grenser i FiskGame
+
+`Tools/Validation/check_includes.py` kjøres i CI. Hver mappe under `Source/FiskGame/Private/` er et område: Angler, Boats, Bootstrap, Career, Collections, DayCycle, Economy, Expedition, Fishing, UI, Voyage og World.
+
+| Fil i | Kan inkludere |
+|---|---|
+| Et funksjonsområde | Eget område, FiskCore, `Source/FiskGame/Public` og Unreal Engine |
+| `Bootstrap/` og `FiskGameModule.cpp` (integrasjonslaget) | Alle områder |
+| `Source/FiskGame/Public` | FiskCore og Unreal Engine |
+
+Et funksjonsområde inkluderer ikke andre områder eller integrasjonslaget. Avhengigheter mellom områder går gjennom grensesnitt og verdiobjekter i FiskCore. En ny tillatt avhengighet krever arkitekturgodkjenning og en oppføring i `ALLOWED` i kontrollen.
+
+Brudd som fantes da kontrollen ble innført (420 includes i 114 filer, november 2026), står i `Tools/Validation/include_exceptions.json`. Listen kan bare krympe. Nye brudd feiler CI, og det gjør også unntak som ikke lenger brukes. Fjern dem med `python Tools/Validation/check_includes.py --prune`. `--summary` viser bruddene per områdepar.
+
 v0.17 bruker motorens innebygde `ProceduralMeshComponent` i FiskGame for formet skrog, havflate og slepefisk. Pluginen aktiveres eksplisitt i prosjektfilen og er en privat renderingsavhengighet i FiskGame. FiskCore beholder bare Core/CoreUObject; ingen ny spillmodul, kjøpt ressurs eller tjeneste er innført. Bootstrapkontrollen håndhever den utvidede, eksplisitte avhengighetslisten.
 
 ## Kommunikasjon og serverautoritet

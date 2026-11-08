@@ -51,7 +51,7 @@ try{
   if((FiskGameSeconds ((Stamp $settlement)-(Stamp $start)).TotalSeconds) -lt 1020){throw 'Revealed before normal 17:00'}
   $end=Select-String -LiteralPath $log -Pattern FISKELAGET_CONTENT_DAY_PASSED | Select-Object -First 1
   if([Math]::Abs((FiskGameSeconds ((Stamp $end)-(Stamp $start)).TotalSeconds)-1200) -gt (3*$FiskClockScale)){throw 'Incorrect 20-minute wall-clock day'}
-  $details=@(Select-String -LiteralPath $log -Pattern 'FISKELAGET_REVEALED_CATCH player=\d+ species=[0-2] grams=\d+ mm=\d+ value=\d+ delivered=1')
+  $details=@(Select-String -LiteralPath $log -Pattern 'FISKELAGET_REVEALED_CATCH player=\d+ species=(?:[0-9]|1[0-4]) grams=\d+ mm=\d+ value=\d+ delivered=1')
   if($details.Count -ne 2){throw 'Expected two valid revealed catches'}
  }
  foreach($role in 'host','client'){

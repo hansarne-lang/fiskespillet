@@ -32,8 +32,12 @@ try{
  Start-Sleep -Seconds 2
  Exactly $hostLog 'FISKELAGET_CAPTAIN_TRANSFER_ACCEPTED' 5
  Exactly $hostLog 'FISKELAGET_CAPTAIN_TRANSFER_REJECTED' 7
- Exactly $hostLog 'FISKELAGET_CAPTAIN_TRIP_REJECTED' 3
- Exactly $hostLog 'FISKELAGET_CAPTAIN_TRIP_AUTHORIZED' 2
+ # Since v0.21 R at sea goes to the return button: a passenger is refused on the client (no RPC),
+ # and the captain's return is logged as RETURN_BUTTON instead of CAPTAIN_TRIP_AUTHORIZED (#123).
+ Exactly $hostLog 'FISKELAGET_CAPTAIN_TRIP_REJECTED' 2
+ Exactly $hostLog 'FISKELAGET_CAPTAIN_TRIP_AUTHORIZED' 1
+ Exactly $hostLog 'FISKELAGET_RETURN_BUTTON accepted=1' 1
+ Exactly $hostLog 'FISKELAGET_RETURN_BUTTON accepted=0' 0
  Exactly $hostLog 'FISKELAGET_CHART_ACCEPTED' 1
  Exactly $hostLog 'FISKELAGET_CHART_REJECTED' 1
  Exactly $hostLog 'FISKELAGET_CAPTAIN_FORMER_DENIED' 1

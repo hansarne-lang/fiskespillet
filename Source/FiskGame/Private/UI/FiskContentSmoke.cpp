@@ -25,10 +25,14 @@ void AFiskBoardingController::RunContentSmoke()
     const int32 Progress=Boat->GetTripProgress();
     const UFiskPrototypeRod& CurrentRod=*GetRod();
     auto Key=[&](FKey K){FInputKeyEventArgs A;A.InputDevice=FInputDeviceId::CreateFromInternalId(0);A.Key=K;A.Event=IE_Pressed;InputKey(A);A.Event=IE_Released;InputKey(A);};
-    auto Capture=[&](const TCHAR* Name){
-        if(Smoke.ContentCaptureDir.IsEmpty() || FScreenshotRequest::IsScreenshotRequested()) { return; }
+    // Returns false while an earlier screenshot is still pending; callers that must have the
+    // image stay on their stage and try again on the next tick (#124).
+    auto Capture=[&](const TCHAR* Name)->bool{
+        if(Smoke.ContentCaptureDir.IsEmpty()) { return true; }
+        if(FScreenshotRequest::IsScreenshotRequested()) { return false; }
         IFileManager::Get().MakeDirectory(*Smoke.ContentCaptureDir,true);
         FScreenshotRequest::RequestScreenshot(FPaths::Combine(Smoke.ContentCaptureDir,FString(Name)+TEXT(".png")),false,false);
+        return true;
     };
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_CONTENT_FAILED player=%d stage=%d %s"),Self,Smoke.ContentStage,Why);GetWorldTimerManager().ClearTimer(Smoke.ContentTimer);};
     auto Matches=[&](int32 B,int32 D,int32 P){const FFiskRigSettings& R=CurrentRod.GetRig();return R.Bait==B && R.Depth==D && R.Program==P;};
@@ -128,11 +132,12 @@ void AFiskBoardingController::RunContentSmoke()
     else if(Smoke.ContentStage==12 && Progress==200)
     {
         if(Boat->GetMarinaArrivalMs(Day->GetElapsedMilliseconds())<0) { Fail(TEXT("missing_arrival"));return; }
-        Capture(TEXT("home"));Smoke.ContentStage=13;
+        if(!Capture(TEXT("home"))) { return; }
+        Smoke.ContentStage=13;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CONTENT_RETURNED player=%d"),Self);
     }
     else if(Smoke.ContentStage==13)
-    { Key(EKeys::F2);Capture(TEXT("results-before17"));Smoke.ContentAt=Now;Smoke.ContentStage=14; }
+    { if(FScreenshotRequest::IsScreenshotRequested()) { return; }Key(EKeys::F2);Capture(TEXT("results-before17"));Smoke.ContentAt=Now;Smoke.ContentStage=14; }
     else if(Smoke.ContentStage==14 && Now-Smoke.ContentAt>=1)
     { Key(EKeys::F2);Smoke.ContentStage=15; }
     else if(Smoke.ContentStage==15 && Now>=1020 && View.bRevealed && IsResultsVisible())

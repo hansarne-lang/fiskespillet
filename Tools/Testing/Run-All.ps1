@@ -62,31 +62,61 @@ $wall = [Diagnostics.Stopwatch]::StartNew()
 "Scripts: $($selected -join ', ')"
 "Clock scale: $ClockScale  Parallel: $Parallel  Source: $sourceCommit"
 
+function Quote([string]$text) { "'" + $text.Replace("'", "''") + "'" }
+
 function Start-Script([string]$name, [int]$slot) {
     $path = Join-Path $PSScriptRoot "Run-$name.ps1"
     $logs = Join-Path $run $name   # Run-HarbourGuide refuses an existing folder, so create only the parent
-    $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $path, '-Package', $Package, '-LogDirectory', $logs)
+    $codeFile = Join-Path $run "$name.exitcode.txt"
+    $params = [ordered]@{ Package = $Package; LogDirectory = $logs }
     $parameters = (Get-Command $path).Parameters.Keys
-    if ($parameters -contains 'SourceCommit') { $arguments += @('-SourceCommit', $sourceCommit) }
-    if ($parameters -contains 'ExpectedExecutableSha256') { $arguments += @('-ExpectedExecutableSha256', $exeHash) }
+    if ($parameters -contains 'SourceCommit') { $params.SourceCommit = $sourceCommit }
+    if ($parameters -contains 'ExpectedExecutableSha256') { $params.ExpectedExecutableSha256 = $exeHash }
+    # The child writes its own result to $codeFile. Process.ExitCode is not reliable for a
+    # Start-Process -PassThru child with redirected output in Windows PowerShell 5.1.
+    $splat = ($params.GetEnumerator() | ForEach-Object { "$($_.Key) = $(Quote $_.Value)" }) -join '; '
+    $wrapper = @"
+`$ErrorActionPreference = 'Stop'
+`$code = 1
+try {
+    `$params = @{ $splat }
+    `$global:LASTEXITCODE = 0
+    & $(Quote $path) @params
+    `$code = if (`$LASTEXITCODE) { [int]`$LASTEXITCODE } else { 0 }
+} catch {
+    [Console]::Error.WriteLine((`$_ | Out-String))
+    `$code = 1
+} finally {
+    [IO.File]::WriteAllText($(Quote $codeFile), [string]`$code)
+}
+exit `$code
+"@
+    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($wrapper))
+    $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', $encoded)
     $env:FISK_TEST_PORT_BASE = [string](7777 + 100 * $slot)
     $env:FISK_CLOCK_SCALE = [string]$ClockScale
     try {
         $process = Start-Process -FilePath $shell -ArgumentList $arguments -PassThru -WindowStyle Hidden `
             -RedirectStandardOutput (Join-Path $run "$name.out.txt") -RedirectStandardError (Join-Path $run "$name.err.txt")
-        # Windows PowerShell 5.1 only reports ExitCode for a -PassThru process if its handle was
-        # opened while the process was running.
-        $null = $process.Handle
+        $null = $process.Handle   # also helps Process.ExitCode, which is only a fallback
     } finally {
         Remove-Item Env:FISK_TEST_PORT_BASE, Env:FISK_CLOCK_SCALE -ErrorAction SilentlyContinue
     }
-    [pscustomobject]@{ Name = $name; Slot = $slot; Process = $process; Clock = [Diagnostics.Stopwatch]::StartNew() }
+    [pscustomobject]@{ Name = $name; Slot = $slot; Process = $process; CodeFile = $codeFile; Clock = [Diagnostics.Stopwatch]::StartNew() }
 }
 
 function Complete-Script($job) {
     $job.Process.WaitForExit()
     $job.Clock.Stop()
-    $code = $job.Process.ExitCode
+    # Known result: the code the child wrote itself. Otherwise Process.ExitCode, and if that is
+    # also missing the result is unknown and counts as a failure (never as exit 0).
+    $code = $null
+    if (Test-Path -LiteralPath $job.CodeFile) {
+        $text = (Get-Content -LiteralPath $job.CodeFile -Raw).Trim()
+        $parsed = 0
+        if ([int]::TryParse($text, [ref]$parsed)) { $code = $parsed }
+    }
+    if ($null -eq $code) { $code = $job.Process.ExitCode }
     $err = Join-Path $run "$($job.Name).err.txt"
     $failed = ($null -eq $code) -or $code -ne 0 -or ((Test-Path -LiteralPath $err) -and (Get-Item -LiteralPath $err).Length -gt 0)
     $row = [pscustomobject]@{

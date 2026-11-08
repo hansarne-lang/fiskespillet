@@ -42,6 +42,6 @@ Den begrensede økonomi-/profilarkitekturen i v0.7-kontrakten er godkjent innen 
 
 ## 2026-11-08 — Testklokke og raskere testkjøring
 
-Prosjekteieren ba i Claude Code-sesjonen 8. november 2026 om å gjennomføre forslag 1–6 for kortere tid fra bygg til ferdig test. Det inkluderer en testklokke som går raskere. Godkjenningen må bekreftes i GitHub (issue/PR) før integrasjon.
+Prosjekteieren ba i Claude Code-sesjonen 8. november 2026 om å gjennomføre forslag 1–6 for kortere tid fra bygg til ferdig test. Det inkluderer en testklokke som går raskere. Godkjenningen er bekreftet fra prosjekteierens konto i [PR #117](https://github.com/hansarne-lang/fiskespillet/pull/117#issuecomment-6719632634) for revisjon 360f9ed.
 
 Regelen «ingen klokkeakselerasjon i tester» erstattes for raske kontroller. `-FiskClockScale=N` (1–20) skalerer serverens dagsklokke og dermed alt som bruker den. Normalverdien er 1. Shipping-bygg ignorerer flagget. Spillregler, tider og priser er uendret. Utgivelsesbevis for dagslengde, 17:00-frist, reisetid og napp krever fortsatt normal klokke (`Run-All.ps1 -Release`).

@@ -211,7 +211,7 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     {
         const double A=Time*.12+I*.52,R=1800+I*140;Birds[I]->SetRelativeLocation(Center+FVector(FMath::Cos(A)*R,FMath::Sin(A)*R,700+I*55));
         Birds[I]->SetRelativeRotation(FRotator(0,FMath::RadiansToDegrees(A)+90,FMath::Sin(Time*3+I)*12));
-        for(int32 Side=0;Side<2;++Side) { auto* W=BirdWings[I*2+Side];const double Sign=Side?1:-1,Flap=FMath::Sin(Time*5+I)*24;W->SetRelativeLocation(Birds[I]->GetRelativeLocation()+Birds[I]->GetRelativeRotation().RotateVector(FVector(0,Sign*27,5)));W->SetRelativeRotation(FRotator(0,FMath::RadiansToDegrees(A)+90,Sign*Flap)); }
+        for(int32 Side=0;Side<2;++Side) { auto* W=BirdWings[I*2+Side].Get();const double Sign=Side?1:-1,Flap=FMath::Sin(Time*5+I)*24;W->SetRelativeLocation(Birds[I]->GetRelativeLocation()+Birds[I]->GetRelativeRotation().RotateVector(FVector(0,Sign*27,5)));W->SetRelativeRotation(FRotator(0,FMath::RadiansToDegrees(A)+90,Sign*Flap)); }
     }
     for(int32 I=0;I<Flyers.Num();++I)
     {

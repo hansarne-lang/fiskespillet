@@ -51,6 +51,14 @@ Først kontrolleres levering og frist mot det autoritative grunnlaget; deretter 
 
 Reisehopp er et valg av presentasjon etter enighet fra alle om bord. Serverklokke, båtens fysiske reise og ankomsttid fortsetter uendret. Det endrer ikke kapteinens myndighet til å starte retur. Strandbar, naust, offshorebalanse og veddemål bygges innenfor de eksisterende logiske modulene; ingen ny fysisk runtime-modul opprettes av disse designvalgene.
 
+### Tillit til karriereprofiler på LAN
+
+Serverautoriteten gjelder spillet i den pågående økten: dagsklokke, fangst, levering, oppgjør, kjøp og nye kvitteringer. Den gjelder ikke karrierehistorikk som spilleren tar med fra andre verter.
+
+Når en spiller kobler til, sender klienten sin lagrede karriere. Verten kontrollerer at kvitteringskjeden henger sammen (`FFiskCareerProfile::IsValid`), at profilen ikke er i konflikt med vertens egen kopi (`Extends`), og at utbetalinger fra dager i vertens egen journal stemmer (`FiskJournalAuthority::RecoverIncome`). Utbetalinger fra andre verter kan ikke kontrolleres og godtas slik de er. En endret klient kan dermed bringe med seg oppdiktet saldo. Dette er en godkjent begrensning (DECISIONS.md, 8. november 2026), ikke en feil som skal rettes i prototypen.
+
+Mens spilleren er tilkoblet, kan klienten ikke kreditere seg selv: nye utbetalinger lages bare av vertens oppgjør, og kjøp kontrolleres mot saldoen verten har godtatt. Ved hver ny tilkobling, også til samme vert, gjelder tilliten over. Ekstra utbetalinger som legges etter vertens kopi, godtas da.
+
 ## Innhold og mulig videre oppdeling
 
 Bruk `Content/FiskELaget/<Modul>/` for ressurseierskap. Felles kart og binære ressurser redigeres av én agent om gangen. Splitt logiske områder til flere fysiske UE-moduler først når avhengigheter, byggetid eller teamarbeid viser et konkret behov, og registrer endringen i DECISIONS.md.

@@ -25,7 +25,7 @@ ALL = 'ALL'
 IGNORED = (
     '*.md', 'Docs/*', 'Tools/Validation/*', 'Tools/Coordination/*', '.github/ISSUE_TEMPLATE/*',
     '.github/CODEOWNERS', '.github/pull_request_template.md', '.github/project-blueprint.json',
-    'Tools/Testing/select_tests.py', 'Tools/Testing/test_select_tests.py', 'Tools/Build/*',
+    'Tools/Testing/select_tests.py', 'Tools/Testing/test_select_tests.py', 'Tools/Testing/Test-RunAllLib.ps1', 'Tools/Build/*',
     '*.docx', '.gitignore',
 )
 
@@ -35,7 +35,7 @@ EVERYTHING = (
     'Source/FiskGame/Public/*', 'Source/FiskGame/Private/FiskGameModule.cpp',
     'Source/FiskGame/Private/Bootstrap/*', 'Source/FiskGame/Private/DayCycle/*',
     'Source/FiskGame/Private/Boats/FiskBoardingController*', 'Source/FiskGame/Private/UI/FiskGameInstance*',
-    'Tools/Testing/FiskTestCommon.ps1', 'Tools/Testing/Run-All.ps1', '.gitattributes',
+    'Tools/Testing/FiskTestCommon.ps1', 'Tools/Testing/Run-All.ps1', 'Tools/Testing/FiskRunAllLib.ps1', '.gitattributes',
 )
 
 FISHING = ['FishCombat', 'RepeatedFishing', 'RigSetup', 'FishingRelease', 'ContentRelease', 'AnglerRelease']

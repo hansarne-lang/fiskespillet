@@ -23,6 +23,7 @@ Verktøyene er lagt til 8. november 2026. Ingen av dem er kjørt på Windows enn
 | `Tools/Build/Build-Fisk.ps1` | Inkrementelt bygg og pakking. `-Mode Code` gjenbruker forrige cook ved rene C++-endringer. Tiden for hvert steg legges i `build-times.csv` i arkivmappen. |
 | `Tools/Build/Test-Automation.ps1` | Kjører `Fiskelaget.*`-automasjonstestene uten grafikk (`-nullrhi`). Krever bygget Editor. |
 | `Tools/Testing/Run-All.ps1` | Kjører grafiske `Run-*.ps1` i parallell med egne porter (`7777 + 100 × plass`), og lager `summary.csv` med resultat og varighet. |
+| `Tools/Testing/Test-RunAllLib.ps1` | Regresjonsprøver for hvordan `Run-All.ps1` klassifiserer `err.txt` (bare PowerShell-fremdrift ignoreres). |
 | `Tools/Testing/select_tests.py` | Velger skript ut fra endrede filer. Ukjente stier gir alle skript. Dokumentasjon gir ingen. |
 | `-FiskClockScale=N` / `FISK_CLOCK_SCALE` | Testklokke 1–20 ganger raskere. Dag, avreise, reisetid, napp og kamp følger den samme klokken. Kompileres bort i Shipping. |
 

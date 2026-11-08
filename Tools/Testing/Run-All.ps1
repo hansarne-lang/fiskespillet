@@ -28,6 +28,7 @@ param(
     [switch]$Release
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'FiskRunAllLib.ps1')
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $exclusive = @('MainMenu', 'SoloPlay')   # use 7777/17784 from game code; cannot be moved yet
 # Scenarios with game-time windows too short for an accelerated clock always run at scale 1.
@@ -108,25 +109,6 @@ exit `$code
         Remove-Item Env:FISK_TEST_PORT_BASE, Env:FISK_CLOCK_SCALE -ErrorAction SilentlyContinue
     }
     [pscustomobject]@{ Name = $name; Slot = $slot; Scale = $scale; Process = $process; CodeFile = $codeFile; Clock = [Diagnostics.Stopwatch]::StartNew() }
-}
-
-# True when err.txt holds anything other than PowerShell progress records. Windows PowerShell
-# can write progress ("Preparing modules for first use") to stderr as CLIXML; that is not an
-# error. Any other content, or CLIXML that cannot be read, counts as an error.
-function Test-ErrorOutput([string]$path) {
-    if (-not (Test-Path -LiteralPath $path) -or (Get-Item -LiteralPath $path).Length -eq 0) { return $false }
-    $text = Get-Content -LiteralPath $path -Raw
-    if ([string]::IsNullOrWhiteSpace($text)) { return $false }
-    $lines = $text -split "`r?`n", 2
-    if ($lines[0].Trim() -ne '#< CLIXML' -or $lines.Count -lt 2) { return $true }
-    try {
-        $xml = [xml]$lines[1]
-        $objects = @($xml.DocumentElement.ChildNodes | Where-Object { $_.LocalName -eq 'Obj' })
-        if (-not $objects.Count) { return $true }
-        return @($objects | Where-Object { $_.GetAttribute('S') -ne 'progress' }).Count -gt 0
-    } catch {
-        return $true
-    }
 }
 
 function Complete-Script($job) {

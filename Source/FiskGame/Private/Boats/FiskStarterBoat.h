@@ -54,7 +54,7 @@ public:
     int32 GetTravelMs() const { return Kind==1?FMath::Max(1,Route.BaseTravelMs*4/5):Route.BaseTravelMs; }
     int32 GetLegTravelMs() const { return LegTravelMs; }
     int32 GetLegSerial() const { return LegSerial; }
-    bool IsTravelling() const { return TripProgress>=0 && TripProgress!=100 && TripProgress!=200; }
+    bool IsTravelling() const { return TripProgress>=0 && TripProgress!=AtFishingSpot && TripProgress!=AtMarina; }
     bool UsesTravelCard() const;
     bool HasTravelVote(int32 Player) const { return TravelVotes.Contains(Player); }
     int32 GetTravelVoteCount() const { return TravelVotes.Num(); }

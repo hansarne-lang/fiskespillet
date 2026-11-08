@@ -55,4 +55,20 @@ bool FFiskSeaGeometryTest::RunTest(const FString& Parameters)
     } }
     TestTrue(TEXT("Route behind island detours"),FiskRouteGeometry::Path(FVector(70000,85000,0)).Num()>2);return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCareerStoredIdsTest,"Fiskelaget.Career.StoredIdsAreStable",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskCareerStoredIdsTest::RunTest(const FString& Parameters)
+{
+    // These numbers are written to career files and journals; renumbering breaks existing saves.
+    TestEqual(TEXT("Initial grant kind"),FFiskCareerReceipt::KindInitialGrant,0);
+    TestEqual(TEXT("Purchase kind"),FFiskCareerReceipt::KindPurchase,1);
+    TestEqual(TEXT("Settlement kind"),FFiskCareerReceipt::KindSettlement,2);
+    TestEqual(TEXT("Line item"),FFiskCareerProfile::ItemLine,0);
+    TestEqual(TEXT("Reel item"),FFiskCareerProfile::ItemReel,1);
+    TestEqual(TEXT("Rod item"),FFiskCareerProfile::ItemRod,2);
+    TestEqual(TEXT("Offshore boat item"),FFiskCareerProfile::ItemOffshoreBoat,3);
+    TestEqual(TEXT("Fight gear bits"),FFiskCareerProfile::FightGearMask,7);
+    TestEqual(TEXT("Offshore boat name"),FFiskCareerProfile::ItemName(FFiskCareerProfile::ItemOffshoreBoat),FString(TEXT("Offshorebåt")));
+    TestEqual(TEXT("New profile starts with initial grant"),FFiskCareerProfile::Create(TEXT("FISKER")).Receipts[0].Kind,FFiskCareerReceipt::KindInitialGrant);
+    return true;
+}
 #endif

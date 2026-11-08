@@ -30,7 +30,7 @@ AFiskMarinaHub* UFiskMarinaPanel::FindHub() const { TActorIterator<AFiskMarinaHu
 bool UFiskMarinaPanel::IsAtDock() const
 {
     const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());const AFiskStarterBoat* Boat=PC->FindStarterBoat();
-    return Boat && PC->PlayerState && (!Boat->IsAboard(PC->PlayerState->GetPlayerId()) || Boat->GetTripProgress()==-1 || Boat->GetTripProgress()==200);
+    return Boat && PC->PlayerState && (!Boat->IsAboard(PC->PlayerState->GetPlayerId()) || Boat->GetTripProgress()==AFiskStarterBoat::AtDock || Boat->GetTripProgress()==AFiskStarterBoat::AtMarina);
 }
 void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponentTickFunction* Function)
 {
@@ -206,7 +206,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
             for(const FFiskMarinaResident& R:Hub->GetResidents())
             {
                 const AFiskStarterBoat* Aboard=nullptr;for(auto* B:PC->FleetBoats()) { if(B->IsAboard(R.PlayerId)) { Aboard=B;break; } }
-                const bool Sea=Aboard && Aboard->GetTripProgress()!=-1 && Aboard->GetTripProgress()!=200;
+                const bool Sea=Aboard && Aboard->GetTripProgress()!=AFiskStarterBoat::AtDock && Aboard->GetTripProgress()!=AFiskStarterBoat::AtMarina;
                 T(R.Identity.DisplayName+TEXT(" | ")+(R.PlayerId<0?TEXT("Frakoblet"):Sea?TEXT("På sjøen"):TEXT("Ved marinaen")),46+(I/6)*285,158+(I%6)*26,.84f);++I;
             }
             const int32 Start=FMath::Max(0,Hub->GetMessages().Num()-3);

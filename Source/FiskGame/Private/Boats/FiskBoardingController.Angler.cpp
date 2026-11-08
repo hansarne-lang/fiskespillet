@@ -17,7 +17,7 @@ void AFiskBoardingController::ServerApplyRigBundle_Implementation(FFiskRigBundle
     for(int32 I=0;I<Count;++I) { const auto* R=GetRodAt(I);Casts.Add(R->GetCastId());Current.Add(R->GetRig());Safe.Add(R->CanConfigure()); }
     const auto* G=B?FiskGrounds::Find(B->GetGroundId()):nullptr;
     const bool OK=IsCareerReady() && PlayerState && D && D->HasStarted() && D->GetElapsedMilliseconds()<1020000 && B && G && B->IsAboard(PlayerState->GetPlayerId())
-        && (B->GetTripProgress()==-1 || B->GetTripProgress()==100) && FiskAngler::Prepare(Request,D->GetDayNumber(),Count,G->BottomDepth,Casts,Current,Safe,Prepared);
+        && (B->GetTripProgress()==AFiskStarterBoat::AtDock || B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot) && FiskAngler::Prepare(Request,D->GetDayNumber(),Count,G->BottomDepth,Casts,Current,Safe,Prepared);
     if(OK)
     { for(int32 I=0;I<Count;++I) { const_cast<UFiskPrototypeRod*>(GetRodAt(I))->Rig=Prepared[I]; }ForceNetUpdate(); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_RIG_BUNDLE accepted=%d player=%d count=%d"),OK,PlayerState?PlayerState->GetPlayerId():-1,Count);ClientRigBundleReply(OK);

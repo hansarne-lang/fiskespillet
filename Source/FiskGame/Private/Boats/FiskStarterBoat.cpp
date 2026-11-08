@@ -208,7 +208,7 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     if(!Next.Equals(Position,.01)) { SetActorRotation((Next-Position).Rotation()); }SetActorLocation(Position);
     const bool Returning=TripProgress>AtFishingSpot;const int32 Percent=FMath::FloorToInt(Fraction*100);
     TripProgress=Returning?100+FMath::Max(1,Percent):Percent;
-    if(TripProgress==100 || TripProgress==200) { if(TripProgress==200) { SetActorLocation(DockPosition()); }SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate(); }
+    if(TripProgress==AtFishingSpot || TripProgress==AtMarina) { if(TripProgress==AtMarina) { SetActorLocation(DockPosition()); }SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate(); }
 }
 bool AFiskStarterBoat::UsesTravelCard() const { return IsTravelling() && FiskVoyage::Unanimous(Crew,TravelVotes); }
 bool AFiskStarterBoat::VoteTravel(int32 Player,int32 ExpectedLeg,bool Vote)
@@ -316,9 +316,9 @@ bool AFiskStarterBoat::SelectPoint(int32 Requester,int32 Revision,FVector Point,
 int32 AFiskStarterBoat::ReturnMarginMs(int32 NowMs) const
 {
     int64 Home=NowMs;const int64 Travel=GetReturnTravelMs();
-    if(TripProgress==-1) { Home=FMath::Max(NowMs,120000)+2*Travel; }
+    if(TripProgress==AtDock) { Home=FMath::Max(NowMs,120000)+2*Travel; }
     else if(TripProgress<100) { Home+=FMath::DivideAndRoundUp<int64>((100LL-TripProgress)*LegTravelMs,100)+Travel; }
-    else if(TripProgress==100) { Home+=Travel; }
+    else if(TripProgress==AtFishingSpot) { Home+=Travel; }
     else if(TripProgress<200) { Home+=FMath::DivideAndRoundUp<int64>((TripProgress==101?100LL:200LL-TripProgress)*LegTravelMs,100); }
     return static_cast<int32>(FMath::Clamp<int64>(1020000-Home,MIN_int32,MAX_int32));
 }

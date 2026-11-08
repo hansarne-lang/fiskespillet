@@ -29,13 +29,13 @@ bool FFiskCareerProfile::IsValid() const
         const FFiskCareerReceipt& R=Receipts[I];
         if(!R.Id.IsValid() || Seen.Contains(R.Id)) { return false; }Seen.Add(R.Id);
         if(I==0)
-        { if(R.Id!=Id || R.Kind!=0 || R.Item!=-1 || R.Amount!=InitialCash) { return false; } }
-        else if(R.Kind==1)
+        { if(R.Id!=Id || R.Kind!=FFiskCareerReceipt::KindInitialGrant || R.Item!=-1 || R.Amount!=InitialCash) { return false; } }
+        else if(R.Kind==FFiskCareerReceipt::KindPurchase)
         {
             if(Price(R.Item)<0 || (Items&(1<<R.Item))!=0 || R.Amount!=-Price(R.Item)) { return false; }
             Items|=1<<R.Item;
         }
-        else if(R.Kind!=2 || R.Item!=-1 || R.Amount<0 || R.Amount>MaxCash) { return false; }
+        else if(R.Kind!=FFiskCareerReceipt::KindSettlement || R.Item!=-1 || R.Amount<0 || R.Amount>MaxCash) { return false; }
         if(R.Amount>0 && Balance>MaxCash-R.Amount) { return false; }
         Balance+=R.Amount;if(Balance<0 || Balance>MaxCash) { return false; }
     }
@@ -50,17 +50,17 @@ bool FFiskCareerProfile::Extends(const FFiskCareerProfile& Older) const
 bool FFiskCareerProfile::Buy(const FGuid& Command,int32 ExpectedRevision,int32 Item)
 {
     if(!IsValid() || !Command.IsValid() || Price(Item)<0) { return false; }
-    for(const FFiskCareerReceipt& R:Receipts) { if(R.Id==Command) { return R.Kind==1 && R.Item==Item; } }
+    for(const FFiskCareerReceipt& R:Receipts) { if(R.Id==Command) { return R.Kind==FFiskCareerReceipt::KindPurchase && R.Item==Item; } }
     if(Revision!=ExpectedRevision || Revision>=MaxReceipts || Has(Item) || Cash<Price(Item)) { return false; }
-    FFiskCareerReceipt R;R.Id=Command;R.Kind=1;R.Item=Item;R.Amount=-Price(Item);
+    FFiskCareerReceipt R;R.Id=Command;R.Kind=FFiskCareerReceipt::KindPurchase;R.Item=Item;R.Amount=-Price(Item);
     Receipts.Add(R);Cash+=R.Amount;Owned|=1<<Item;++Revision;return true;
 }
 bool FFiskCareerProfile::Credit(const FGuid& Settlement,int64 Amount)
 {
     if(!IsValid() || !Settlement.IsValid() || Amount<0 || Amount>MaxCash) { return false; }
-    for(const FFiskCareerReceipt& R:Receipts) { if(R.Id==Settlement) { return R.Kind==2 && R.Amount==Amount; } }
+    for(const FFiskCareerReceipt& R:Receipts) { if(R.Id==Settlement) { return R.Kind==FFiskCareerReceipt::KindSettlement && R.Amount==Amount; } }
     if(Revision>=MaxReceipts || Cash>MaxCash-Amount) { return false; }
-    FFiskCareerReceipt R;R.Id=Settlement;R.Kind=2;R.Amount=Amount;Receipts.Add(R);Cash+=Amount;++Revision;return true;
+    FFiskCareerReceipt R;R.Id=Settlement;R.Kind=FFiskCareerReceipt::KindSettlement;R.Amount=Amount;Receipts.Add(R);Cash+=Amount;++Revision;return true;
 }
 FString FFiskCareerProfile::Money() const
 { return FString::Printf(TEXT("$%lld.%02lld"),static_cast<long long>(Cash/100),static_cast<long long>(Cash%100)); }

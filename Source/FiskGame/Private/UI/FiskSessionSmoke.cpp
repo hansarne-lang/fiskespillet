@@ -101,8 +101,8 @@ void AFiskBoardingController::RunSessionSmoke()
     }
     else if(SessionStage==7)
     {
-        if(Host && Boat->GetTripProgress()==-1 && Day->GetElapsedSeconds()>=120) { Key(EKeys::R); }
-        if(Boat->GetTripProgress()==100) { ServerCastRod(SessionOldCast);SessionAt=RealNow;SessionStage=8; }
+        if(Host && Boat->GetTripProgress()==AFiskStarterBoat::AtDock && Day->GetElapsedSeconds()>=120) { Key(EKeys::R); }
+        if(Boat->GetTripProgress()==AFiskStarterBoat::AtFishingSpot) { ServerCastRod(SessionOldCast);SessionAt=RealNow;SessionStage=8; }
     }
     else if(SessionStage==8 && RealNow-SessionAt>=1)
     {
@@ -122,7 +122,7 @@ void AFiskBoardingController::RunSessionSmoke()
             {const AFiskBoardingController* Other=Cast<AFiskBoardingController>(It->Get());if(Other && Other->GetRod()->GetState()==EFiskRodState::Fishing){++Fishing;}}
             if(Fishing==2) { Key(EKeys::R); }
         }
-        if(Boat->GetTripProgress()==200)
+        if(Boat->GetTripProgress()==AFiskStarterBoat::AtMarina)
         {
             if(History.Num()!=1 || View.bRevealed || !View.Results.IsEmpty() || Day->GetDayNumber()!=2) { Fail(TEXT("new_day_final_state"));return; }
             Capture(TEXT("day2-home"));SessionStage=11;

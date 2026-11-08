@@ -42,7 +42,7 @@ Den begrensede økonomi-/profilarkitekturen i v0.7-kontrakten er godkjent innen 
 
 ## 2026-11-08 — Karriereprofiler stoles på mellom LAN-verter
 
-Prosjekteieren valgte 8. november 2026 alternativ 1 i [#112](https://github.com/hansarne-lang/fiskespillet/issues/112): FISKELAGET er et LAN-spill mellom venner, og verten stoler på karrieren klienten sender inn, så lenge kvitteringskjeden er gyldig og ikke er i konflikt med vertens egen kopi.
+Prosjekteieren valgte 8. november 2026 alternativ 1 i [#112](https://github.com/hansarne-lang/fiskespillet/issues/112), bekreftet fra prosjekteierens konto i [PR #120](https://github.com/hansarne-lang/fiskespillet/pull/120#issuecomment-6719892215) for revisjon ebe6910: FISKELAGET er et LAN-spill mellom venner, og verten stoler på karrieren klienten sender inn, så lenge kvitteringskjeden er gyldig og ikke er i konflikt med vertens egen kopi.
 
 Bakgrunn: Karrieren skal følge spilleren mellom LAN-verter (IDÉ-004, RULE09), og v0.7-godkjenningen slår fast at kopiering av profiler utenfor spillet ikke kan hindres mellom uavhengige verter. En ny vert kan ikke skille ekte utbetalinger fra andre verter fra oppdiktede, og siden enhver spiller kan være vert, gir heller ikke signering et reelt vern. En endret klient kan derfor ta med seg oppdiktet saldo. Dette godtas.
 

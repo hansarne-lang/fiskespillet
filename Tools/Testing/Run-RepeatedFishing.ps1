@@ -45,10 +45,10 @@ function Time-Of($event) {
     [DateTime]::ParseExact($Matches[1],'yyyy.MM.dd-HH.mm.ss:fff',[Globalization.CultureInfo]::InvariantCulture)
 }
 $clientApp = $null
-$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen',"-port=$(FiskFixedPort 17782)",('-abslog="{0}"' -f $hostLog)) + $flags + $hostCapture) -PassThru -WindowStyle Hidden
+$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen',"-port=$(FiskFixedPort 17782)",('-abslog="{0}"' -f $hostLog),('-UserDir="{0}"' -f ($hostLog -replace '\.log$','-profile'))) + $flags + $hostCapture) -PassThru -WindowStyle Hidden
 try {
     Wait-Event $hostLog 'FISKELAGET_BOOTSTRAP_READY' $hostApp 90
-    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@("127.0.0.1:$(FiskFixedPort 17782)",('-abslog="{0}"' -f $clientLog)) + $flags + $clientCapture) -PassThru -WindowStyle Hidden
+    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@("127.0.0.1:$(FiskFixedPort 17782)",('-abslog="{0}"' -f $clientLog),('-UserDir="{0}"' -f ($clientLog -replace '\.log$','-profile'))) + $flags + $clientCapture) -PassThru -WindowStyle Hidden
     Wait-Event $hostLog 'FISKELAGET_DAY_STARTED' $hostApp 90
     Wait-Event $hostLog 'FISKELAGET_MARINA_REACHED crew=2' $hostApp 1000
     Wait-Event $clientLog 'FISKELAGET_MARINA_REACHED crew=2' $clientApp 20

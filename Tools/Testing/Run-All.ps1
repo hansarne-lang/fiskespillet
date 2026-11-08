@@ -74,6 +74,9 @@ function Start-Script([string]$name, [int]$slot) {
     try {
         $process = Start-Process -FilePath $shell -ArgumentList $arguments -PassThru -WindowStyle Hidden `
             -RedirectStandardOutput (Join-Path $run "$name.out.txt") -RedirectStandardError (Join-Path $run "$name.err.txt")
+        # Windows PowerShell 5.1 only reports ExitCode for a -PassThru process if its handle was
+        # opened while the process was running.
+        $null = $process.Handle
     } finally {
         Remove-Item Env:FISK_TEST_PORT_BASE, Env:FISK_CLOCK_SCALE -ErrorAction SilentlyContinue
     }
@@ -85,9 +88,9 @@ function Complete-Script($job) {
     $job.Clock.Stop()
     $code = $job.Process.ExitCode
     $err = Join-Path $run "$($job.Name).err.txt"
-    $failed = $code -ne 0 -or ((Test-Path -LiteralPath $err) -and (Get-Item -LiteralPath $err).Length -gt 0)
+    $failed = ($null -eq $code) -or $code -ne 0 -or ((Test-Path -LiteralPath $err) -and (Get-Item -LiteralPath $err).Length -gt 0)
     $row = [pscustomobject]@{
-        Script = $job.Name; Result = $(if ($failed) { 'Failed' } else { 'Passed' }); ExitCode = $code
+        Script = $job.Name; Result = $(if ($failed) { 'Failed' } else { 'Passed' }); ExitCode = $(if ($null -eq $code) { 'unknown' } else { $code })
         Seconds = [Math]::Round($job.Clock.Elapsed.TotalSeconds); Slot = $job.Slot; ClockScale = $ClockScale
     }
     $results.Add($row)

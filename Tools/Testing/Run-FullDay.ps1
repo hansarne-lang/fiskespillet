@@ -32,10 +32,10 @@ function Event-Time($event) {
     [DateTime]::ParseExact($Matches[1], 'yyyy.MM.dd-HH.mm.ss:fff', [Globalization.CultureInfo]::InvariantCulture)
 }
 
-$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen',"-port=$(FiskFixedPort 17780)",('-abslog="{0}"' -f $hostLog)) + $flags) -PassThru -WindowStyle Hidden
+$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen',"-port=$(FiskFixedPort 17780)",('-abslog="{0}"' -f $hostLog),('-UserDir="{0}"' -f ($hostLog -replace '\.log$','-profile'))) + $flags) -PassThru -WindowStyle Hidden
 try {
     Wait-Event $hostLog 'FISKELAGET_BOOTSTRAP_READY' $hostApp 90
-    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@("127.0.0.1:$(FiskFixedPort 17780)",('-abslog="{0}"' -f $clientLog)) + $flags) -PassThru -WindowStyle Hidden
+    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@("127.0.0.1:$(FiskFixedPort 17780)",('-abslog="{0}"' -f $clientLog),('-UserDir="{0}"' -f ($clientLog -replace '\.log$','-profile'))) + $flags) -PassThru -WindowStyle Hidden
     Wait-Event $hostLog 'FISKELAGET_DAY_STARTED' $hostApp 90
     if ($ClockOnlySeconds -gt 0) {
         $stopwatch = [Diagnostics.Stopwatch]::StartNew()

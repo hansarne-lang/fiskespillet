@@ -29,6 +29,20 @@ flowchart TD
 
 Pilene viser kompileringsavhengigheter. Funksjonsområdene har ingen direkte kompileringsavhengigheter til hverandre. UE-avhengigheter holdes minimale og listes eksplisitt i Build.cs ved opprettelse. En enkel grensekontroll i CI skal finne ulovlige includes; dette er en praktisk avgrensning, ikke et fullstendig språkbasert vern når områdene ligger i samme fysiske modul.
 
+### Include-grenser i FiskGame
+
+`Tools/Validation/check_includes.py` kjøres i CI. Hver mappe under `Source/FiskGame/Private/` er et område: Angler, Boats, Bootstrap, Career, Collections, DayCycle, Economy, Expedition, Fishing, UI, Voyage og World.
+
+| Fil i | Kan inkludere |
+|---|---|
+| Et funksjonsområde | Eget område, FiskCore, `Source/FiskGame/Public` og Unreal Engine |
+| `Bootstrap/` og `FiskGameModule.cpp` (integrasjonslaget) | Alle områder |
+| `Source/FiskGame/Public` | FiskCore og Unreal Engine |
+
+Et funksjonsområde inkluderer ikke andre områder eller integrasjonslaget. Avhengigheter mellom områder går gjennom grensesnitt og verdiobjekter i FiskCore. En ny tillatt avhengighet krever arkitekturgodkjenning og en oppføring i `ALLOWED` i kontrollen.
+
+Brudd som fantes da kontrollen ble innført (420 includes i 114 filer, november 2026), står i `Tools/Validation/include_exceptions.json`. Listen kan bare krympe. Nye brudd feiler CI, og det gjør også unntak som ikke lenger brukes. Fjern dem med `python Tools/Validation/check_includes.py --prune`. `--summary` viser bruddene per områdepar.
+
 v0.17 bruker motorens innebygde `ProceduralMeshComponent` i FiskGame for formet skrog, havflate og slepefisk. Pluginen aktiveres eksplisitt i prosjektfilen og er en privat renderingsavhengighet i FiskGame. FiskCore beholder bare Core/CoreUObject; ingen ny spillmodul, kjøpt ressurs eller tjeneste er innført. Bootstrapkontrollen håndhever den utvidede, eksplisitte avhengighetslisten.
 
 ## Kommunikasjon og serverautoritet
@@ -50,6 +64,14 @@ Dagens bekreftede fangstresultater skal holdes skjult for alle, også fisker og 
 Først kontrolleres levering og frist mot det autoritative grunnlaget; deretter gjennomføres felles avsløring og økonomisk oppgjør. Tidlig ankomst gir ingen salgsrett før minutt 17. Retry og gjenoppkobling skal ikke utløse ekstra utbetaling. Den samme avsløringsregelen gjelder HUD, journal, rekordvarsler, trofévegg og alle klientlesemodeller. Skjulte data skal ikke sendes i underliggende klientpayload før riktig tidspunkt. Fiskens skjulte utholdenhet skal fortsatt ikke vises som helsebar. En full serverhendelse er derfor ikke en offentlig nettverkspakke.
 
 Reisehopp er et valg av presentasjon etter enighet fra alle om bord. Serverklokke, båtens fysiske reise og ankomsttid fortsetter uendret. Det endrer ikke kapteinens myndighet til å starte retur. Strandbar, naust, offshorebalanse og veddemål bygges innenfor de eksisterende logiske modulene; ingen ny fysisk runtime-modul opprettes av disse designvalgene.
+
+### Tillit til karriereprofiler på LAN
+
+Serverautoriteten gjelder spillet i den pågående økten: dagsklokke, fangst, levering, oppgjør, kjøp og nye kvitteringer. Den gjelder ikke karrierehistorikk som spilleren tar med fra andre verter.
+
+Når en spiller kobler til, sender klienten sin lagrede karriere. Verten kontrollerer at kvitteringskjeden henger sammen (`FFiskCareerProfile::IsValid`), at profilen ikke er i konflikt med vertens egen kopi (`Extends`), og at utbetalinger fra dager i vertens egen journal stemmer (`FiskJournalAuthority::RecoverIncome`). Utbetalinger fra andre verter kan ikke kontrolleres og godtas slik de er. En endret klient kan dermed bringe med seg oppdiktet saldo. Dette er en godkjent begrensning (DECISIONS.md, 8. november 2026), ikke en feil som skal rettes i prototypen.
+
+Mens spilleren er tilkoblet, kan klienten ikke kreditere seg selv: nye utbetalinger lages bare av vertens oppgjør, og kjøp kontrolleres mot saldoen verten har godtatt. Ved hver ny tilkobling, også til samme vert, gjelder tilliten over. Ekstra utbetalinger som legges etter vertens kopi, godtas da.
 
 ## Innhold og mulig videre oppdeling
 

@@ -1,6 +1,6 @@
 # Plan: oppdeling av AFiskBoardingController (#113)
 
-Status: forslag til prosjekteierens arkitekturgodkjenning i [#113](https://github.com/hansarne-lang/fiskespillet/issues/113). Steg 1 er levert i samme PR som denne planen. Steg 2–9 startes først når planen er godkjent, og hvert steg er en egen PR som bygges og LAN-testes på Windows før neste steg.
+Status: godkjent av prosjekteieren 8. november 2026 i [PR #122](https://github.com/hansarne-lang/fiskespillet/pull/122#issuecomment-6719895702) for revisjon ec611e0, med forslagene slik de står: komponenter i `Boats/Controller/` først, og hvert steg integreres for seg. Steg 1 er levert i samme PR. Hvert av stegene 2–9 er en egen PR som bygges og LAN-testes på Windows før neste steg. Steg 2 starter når steg 1 er bygget og testet.
 
 ## Utgangspunkt
 

@@ -56,7 +56,7 @@ Lukk kart og paneler før du trykker R.
 | Høyre mus (hold) | Sveiv inn |
 | Musehjul | Stram eller løsne bremsen |
 | Mellomrom | Land fisken når den er nær og under kontroll |
-| Å | AI-testhjelp: forsøker én vanlig kamp og landing etter napp. Å eller manuell kontroll tar over igjen |
+| Å | AI-testhjelp: forsøker én vanlig kamp og landing etter napp. Å eller manuell kontroll tar over igjen. Finnes i Development-pakken, ikke i Shipping-bygg |
 
 Napp kommer etter noen minutter og varsles med en tydelig lyd. Pump ved å løfte uten å sveive, og senk så mens du sveiver inn. Stram ikke bremsen for hardt under utras, ellers ryker lina. Slakk line for lenge mister fisken. F6 i hovedmenyen åpner fiskeskolen, der du kan øve uten at det påvirker karrieren.
 
@@ -79,10 +79,10 @@ Napp kommer etter noen minutter og varsles med en tydelig lyd. Pump ved å løft
 
 | Tast | Funksjon |
 |---|---|
-| H | Ditt naust. N åpner naustbutikken, V viser hele naustet, U viser lagrede stangoppsett |
+| H | Ditt naust. N åpner naustbutikken, der V forhåndsviser hele naustet. U viser lagrede stangoppsett |
 | B | Strandbaren. 1–5 sender hilsener, V bytter mellom bar, havn og følg båt |
 | T | Bryggeliv i land: W/A/S/D går, Shift løper, piltaster dreier kameraet, musehjul zoomer, Home nullstiller |
-| F10 | Havneguide til båt, strandbar eller ett av tolv naust |
+| F10 | I bryggeliv (trykk T først): havneguide til båt, strandbar eller ett av tolv naust |
 
 Fra en båt ved marinaen går du i land med Tab, L, Tab.
 

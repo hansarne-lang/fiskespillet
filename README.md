@@ -17,6 +17,7 @@ Repositoryet er offentlig etter prosjekteierens beslutning, men **alle rettighet
 ## Dokumentasjon
 
 - [Spillerguide](Docs/PLAYER_GUIDE.md) og [endringslogg](CHANGELOG.md)
+- [Assetliste og fremdrift](Docs/Assets/FISKELAGET_Assetliste.md), [assetstandard](Docs/Assets/FISKELAGET_Assetstandard.md) og [assetdokumentasjon med forhåndsbilder](Docs/Assets/README.md) (status 5. november 2026)
 - [Gjeldende kravspesifikasjon v1.1](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.md) og [Word-utgave](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.1.docx)
 - [Samlet idébank](Docs/Requirements/FISKELAGET_Idebank_2026-11-03.md) og [tidligere krav v1.0](Docs/Requirements/FISKELAGET_Kravspesifikasjon_v1.0.md)
 - [Arkitektur](ARCHITECTURE.md) og [modulkontrakter](MODULE_CONTRACTS.md)

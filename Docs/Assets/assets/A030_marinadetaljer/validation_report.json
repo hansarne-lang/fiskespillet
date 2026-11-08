@@ -1,0 +1,329 @@
+{
+  "asset_id": "A030",
+  "saved_source_reopened": true,
+  "game_integration": "pending",
+  "prop_count": 10,
+  "meshes": {
+    "SM_FISK_Marina_Buoy_v1": {
+      "triangles": 1592,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.22499999403953552,
+          -0.22499999403953552,
+          0.0
+        ],
+        [
+          0.22499999403953552,
+          0.22499999403953552,
+          0.6970000267028809
+        ]
+      ],
+      "materials": 3
+    },
+    "SM_FISK_Marina_Fender_v1": {
+      "triangles": 1892,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.11650000512599945,
+          -0.11629904061555862,
+          0.0
+        ],
+        [
+          0.11650000512599945,
+          0.11629904061555862,
+          0.8230000138282776
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Marina_RopeCoil_v1": {
+      "triangles": 28856,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.21906542778015137,
+          -0.2287217080593109,
+          0.01100250519812107
+        ],
+        [
+          0.3568638563156128,
+          0.24637268483638763,
+          0.03499680384993553
+        ]
+      ],
+      "materials": 1
+    },
+    "SM_FISK_Marina_Cleat_v1": {
+      "triangles": 592,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.05999999865889549,
+          -0.1894853562116623,
+          0.0
+        ],
+        [
+          0.05999999865889549,
+          0.1894853711128235,
+          0.14418092370033264
+        ]
+      ],
+      "materials": 1
+    },
+    "SM_FISK_Marina_FishCrate_v1": {
+      "triangles": 14664,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.32749998569488525,
+          -0.23749999701976776,
+          0.0
+        ],
+        [
+          0.32749998569488525,
+          0.23749999701976776,
+          0.33500000834465027
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Marina_Cooler_v1": {
+      "triangles": 1968,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.46777817606925964,
+          -0.2695000171661377,
+          0.0
+        ],
+        [
+          0.46777814626693726,
+          0.26600000262260437,
+          0.5225000381469727
+        ]
+      ],
+      "materials": 4
+    },
+    "SM_FISK_Marina_TackleBox_v1": {
+      "triangles": 796,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.23000000417232513,
+          -0.15850000083446503,
+          0.004999995231628418
+        ],
+        [
+          0.23000000417232513,
+          0.14000001549720764,
+          0.30777817964553833
+        ]
+      ],
+      "materials": 3
+    },
+    "SM_FISK_Marina_Bollard_v1": {
+      "triangles": 928,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.13500000536441803,
+          -0.13500000536441803,
+          0.0
+        ],
+        [
+          0.13500000536441803,
+          0.13500000536441803,
+          0.41499999165534973
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Marina_Lifebuoy_v1": {
+      "triangles": 3152,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.4010000228881836,
+          -0.065000019967556,
+          -0.021000027656555176
+        ],
+        [
+          0.4010000228881836,
+          0.065000019967556,
+          0.781000018119812
+        ]
+      ],
+      "materials": 3
+    },
+    "SM_FISK_Marina_Bucket_v1": {
+      "triangles": 2104,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.17702874541282654,
+          -0.16200000047683716,
+          0.0
+        ],
+        [
+          0.17702874541282654,
+          0.16200000047683716,
+          0.5070310831069946
+        ]
+      ],
+      "materials": 3
+    }
+  },
+  "SM_FISK_Marina_Buoy_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Buoy_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Fender_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 7.450580596923828e-09,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Fender_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_RopeCoil_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 2.9802322387695312e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_RopeCoil_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Cleat_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Cleat_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_FishCrate_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 2.9802322387695312e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_FishCrate_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Cooler_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 2.9802322387695312e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Cooler_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_TackleBox_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_TackleBox_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Bollard_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Bollard_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Lifebuoy_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 3.725290298461914e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Lifebuoy_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Bucket_v1_fbx": {
+    "meshes": 1,
+    "max_bounds_error_m": 1.4901161193847656e-08,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "SM_FISK_Marina_Bucket_v1_glb": {
+    "meshes": 1,
+    "max_bounds_error_m": 0,
+    "anchors": 1,
+    "collision_boxes": 0
+  },
+  "status": "passed"
+}

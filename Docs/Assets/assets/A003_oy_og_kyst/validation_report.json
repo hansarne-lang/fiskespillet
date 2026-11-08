@@ -1,0 +1,17 @@
+{
+  "asset": "A003",
+  "status": "passed",
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "material_compile_errors": [],
+  "mesh_size_cm": [
+    76000.0,
+    76000.0,
+    9002.4189453125
+  ],
+  "island_actor_count": 1,
+  "placed_coastal_rocks": 10,
+  "rock_variants": 3,
+  "preview_cameras": 3,
+  "collision": "disabled; integration work pending",
+  "geometry_validation": "geometry_validation.json"
+}

@@ -1,0 +1,60 @@
+{
+  "asset_id": "A007",
+  "saved_source_reopened": true,
+  "holder_fit": {
+    "butt_max_diameter_m": 0.034400003056799904,
+    "holder_inner_diameter_m": 0.054,
+    "diametral_clearance_m": 0.019599996943200096
+  },
+  "deformation": {
+    "rest_tip_m": [
+      0.0,
+      0.006000000052154064,
+      1.899999976158142
+    ],
+    "loaded_tip_m": [
+      0.0,
+      0.425680935382843,
+      1.7504725456237793
+    ],
+    "fixed_grip_max_error_m": 0.0,
+    "normalized_skin_weights": true,
+    "bones": 8
+  },
+  "meshes": {
+    "SK_FISK_BoatRod_v1": {
+      "triangles": 46060,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.01720000058412552,
+          -0.01720000058412552,
+          0.0
+        ],
+        [
+          0.01720000058412552,
+          0.042399998754262924,
+          1.9010000228881836
+        ]
+      ],
+      "materials": 6
+    }
+  },
+  "fbx_roundtrip": {
+    "animated": true,
+    "bone_count": 8,
+    "max_loaded_tip_error_m": 2.980232238769531e-07,
+    "mesh_count": 1
+  },
+  "glb_roundtrip": {
+    "animated": true,
+    "bone_count": 8,
+    "max_loaded_tip_error_m": 1.4901161193847656e-07,
+    "mesh_count": 1
+  },
+  "status": "passed",
+  "game_integration": "pending"
+}

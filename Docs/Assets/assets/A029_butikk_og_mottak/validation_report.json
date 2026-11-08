@@ -1,0 +1,174 @@
+{
+  "asset_id": "A029",
+  "saved_source_reopened": true,
+  "game_integration": "pending",
+  "entry_clearance": {
+    "TackleShop": {
+      "wall_opening_width_m": 1.0,
+      "clear_width_between_trim_m": 0.91,
+      "height_m": 2.18,
+      "door_hinge_stable": true,
+      "collision_boxes": 7
+    },
+    "FishReception": {
+      "wall_opening_width_m": 1.0000000000000002,
+      "clear_width_between_trim_m": 0.9100000000000003,
+      "height_m": 2.18,
+      "door_hinge_stable": true,
+      "collision_boxes": 7
+    }
+  },
+  "own_packed_2k_images": 3,
+  "meshes": {
+    "SM_FISK_TackleShop_v1": {
+      "triangles": 46956,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -2.7676899433135986,
+          -2.365000009536743,
+          0.0
+        ],
+        [
+          2.7676899433135986,
+          4.234999656677246,
+          4.249224662780762
+        ]
+      ],
+      "materials": 9,
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_FISK_TackleShop_Door_v1": {
+      "triangles": 1032,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.8650000095367432,
+          -0.14000000059604645,
+          0.3399999141693115
+        ],
+        [
+          -0.877500057220459,
+          0.002500005066394806,
+          2.4800000190734863
+        ]
+      ],
+      "materials": 2,
+      "pivot_m": [
+        -1.850000023841858,
+        -0.03500000014901161,
+        0.3200000524520874
+      ]
+    },
+    "SM_FISK_FishReception_v1": {
+      "triangles": 42636,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -3.066159725189209,
+          -2.365000009536743,
+          0.0
+        ],
+        [
+          3.066159725189209,
+          4.634999752044678,
+          4.2498064041137695
+        ]
+      ],
+      "materials": 7,
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "SM_FISK_FishReception_Door_v1": {
+      "triangles": 1032,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          1.2049999237060547,
+          -0.13999998569488525,
+          0.3399999141693115
+        ],
+        [
+          2.192500114440918,
+          0.002499997615814209,
+          2.4800000190734863
+        ]
+      ],
+      "materials": 2,
+      "pivot_m": [
+        1.2200000286102295,
+        -0.03500000387430191,
+        0.3200000524520874
+      ]
+    },
+    "SM_FISK_FishReception_Hatch_v1": {
+      "triangles": 228,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -2.0500001907348633,
+          -1.0799999237060547,
+          1.9909709692001343
+        ],
+        [
+          0.6000000238418579,
+          -0.06000000238418579,
+          2.5625
+        ]
+      ],
+      "materials": 2,
+      "pivot_m": [
+        -0.7250000238418579,
+        -0.07999998331069946,
+        2.450000047683716
+      ]
+    }
+  },
+  "TackleShop_v1_fbx": {
+    "meshes": 2,
+    "max_bounds_error_m": 4.76837158203125e-07,
+    "anchors": 4,
+    "collision_boxes": 7
+  },
+  "TackleShop_v1_glb": {
+    "meshes": 2,
+    "max_bounds_error_m": 0,
+    "anchors": 4,
+    "collision_boxes": 0
+  },
+  "FishReception_v1_fbx": {
+    "meshes": 3,
+    "max_bounds_error_m": 4.76837158203125e-07,
+    "anchors": 4,
+    "collision_boxes": 7
+  },
+  "FishReception_v1_glb": {
+    "meshes": 3,
+    "max_bounds_error_m": 0,
+    "anchors": 4,
+    "collision_boxes": 0
+  },
+  "status": "passed"
+}

@@ -1,0 +1,71 @@
+{
+  "lod0_geometry": {
+    "vertices": 36660,
+    "triangles": 70844,
+    "degenerate_faces": 0,
+    "nonfinite_vertices": 0,
+    "loose_vertices": 0,
+    "edges_with_more_than_two_faces": 0,
+    "boundary_edges": 0
+  },
+  "lod1_geometry": {
+    "vertices": 18949,
+    "triangles": 35422,
+    "degenerate_faces": 0,
+    "nonfinite_vertices": 0,
+    "loose_vertices": 0,
+    "edges_with_more_than_two_faces": 0,
+    "boundary_edges": 0
+  },
+  "materials": [
+    "M_FISK_PierWood_1",
+    "M_FISK_BrushedSteel",
+    "M_FISK_PierWood_3",
+    "M_FISK_PierWood_2",
+    "M_FISK_PaintedTurquoise",
+    "M_FISK_WetPileWood",
+    "M_FISK_IvoryRubber",
+    "M_FISK_HempRope",
+    "M_FISK_DarkRubber",
+    "M_FISK_SafetyYellow",
+    "M_FISK_LifebuoyCoral"
+  ],
+  "finite_uvs": true,
+  "bounds_m": [
+    [
+      -6.072500228881836,
+      -4.3958425521850586e-07,
+      -2.4000000953674316
+    ],
+    [
+      6.072500228881836,
+      21.072500228881836,
+      2.5970001220703125
+    ]
+  ],
+  "source_parts": 621,
+  "source_editable": true,
+  "scale_length_m": 1.0,
+  "packed_images": [
+    "T_FISK_PierWood_BaseColor_1K",
+    "T_FISK_PierWood_NormalGL_1K",
+    "T_FISK_PierWood_Roughness_1K"
+  ],
+  "closed_convex_collision_boxes": 2,
+  "anchors": 5,
+  "glb_roundtrip": {
+    "max_bounds_error_m": 0.0,
+    "triangles": 70844,
+    "materials": 11
+  },
+  "fbx_roundtrip": {
+    "max_bounds_error_m": 1.9073486328125e-06,
+    "triangles": 70844,
+    "materials": 11,
+    "collision_boxes": 2,
+    "anchors": 5
+  },
+  "status": "passed",
+  "saved_source_reopened": true,
+  "unreal_integration": "pending"
+}

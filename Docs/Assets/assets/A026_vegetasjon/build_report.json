@@ -1,0 +1,92 @@
+{
+  "asset": "A026",
+  "engine": "5.8.4-58902052+++UE5+Release-5.8",
+  "status": "native_assets_and_reopened_scene_checked; game_integration_pending",
+  "meshes": {
+    "SM_FISK_Palm_1_v1": {
+      "path": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_1_v1.SM_FISK_Palm_1_v1",
+      "slots": [
+        {
+          "name": "Bark",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_PalmBark_v1.M_FISK_PalmBark_v1"
+        },
+        {
+          "name": "Fruit",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_Coconut_v1.M_FISK_Coconut_v1"
+        },
+        {
+          "name": "Leaves",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_TropicalLeaves_v1.M_FISK_TropicalLeaves_v1"
+        }
+      ]
+    },
+    "SM_FISK_Palm_2_v1": {
+      "path": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_2_v1.SM_FISK_Palm_2_v1",
+      "slots": [
+        {
+          "name": "Bark",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_PalmBark_v1.M_FISK_PalmBark_v1"
+        },
+        {
+          "name": "Fruit",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_Coconut_v1.M_FISK_Coconut_v1"
+        },
+        {
+          "name": "Leaves",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_TropicalLeaves_v1.M_FISK_TropicalLeaves_v1"
+        }
+      ]
+    },
+    "SM_FISK_Palm_3_v1": {
+      "path": "/Game/Fiskelaget/Vegetation/SM_FISK_Palm_3_v1.SM_FISK_Palm_3_v1",
+      "slots": [
+        {
+          "name": "Bark",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_PalmBark_v1.M_FISK_PalmBark_v1"
+        },
+        {
+          "name": "Fruit",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_Coconut_v1.M_FISK_Coconut_v1"
+        },
+        {
+          "name": "Leaves",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_TropicalLeaves_v1.M_FISK_TropicalLeaves_v1"
+        }
+      ]
+    },
+    "SM_FISK_TropicalShrub_v1": {
+      "path": "/Game/Fiskelaget/Vegetation/SM_FISK_TropicalShrub_v1.SM_FISK_TropicalShrub_v1",
+      "slots": [
+        {
+          "name": "Leaves",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_TropicalLeaves_v1.M_FISK_TropicalLeaves_v1"
+        },
+        {
+          "name": "Bark",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_PalmBark_v1.M_FISK_PalmBark_v1"
+        }
+      ]
+    },
+    "SM_FISK_CoastalGrass_v1": {
+      "path": "/Game/Fiskelaget/Vegetation/SM_FISK_CoastalGrass_v1.SM_FISK_CoastalGrass_v1",
+      "slots": [
+        {
+          "name": "Leaves",
+          "material": "/Game/Fiskelaget/Vegetation/M_FISK_TropicalLeaves_v1.M_FISK_TropicalLeaves_v1"
+        }
+      ]
+    }
+  },
+  "material_compile_errors": {
+    "Bark": [],
+    "Leaves": [],
+    "Fruit": []
+  },
+  "project": "../A003_oy_og_kyst/unreal/FiskelagetIslandAsset.uproject",
+  "persisted_scene_reopened": true,
+  "previews": [
+    "A003_oy_og_kyst\\A003_marinabukt_v2.png",
+    "A003_oy_og_kyst\\A003_oy_oversikt_v2.png",
+    "A026_vegetasjon\\A026_palme_detalj_v1.png"
+  ]
+}

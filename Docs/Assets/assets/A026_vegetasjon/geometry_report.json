@@ -1,0 +1,65 @@
+{
+  "asset": "A026",
+  "version": 1,
+  "units": "metres in manifest; centimetres in OBJ",
+  "obj_y_to_unreal_y": -1,
+  "meshes": [
+    {
+      "file": "palm_1_v1.obj",
+      "vertices": 8402,
+      "triangles": 10060,
+      "materials": [
+        "Bark",
+        "Fruit",
+        "Leaves"
+      ],
+      "height_m": 12.840721660856335,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "palm_2_v1.obj",
+      "vertices": 9424,
+      "triangles": 11140,
+      "materials": [
+        "Bark",
+        "Fruit",
+        "Leaves"
+      ],
+      "height_m": 14.937659273798165,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "palm_3_v1.obj",
+      "vertices": 10510,
+      "triangles": 12284,
+      "materials": [
+        "Bark",
+        "Fruit",
+        "Leaves"
+      ],
+      "height_m": 16.63654984948564,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "tropical_shrub_v1.obj",
+      "vertices": 805,
+      "triangles": 870,
+      "materials": [
+        "Bark",
+        "Leaves"
+      ],
+      "height_m": 1.3713933626552133,
+      "open_leaf_edges_intentional": true
+    },
+    {
+      "file": "coastal_grass_v1.obj",
+      "vertices": 160,
+      "triangles": 160,
+      "materials": [
+        "Leaves"
+      ],
+      "height_m": 0.7150433365579274,
+      "open_leaf_edges_intentional": true
+    }
+  ]
+}

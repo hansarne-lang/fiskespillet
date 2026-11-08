@@ -1,0 +1,180 @@
+{
+  "asset_id": "A005",
+  "version": 1,
+  "blender_version": "5.2.2 LTS",
+  "units": "metres",
+  "hull_length_m": 7.9248,
+  "nominal_beam_m": 2.64,
+  "cockpit_floor_z_m": 0.52,
+  "sea_level_m": 0,
+  "players": 2,
+  "active_rod_positions": 2,
+  "source_meshes": {
+    "Hull": 117,
+    "Engine": 18,
+    "Propeller": 4
+  },
+  "game_meshes": {
+    "Hull": {
+      "name": "SM_FISK_StartBoat_Hull_v1",
+      "triangles": 37276,
+      "materials": [
+        "M_FISK_Boat_IvoryGelcoat",
+        "M_FISK_Boat_TurquoiseGelcoat",
+        "M_FISK_Boat_Rubber",
+        "M_FISK_Boat_GoldPinstripe",
+        "M_FISK_Boat_CreamUpholstery",
+        "M_FISK_Boat_NonslipDeck",
+        "M_FISK_Boat_MarineSteel",
+        "M_FISK_Boat_Charcoal",
+        "M_FISK_Boat_Screen",
+        "M_FISK_Boat_Windscreen",
+        "M_FISK_Boat_SeatPiping",
+        "M_FISK_Boat_PortLight",
+        "M_FISK_Boat_StarboardLight"
+      ],
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "Engine": {
+      "name": "SM_FISK_StartBoat_Engine_v1",
+      "triangles": 6556,
+      "materials": [
+        "M_FISK_Boat_MarineSteel",
+        "M_FISK_Boat_Charcoal",
+        "M_FISK_Boat_IvoryGelcoat",
+        "M_FISK_Boat_TurquoiseGelcoat",
+        "M_FISK_Boat_Rubber"
+      ],
+      "pivot_m": [
+        0.0,
+        -3.9800000190734863,
+        0.6000000238418579
+      ]
+    },
+    "Propeller": {
+      "name": "SM_FISK_StartBoat_Propeller_v1",
+      "triangles": 488,
+      "materials": [
+        "M_FISK_Boat_MarineSteel"
+      ],
+      "pivot_m": [
+        0.0,
+        -4.690000057220459,
+        -0.8700000047683716
+      ]
+    }
+  },
+  "lod1_hull_triangles": 17892,
+  "anchors_m": {
+    "Entry_Port": [
+      -1.25,
+      -0.1,
+      0.72
+    ],
+    "Entry_Starboard": [
+      1.25,
+      -0.1,
+      0.72
+    ],
+    "Fisher_Port": [
+      -0.7,
+      -1.95,
+      0.52
+    ],
+    "Fisher_Starboard": [
+      0.7,
+      -1.95,
+      0.52
+    ],
+    "Helm": [
+      0,
+      -0.94,
+      0.52
+    ],
+    "Landing_Port": [
+      -1.18,
+      -2.8,
+      0.83
+    ],
+    "Landing_Starboard": [
+      1.18,
+      -2.8,
+      0.83
+    ],
+    "Engine_Pivot": [
+      0,
+      -3.98,
+      0.6
+    ],
+    "Propeller_Axis": [
+      0.0,
+      -4.690000057220459,
+      -0.8700000047683716
+    ],
+    "Camera_Travel": [
+      0,
+      -2.0,
+      2.15
+    ],
+    "Camera_Fishing_Port": [
+      -0.45,
+      -0.92,
+      2.0
+    ],
+    "Camera_Fishing_Starboard": [
+      0.45,
+      -0.92,
+      2.0
+    ],
+    "Rod_Port": [
+      -1.1783931255340576,
+      -2.187793731689453,
+      1.1027275323867798
+    ],
+    "Rod_Starboard": [
+      1.1783931255340576,
+      -2.187793731689453,
+      1.1027275323867798
+    ]
+  },
+  "rod_directions": {
+    "Rod_Port": {
+      "position_m": [
+        -1.1783931255340576,
+        -2.187793731689453,
+        1.1027275323867798
+      ],
+      "direction": [
+        -0.2797727882862091,
+        -0.25978899002075195,
+        0.9242493510246277
+      ]
+    },
+    "Rod_Starboard": {
+      "position_m": [
+        1.1783931255340576,
+        -2.187793731689453,
+        1.1027275323867798
+      ],
+      "direction": [
+        0.2797727882862091,
+        -0.25978899002075195,
+        0.9242493510246277
+      ]
+    }
+  },
+  "collision_meshes": [
+    "UCX_SM_FISK_StartBoat_Hull_v1_00",
+    "UCX_SM_FISK_StartBoat_Hull_v1_01",
+    "UCX_SM_FISK_StartBoat_Hull_v1_02"
+  ],
+  "textures": [
+    "T_FISK_Boat_Nonslip_BaseColor_2K",
+    "T_FISK_Boat_Nonslip_NormalGL_2K"
+  ],
+  "status": "blender_source_and_exports_created; unreal_integration_pending"
+}

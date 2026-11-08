@@ -1,0 +1,176 @@
+{
+  "asset_id": "A005",
+  "saved_source_reopened": true,
+  "units": "metres",
+  "game_meshes": {
+    "SM_FISK_StartBoat_Hull_v1": {
+      "triangles": 37276,
+      "vertices": 18856,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "edges_with_more_than_two_faces": 0,
+      "loose_vertices": 0,
+      "nonfinite_vertices": 0,
+      "bounds_m": [
+        [
+          -1.3635653257369995,
+          -3.9662017822265625,
+          -0.6348620653152466
+        ],
+        [
+          1.3635653257369995,
+          3.962399959564209,
+          3.381685495376587
+        ]
+      ],
+      "pivot_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "materials": [
+        "M_FISK_Boat_IvoryGelcoat",
+        "M_FISK_Boat_TurquoiseGelcoat",
+        "M_FISK_Boat_Rubber",
+        "M_FISK_Boat_GoldPinstripe",
+        "M_FISK_Boat_CreamUpholstery",
+        "M_FISK_Boat_NonslipDeck",
+        "M_FISK_Boat_MarineSteel",
+        "M_FISK_Boat_Charcoal",
+        "M_FISK_Boat_Screen",
+        "M_FISK_Boat_Windscreen",
+        "M_FISK_Boat_SeatPiping",
+        "M_FISK_Boat_PortLight",
+        "M_FISK_Boat_StarboardLight"
+      ]
+    },
+    "SM_FISK_StartBoat_Engine_v1": {
+      "triangles": 6556,
+      "vertices": 3314,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "edges_with_more_than_two_faces": 0,
+      "loose_vertices": 0,
+      "nonfinite_vertices": 0,
+      "bounds_m": [
+        [
+          -0.35199999809265137,
+          -4.695000171661377,
+          -1.2649999856948853
+        ],
+        [
+          0.35199999809265137,
+          -3.822499990463257,
+          1.2050000429153442
+        ]
+      ],
+      "pivot_m": [
+        0.0,
+        -3.9800000190734863,
+        0.6000000238418579
+      ],
+      "materials": [
+        "M_FISK_Boat_MarineSteel",
+        "M_FISK_Boat_Charcoal",
+        "M_FISK_Boat_IvoryGelcoat",
+        "M_FISK_Boat_TurquoiseGelcoat",
+        "M_FISK_Boat_Rubber"
+      ]
+    },
+    "SM_FISK_StartBoat_Propeller_v1": {
+      "triangles": 488,
+      "vertices": 252,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "edges_with_more_than_two_faces": 0,
+      "loose_vertices": 0,
+      "nonfinite_vertices": 0,
+      "bounds_m": [
+        [
+          -0.2537035346031189,
+          -4.775000095367432,
+          -1.1409735679626465
+        ],
+        [
+          0.2582579255104065,
+          -4.605000019073486,
+          -0.6854630708694458
+        ]
+      ],
+      "pivot_m": [
+        0.0,
+        -4.690000057220459,
+        -0.8700000047683716
+      ],
+      "materials": [
+        "M_FISK_Boat_MarineSteel"
+      ]
+    }
+  },
+  "hull_lod1": {
+    "triangles": 17892,
+    "vertices": 9164,
+    "degenerate_faces": 0,
+    "boundary_edges": 0,
+    "edges_with_more_than_two_faces": 0,
+    "loose_vertices": 0,
+    "nonfinite_vertices": 0
+  },
+  "source_mesh_count": 139,
+  "hull_shell_dimensions_m": [
+    2.653177261352539,
+    7.924799919128418,
+    2.054914712905884
+  ],
+  "packed_images": [
+    "T_FISK_Boat_Nonslip_BaseColor_2K",
+    "T_FISK_Boat_Nonslip_NormalGL_2K"
+  ],
+  "engine_propeller_hierarchy": true,
+  "illustrative_actions_saved": true,
+  "source_preview_isolated": true,
+  "convex_collision_meshes": 3,
+  "anchors": 14,
+  "glb_roundtrip": {
+    "SM_FISK_StartBoat_Engine_v1": {
+      "bounds_error_m": 0.0,
+      "pivot_error_m": 0.0,
+      "triangles": 6556,
+      "materials": 5
+    },
+    "SM_FISK_StartBoat_Propeller_v1": {
+      "bounds_error_m": 0.0,
+      "pivot_error_m": 0.0,
+      "triangles": 488,
+      "materials": 1
+    },
+    "SM_FISK_StartBoat_Hull_v1": {
+      "bounds_error_m": 0.0,
+      "pivot_error_m": 0.0,
+      "triangles": 37276,
+      "materials": 13
+    }
+  },
+  "fbx_roundtrip": {
+    "SM_FISK_StartBoat_Propeller_v1": {
+      "bounds_error_m": 4.172325134277344e-07,
+      "pivot_error_m": 4.100128298252919e-07,
+      "triangles": 488,
+      "materials": 1
+    },
+    "SM_FISK_StartBoat_Engine_v1": {
+      "bounds_error_m": 4.172325134277344e-07,
+      "pivot_error_m": 3.4794265061412965e-07,
+      "triangles": 6556,
+      "materials": 5
+    },
+    "SM_FISK_StartBoat_Hull_v1": {
+      "bounds_error_m": 3.5762786865234375e-07,
+      "pivot_error_m": 0.0,
+      "triangles": 37276,
+      "materials": 13
+    }
+  },
+  "status": "passed",
+  "game_integration": "pending"
+}

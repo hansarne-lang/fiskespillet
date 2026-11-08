@@ -1,0 +1,145 @@
+{
+  "asset_id": "A009",
+  "saved_source_reopened": true,
+  "game_integration": "pending",
+  "meshes": {
+    "SM_FISK_BaitHook_v1": {
+      "triangles": 1748,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.004399999976158142,
+          -0.0010999999940395355,
+          -0.01510000042617321
+        ],
+        [
+          0.018642636016011238,
+          0.0010999999940395355,
+          0.024399999529123306
+        ]
+      ],
+      "materials": 1
+    },
+    "SM_FISK_RollingSwivel_v1": {
+      "triangles": 1116,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.0033500001300126314,
+          -0.0017999999690800905,
+          -0.010850000195205212
+        ],
+        [
+          0.0033500001300126314,
+          0.0017999999690800905,
+          0.010850000195205212
+        ]
+      ],
+      "materials": 2
+    },
+    "SM_FISK_Line_Taut_v1": {
+      "triangles": 308,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.0005000001401640475,
+          0.005797362886369228,
+          0.19968320429325104
+        ],
+        [
+          0.0005000001401640475,
+          1.7502951622009277,
+          1.9003826379776
+        ]
+      ],
+      "materials": 1
+    },
+    "SM_FISK_Line_Slack_v1": {
+      "triangles": 308,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.0005000001401640475,
+          0.03013569675385952,
+          0.29957830905914307
+        ],
+        [
+          0.0005000001401640475,
+          1.3000982999801636,
+          1.8672817945480347
+        ]
+      ],
+      "materials": 1
+    },
+    "SM_FISK_Line_Loaded_v1": {
+      "triangles": 308,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.0005000001401640475,
+          0.03204004466533661,
+          0.1496869921684265
+        ],
+        [
+          0.0005000001401640475,
+          2.100299119949341,
+          1.7509055137634277
+        ]
+      ],
+      "materials": 1
+    }
+  },
+  "live_line_states": {
+    "Taut": {
+      "control_count": 26,
+      "max_control_to_surface_m": 0.0005000001414773378,
+      "midspan_sag_m": 0.019999980926513672,
+      "eye_attached_to_endpoint": true
+    },
+    "Slack": {
+      "control_count": 26,
+      "max_control_to_surface_m": 0.0005000001414773378,
+      "midspan_sag_m": 0.3500000238418579,
+      "eye_attached_to_endpoint": true
+    },
+    "Loaded": {
+      "control_count": 26,
+      "max_control_to_surface_m": 0.0005000001414773378,
+      "midspan_sag_m": 0.0,
+      "eye_attached_to_endpoint": true
+    }
+  },
+  "guide_radial_clearance_min_m": 0.00265,
+  "FISK_HookAndSwivel_v1_fbx": {
+    "meshes": 2,
+    "max_bounds_error_m": 1.6298145055770874e-09
+  },
+  "FISK_HookAndSwivel_v1_glb": {
+    "meshes": 2,
+    "max_bounds_error_m": 0.0
+  },
+  "FISK_LineStates_v1_fbx": {
+    "meshes": 3,
+    "max_bounds_error_m": 1.835869625210762e-07
+  },
+  "FISK_LineStates_v1_glb": {
+    "meshes": 3,
+    "max_bounds_error_m": 0.0
+  },
+  "status": "passed"
+}

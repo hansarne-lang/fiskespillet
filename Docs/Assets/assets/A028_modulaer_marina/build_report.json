@@ -1,0 +1,1553 @@
+{
+  "asset_id": "A028",
+  "units": "metres",
+  "deck_reference_m": 1.35,
+  "land_reference_m": 2.2,
+  "module_count": 12,
+  "source_parts": 838,
+  "modules": {
+    "Straight3x6": {
+      "name": "SM_FISK_Dock_Straight3x6_v1",
+      "triangles": 8668,
+      "materials": 6,
+      "bounds_m": [
+        [
+          -1.7865999937057495,
+          -3.0,
+          -2.3999998569488525
+        ],
+        [
+          1.7865999937057495,
+          3.0,
+          1.8799999952316284
+        ]
+      ],
+      "source_parts": 105,
+      "nominal_widths_m": [
+        3,
+        3
+      ],
+      "length_m": 6,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "N": {
+          "position_m": [
+            0,
+            3.0,
+            1.35
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Straight3x6_N"
+        },
+        "S": {
+          "position_m": [
+            0,
+            -3.0,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Straight3x6_S"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Straight3x6_v1_00",
+        "UCX_SM_FISK_Dock_Straight3x6_v1_01",
+        "UCX_SM_FISK_Dock_Straight3x6_v1_02",
+        "UCX_SM_FISK_Dock_Straight3x6_v1_03",
+        "UCX_SM_FISK_Dock_Straight3x6_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Straight3x6_N",
+        "SOCKET_Straight3x6_S"
+      ]
+    },
+    "Hub3x3": {
+      "name": "SM_FISK_Dock_Hub3x3_v1",
+      "triangles": 3176,
+      "materials": 3,
+      "bounds_m": [
+        [
+          -1.5,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          1.5,
+          1.5,
+          1.3534998893737793
+        ]
+      ],
+      "source_parts": 54,
+      "nominal_widths_m": [
+        3,
+        3
+      ],
+      "length_m": 3,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "N": {
+          "position_m": [
+            0,
+            1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Hub3x3_N"
+        },
+        "E": {
+          "position_m": [
+            1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Hub3x3_E"
+        },
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Hub3x3_S"
+        },
+        "W": {
+          "position_m": [
+            -1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Hub3x3_W"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Hub3x3_v1_00",
+        "UCX_SM_FISK_Dock_Hub3x3_v1_01",
+        "UCX_SM_FISK_Dock_Hub3x3_v1_02",
+        "UCX_SM_FISK_Dock_Hub3x3_v1_03",
+        "UCX_SM_FISK_Dock_Hub3x3_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Hub3x3_N",
+        "SOCKET_Hub3x3_E",
+        "SOCKET_Hub3x3_S",
+        "SOCKET_Hub3x3_W"
+      ]
+    },
+    "Corner3x3": {
+      "name": "SM_FISK_Dock_Corner3x3_v1",
+      "triangles": 4168,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -1.7865999937057495,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          1.5000001192092896,
+          1.5525000095367432,
+          2.235980749130249
+        ]
+      ],
+      "source_parts": 66,
+      "nominal_widths_m": [
+        3,
+        3
+      ],
+      "length_m": 3,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Corner3x3_S"
+        },
+        "E": {
+          "position_m": [
+            1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Corner3x3_E"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Corner3x3_v1_00",
+        "UCX_SM_FISK_Dock_Corner3x3_v1_01",
+        "UCX_SM_FISK_Dock_Corner3x3_v1_02",
+        "UCX_SM_FISK_Dock_Corner3x3_v1_03",
+        "UCX_SM_FISK_Dock_Corner3x3_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Corner3x3_S",
+        "SOCKET_Corner3x3_E"
+      ]
+    },
+    "Tee3x3": {
+      "name": "SM_FISK_Dock_Tee3x3_v1",
+      "triangles": 3612,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -1.5,
+          -1.5,
+          -2.3999998569488525
+        ],
+        [
+          1.5000001192092896,
+          1.5525000095367432,
+          2.235980749130249
+        ]
+      ],
+      "source_parts": 59,
+      "nominal_widths_m": [
+        3,
+        3
+      ],
+      "length_m": 3,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Tee3x3_S"
+        },
+        "E": {
+          "position_m": [
+            1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Tee3x3_E"
+        },
+        "W": {
+          "position_m": [
+            -1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Tee3x3_W"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Tee3x3_v1_00",
+        "UCX_SM_FISK_Dock_Tee3x3_v1_01",
+        "UCX_SM_FISK_Dock_Tee3x3_v1_02",
+        "UCX_SM_FISK_Dock_Tee3x3_v1_03",
+        "UCX_SM_FISK_Dock_Tee3x3_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Tee3x3_S",
+        "SOCKET_Tee3x3_E",
+        "SOCKET_Tee3x3_W"
+      ]
+    },
+    "End3x3": {
+      "name": "SM_FISK_Dock_End3x3_v1",
+      "triangles": 4724,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -1.7865999937057495,
+          -1.5,
+          -2.3999998569488525
+        ],
+        [
+          1.7865999937057495,
+          1.5525000095367432,
+          2.235980749130249
+        ]
+      ],
+      "source_parts": 73,
+      "nominal_widths_m": [
+        3,
+        3
+      ],
+      "length_m": 3,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_End3x3_S"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_End3x3_v1_00",
+        "UCX_SM_FISK_Dock_End3x3_v1_01",
+        "UCX_SM_FISK_Dock_End3x3_v1_02",
+        "UCX_SM_FISK_Dock_End3x3_v1_03",
+        "UCX_SM_FISK_Dock_End3x3_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_End3x3_S"
+      ]
+    },
+    "Finger1p2x6": {
+      "name": "SM_FISK_Dock_Finger1p2x6_v1",
+      "triangles": 9420,
+      "materials": 6,
+      "bounds_m": [
+        [
+          -0.8488000631332397,
+          -3.0,
+          -2.3999998569488525
+        ],
+        [
+          0.8488000631332397,
+          3.0,
+          1.8799999952316284
+        ]
+      ],
+      "source_parts": 109,
+      "nominal_widths_m": [
+        1.2,
+        1.2
+      ],
+      "length_m": 6,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "N": {
+          "position_m": [
+            0,
+            3.0,
+            1.35
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "walk",
+          "socket": "SOCKET_Finger1p2x6_N"
+        },
+        "S": {
+          "position_m": [
+            0,
+            -3.0,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "walk",
+          "socket": "SOCKET_Finger1p2x6_S"
+        },
+        "Board_E": {
+          "position_m": [
+            0.6,
+            0,
+            1.35
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "accessory",
+          "socket": "SOCKET_Finger1p2x6_Board_E"
+        },
+        "Board_W": {
+          "position_m": [
+            -0.6,
+            0,
+            1.35
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "accessory",
+          "socket": "SOCKET_Finger1p2x6_Board_W"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Finger1p2x6_v1_00",
+        "UCX_SM_FISK_Dock_Finger1p2x6_v1_01",
+        "UCX_SM_FISK_Dock_Finger1p2x6_v1_02",
+        "UCX_SM_FISK_Dock_Finger1p2x6_v1_03",
+        "UCX_SM_FISK_Dock_Finger1p2x6_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Finger1p2x6_N",
+        "SOCKET_Finger1p2x6_S",
+        "SOCKET_Finger1p2x6_Board_E",
+        "SOCKET_Finger1p2x6_Board_W"
+      ]
+    },
+    "FingerEnd1p2": {
+      "name": "SM_FISK_Dock_FingerEnd1p2_v1",
+      "triangles": 3412,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -0.848800003528595,
+          -0.6000000238418579,
+          -2.3999998569488525
+        ],
+        [
+          0.8488000631332397,
+          0.6525000333786011,
+          2.235980749130249
+        ]
+      ],
+      "source_parts": 49,
+      "nominal_widths_m": [
+        1.2,
+        1.2
+      ],
+      "length_m": 1.2,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -0.6,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "walk",
+          "socket": "SOCKET_FingerEnd1p2_S"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_FingerEnd1p2_v1_00",
+        "UCX_SM_FISK_Dock_FingerEnd1p2_v1_01",
+        "UCX_SM_FISK_Dock_FingerEnd1p2_v1_02",
+        "UCX_SM_FISK_Dock_FingerEnd1p2_v1_03",
+        "UCX_SM_FISK_Dock_FingerEnd1p2_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_FingerEnd1p2_S"
+      ]
+    },
+    "Branch3x3": {
+      "name": "SM_FISK_Dock_Branch3x3_v1",
+      "triangles": 3928,
+      "materials": 4,
+      "bounds_m": [
+        [
+          -1.5,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          1.5,
+          1.5525000095367432,
+          1.377500057220459
+        ]
+      ],
+      "source_parts": 58,
+      "nominal_widths_m": [
+        3,
+        3
+      ],
+      "length_m": 3,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "N": {
+          "position_m": [
+            0,
+            1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "walk",
+          "socket": "SOCKET_Branch3x3_N"
+        },
+        "E": {
+          "position_m": [
+            1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Branch3x3_E"
+        },
+        "W": {
+          "position_m": [
+            -1.5,
+            0,
+            1.35
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Branch3x3_W"
+        },
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_Branch3x3_S"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Branch3x3_v1_00",
+        "UCX_SM_FISK_Dock_Branch3x3_v1_01",
+        "UCX_SM_FISK_Dock_Branch3x3_v1_02",
+        "UCX_SM_FISK_Dock_Branch3x3_v1_03",
+        "UCX_SM_FISK_Dock_Branch3x3_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Branch3x3_N",
+        "SOCKET_Branch3x3_E",
+        "SOCKET_Branch3x3_W",
+        "SOCKET_Branch3x3_S"
+      ]
+    },
+    "RampAdapter3to1p5": {
+      "name": "SM_FISK_Dock_RampAdapter3to1p5_v1",
+      "triangles": 4288,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -1.5990999937057495,
+          -1.5112779140472412,
+          -2.3999998569488525
+        ],
+        [
+          1.599100112915039,
+          1.5112780332565308,
+          2.235980749130249
+        ]
+      ],
+      "source_parts": 68,
+      "nominal_widths_m": [
+        3,
+        1.5
+      ],
+      "length_m": 3,
+      "deck_start_m": 1.35,
+      "deck_end_m": 1.35,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 3,
+          "role": "walk",
+          "socket": "SOCKET_RampAdapter3to1p5_S"
+        },
+        "N": {
+          "position_m": [
+            0,
+            1.5,
+            1.35
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 1.5,
+          "role": "walk",
+          "socket": "SOCKET_RampAdapter3to1p5_N"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_RampAdapter3to1p5_v1_00",
+        "UCX_SM_FISK_Dock_RampAdapter3to1p5_v1_01",
+        "UCX_SM_FISK_Dock_RampAdapter3to1p5_v1_02",
+        "UCX_SM_FISK_Dock_RampAdapter3to1p5_v1_03",
+        "UCX_SM_FISK_Dock_RampAdapter3to1p5_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_RampAdapter3to1p5_S",
+        "SOCKET_RampAdapter3to1p5_N"
+      ]
+    },
+    "Gangway1p5x6": {
+      "name": "SM_FISK_Dock_Gangway1p5x6_v1",
+      "triangles": 6420,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -0.9987999796867371,
+          -3.0159902572631836,
+          -2.3999998569488525
+        ],
+        [
+          0.9988000392913818,
+          3.0159902572631836,
+          3.0715572834014893
+        ]
+      ],
+      "source_parts": 107,
+      "nominal_widths_m": [
+        1.5,
+        1.5
+      ],
+      "length_m": 6,
+      "deck_start_m": 1.35,
+      "deck_end_m": 2.2,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -3.0,
+            1.35
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 1.5,
+          "role": "walk",
+          "socket": "SOCKET_Gangway1p5x6_S"
+        },
+        "N": {
+          "position_m": [
+            0,
+            3.0,
+            2.2
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 1.5,
+          "role": "walk",
+          "socket": "SOCKET_Gangway1p5x6_N"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_Gangway1p5x6_v1_00",
+        "UCX_SM_FISK_Dock_Gangway1p5x6_v1_01",
+        "UCX_SM_FISK_Dock_Gangway1p5x6_v1_02",
+        "UCX_SM_FISK_Dock_Gangway1p5x6_v1_03",
+        "UCX_SM_FISK_Dock_Gangway1p5x6_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_Gangway1p5x6_S",
+        "SOCKET_Gangway1p5x6_N"
+      ]
+    },
+    "TopLanding1p5x3": {
+      "name": "SM_FISK_Dock_TopLanding1p5x3_v1",
+      "triangles": 4288,
+      "materials": 5,
+      "bounds_m": [
+        [
+          -0.9987999796867371,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          0.9987999796867371,
+          1.5,
+          3.0859806537628174
+        ]
+      ],
+      "source_parts": 68,
+      "nominal_widths_m": [
+        1.5,
+        1.5
+      ],
+      "length_m": 3,
+      "deck_start_m": 2.2,
+      "deck_end_m": 2.2,
+      "ports": {
+        "S": {
+          "position_m": [
+            0,
+            -1.5,
+            2.2
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "width_m": 1.5,
+          "role": "walk",
+          "socket": "SOCKET_TopLanding1p5x3_S"
+        },
+        "N": {
+          "position_m": [
+            0,
+            1.5,
+            2.2
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "width_m": 1.5,
+          "role": "walk",
+          "socket": "SOCKET_TopLanding1p5x3_N"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_TopLanding1p5x3_v1_00",
+        "UCX_SM_FISK_Dock_TopLanding1p5x3_v1_01",
+        "UCX_SM_FISK_Dock_TopLanding1p5x3_v1_02",
+        "UCX_SM_FISK_Dock_TopLanding1p5x3_v1_03",
+        "UCX_SM_FISK_Dock_TopLanding1p5x3_v1_04"
+      ],
+      "sockets": [
+        "SOCKET_TopLanding1p5x3_S",
+        "SOCKET_TopLanding1p5x3_N"
+      ]
+    },
+    "BoardingSteps0p9x1p2": {
+      "name": "SM_FISK_Dock_BoardingSteps0p9x1p2_v1",
+      "triangles": 6232,
+      "materials": 7,
+      "bounds_m": [
+        [
+          -0.684999942779541,
+          -0.6860000491142273,
+          0.47600001096725464
+        ],
+        [
+          0.5815500020980835,
+          0.6860000491142273,
+          2.1701395511627197
+        ]
+      ],
+      "source_parts": 22,
+      "nominal_widths_m": [
+        0.9,
+        0.9
+      ],
+      "length_m": 1.2,
+      "deck_start_m": 1.35,
+      "deck_end_m": 0.95,
+      "ports": {
+        "W": {
+          "position_m": [
+            -0.45,
+            0,
+            1.35
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "width_m": 1.2,
+          "role": "accessory",
+          "socket": "SOCKET_BoardingSteps0p9x1p2_W"
+        }
+      },
+      "collision_names": [
+        "UCX_SM_FISK_Dock_BoardingSteps0p9x1p2_v1_00",
+        "UCX_SM_FISK_Dock_BoardingSteps0p9x1p2_v1_01",
+        "UCX_SM_FISK_Dock_BoardingSteps0p9x1p2_v1_02",
+        "UCX_SM_FISK_Dock_BoardingSteps0p9x1p2_v1_03"
+      ],
+      "sockets": [
+        "SOCKET_BoardingSteps0p9x1p2_W",
+        "SOCKET_BoardingSteps0p9x1p2_BoatTransfer"
+      ]
+    }
+  },
+  "example": {
+    "placements": [
+      {
+        "id": "Main_0",
+        "module": "Branch3x3",
+        "position_m": [
+          -12,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_0"
+      },
+      {
+        "id": "Main_1",
+        "module": "Hub3x3",
+        "position_m": [
+          -9,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_1"
+      },
+      {
+        "id": "Main_2",
+        "module": "Branch3x3",
+        "position_m": [
+          -6,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_2"
+      },
+      {
+        "id": "Main_3",
+        "module": "Hub3x3",
+        "position_m": [
+          -3,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_3"
+      },
+      {
+        "id": "Main_4",
+        "module": "Branch3x3",
+        "position_m": [
+          0,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_4"
+      },
+      {
+        "id": "Main_5",
+        "module": "Hub3x3",
+        "position_m": [
+          3,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_5"
+      },
+      {
+        "id": "Main_6",
+        "module": "Branch3x3",
+        "position_m": [
+          6,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_6"
+      },
+      {
+        "id": "Main_7",
+        "module": "Hub3x3",
+        "position_m": [
+          9,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_7"
+      },
+      {
+        "id": "Main_8",
+        "module": "Branch3x3",
+        "position_m": [
+          12,
+          0,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Main_8"
+      },
+      {
+        "id": "WestEnd",
+        "module": "End3x3",
+        "position_m": [
+          -15,
+          0,
+          0
+        ],
+        "yaw_rad": 1.5707963267948966,
+        "object": "EXAMPLE_WestEnd"
+      },
+      {
+        "id": "EastEnd",
+        "module": "End3x3",
+        "position_m": [
+          15,
+          0,
+          0
+        ],
+        "yaw_rad": -1.5707963267948966,
+        "object": "EXAMPLE_EastEnd"
+      },
+      {
+        "id": "Finger_0_A",
+        "module": "Finger1p2x6",
+        "position_m": [
+          -12,
+          4.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_0_A"
+      },
+      {
+        "id": "Finger_0_B",
+        "module": "Finger1p2x6",
+        "position_m": [
+          -12,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_0_B"
+      },
+      {
+        "id": "Finger_0_End",
+        "module": "FingerEnd1p2",
+        "position_m": [
+          -12,
+          14.1,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_0_End"
+      },
+      {
+        "id": "Boarding_0",
+        "module": "BoardingSteps0p9x1p2",
+        "position_m": [
+          -10.95,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Boarding_0"
+      },
+      {
+        "id": "Finger_1_A",
+        "module": "Finger1p2x6",
+        "position_m": [
+          -6,
+          4.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_1_A"
+      },
+      {
+        "id": "Finger_1_B",
+        "module": "Finger1p2x6",
+        "position_m": [
+          -6,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_1_B"
+      },
+      {
+        "id": "Finger_1_End",
+        "module": "FingerEnd1p2",
+        "position_m": [
+          -6,
+          14.1,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_1_End"
+      },
+      {
+        "id": "Boarding_1",
+        "module": "BoardingSteps0p9x1p2",
+        "position_m": [
+          -4.95,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Boarding_1"
+      },
+      {
+        "id": "Finger_2_A",
+        "module": "Finger1p2x6",
+        "position_m": [
+          0,
+          4.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_2_A"
+      },
+      {
+        "id": "Finger_2_B",
+        "module": "Finger1p2x6",
+        "position_m": [
+          0,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_2_B"
+      },
+      {
+        "id": "Finger_2_End",
+        "module": "FingerEnd1p2",
+        "position_m": [
+          0,
+          14.1,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_2_End"
+      },
+      {
+        "id": "Boarding_2",
+        "module": "BoardingSteps0p9x1p2",
+        "position_m": [
+          1.05,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Boarding_2"
+      },
+      {
+        "id": "Finger_3_A",
+        "module": "Finger1p2x6",
+        "position_m": [
+          6,
+          4.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_3_A"
+      },
+      {
+        "id": "Finger_3_B",
+        "module": "Finger1p2x6",
+        "position_m": [
+          6,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_3_B"
+      },
+      {
+        "id": "Finger_3_End",
+        "module": "FingerEnd1p2",
+        "position_m": [
+          6,
+          14.1,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_3_End"
+      },
+      {
+        "id": "Boarding_3",
+        "module": "BoardingSteps0p9x1p2",
+        "position_m": [
+          7.05,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Boarding_3"
+      },
+      {
+        "id": "Finger_4_A",
+        "module": "Finger1p2x6",
+        "position_m": [
+          12,
+          4.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_4_A"
+      },
+      {
+        "id": "Finger_4_B",
+        "module": "Finger1p2x6",
+        "position_m": [
+          12,
+          10.5,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_4_B"
+      },
+      {
+        "id": "Finger_4_End",
+        "module": "FingerEnd1p2",
+        "position_m": [
+          12,
+          14.1,
+          0
+        ],
+        "yaw_rad": 0,
+        "object": "EXAMPLE_Finger_4_End"
+      },
+      {
+        "id": "RampAdapter",
+        "module": "RampAdapter3to1p5",
+        "position_m": [
+          0,
+          -3,
+          0
+        ],
+        "yaw_rad": 3.141592653589793,
+        "object": "EXAMPLE_RampAdapter"
+      },
+      {
+        "id": "Gangway",
+        "module": "Gangway1p5x6",
+        "position_m": [
+          0,
+          -7.5,
+          0
+        ],
+        "yaw_rad": 3.141592653589793,
+        "object": "EXAMPLE_Gangway"
+      },
+      {
+        "id": "LandLanding",
+        "module": "TopLanding1p5x3",
+        "position_m": [
+          0,
+          -12,
+          0
+        ],
+        "yaw_rad": 3.141592653589793,
+        "object": "EXAMPLE_LandLanding"
+      }
+    ],
+    "connections": [
+      [
+        "Main_0",
+        "E",
+        "Main_1",
+        "W"
+      ],
+      [
+        "Main_1",
+        "E",
+        "Main_2",
+        "W"
+      ],
+      [
+        "Main_2",
+        "E",
+        "Main_3",
+        "W"
+      ],
+      [
+        "Main_3",
+        "E",
+        "Main_4",
+        "W"
+      ],
+      [
+        "Main_4",
+        "E",
+        "Main_5",
+        "W"
+      ],
+      [
+        "Main_5",
+        "E",
+        "Main_6",
+        "W"
+      ],
+      [
+        "Main_6",
+        "E",
+        "Main_7",
+        "W"
+      ],
+      [
+        "Main_7",
+        "E",
+        "Main_8",
+        "W"
+      ],
+      [
+        "WestEnd",
+        "S",
+        "Main_0",
+        "W"
+      ],
+      [
+        "Main_8",
+        "E",
+        "EastEnd",
+        "S"
+      ],
+      [
+        "Main_0",
+        "N",
+        "Finger_0_A",
+        "S"
+      ],
+      [
+        "Finger_0_A",
+        "N",
+        "Finger_0_B",
+        "S"
+      ],
+      [
+        "Finger_0_B",
+        "N",
+        "Finger_0_End",
+        "S"
+      ],
+      [
+        "Finger_0_B",
+        "Board_E",
+        "Boarding_0",
+        "W"
+      ],
+      [
+        "Main_2",
+        "N",
+        "Finger_1_A",
+        "S"
+      ],
+      [
+        "Finger_1_A",
+        "N",
+        "Finger_1_B",
+        "S"
+      ],
+      [
+        "Finger_1_B",
+        "N",
+        "Finger_1_End",
+        "S"
+      ],
+      [
+        "Finger_1_B",
+        "Board_E",
+        "Boarding_1",
+        "W"
+      ],
+      [
+        "Main_4",
+        "N",
+        "Finger_2_A",
+        "S"
+      ],
+      [
+        "Finger_2_A",
+        "N",
+        "Finger_2_B",
+        "S"
+      ],
+      [
+        "Finger_2_B",
+        "N",
+        "Finger_2_End",
+        "S"
+      ],
+      [
+        "Finger_2_B",
+        "Board_E",
+        "Boarding_2",
+        "W"
+      ],
+      [
+        "Main_6",
+        "N",
+        "Finger_3_A",
+        "S"
+      ],
+      [
+        "Finger_3_A",
+        "N",
+        "Finger_3_B",
+        "S"
+      ],
+      [
+        "Finger_3_B",
+        "N",
+        "Finger_3_End",
+        "S"
+      ],
+      [
+        "Finger_3_B",
+        "Board_E",
+        "Boarding_3",
+        "W"
+      ],
+      [
+        "Main_8",
+        "N",
+        "Finger_4_A",
+        "S"
+      ],
+      [
+        "Finger_4_A",
+        "N",
+        "Finger_4_B",
+        "S"
+      ],
+      [
+        "Finger_4_B",
+        "N",
+        "Finger_4_End",
+        "S"
+      ],
+      [
+        "Main_4",
+        "S",
+        "RampAdapter",
+        "S"
+      ],
+      [
+        "RampAdapter",
+        "N",
+        "Gangway",
+        "S"
+      ],
+      [
+        "Gangway",
+        "N",
+        "LandLanding",
+        "S"
+      ]
+    ],
+    "boats": [
+      {
+        "id": 0,
+        "position_m": [
+          -9,
+          10.6,
+          0
+        ],
+        "root": "EXAMPLE_Boat_0",
+        "boarding_module": "Boarding_0",
+        "entry_local_m": [
+          -1.25,
+          -0.1,
+          0.72
+        ],
+        "bay_x_m": [
+          -12,
+          -6
+        ],
+        "bay_y_m": [
+          1.5,
+          14.7
+        ]
+      },
+      {
+        "id": 1,
+        "position_m": [
+          -3,
+          10.6,
+          0
+        ],
+        "root": "EXAMPLE_Boat_1",
+        "boarding_module": "Boarding_1",
+        "entry_local_m": [
+          -1.25,
+          -0.1,
+          0.72
+        ],
+        "bay_x_m": [
+          -6,
+          0
+        ],
+        "bay_y_m": [
+          1.5,
+          14.7
+        ]
+      },
+      {
+        "id": 2,
+        "position_m": [
+          3,
+          10.6,
+          0
+        ],
+        "root": "EXAMPLE_Boat_2",
+        "boarding_module": "Boarding_2",
+        "entry_local_m": [
+          -1.25,
+          -0.1,
+          0.72
+        ],
+        "bay_x_m": [
+          0,
+          6
+        ],
+        "bay_y_m": [
+          1.5,
+          14.7
+        ]
+      },
+      {
+        "id": 3,
+        "position_m": [
+          9,
+          10.6,
+          0
+        ],
+        "root": "EXAMPLE_Boat_3",
+        "boarding_module": "Boarding_3",
+        "entry_local_m": [
+          -1.25,
+          -0.1,
+          0.72
+        ],
+        "bay_x_m": [
+          6,
+          12
+        ],
+        "bay_y_m": [
+          1.5,
+          14.7
+        ]
+      }
+    ],
+    "reference_assets": [
+      "A004",
+      "A005",
+      "A026",
+      "A029",
+      "A030"
+    ]
+  },
+  "status": "modules_connectors_and_example_created; game_integration_pending"
+}

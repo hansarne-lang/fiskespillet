@@ -1,0 +1,482 @@
+{
+  "asset_id": "A028",
+  "saved_source_reopened": true,
+  "game_integration": "pending",
+  "meshes": {
+    "SM_FISK_Dock_Straight3x6_v1": {
+      "triangles": 8668,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.7865999937057495,
+          -3.0,
+          -2.3999998569488525
+        ],
+        [
+          1.7865999937057495,
+          3.0,
+          1.8799999952316284
+        ]
+      ],
+      "materials": 6
+    },
+    "SM_FISK_Dock_Hub3x3_v1": {
+      "triangles": 3176,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.5,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          1.5,
+          1.5,
+          1.3534998893737793
+        ]
+      ],
+      "materials": 3
+    },
+    "SM_FISK_Dock_Corner3x3_v1": {
+      "triangles": 4168,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.7865999937057495,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          1.5000001192092896,
+          1.5525000095367432,
+          2.235980749130249
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_Tee3x3_v1": {
+      "triangles": 3612,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.5,
+          -1.5,
+          -2.3999998569488525
+        ],
+        [
+          1.5000001192092896,
+          1.5525000095367432,
+          2.235980749130249
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_End3x3_v1": {
+      "triangles": 4724,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.7865999937057495,
+          -1.5,
+          -2.3999998569488525
+        ],
+        [
+          1.7865999937057495,
+          1.5525000095367432,
+          2.235980749130249
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_Finger1p2x6_v1": {
+      "triangles": 9420,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.8488000631332397,
+          -3.0,
+          -2.3999998569488525
+        ],
+        [
+          0.8488000631332397,
+          3.0,
+          1.8799999952316284
+        ]
+      ],
+      "materials": 6
+    },
+    "SM_FISK_Dock_FingerEnd1p2_v1": {
+      "triangles": 3412,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.848800003528595,
+          -0.6000000238418579,
+          -2.3999998569488525
+        ],
+        [
+          0.8488000631332397,
+          0.6525000333786011,
+          2.235980749130249
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_Branch3x3_v1": {
+      "triangles": 3928,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.5,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          1.5,
+          1.5525000095367432,
+          1.377500057220459
+        ]
+      ],
+      "materials": 4
+    },
+    "SM_FISK_Dock_RampAdapter3to1p5_v1": {
+      "triangles": 4288,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -1.5990999937057495,
+          -1.5112779140472412,
+          -2.3999998569488525
+        ],
+        [
+          1.599100112915039,
+          1.5112780332565308,
+          2.235980749130249
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_Gangway1p5x6_v1": {
+      "triangles": 6420,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.9987999796867371,
+          -3.0159902572631836,
+          -2.3999998569488525
+        ],
+        [
+          0.9988000392913818,
+          3.0159902572631836,
+          3.0715572834014893
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_TopLanding1p5x3_v1": {
+      "triangles": 4288,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.9987999796867371,
+          -1.5,
+          -2.4000000953674316
+        ],
+        [
+          0.9987999796867371,
+          1.5,
+          3.0859806537628174
+        ]
+      ],
+      "materials": 5
+    },
+    "SM_FISK_Dock_BoardingSteps0p9x1p2_v1": {
+      "triangles": 6232,
+      "degenerate_faces": 0,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "loose_vertices": 0,
+      "bounds_m": [
+        [
+          -0.684999942779541,
+          -0.6860000491142273,
+          0.47600001096725464
+        ],
+        [
+          0.5815500020980835,
+          0.6860000491142273,
+          2.1701395511627197
+        ]
+      ],
+      "materials": 7
+    }
+  },
+  "module_count": 12,
+  "assembly_graph": {
+    "modules": 33,
+    "connections": 32,
+    "max_connector_gap_m": 4.76837158203125e-07,
+    "all_modules_connected_to_land": true
+  },
+  "berths": [
+    {
+      "boat": 0,
+      "bounds_m": [
+        [
+          -10.363565444946289,
+          5.825000286102295,
+          -1.2649999856948853
+        ],
+        [
+          -7.636434555053711,
+          14.562400817871094,
+          3.381685495376587
+        ]
+      ],
+      "hull_to_step_fender_bounds_gap_m": 0.0048847198486328125,
+      "transfer_horizontal_gap_m": 0.25,
+      "transfer_height_difference_m": -0.22999995946884155,
+      "boarding_connected_to_land": true
+    },
+    {
+      "boat": 1,
+      "bounds_m": [
+        [
+          -4.363565444946289,
+          5.825000286102295,
+          -1.2649999856948853
+        ],
+        [
+          -1.6364346742630005,
+          14.562400817871094,
+          3.381685495376587
+        ]
+      ],
+      "hull_to_step_fender_bounds_gap_m": 0.004884243011474609,
+      "transfer_horizontal_gap_m": 0.25,
+      "transfer_height_difference_m": -0.22999995946884155,
+      "boarding_connected_to_land": true
+    },
+    {
+      "boat": 2,
+      "bounds_m": [
+        [
+          1.6364346742630005,
+          5.825000286102295,
+          -1.2649999856948853
+        ],
+        [
+          4.363565444946289,
+          14.562400817871094,
+          3.381685495376587
+        ]
+      ],
+      "hull_to_step_fender_bounds_gap_m": 0.0048847198486328125,
+      "transfer_horizontal_gap_m": 0.25,
+      "transfer_height_difference_m": -0.22999995946884155,
+      "boarding_connected_to_land": true
+    },
+    {
+      "boat": 3,
+      "bounds_m": [
+        [
+          7.636434555053711,
+          5.825000286102295,
+          -1.2649999856948853
+        ],
+        [
+          10.363565444946289,
+          14.562400817871094,
+          3.381685495376587
+        ]
+      ],
+      "hull_to_step_fender_bounds_gap_m": 0.004884243011474609,
+      "transfer_horizontal_gap_m": 0.25,
+      "transfer_height_difference_m": -0.22999995946884155,
+      "boarding_connected_to_land": true
+    }
+  ],
+  "ramp": {
+    "length_m": 6,
+    "rise_m": 0.85,
+    "slope_degrees": 8.063246165697251
+  },
+  "Straight3x6_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 2.384185791015625e-07,
+    "sockets": 2,
+    "collision_meshes": 5
+  },
+  "Straight3x6_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 2,
+    "collision_meshes": 0
+  },
+  "Hub3x3_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 4,
+    "collision_meshes": 5
+  },
+  "Hub3x3_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 4,
+    "collision_meshes": 0
+  },
+  "Corner3x3_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 2,
+    "collision_meshes": 5
+  },
+  "Corner3x3_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 2,
+    "collision_meshes": 0
+  },
+  "Tee3x3_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 3,
+    "collision_meshes": 5
+  },
+  "Tee3x3_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 3,
+    "collision_meshes": 0
+  },
+  "End3x3_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 1,
+    "collision_meshes": 5
+  },
+  "End3x3_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 1,
+    "collision_meshes": 0
+  },
+  "Finger1p2x6_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 2.384185791015625e-07,
+    "sockets": 4,
+    "collision_meshes": 5
+  },
+  "Finger1p2x6_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 4,
+    "collision_meshes": 0
+  },
+  "FingerEnd1p2_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 5.960464477539063e-08,
+    "sockets": 1,
+    "collision_meshes": 5
+  },
+  "FingerEnd1p2_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 1,
+    "collision_meshes": 0
+  },
+  "Branch3x3_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 4,
+    "collision_meshes": 5
+  },
+  "Branch3x3_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 4,
+    "collision_meshes": 0
+  },
+  "RampAdapter3to1p5_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 2,
+    "collision_meshes": 5
+  },
+  "RampAdapter3to1p5_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 2,
+    "collision_meshes": 0
+  },
+  "Gangway1p5x6_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 2.384185791015625e-07,
+    "sockets": 2,
+    "collision_meshes": 5
+  },
+  "Gangway1p5x6_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 2,
+    "collision_meshes": 0
+  },
+  "TopLanding1p5x3_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 1.1920928955078125e-07,
+    "sockets": 2,
+    "collision_meshes": 5
+  },
+  "TopLanding1p5x3_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 2,
+    "collision_meshes": 0
+  },
+  "BoardingSteps0p9x1p2_fbx": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 5.960464477539063e-08,
+    "sockets": 2,
+    "collision_meshes": 4
+  },
+  "BoardingSteps0p9x1p2_glb": {
+    "mesh_count": 1,
+    "max_bounds_error_m": 0.0,
+    "sockets": 2,
+    "collision_meshes": 0
+  },
+  "status": "passed"
+}

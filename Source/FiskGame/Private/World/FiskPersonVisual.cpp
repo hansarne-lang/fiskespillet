@@ -1,5 +1,6 @@
 #include "World/FiskPersonVisual.h"
 #include "World/FiskVisualPrimitives.h"
+#include "FiskPierGuide.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -23,7 +24,7 @@ void FFiskPersonVisual::Build(AActor* Actor,USceneComponent* Parent,FName Name,U
 }
 void FFiskPersonVisual::SetShirt(FLinearColor Color)
 { if(ShirtColor.Equals(Color)) { return; }ShirtColor=Color;for(auto* P:Shirts) { if(auto* M=Cast<UMaterialInstanceDynamic>(P->GetMaterial(0))) { TArray<FMaterialParameterInfo> Params;TArray<FGuid> Ids;M->GetAllVectorParameterInfo(Params,Ids);for(const auto& V:Params) { M->SetVectorParameterValue(V.Name,Color); } } } }
-void FFiskPersonVisual::Pose(double Time,int32 Activity,bool Wave,const FString& Name,FVector Camera,float Walk)
+void FFiskPersonVisual::Pose(double Time,int32 Activity,bool Wave,const FString& Name,FVector Camera,float Walk,FVector CameraUp)
 {
     if(!Root) { return; }const float Bob=FMath::Sin(Time*1.7)*1.7;
     for(int32 I=0;I<2;++I)
@@ -35,5 +36,5 @@ void FFiskPersonVisual::Pose(double Time,int32 Activity,bool Wave,const FString&
         FiskVisual::SetCylinder(Legs[I],FVector(0,S*13,77),Foot,8);Feet[I]->SetRelativeLocation(Foot+FVector(8,0,-8));
         FiskVisual::SetCylinder(Upper[I],A,B+FVector(!Wave && !Activity?-Swing*18:0,0,0),8);FiskVisual::SetCylinder(Lower[I],B+FVector(!Wave && !Activity?-Swing*18:0,0,0),C+FVector(!Wave && !Activity?-Swing*28:0,0,0),6.5);
     }
-    Label->SetText(FText::FromString(Name));Label->SetWorldRotation((Camera-Label->GetComponentLocation()).Rotation());
+    Label->SetText(FText::FromString(Name));Label->SetWorldRotation(FiskPier::NameFacing(Camera-Label->GetComponentLocation(),CameraUp));
 }

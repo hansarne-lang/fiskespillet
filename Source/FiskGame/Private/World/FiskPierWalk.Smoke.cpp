@@ -27,6 +27,7 @@ void UFiskPierWalk::BeginPlay()
 #if WITH_DEV_AUTOMATION_TESTS
 void UFiskPierWalk::RunSmoke()
 {
+    if(SmokeMode==TEXT("guide")) { RunGuideSmoke();return; }
     auto* P=CastChecked<AFiskBoardingController>(GetOwner());auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());auto* Panel=P->GetMarinaPanel();auto* H=Panel->FindHub();auto* D=GetWorld()->GetGameState<AFiskDayState>();
     if(!P->IsCareerReady() || !P->PlayerState || !H || !D || !D->HasStarted()) { return; }
     const auto* Own=H->GetResidents().FindByPredicate([&](const FFiskMarinaResident& R){return R.Profile==GI->Career.Id;});if(!Own) { return; }

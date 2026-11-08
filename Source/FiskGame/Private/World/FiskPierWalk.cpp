@@ -1,5 +1,6 @@
 #include "World/FiskPierWalk.h"
 #include "FiskPierRules.h"
+#include "FiskPierGuide.h"
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
 #include "World/FiskMarinaHub.h"
@@ -37,7 +38,7 @@ void UFiskPierWalk::ServerMode(FGuid Profile,bool Enable)
     if(!Allowed) { P->ClientActionFeedback(TEXT("Gå i land ved brygga først: Tab, L, Tab. T åpner bryggeliv.")); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PIER_MODE accepted=%d enabled=%d generation=%d"),Allowed,bEnabled,Generation);
 }
-void UFiskPierWalk::ReceiveMode(bool Enable,FVector P,int32 G) { if(G!=Generation) { Serial=0; }bEnabled=Enable;Position=P;Generation=G;bPending=false;if(!Enable) { ClearKeys(); } }
+void UFiskPierWalk::ReceiveMode(bool Enable,FVector P,int32 G) { if(G!=Generation) { Serial=0; }bEnabled=Enable;Position=P;Generation=G;bPending=false;if(!Enable) { ClearKeys();bGuidePanel=false;StopGuide(TEXT("Bryggeliv avsluttet.")); } }
 void UFiskPierWalk::ServerInput(FGuid Profile,int32 G,int32 S,FVector2D A,bool Sprint)
 {
     const auto* P=CastChecked<AFiskBoardingController>(GetOwner());
@@ -56,8 +57,11 @@ void UFiskPierWalk::TickComponent(float Delta,ELevelTick Type,FActorComponentTic
     }
     if(P->IsLocalController() && bEnabled && Now>=NextSend)
     {
-        NextSend=Now+.1;if(HasMenu()) { ClearKeys(); }
-        const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());const FVector2D A((bLeft?1.:0)-(bRight?1.:0),(bUp?1.:0)-(bDown?1.:0));P->ServerPierInput(GI->Career.Id,Generation,++Serial,A,bSprint);
+        if(const auto* H=P->GetMarinaPanel()->FindHub();H && !H->GetMessages().IsEmpty() && H->GetMessages().Last().Serial>GreetingSerial) { GreetingSerial=H->GetMessages().Last().Serial;GreetingUntil=Now+10; }
+        NextSend=Now+.1;if(HasMenu()) { ClearKeys();bGuidePanel=false;StopGuide(TEXT("Gåhjelp stoppet av meny.")); }
+        const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());FVector2D A((bLeft?1.:0)-(bRight?1.:0),(bUp?1.:0)-(bDown?1.:0));
+        if(bGuidePanel) { A=FVector2D::ZeroVector; }else if(bGuiding) { A=GuideAxis(Now); }
+        P->ServerPierInput(GI->Career.Id,Generation,++Serial,A,bSprint || bGuiding);
     }
 }
 bool UFiskPierWalk::HandleKey(const FInputKeyEventArgs& A)
@@ -65,15 +69,26 @@ bool UFiskPierWalk::HandleKey(const FInputKeyEventArgs& A)
     auto* P=CastChecked<AFiskBoardingController>(GetOwner());const bool Press=A.Event==IE_Pressed,Release=A.Event==IE_Released;
     if(bDispatching || HasMenu()) { return false; }
     if(Press && A.Key==EKeys::T)
-    { const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());ClearKeys();bPending=true;P->ReleaseRodInputsForMenu();P->ServerPierMode(GI->Career.Id,!bEnabled);return true; }
+    { const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());ClearKeys();bGuidePanel=false;StopGuide(TEXT("Gåhjelp avsluttet."));bPending=true;P->ReleaseRodInputsForMenu();P->ServerPierMode(GI->Career.Id,!bEnabled);return true; }
     if(!bEnabled && !bPending) { return false; }
+    if(Press && A.Key==EKeys::F10) { ClearKeys();StopGuide(TEXT("Velg et mål i havneguiden."));bGuidePanel=!bGuidePanel;return true; }
+    if(bGuidePanel)
+    {
+        if(Press && (A.Key==EKeys::Up || A.Key==EKeys::Down)) { GuideChoice=(GuideChoice+(A.Key==EKeys::Up?13:1))%FiskPier::DestinationCount;return true; }
+        if(Press && A.Key==EKeys::Enter) { StartGuide();return true; }
+        if(Press && A.Key==EKeys::Escape) { bGuidePanel=false;return true; }
+        if(A.Key==EKeys::W || A.Key==EKeys::A || A.Key==EKeys::S || A.Key==EKeys::D) { return true; }
+    }
+    if(Press && (A.Key==EKeys::W || A.Key==EKeys::A || A.Key==EKeys::S || A.Key==EKeys::D || A.Key==EKeys::E || A.Key==EKeys::Escape)) { StopGuide(TEXT("Du har overtatt gangen.")); }
     const bool Held=Press || A.Event==IE_Repeat;
     if(A.Key==EKeys::W) { bUp=Held;return true; }if(A.Key==EKeys::S) { bDown=Held;return true; }if(A.Key==EKeys::A) { bLeft=Held;return true; }if(A.Key==EKeys::D) { bRight=Held;return true; }if(A.Key==EKeys::LeftShift || A.Key==EKeys::RightShift) { bSprint=Held;return true; }
     if(Press && A.Key==EKeys::E) { Interact();return true; }
     if(Press && A.Key==EKeys::M) { P->GetMarinaPanel()->ToggleHarbourMusic();return true; }
+    if(Press && A.Key==EKeys::C) { CameraMode=(CameraMode+1)%3;return true; }
+    const FKey Greetings[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};for(int32 I=0;I<5;++I) { if(Press && A.Key==Greetings[I]) { P->ServerMarinaSay(I);return true; } }
     if(Press && A.Key==EKeys::Left) { CameraYaw-=15;return true; }if(Press && A.Key==EKeys::Right) { CameraYaw+=15;return true; }
     if(Press && A.Key==EKeys::MouseScrollUp) { Zoom=FMath::Clamp(Zoom-.1f,.7f,1.6f);return true; }if(Press && A.Key==EKeys::MouseScrollDown) { Zoom=FMath::Clamp(Zoom+.1f,.7f,1.6f);return true; }
-    if(Press && A.Key==EKeys::Home) { Zoom=1;CameraYaw=0;return true; }
+    if(Press && A.Key==EKeys::Home) { Zoom=1;CameraYaw=0;CameraMode=0;return true; }
     if(Press && A.Key==EKeys::Escape) { ClearKeys();P->ServerPierMode(CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->Career.Id,false);return true; }
     return false;
 }

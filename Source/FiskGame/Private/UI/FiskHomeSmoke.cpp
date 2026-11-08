@@ -36,7 +36,7 @@ void UFiskMarinaPanel::RunHomeSmoke()
             if(!B->IsAboard(PC->PlayerState->GetPlayerId())) { Key(EKeys::E);return; }HomeStage=21;
         }
         else if(HomeStage==21)
-        { if(Elapsed>=120 && B->GetTripProgress()==-1) { Key(EKeys::R); }if(B->GetTripProgress()==100) { Key(EKeys::F);HomeStage=22; } }
+        { if(Elapsed>=120 && B->GetTripProgress()==AFiskStarterBoat::AtDock) { Key(EKeys::R); }if(B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot) { Key(EKeys::F);HomeStage=22; } }
         else if(HomeStage==22)
         {
             const auto* R=PC->GetRod();const auto State=R->GetState();
@@ -50,8 +50,8 @@ void UFiskMarinaPanel::RunHomeSmoke()
             if(State==EFiskRodState::ReadyToLand) { Key(EKeys::SpaceBar); }
             if(State==EFiskRodState::Landed) { HomeAt=Now;HomeStage=23; }
         }
-        else if(HomeStage==23 && Now-HomeAt>1) { if(B->GetTripProgress()==100) { Key(EKeys::R); }HomeStage=24; }
-        else if(HomeStage==24 && B->GetTripProgress()==200) { HomeStage=25; }
+        else if(HomeStage==23 && Now-HomeAt>1) { if(B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot) { Key(EKeys::R); }HomeStage=24; }
+        else if(HomeStage==24 && B->GetTripProgress()==AFiskStarterBoat::AtMarina) { HomeStage=25; }
         else if(HomeStage==25 && Elapsed>=1080)
         {
             const auto& J=GI->GetJournal();if(J.GetEntries().Num()!=1 || !J.GetEntries()[0].bSold || GI->Career.Cash!=1755000+J.Stats().Income*100 || GI->Career.Owned!=8183 || GI->Career.Revision!=14)

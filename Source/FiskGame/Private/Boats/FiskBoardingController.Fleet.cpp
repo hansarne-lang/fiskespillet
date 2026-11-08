@@ -42,10 +42,10 @@ void AFiskBoardingController::ServerFleetSelect_Implementation(int32 Index,bool 
     const int32 PlayerId=PlayerState?PlayerState->GetPlayerId():-1;auto* Old=M?M->GetBoatForPlayer(PlayerId):nullptr;
     auto Reject=[&](){ClientActionFeedback(TEXT("Båtbytte avvist. Velg en ledig båt ved brygga før avreise; etter turen venter du til neste dag."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECT_REJECTED player=%d index=%d"),PlayerId,Index);};
     if(!M || !D || !D->HasStarted() || !IsCareerSynced() || !M->CanJoinFleet(ServerCareer.Id) || PlayerId<0 || D->GetElapsedMilliseconds()>=1020000
-        || (Old && Old->IsAboard(PlayerId) && Old->GetTripProgress()!=-1)) { Reject();return; }
+        || (Old && Old->IsAboard(PlayerId) && Old->GetTripProgress()!=AFiskStarterBoat::AtDock)) { Reject();return; }
     for(int32 Slot=0;Slot<3;++Slot) { if(!GetRodAt(Slot)->CanConfigure()) { Reject();return; } }
     AFiskStarterBoat* Target=CreateOwn?M->CreateOwnedBoat(this):M->GetFleet().IsValidIndex(Index)?M->GetFleet()[Index].Get():nullptr;
-    if(!Target || Target->GetTripProgress()!=-1 || (!Target->IsAboard(PlayerId) && Target->GetCrewCount()>=Target->GetCapacity())) { Reject();return; }
+    if(!Target || Target->GetTripProgress()!=AFiskStarterBoat::AtDock || (!Target->IsAboard(PlayerId) && Target->GetCrewCount()>=Target->GetCapacity())) { Reject();return; }
     if(Old && Old!=Target && Old->IsAboard(PlayerId)) { Old->Leave(PlayerId); }
     SelectedFleetBoat=Target;Target->Board(PlayerId);ResetRodForDay(D->GetDayNumber());ForceNetUpdate();
     ClientActionFeedback(FString::Printf(TEXT("Om bord i båt %d. O: din båts turplan. J: ekspedisjon. R: avreise fra 02:00."),Target->GetFleetIndex()+1));
@@ -54,7 +54,7 @@ void AFiskBoardingController::ServerFleetSelect_Implementation(int32 Index,bool 
 void AFiskBoardingController::ServerFleetLeave_Implementation()
 {
     const auto* D=GetWorld()->GetGameState<AFiskDayState>();auto* B=const_cast<AFiskStarterBoat*>(FindStarterBoat());
-    if(!D || !PlayerState || !B || B->GetTripProgress()!=-1 || !B->IsAboard(PlayerState->GetPlayerId()))
+    if(!D || !PlayerState || !B || B->GetTripProgress()!=AFiskStarterBoat::AtDock || !B->IsAboard(PlayerState->GetPlayerId()))
     { ClientActionFeedback(TEXT("Gå i land ved startbrygga før avreise. Mannskapet er låst på denne turen til neste døgn."));return; }
     B->Leave(PlayerState->GetPlayerId());ResetRodForDay(D->GetDayNumber());ClientActionFeedback(TEXT("Du er i land. B: strandbar. H: naust. Tab: velg en annen båt."));
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_LEFT player=%d boat=%d"),PlayerState->GetPlayerId(),B->GetFleetIndex());

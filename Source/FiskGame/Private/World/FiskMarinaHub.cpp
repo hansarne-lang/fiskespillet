@@ -60,7 +60,7 @@ void AFiskMarinaHub::Tick(float DeltaSeconds)
     bool Changed=false;for(FFiskMarinaResident& R:Residents)
     {
         if(R.PlayerId>=0 && !Active.Contains(R.PlayerId)) { PlaceChoices.Remove(R.PlayerId);R.PlayerId=-1;R.bWalking=false;Changed=true; }
-        bool Sea=false;for(TActorIterator<AFiskStarterBoat> B(GetWorld());B;++B) { if(R.PlayerId>=0 && B->IsAboard(R.PlayerId) && B->GetTripProgress()!=-1 && B->GetTripProgress()!=200) { Sea=true;break; } }
+        bool Sea=false;for(TActorIterator<AFiskStarterBoat> B(GetWorld());B;++B) { if(R.PlayerId>=0 && B->IsAboard(R.PlayerId) && B->GetTripProgress()!=AFiskStarterBoat::AtDock && B->GetTripProgress()!=AFiskStarterBoat::AtMarina) { Sea=true;break; } }
         const int32 Place=FiskHarbour::PublicPlace(R.PlayerId>=0,Sea,PlaceChoices.FindRef(R.PlayerId));if(R.Place!=Place) { R.Place=Place;Changed=true; }
     }
     if(Changed) { OnRep_Residents();ForceNetUpdate(); }

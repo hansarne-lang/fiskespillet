@@ -1,6 +1,7 @@
 #include "UI/FiskJournalPanel.h"
 #include "UI/FiskGameInstance.h"
 #include "Boats/FiskBoardingController.h"
+#include "FiskCareerProfile.h"
 #include "Fishing/FiskRigSettings.h"
 #include "FiskFishingGround.h"
 #include "Engine/Canvas.h"
@@ -85,13 +86,14 @@ void UFiskJournalPanel::Draw(AHUD& HUD,UCanvas& Canvas)
         {
             const FFiskJournalEntry& E=Journal.GetEntries()[Selected[Page*5+I]];const float Y=(204+68*I)*S;
             const FFiskFishingGround* Ground=FiskGrounds::Find(E.Context.Ground);
+            const auto Gear=[&E](int32 Item)->const TCHAR* { return (E.Context.Equipment & (1<<Item))!=0?TEXT("oppgradert"):TEXT("standard"); };
             HUD.DrawText(FString::Printf(TEXT("%s | %.1f kg | %.1f cm | %s | %d fiskepenger"),FiskCatches::Find(E.Fish.Species)->Name,
                 E.Fish.WeightGrams/1000.0,E.Fish.LengthMm/10.0,E.bSold?TEXT("SOLGT"):TEXT("TAPT VED RETUR"),E.bSold?E.Fish.Value:0),FLinearColor::White,52*S,Y,nullptr,1.1f*S);
             HUD.DrawText(FString::Printf(TEXT("%s UTC | %s | %s / %d m / %s | Kamp %.1f s"),*E.Context.LandedUtc.Left(19).Replace(TEXT("T"),TEXT(" ")),
                 Ground->Name,FFiskRigRules::BaitName(E.Context.Bait),E.Context.Depth,FFiskRigRules::ProgramName(E.Context.Program),E.Context.FightMs/1000.0),
                 FLinearColor(0.65f,0.85f,0.85f),52*S,Y+28*S,nullptr,0.90f*S);
             HUD.DrawText(FString::Printf(TEXT("%s | Snøre %s | Snelle %s | Stang %s"),E.Context.BoatKind==1?TEXT("Offshorebåt"):TEXT("Startbåt"),
-                E.Context.Equipment&1?TEXT("oppgradert"):TEXT("standard"),E.Context.Equipment&2?TEXT("oppgradert"):TEXT("standard"),E.Context.Equipment&4?TEXT("oppgradert"):TEXT("standard")),
+                Gear(FFiskCareerProfile::ItemLine),Gear(FFiskCareerProfile::ItemReel),Gear(FFiskCareerProfile::ItemRod)),
                 FLinearColor(.45f,.8f,.75f),52*S,Y+47*S,nullptr,.76f*S);
         }
         HUD.DrawText(FString::Printf(TEXT("Side %d/%d | PgUp/PgDn eller piler: bla | F6: artsrekorder"),Page+1,Pages),FLinearColor(0.5f,0.9f,0.8f),52*S,560*S,nullptr,1.0f*S);

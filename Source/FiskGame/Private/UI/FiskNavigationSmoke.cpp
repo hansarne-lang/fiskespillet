@@ -93,7 +93,7 @@ void AFiskBoardingController::RunNavigationSmoke()
         if(!P || P->Ground!=1 || P->Name!=TEXT("MINPLASS") || Boat->GetGroundId()!=1) { Fail(TEXT("favorite_live_failed"));return; }
         Key(EKeys::M);Capture(TEXT("hud-ready"));Smoke.NavigationStage=2;
     }
-    else if(Smoke.NavigationStage==2 && Boat->GetTripProgress()==100 && Rod->GetState()==EFiskRodState::Fishing)
+    else if(Smoke.NavigationStage==2 && Boat->GetTripProgress()==AFiskStarterBoat::AtFishingSpot && Rod->GetState()==EFiskRodState::Fishing)
     {
         Key(EKeys::F7);
         const FFiskSonarView V=FiskNavigation::Sonar(Boat->GetGroundId(),100,true,Rod->GetRig().Depth);

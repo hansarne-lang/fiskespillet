@@ -29,7 +29,7 @@ bool FFiskPracticeSession::Start(int32 S,int32 Gear,int32 Seed)
 void FFiskPracticeSession::Advance(double Dt)
 {
     if(!IsRunning() || !FMath::IsFinite(Dt) || Dt<=0) { return; }Dt=FMath::Min(Dt,.25);Seconds+=Dt;Fight.Advance(Dt);
-    if(Fight.GetLoadPercent()>(Equipment&1?115:100) || Fight.GetLoadPercent()<20) { BadLoadSeconds+=Dt; }
+    if(Fight.GetLoadPercent()>static_cast<int32>(FFiskFightModel::OverloadLoad(Equipment,FFiskCareerProfile::ItemLine)) || Fight.GetLoadPercent()<20) { BadLoadSeconds+=Dt; }
     if(Fight.IsSurging() && Fight.IsReeling()) { SurgeReelSeconds+=Dt; }
 }
 bool FFiskPracticeSession::Land()

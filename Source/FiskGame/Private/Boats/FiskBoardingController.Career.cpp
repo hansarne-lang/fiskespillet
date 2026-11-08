@@ -90,7 +90,7 @@ void AFiskBoardingController::TickCareer()
 void AFiskBoardingController::ServerBuyCareer_Implementation(FGuid Command,int32 Revision,int32 Item)
 {
     const AFiskStarterBoat* Boat=FindStarterBoat();const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
-    const bool Dock=Boat && PlayerState && (!Boat->IsAboard(PlayerState->GetPlayerId()) || Boat->GetTripProgress()==-1 || Boat->GetTripProgress()==200);
+    const bool Dock=Boat && PlayerState && (!Boat->IsAboard(PlayerState->GetPlayerId()) || Boat->GetTripProgress()==AFiskStarterBoat::AtDock || Boat->GetTripProgress()==AFiskStarterBoat::AtMarina);
     FFiskCareerProfile P=ServerCareer;
     const bool Accepted=bCareerReady && Day && Day->HasStarted() && Dock && P.Buy(Command,Revision,Item)
         && SaveServerCareer(P,TEXT("Kjøp bekreftet: ")+FFiskCareerProfile::ItemName(Item));
@@ -100,7 +100,7 @@ void AFiskBoardingController::ServerBuyCareer_Implementation(FGuid Command,int32
 void AFiskBoardingController::ServerChooseBoat_Implementation(int32 Revision,int32 Kind)
 {
     AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();AFiskStarterBoat* Boat=Mode?Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE):nullptr;
-    const bool Accepted=bCareerReady && Boat && PlayerState && (Kind==0 || (Kind==1 && ServerCareer.Has(3))) && Boat->ChooseKind(PlayerState->GetPlayerId(),Revision,Kind);
+    const bool Accepted=bCareerReady && Boat && PlayerState && (Kind==0 || (Kind==1 && ServerCareer.Has(FFiskCareerProfile::ItemOffshoreBoat))) && Boat->ChooseKind(PlayerState->GetPlayerId(),Revision,Kind);
     ClientActionFeedback(Accepted?TEXT("Båt valgt. Mannskap og stangfordeling er oppdatert."):TEXT("Båtvalg avvist. Bare eieren kan velge eid båt ved brygga, med plass til alle."));
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_BOAT_CHOICE accepted=%d kind=%d"),Accepted,Kind);
 }

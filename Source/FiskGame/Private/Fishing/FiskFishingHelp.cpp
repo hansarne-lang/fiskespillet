@@ -95,7 +95,7 @@ bool UFiskFishingHelp::HandleKey(const FInputKeyEventArgs& Args)
             if(Boat->GetTripProgress()>=0 && Boat->GetTripProgress()<200 && FiskQuickControls::ReturnBox(S).IsInside(Mouse))
             { bButtonHeld=true;RequestReturn();return true; }
 #if !UE_BUILD_SHIPPING
-            if(Boat->GetTripProgress()==100 && FiskQuickControls::AssistBox(S).IsInside(Mouse))
+            if(Boat->GetTripProgress()==AFiskStarterBoat::AtFishingSpot && FiskQuickControls::AssistBox(S).IsInside(Mouse))
             { bButtonHeld=true;ToggleAssist();return true; }
 #endif
         }
@@ -132,7 +132,7 @@ void UFiskFishingHelp::TickComponent(float Delta,ELevelTick Type,FActorComponent
         bWaitingSelection=false;
     }
     const auto* Rod=PC->GetRod();
-    if(!Aboard || !Boat || Boat->GetTripProgress()!=100 || PC->GetSelectedRod()!=TargetSlot || Rod->GetCastId()!=TargetCast || !HasFish(Rod))
+    if(!Aboard || !Boat || Boat->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot || PC->GetSelectedRod()!=TargetSlot || Rod->GetCastId()!=TargetCast || !HasFish(Rod))
     {
         if(Rod->GetCastId()==TargetCast && Rod->GetState()==EFiskRodState::Landed)
         { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TEST_ASSIST_LANDED slot=%d cast=%s"),TargetSlot,*TargetCast.ToString(EGuidFormats::Digits));PC->ClientActionFeedback_Implementation(TEXT("AI-testhjelpen landet fisken. Vanlig oppgjør ved 17:00 gjelder.")); }

@@ -44,7 +44,7 @@ void AFiskBoardingController::RunExpeditionSmoke()
     const bool Solo=Smoke.CareerSmokeMode==TEXT("solo"),Captain=B->GetCaptainId()==Self;
     int32 Weather=0;FParse::Value(FCommandLine::Get(),TEXT("FiskExpectedWeather="),Weather);
     if(Day->GetDayNumber()==1 && P.Weather!=Weather) { Fail(TEXT("server_weather_disagrees"));return; }
-    if(Smoke.ExpeditionSmokeStage==0 && Smoke.CareerSmokeStage==13 && B->GetTripProgress()==-1 && Now>=70)
+    if(Smoke.ExpeditionSmokeStage==0 && Smoke.CareerSmokeStage==13 && B->GetTripProgress()==AFiskStarterBoat::AtDock && Now>=70)
     {
         Key(EKeys::J);if(!ExpeditionPanel->IsVisible()) { Fail(TEXT("plan_not_open"));return; }
         if(Captain) { Key(Solo?EKeys::Five:EKeys::Three); }else { ServerExpeditionChoose(P.Revision,4); }

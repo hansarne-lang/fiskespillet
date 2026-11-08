@@ -77,7 +77,7 @@ bool AFiskBootstrapGameMode::StartNextDay(APlayerController* Requester, int32 Ex
     if (!Day || !StarterBoat || !Settlement || !FiskSession::CanAdvance(Host, Day->GetDayNumber(), ExpectedDay,
         Day->GetElapsedMilliseconds(), Settlement->GetView().bRevealed) || ArchivedDay!=Settlement->GetView().DayId) { return false; }
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
-    { const AFiskBoardingController* P=Cast<AFiskBoardingController>(It->Get());if(P && (!P->IsCareerSynced() || !P->GetServerCareer().Receipts.ContainsByPredicate([&](const FFiskCareerReceipt& R){return R.Id==Settlement->GetView().DayId && R.Kind==2;}))) { return false; } }
+    { const AFiskBoardingController* P=Cast<AFiskBoardingController>(It->Get());if(P && (!P->IsCareerSynced() || !P->GetServerCareer().Receipts.ContainsByPredicate([&](const FFiskCareerReceipt& R){return R.Id==Settlement->GetView().DayId && R.Kind==FFiskCareerReceipt::KindSettlement;}))) { return false; } }
     // All resets run in this one server frame before the fresh clock starts.
     for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     { if (AFiskBoardingController* PC = Cast<AFiskBoardingController>(It->Get())) { PC->ResetRodForDay(ExpectedDay+1); } }

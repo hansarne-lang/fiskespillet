@@ -12,7 +12,7 @@ Spillbar Unreal Engine 5.8-utviklingsversjon, **v0.22**. Spill alene eller innti
 
 Lagringer er lokale; GitHub synkroniserer ikke spillprofiler mellom PC-er.
 
-Repositoryet er offentlig etter prosjekteierens beslutning. Offentlig tilgjengelighet gir ikke automatisk en åpen kildekodelisens; lisens og tredjepartsrettigheter må avklares før gjenbruk eller videre distribusjon.
+Repositoryet er offentlig etter prosjekteierens beslutning, men **alle rettigheter er forbeholdt**. Se [LICENSE](LICENSE). Offentlig innsyn gir ingen rett til gjenbruk eller videre distribusjon. Unreal Engine er underlagt Epics egne vilkår.
 
 ## Dokumentasjon
 

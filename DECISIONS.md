@@ -53,3 +53,22 @@ Mens spilleren er tilkoblet, er serverautoriteten uendret: bare vertens oppgjør
 Prosjekteieren ba i Claude Code-sesjonen 8. november 2026 om å gjennomføre forslag 1–6 for kortere tid fra bygg til ferdig test. Det inkluderer en testklokke som går raskere. Godkjenningen er bekreftet fra prosjekteierens konto i [PR #117](https://github.com/hansarne-lang/fiskespillet/pull/117#issuecomment-6719632634) for revisjon 360f9ed.
 
 Regelen «ingen klokkeakselerasjon i tester» erstattes for raske kontroller. `-FiskClockScale=N` (1–20) skalerer serverens dagsklokke og dermed alt som bruker den. Normalverdien er 1. Shipping-bygg ignorerer flagget. Spillregler, tider og priser er uendret. Utgivelsesbevis for dagslengde, 17:00-frist, reisetid og napp krever fortsatt normal klokke (`Run-All.ps1 -Release`).
+
+## 2026-11-08 — Lisens: alle rettigheter forbeholdt
+
+Prosjekteieren valgte alternativ A i [#10](https://github.com/hansarne-lang/fiskespillet/issues/10#issuecomment-6726548569) (godkjent [her](https://github.com/hansarne-lang/fiskespillet/issues/10#issuecomment-6726563802)): Repositoryet forblir offentlig for innsyn, men alle rettigheter er forbeholdt. `LICENSE` gir ingen lisens til bruk, endring eller distribusjon utover GitHubs vilkår. Unreal Engine er underlagt Epics egne vilkår. Valget kan senere åpnes til en ikke-kommersiell eller åpen lisens, mens en gitt lisens ikke kan trekkes tilbake. GPL og andre sterke copyleft-lisenser er frarådet sammen med Unreal Engine.
+
+## 2026-11-08 — Særregler for strandbarens veddemål
+
+Prosjekteieren godkjente forslaget i [#15](https://github.com/hansarne-lang/fiskespillet/issues/15#issuecomment-6726551924) i sin helhet ([godkjenning](https://github.com/hansarne-lang/fiskespillet/issues/15#issuecomment-6726564377)). Hovedregelen fra IDÉ-005 ligger fast. «Fiskeren» er stangeieren, også på delt båt og ved hjelp til landing.
+
+1. **Innsats:** fast valg mellom $50, $100 og $250, trukket én gang ved registrering.
+2. **Antall:** ett veddemål per spiller per dag.
+3. **Ulike innsatser:** Vinnerne deler hele potten i forhold til innsatsen.
+4. **Lik størstevekt:** Alle som har satset på en av fiskerne med lik største vekt (samme gram), er vinnere og deler etter punkt 3.
+5. **Ingen riktige tips:** Alle får hele innsatsen tilbake.
+6. **Ingen tellende fangst** (ingen av fiskerne det er satset på, leverte innen fristen): Alle får innsatsen tilbake.
+7. **Avrunding:** Beløp regnes i øre. Hver andel rundes ned, og restøren går til vinneren med størst innsats, ved likhet til den som registrerte først. Summen av utbetalingene er alltid lik potten.
+8. **Frakobling:** Veddemålet står. Utbetalingen er en egen oppgjørskvittering med unik ID per dag og veddemål, og godskrives ved neste tilkobling. Samme kvittering gir aldri ny utbetaling.
+
+Innsatsgrensen begrenser også virkningen av saldo fra andre verter, som ikke kan kontrolleres ([#112](https://github.com/hansarne-lang/fiskespillet/issues/112)). Regneeksemplene står i kravspesifikasjonen. Gjennomføringen gjøres i [#22](https://github.com/hansarne-lang/fiskespillet/issues/22).

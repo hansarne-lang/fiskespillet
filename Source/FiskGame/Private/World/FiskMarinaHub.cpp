@@ -4,6 +4,8 @@
 #include "Boats/FiskStarterBoat.h"
 #include "FiskHarbourRules.h"
 #include "FiskPierRules.h"
+#include "FiskPierGuide.h"
+#include "FiskRouteGeometry.h"
 #include "World/FiskPierWalk.h"
 #include "EngineUtils.h"
 #include "World/FiskVisualPrimitives.h"
@@ -85,8 +87,11 @@ void AFiskMarinaHub::CalcCamera(float DeltaTime,FMinimalViewInfo& Out)
 {
     Super::CalcCamera(DeltaTime,Out);const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetWorld()->GetFirstPlayerController());
     const UFiskMarinaPanel* Panel=PC?PC->GetMarinaPanel():nullptr;const bool Bar=Panel && Panel->GetPage()==2;
+#if WITH_DEV_AUTOMATION_TESTS
+    if(PC && PC->GetPierWalk()->CoastTestView()>=0) { const int32 I=PC->GetPierWalk()->CoastTestView();const FVector Focus=FiskRouteGeometry::Island(I)+FVector(0,0,350);Out.Location=Focus+FVector(-1.7,-1.9,1.05)*FiskRouteGeometry::Radius(I);Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=55;return; }
+#endif
     if(PC && PC->GetPierWalk()->IsEnabled() && Panel && !Panel->IsVisible())
-    { const auto* W=PC->GetPierWalk();const FVector Focus=W->GetPosition()+FVector(0,0,110);Out.Location=Focus+FRotator(0,W->GetCameraYaw(),0).RotateVector(FVector(-750,-1050,720))*W->GetZoom();Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=60;return; }
+    { const auto* W=PC->GetPierWalk();const FVector Focus=W->GetPosition()+FVector(0,0,110);Out.Location=Focus+FRotator(0,W->GetCameraYaw(),0).RotateVector(FiskPier::WalkCamera(W->GetCameraMode()))*W->GetZoom();Out.Rotation=(Focus-Out.Location).Rotation();Out.FOV=60;return; }
     if(Panel && Panel->IsGallery())
     {
         const FVector Focus(-10000,-6000,650);Out.Location=Focus+FVector(450,-1800*Panel->GetGalleryZoom(),180);Out.Rotation=(Focus+FVector(450,0,0)-Out.Location).Rotation();Out.FOV=55;return;

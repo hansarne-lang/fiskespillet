@@ -16,9 +16,9 @@ void FiskPierScenery::Build(AActor* O,UStaticMesh* Cube,UStaticMesh* Cylinder,UM
         const bool Long=A.Y1-A.Y0>A.X1-A.X0;
         for(double V=Long?A.Y0:A.X0;V<(Long?A.Y1:A.X1);V+=240) { Part(Cube,Long?FVector((A.X0+A.X1)/2,V,130.3):FVector(V,(A.Y0+A.Y1)/2,130.3),Long?FVector((A.X1-A.X0)/100,.025,.012):FVector(.025,(A.Y1-A.Y0)/100,.012),Dark); }
     }
-    for(int32 I=0;I<13;++I)
+    for(int32 I=0;I<FiskPier::PostCount;++I)
     {
-        const double Y=-3000+I*1000;const FVector P(-1750,Y,130);Part(Cylinder,P+FVector(0,0,-60),FVector(.22,.22,2.8),Wood);
+        const FVector P=FiskPier::Post(I);Part(Cylinder,P+FVector(0,0,-60),FVector(.22,.22,2.8),Wood);
         if(I%2==0) { Part(Cylinder,P+FVector(0,0,165),FVector(.06,.06,3.3),Dark);Part(Cube,P+FVector(0,0,338),FVector(.45,.45,.4),FLinearColor(.94f,.73f,.31f));
             auto* L=NewObject<UPointLightComponent>(O,*FString::Printf(TEXT("PierLamp%d"),I));O->AddInstanceComponent(L);L->SetupAttachment(O->GetRootComponent());L->SetRelativeLocation(P+FVector(0,0,330));L->SetIntensity(450);L->SetAttenuationRadius(500);L->SetCastShadows(false);L->SetLightColor(FLinearColor(1,.75f,.4f));L->RegisterComponent(); }
     }

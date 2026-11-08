@@ -30,7 +30,9 @@ private:
     UPROPERTY() TObjectPtr<UStaticMesh> Cylinder;
     UPROPERTY() TObjectPtr<UMaterialInterface> Material;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Birds;
+    UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> BirdWings;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Flyers;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Wake;
     UPROPERTY() TArray<TObjectPtr<UStaticMeshComponent>> Traffic;
+    void BuildCoast();
 };

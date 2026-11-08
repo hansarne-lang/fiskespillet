@@ -78,13 +78,7 @@ void AFiskOceanScene::BeginPlay()
     Water->SetCastShadow(false);
     WaveSurface=FiskMarine::Add(this,RootComponent,TEXT("LiveWaveSurface"),FiskMarine::Water(0,1),Material,FLinearColor(.012f,.16f,.22f),.16f);WaveSurface->SetCastShadow(false);
     Part(TEXT("ShallowWater"),Sphere,FVector(18000,0,-75),FVector(700,950,.03),FLinearColor(.015f,.32f,.38f))->SetCastShadow(false);
-    for(int32 I=0;I<FiskRouteGeometry::IslandCount;++I)
-    {
-        const FVector P=FiskRouteGeometry::Island(I);const double R=FiskRouteGeometry::Radius(I);
-        Part(*FString::Printf(TEXT("SeaIslandSand%d"),I),Sphere,P+FVector(0,0,-40),FVector(R/50,R/50,5),FLinearColor(.68f,.55f,.32f));
-        Part(*FString::Printf(TEXT("SeaIslandGreen%d"),I),Sphere,P+FVector(0,0,150),FVector(R/65,R/65,I==2?3:14),FLinearColor(.08f,.23f,.055f));
-        if(I<2) { Part(*FString::Printf(TEXT("SeaIslandHill%d"),I),Sphere,P+FVector(-R/4,0,650),FVector(R/110,R/120,20),FLinearColor(.11f,.22f,.08f)); }
-    }
+    BuildCoast();
     // Root silhouettes stay inside the navigation exclusion around the mangrove island.
     for(int32 I=0;I<12;++I)
     {
@@ -137,7 +131,8 @@ void AFiskOceanScene::BeginPlay()
     for(int32 I=0;I<12;++I)
     {
         UStaticMeshComponent* Bird=Part(*FString::Printf(TEXT("Seabird%d"),I),Sphere,FVector::ZeroVector,FVector(.5,1.8,.06),FLinearColor(.84f,.87f,.82f));
-        Bird->SetCastShadow(false);Birds.Add(Bird);
+        Bird->SetCastShadow(false);Bird->SetRelativeScale3D(FVector(.48,.14,.14));Birds.Add(Bird);
+        for(int32 Side:{-1,1}) { auto* Wing=Part(*FString::Printf(TEXT("SeabirdWing%d_%d"),I,Side),Sphere,FVector::ZeroVector,FVector(.4,.7,.045),FLinearColor(.75f,.8f,.77f));Wing->SetCastShadow(false);BirdWings.Add(Wing); }
     }
     for(int32 I=0;I<8;++I)
     {
@@ -216,6 +211,7 @@ void AFiskOceanScene::Tick(float DeltaSeconds)
     {
         const double A=Time*.12+I*.52,R=1800+I*140;Birds[I]->SetRelativeLocation(Center+FVector(FMath::Cos(A)*R,FMath::Sin(A)*R,700+I*55));
         Birds[I]->SetRelativeRotation(FRotator(0,FMath::RadiansToDegrees(A)+90,FMath::Sin(Time*3+I)*12));
+        for(int32 Side=0;Side<2;++Side) { auto* W=BirdWings[I*2+Side].Get();const double Sign=Side?1:-1,Flap=FMath::Sin(Time*5+I)*24;W->SetRelativeLocation(Birds[I]->GetRelativeLocation()+Birds[I]->GetRelativeRotation().RotateVector(FVector(0,Sign*27,5)));W->SetRelativeRotation(FRotator(0,FMath::RadiansToDegrees(A)+90,Sign*Flap)); }
     }
     for(int32 I=0;I<Flyers.Num();++I)
     {

@@ -3,6 +3,7 @@
 #include "World/FiskSpeciesArt.h"
 #include "World/FiskVisualPrimitives.h"
 #include "FiskHarbourRules.h"
+#include "FiskPierLayout.h"
 #include "World/FiskPierScenery.h"
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
@@ -26,10 +27,10 @@ void UFiskHarbourLife::BeginPlay()
     Super::BeginPlay();FiskPierScenery::Build(GetOwner(),Cube,Cylinder,Material);int32 N=0;
     auto Part=[&](UStaticMesh* Mesh,FVector P,FVector Scale,FLinearColor Color){return FiskVisual::AddPart(GetOwner(),GetOwner()->GetRootComponent(),Mesh,Material,*FString::Printf(TEXT("HarbourLiving%d"),N++),P,Scale,Color,.75f);};
     const FVector Bar(-4200,-1900,0);
-    for(int32 I=0;I<12;++I)
-    { const FVector P(-5000+(I%6)*300,-2280-(I/6)*380,0);Part(Cylinder,P+FVector(0,0,180),FVector(.35,.35,.9),FLinearColor(.28,.19,.11));Part(Cylinder,P+FVector(0,0,232),FVector(.65,.65,.13),FLinearColor(.76,.51,.22)); }
-    for(int32 I=0;I<5;++I)
-    { const FVector P=Bar+FVector(-1200+I*600,-1250,0);Part(Cylinder,P+FVector(0,0,210),FVector(.13,.13,2),FLinearColor(.3,.23,.13));Part(Cylinder,P+FVector(0,0,319),FVector(2.5,2.5,.15),FLinearColor(.62,.42,.2));Part(Cylinder,P+FVector(0,0,345),FVector(.15,.15,.5),FLinearColor(.13,.56,.51)); }
+    for(int32 I=0;I<FiskPier::StoolCount;++I)
+    { const FVector P=FiskPier::Stool(I)-FVector(0,0,130);Part(Cylinder,P+FVector(0,0,180),FVector(.35,.35,.9),FLinearColor(.28,.19,.11));Part(Cylinder,P+FVector(0,0,232),FVector(.65,.65,.13),FLinearColor(.76,.51,.22)); }
+    for(int32 I=0;I<FiskPier::TableCount;++I)
+    { const FVector P=FiskPier::Table(I)-FVector(0,0,130);Part(Cylinder,P+FVector(0,0,210),FVector(.13,.13,2),FLinearColor(.3,.23,.13));Part(Cylinder,P+FVector(0,0,319),FVector(2.5,2.5,.15),FLinearColor(.62,.42,.2));Part(Cylinder,P+FVector(0,0,345),FVector(.15,.15,.5),FLinearColor(.13,.56,.51)); }
     for(int32 I=0;I<7;++I)
     { const FVector P=Bar+FVector(-1600+I*530,950,0);Part(Cylinder,P+FVector(0,0,290),FVector(.35,.35,5.8),FLinearColor(.43,.3,.16));for(int32 S=0;S<6;++S) { auto* Leaf=Part(Sphere,P+FVector(190*FMath::Cos(S*PI/3),190*FMath::Sin(S*PI/3),600),FVector(4.8,.75,.16),FLinearColor(.1,.36,.14));Leaf->SetRelativeRotation(FRotator(-14,S*60,0)); } }
 }
@@ -65,7 +66,7 @@ void UFiskHarbourLife::TickComponent(float Delta,ELevelTick Type,FActorComponent
         F.SetShirt(Colors[Resident->Identity.Color]);++VisiblePeople;F.Root->SetVisibility(true,true);
         const FVector Target=Resident->bWalking?Resident->WalkPosition:Resident->Place==1?AFiskMarinaHub::HousePosition(I)+FVector(0,-650,130):FiskHarbour::MeetingPoint(I,Resident->Place);
         F.Root->SetRelativeLocation(Resident->bWalking?FMath::VInterpTo(F.Root->GetRelativeLocation(),Target,Delta,16):Target);F.Root->SetRelativeRotation(FRotator(0,Resident->bWalking?Resident->WalkYaw:Resident->Place==1?-90:Resident->Place==2?-90:0,0));
-        F.Pose(Now,0,Greetings.IsWaving(Resident->Identity.DisplayName,Now),Resident->Identity.DisplayName,Camera,Resident->bWalking?Resident->WalkSpeed/220:0);
+        F.Pose(Now,0,Greetings.IsWaving(Resident->Identity.DisplayName,Now),Resident->Identity.DisplayName,Camera,Resident->bWalking?Resident->WalkSpeed/220:0,PC->PlayerCameraManager?PC->PlayerCameraManager->GetCameraRotation().RotateVector(FVector::UpVector):FVector::UpVector);
     }
     const bool Gallery=Panel && Panel->IsGallery();if(Gallery && BuiltSpecies!=Panel->GetGallerySpecies()) { BuildGallery(Panel->GetGallerySpecies()); }
     if(GalleryRoot) { GalleryRoot->SetVisibility(Gallery,true);if(Gallery) { GalleryRoot->SetRelativeRotation(FRotator(0,Panel->GetGalleryYaw(),0));GalleryRoot->SetRelativeLocation(FVector(-10000,-6000,650+FMath::Sin(GetWorld()->GetRealTimeSeconds())*7)); } }

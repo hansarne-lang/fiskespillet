@@ -13,5 +13,5 @@ struct FFiskPersonVisual
     void SetShirt(FLinearColor Color);
     UTextRenderComponent* Label=nullptr;
     void Build(AActor* Actor,USceneComponent* Parent,FName Name,UStaticMesh* Sphere,UStaticMesh* Cube,UStaticMesh* Cylinder,UMaterialInterface* Material,FLinearColor Shirt);
-    void Pose(double Time,int32 Activity,bool Wave,const FString& Name,FVector Camera,float Walk=0);
+    void Pose(double Time,int32 Activity,bool Wave,const FString& Name,FVector Camera,float Walk=0,FVector CameraUp=FVector::UpVector);
 };

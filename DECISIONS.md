@@ -39,3 +39,9 @@ Prosjekteieren svarte «Ja – bygg hele v0.7-pakken» på det konkrete forslage
 Én aktiv felles båt velges av verten/eieren ved brygga. Offshorebåten har4plasser,6holdere og25% høyere fart. Fordelingen for1/2/3/4om bord er3 /3+3 /2+2+2 /2+2+1+1, med maksimalt3stenger per spiller. Startbåtens godkjente to-alene/én-hver-fordeling beholdes. Fire LAN-spillere, fritt valg av gyldige sjøpunkter, migrerte koordinatfavoritter og rikere kildebygd miljø/lyd inngår.
 
 Den begrensede økonomi-/profilarkitekturen i v0.7-kontrakten er godkjent innen de eksisterende to UE-modulene. Historisk journal etterbetales ikke. Offline-profilkopiering kan ikke forhindres mellom uavhengige servere. Flere samtidige båter, lager/overlast/sleping, offshore-sannsynlighet, reisehopp, strandbar, naust og veddemål inngår ikke; deres øvrige åpne eierbeslutninger beholdes. Tallene er testbalanse, ikke endelig økonomi.
+
+## 2026-11-08 — Testklokke og raskere testkjøring
+
+Prosjekteieren ba i Claude Code-sesjonen 8. november 2026 om å gjennomføre forslag 1–6 for kortere tid fra bygg til ferdig test. Det inkluderer en testklokke som går raskere. Godkjenningen må bekreftes i GitHub (issue/PR) før integrasjon.
+
+Regelen «ingen klokkeakselerasjon i tester» erstattes for raske kontroller. `-FiskClockScale=N` (1–20) skalerer serverens dagsklokke og dermed alt som bruker den. Normalverdien er 1. Shipping-bygg ignorerer flagget. Spillregler, tider og priser er uendret. Utgivelsesbevis for dagslengde, 17:00-frist, reisetid og napp krever fortsatt normal klokke (`Run-All.ps1 -Release`).

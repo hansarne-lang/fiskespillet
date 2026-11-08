@@ -14,6 +14,28 @@ Status: testplan. Ingen UE-bygg, modell-samarbeidsprøve eller spillregeltest er
 
 Definer endringsfiltre og «ikke relevant» eksplisitt. En required kontroll skal avslutte med et tydelig kontrollert utfall, ikke bare mangle. Infrastrukturtester kan innføres nå; tester for fiskereglene aktiveres når funksjonen faktisk implementeres.
 
+## Raskere bygg og testkjøring
+
+Verktøyene er lagt til 8. november 2026. Ingen av dem er kjørt på Windows ennå. Første kjøring skal registrere faktiske tider før og etter.
+
+| Verktøy | Formål |
+|---|---|
+| `Tools/Build/Build-Fisk.ps1` | Inkrementelt bygg og pakking. `-Mode Code` gjenbruker forrige cook ved rene C++-endringer. Tiden for hvert steg legges i `build-times.csv` i arkivmappen. |
+| `Tools/Build/Test-Automation.ps1` | Kjører `Fiskelaget.*`-automasjonstestene uten grafikk (`-nullrhi`). Krever bygget Editor. |
+| `Tools/Testing/Run-All.ps1` | Kjører grafiske `Run-*.ps1` i parallell med egne porter (`7777 + 100 × plass`), og lager `summary.csv` med resultat og varighet. |
+| `Tools/Testing/select_tests.py` | Velger skript ut fra endrede filer. Ukjente stier gir alle skript. Dokumentasjon gir ingen. |
+| `-FiskClockScale=N` / `FISK_CLOCK_SCALE` | Testklokke 1–20 ganger raskere. Dag, avreise, reisetid, napp og kamp følger den samme klokken. Kompileres bort i Shipping. |
+
+Lagdelt kjøring:
+
+1. **Hver endring:** `check_repository.py`, `check_bootstrap.py`, Python-testene og `Test-Automation.ps1`.
+2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 4 som standard).
+3. **Utgivelse:** `Run-All.ps1 -Release`. Normal 20-minuttersdag (faktor 1) og alle skript. Bare dette gjelder som utgivelsesbevis for dagslengde, 17:00-frist og reisetid.
+
+Skript som kjøres direkte, uten miljøvariabler, oppfører seg som før: port 7777 og faktor 1. `Run-MainMenu` og `Run-SoloPlay` kjøres alene etter de andre, fordi spillkoden selv bruker port 7777 og 17784.
+
+Kjente begrensninger: klokkefaktoren endrer også kampens tempo, så automatisk kamphjelp og pilot må vise at de består ved faktoren som brukes. Røykprøvene for Cargo, Collection, Fleet, Harbour, Help og Home har ingen `Run-*.ps1` i repoet og dekkes ikke av `Run-All.ps1`.
+
 ## Modulkontrakter
 
 Test nødvendige felter/enheter, ugyldige ID-er, ukjent majorversjon, ugyldig enum, avsender uten autoritet, dobbel levering, hendelser i feil rekkefølge og omstart mellom bokføring og kvittering. Landet, solgt og tapt skal ikke forveksles. Klientprojeksjoner skal ikke lekke dagens skjulte fangstresultater før minutt 17; dette gjelder også journal, statistikk, rekordvarsler, trofévegg, saldo og underliggende klientpayload. Utholdenhet vises aldri som helsebar.

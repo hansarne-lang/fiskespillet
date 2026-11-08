@@ -1,12 +1,13 @@
 param([Parameter(Mandatory)][string]$Package,[Parameter(Mandatory)][string]$LogDirectory)
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference='Stop'
 $exe=Join-Path $Package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
 if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged executable missing'}
-if(@(Get-NetUDPEndpoint -LocalPort 7777 -ErrorAction SilentlyContinue).Count){throw 'Port 7777 is occupied'}
+if(@(Get-NetUDPEndpoint -LocalPort $FiskPort0 -ErrorAction SilentlyContinue).Count){throw "Port $FiskPort0 is occupied"}
 $run=Join-Path $LogDirectory (Get-Date -Format yyyyMMdd-HHmmss)
 New-Item -ItemType Directory -Path $run -Force | Out-Null
 $log=Join-Path $run 'solo.log'
-$flags=@('-FiskMenuSmoke=solo','-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',('-abslog="{0}"' -f $log),('-FiskScreenshotDir="{0}"' -f $run),('-UserDir="{0}"' -f (Join-Path $run 'settings')))
+$flags=@('-FiskMenuSmoke=solo','-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag,('-abslog="{0}"' -f $log),('-FiskScreenshotDir="{0}"' -f $run),('-UserDir="{0}"' -f (Join-Path $run 'settings')))
 $app=$null
 try {
  $app=Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList $flags -PassThru -WindowStyle Hidden

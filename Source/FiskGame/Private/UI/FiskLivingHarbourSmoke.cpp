@@ -52,7 +52,7 @@ void UFiskMarinaPanel::RunHarbourSmoke()
         else if(HarbourStage==9 && Real-HarbourAt>=1) { if(Own->Place!=0 || WantsCamera()) { Fail(TEXT("closing_bar_did_not_restore_presence"));return; }Done(); }
         return;
     }
-    if(PC->FleetRole>=0 && PC->FleetStage<3) { return; }
+    if(PC->Smoke.FleetRole>=0 && PC->Smoke.FleetStage<3) { return; }
     if(Crew)
     {
         if(HarbourStage==0 && Elapsed>=250) { PC->ServerHarbourPlace(LoadedProfile,2);HarbourAt=Real;HarbourStage=1; }

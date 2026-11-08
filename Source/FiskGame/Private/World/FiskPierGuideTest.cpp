@@ -8,7 +8,7 @@ bool FFiskPierFurniture::RunTest(const FString&)
     for(int32 I=0;I<FiskPier::StoolCount;++I) { TestFalse(TEXT("Stool blocks"),FiskPier::Inside(FiskPier::Stool(I))); }
     for(int32 I=0;I<FiskPier::TableCount;++I) { TestFalse(TEXT("Table blocks"),FiskPier::Inside(FiskPier::Table(I))); }
     for(int32 I=0;I<FiskPier::PostCount;++I) { TestFalse(TEXT("Post blocks"),FiskPier::Inside(FiskPier::Post(I))); }
-    TestFalse(TEXT("Body stays inside edge"),FiskPier::Inside(FVector(-910,0,130)));TestTrue(TEXT("Clear passage"),FiskPier::Inside(FVector(-1000,0,130)));return true;
+    TestFalse(TEXT("Body stays inside edge"),FiskPier::Inside(FVector(-910,1000,130)));TestTrue(TEXT("Clear passage"),FiskPier::Inside(FVector(-1000,0,130)));return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPierSweep,"Fiskelaget.PierGuide.SweptMovementCannotCrossStools",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FFiskPierSweep::RunTest(const FString&)

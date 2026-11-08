@@ -6,6 +6,7 @@ param(
     [switch]$Audio,
     [string]$CaptureDirectory = ''
 )
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference = 'Stop'
 $exe = Join-Path $Package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
 if (!(Test-Path -LiteralPath $exe -PathType Leaf)) { throw 'Packaged executable missing' }
@@ -13,7 +14,7 @@ New-Item -ItemType Directory -Path $LogDirectory -Force | Out-Null
 $stamp = Get-Date -Format yyyyMMdd-HHmmss
 $hostLog = Join-Path $LogDirectory "combat-$Case-host-$stamp.log"
 $clientLog = Join-Path $LogDirectory "combat-$Case-client-$stamp.log"
-$flags = @('-FiskLanSmoke',"-FiskFightCase=$Case",'-unattended','-nosplash','-multihome=127.0.0.1')
+$flags = @('-FiskLanSmoke',"-FiskFightCase=$Case",'-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag)
 if (!$Audio) { $flags += '-nosound' }
 if ($Graphics) { $flags += @('-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-ExecCmds="t.MaxFPS 30"') }
 else { $flags += '-nullrhi' }
@@ -25,7 +26,7 @@ if ($CaptureDirectory) {
 }
 function Events($log, $pattern) { @(Select-String -LiteralPath $log -Pattern $pattern) }
 function Wait-Event($log, $pattern, $process, $seconds) {
-    $deadline = (Get-Date).AddSeconds($seconds)
+    $deadline = (Get-Date).AddSeconds((FiskTimeout $seconds))
     while ((Get-Date) -lt $deadline) {
         if ($process.HasExited) { throw "Process exited before $pattern. Log: $log" }
         if ((Test-Path -LiteralPath $log) -and (Select-String -LiteralPath $log -Pattern $pattern -Quiet)) { return }
@@ -38,10 +39,10 @@ function Exactly($log, $pattern, $count) {
     if ($found.Count -ne $count) { throw "Expected $count events matching $pattern; found $($found.Count). Log: $log" }
 }
 $clientApp = $null
-$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen','-port=17781',('-abslog="{0}"' -f $hostLog),('-UserDir="{0}"' -f ($hostLog -replace '\.log$','-profile'))) + $flags + $hostCapture) -PassThru -WindowStyle Hidden
+$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen',"-port=$(FiskFixedPort 17781)",('-abslog="{0}"' -f $hostLog),('-UserDir="{0}"' -f ($hostLog -replace '\.log$','-profile'))) + $flags + $hostCapture) -PassThru -WindowStyle Hidden
 try {
     Wait-Event $hostLog 'FISKELAGET_BOOTSTRAP_READY' $hostApp 90
-    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('127.0.0.1:17781',('-abslog="{0}"' -f $clientLog),('-UserDir="{0}"' -f ($clientLog -replace '\.log$','-profile'))) + $flags + $clientCapture) -PassThru -WindowStyle Hidden
+    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@("127.0.0.1:$(FiskFixedPort 17781)",('-abslog="{0}"' -f $clientLog),('-UserDir="{0}"' -f ($clientLog -replace '\.log$','-profile'))) + $flags + $clientCapture) -PassThru -WindowStyle Hidden
     Wait-Event $hostLog 'FISKELAGET_MARINA_REACHED crew=2' $hostApp 700
     Wait-Event $clientLog 'FISKELAGET_MARINA_REACHED crew=2' $clientApp 20
     Wait-Event $hostLog 'FISKELAGET_TEST_PRIVATE revealed=0 rows=0' $hostApp 5

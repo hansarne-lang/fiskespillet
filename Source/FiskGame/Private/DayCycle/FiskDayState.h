@@ -22,6 +22,10 @@ public:
     static constexpr int32 PreparationEnd = 120;
     static constexpr int32 SettlementStart = 1020;
     static constexpr int32 DayEnd = 1200;
+    // Test-only acceleration (-FiskClockScale=N). Always 1 in Shipping and without the flag.
+    static constexpr int32 MaxTestClockScale = 20;
+    static int32 ParseTestClockScale(const TCHAR* CommandLine);
+    static int32 ScaledElapsedMilliseconds(double WallSeconds, int32 Scale);
 
     AFiskDayState();
     void StartDay();
@@ -42,6 +46,7 @@ private:
     UFUNCTION()
     void OnRep_Clock();
     double StartedMonotonic = 0.0;
+    int32 ClockScale = 1;
     int32 ReportedDay = 0;
     int32 LastMinute = -1;
 };

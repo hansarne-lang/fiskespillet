@@ -40,6 +40,14 @@ Prosjekteieren svarte «Ja – bygg hele v0.7-pakken» på det konkrete forslage
 
 Den begrensede økonomi-/profilarkitekturen i v0.7-kontrakten er godkjent innen de eksisterende to UE-modulene. Historisk journal etterbetales ikke. Offline-profilkopiering kan ikke forhindres mellom uavhengige servere. Flere samtidige båter, lager/overlast/sleping, offshore-sannsynlighet, reisehopp, strandbar, naust og veddemål inngår ikke; deres øvrige åpne eierbeslutninger beholdes. Tallene er testbalanse, ikke endelig økonomi.
 
+## 2026-11-08 — Karriereprofiler stoles på mellom LAN-verter
+
+Prosjekteieren valgte 8. november 2026 alternativ 1 i [#112](https://github.com/hansarne-lang/fiskespillet/issues/112), bekreftet fra prosjekteierens konto i [PR #120](https://github.com/hansarne-lang/fiskespillet/pull/120#issuecomment-6719892215) for revisjon ebe6910: FISKELAGET er et LAN-spill mellom venner, og verten stoler på karrieren klienten sender inn, så lenge kvitteringskjeden er gyldig og ikke er i konflikt med vertens egen kopi.
+
+Bakgrunn: Karrieren skal følge spilleren mellom LAN-verter (IDÉ-004, RULE09), og v0.7-godkjenningen slår fast at kopiering av profiler utenfor spillet ikke kan hindres mellom uavhengige verter. En ny vert kan ikke skille ekte utbetalinger fra andre verter fra oppdiktede, og siden enhver spiller kan være vert, gir heller ikke signering et reelt vern. En endret klient kan derfor ta med seg oppdiktet saldo. Dette godtas.
+
+Mens spilleren er tilkoblet, er serverautoriteten uendret: bare vertens oppgjør lager nye utbetalinger, og kjøp kontrolleres mot godtatt saldo. Tilliten gjelder ved hver ny tilkobling, også til samme vert. Konkurranser eller rangeringer der saldo fra andre verter avgjør utfallet, krever en ny beslutning. Se ARCHITECTURE.md, «Tillit til karriereprofiler på LAN».
+
 ## 2026-11-08 — Testklokke og raskere testkjøring
 
 Prosjekteieren ba i Claude Code-sesjonen 8. november 2026 om å gjennomføre forslag 1–6 for kortere tid fra bygg til ferdig test. Det inkluderer en testklokke som går raskere. Godkjenningen er bekreftet fra prosjekteierens konto i [PR #117](https://github.com/hansarne-lang/fiskespillet/pull/117#issuecomment-6719632634) for revisjon 360f9ed.

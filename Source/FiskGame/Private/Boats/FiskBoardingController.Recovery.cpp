@@ -38,8 +38,8 @@ void AFiskBoardingController::ClientJournalBatch_Implementation(FGuid Profile,in
     if(Serial<ClientRecoverySerial || !GI->AcceptRecoveredJournal(Profile,Entries)) { return; }
     ClientRecoverySerial=Serial;
 #if WITH_DEV_AUTOMATION_TESTS
-    if(!bTestJournalAckDropped && FParse::Param(FCommandLine::Get(),TEXT("FiskDropJournalAck")))
-    { bTestJournalAckDropped=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TEST_JOURNAL_ACK_DROPPED serial=%d"),Serial); }
+    if(!Smoke.bTestJournalAckDropped && FParse::Param(FCommandLine::Get(),TEXT("FiskDropJournalAck")))
+    { Smoke.bTestJournalAckDropped=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TEST_JOURNAL_ACK_DROPPED serial=%d"),Serial); }
     else
 #endif
     { ServerJournalAck(Profile,Serial); }

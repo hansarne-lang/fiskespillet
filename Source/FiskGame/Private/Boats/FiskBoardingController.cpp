@@ -164,23 +164,23 @@ void AFiskBoardingController::BeginPlay()
 {
     Super::BeginPlay();
 #if WITH_DEV_AUTOMATION_TESTS
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFleetRole="),FleetRole) && FleetRole>=0 && FleetRole<12)
-    { bFleetResume=FParse::Param(FCommandLine::Get(),TEXT("FiskFleetResume"));FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FleetDir);GetWorldTimerManager().SetTimer(FleetTimer,this,&AFiskBoardingController::RunFleetSmoke,.5f,true,3.f); }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCargoSmoke="),CargoMode))
-    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CargoDir);GetWorldTimerManager().SetTimer(CargoTimer,this,&AFiskBoardingController::RunCargoSmoke,.5f,true,3.f); }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),CollectionMode))
-    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CollectionDir);GetWorldTimerManager().SetTimer(CollectionTimer,this,&AFiskBoardingController::RunCollectionSmoke,.5f,true,3.f); }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskAnglerSmoke="),AnglerMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFleetRole="),Smoke.FleetRole) && Smoke.FleetRole>=0 && Smoke.FleetRole<12)
+    { Smoke.bFleetResume=FParse::Param(FCommandLine::Get(),TEXT("FiskFleetResume"));FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.FleetDir);GetWorldTimerManager().SetTimer(Smoke.FleetTimer,this,&AFiskBoardingController::RunFleetSmoke,.5f,true,3.f); }
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCargoSmoke="),Smoke.CargoMode))
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.CargoDir);GetWorldTimerManager().SetTimer(Smoke.CargoTimer,this,&AFiskBoardingController::RunCargoSmoke,.5f,true,3.f); }
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCollectionSmoke="),Smoke.CollectionMode))
+    { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.CollectionDir);GetWorldTimerManager().SetTimer(Smoke.CollectionTimer,this,&AFiskBoardingController::RunCollectionSmoke,.5f,true,3.f); }
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskAnglerSmoke="),Smoke.AnglerMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),AnglerDir);
-        GetWorldTimerManager().SetTimer(AnglerTimer,this,&AFiskBoardingController::RunAnglerSmoke,.5f,true,2.f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.AnglerDir);
+        GetWorldTimerManager().SetTimer(Smoke.AnglerTimer,this,&AFiskBoardingController::RunAnglerSmoke,.5f,true,2.f);
     }
 #endif
 #if WITH_DEV_AUTOMATION_TESTS
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSkipperSmoke="),SkipperMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSkipperSmoke="),Smoke.SkipperMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),SkipperDir);
-        GetWorldTimerManager().SetTimer(SkipperTimer,this,&AFiskBoardingController::RunSkipperSmoke,.5f,true,2.f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.SkipperDir);
+        GetWorldTimerManager().SetTimer(Smoke.SkipperTimer,this,&AFiskBoardingController::RunSkipperSmoke,.5f,true,2.f);
     }
 #endif
     // Remote server controllers have no PlayerInput and never receive PlayerTick.
@@ -188,51 +188,51 @@ void AFiskBoardingController::BeginPlay()
     GetWorldTimerManager().SetTimer(CareerTimer,this,&AFiskBoardingController::TickCareer,.5f,true);
 
 #if WITH_DEV_AUTOMATION_TESTS
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExplorationSmoke="),ExplorationMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExplorationSmoke="),Smoke.ExplorationMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ExplorationDir);
-        GetWorldTimerManager().SetTimer(ExplorationTimer,this,&AFiskBoardingController::RunExplorationSmoke,.5f,true,2.f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.ExplorationDir);
+        GetWorldTimerManager().SetTimer(Smoke.ExplorationTimer,this,&AFiskBoardingController::RunExplorationSmoke,.5f,true,2.f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExpeditionSmoke="),ExpeditionSmokeMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskExpeditionSmoke="),Smoke.ExpeditionSmokeMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ExpeditionSmokeDir);
-        GetWorldTimerManager().SetTimer(ExpeditionSmokeTimer,this,&AFiskBoardingController::RunExpeditionSmoke,.5f,true,2.f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.ExpeditionSmokeDir);
+        GetWorldTimerManager().SetTimer(Smoke.ExpeditionSmokeTimer,this,&AFiskBoardingController::RunExpeditionSmoke,.5f,true,2.f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCareerReleaseSmoke="),CareerSmokeMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskCareerReleaseSmoke="),Smoke.CareerSmokeMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),CareerSmokeDir);
-        GetWorldTimerManager().SetTimer(CareerSmokeTimer,this,&AFiskBoardingController::RunCareerReleaseSmoke,.5f,true,2.f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.CareerSmokeDir);
+        GetWorldTimerManager().SetTimer(Smoke.CareerSmokeTimer,this,&AFiskBoardingController::RunCareerReleaseSmoke,.5f,true,2.f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFishingReleaseSmoke="),FishingReleaseMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskFishingReleaseSmoke="),Smoke.FishingReleaseMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),FishingReleaseCapture);
-        GetWorldTimerManager().SetTimer(FishingReleaseTimer,this,&AFiskBoardingController::RunFishingReleaseSmoke,0.5f,true,2.0f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.FishingReleaseCapture);
+        GetWorldTimerManager().SetTimer(Smoke.FishingReleaseTimer,this,&AFiskBoardingController::RunFishingReleaseSmoke,0.5f,true,2.0f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskNavigationSmoke="),NavigationMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskNavigationSmoke="),Smoke.NavigationMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),NavigationCaptureDir);
-        GetWorldTimerManager().SetTimer(NavigationTimer,this,&AFiskBoardingController::RunNavigationSmoke,0.5f,true,2.0f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.NavigationCaptureDir);
+        GetWorldTimerManager().SetTimer(Smoke.NavigationTimer,this,&AFiskBoardingController::RunNavigationSmoke,0.5f,true,2.0f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskJournalSmoke="),JournalMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskJournalSmoke="),Smoke.JournalMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),JournalCaptureDir);
-        FParse::Value(FCommandLine::Get(),TEXT("FiskJournalExpectedDepth="),JournalExpectedDepth);
-        GetWorldTimerManager().SetTimer(JournalTimer,this,&AFiskBoardingController::RunJournalSmoke,0.5f,true,2.0f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.JournalCaptureDir);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskJournalExpectedDepth="),Smoke.JournalExpectedDepth);
+        GetWorldTimerManager().SetTimer(Smoke.JournalTimer,this,&AFiskBoardingController::RunJournalSmoke,0.5f,true,2.0f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSessionSmoke="),SessionMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskSessionSmoke="),Smoke.SessionMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),SessionCaptureDir);
-        GetWorldTimerManager().SetTimer(SessionTimer,this,&AFiskBoardingController::RunSessionSmoke,0.5f,true,2.0f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.SessionCaptureDir);
+        GetWorldTimerManager().SetTimer(Smoke.SessionTimer,this,&AFiskBoardingController::RunSessionSmoke,0.5f,true,2.0f);
     }
-    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskContentSmoke="),ContentMode))
+    if(IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskContentSmoke="),Smoke.ContentMode))
     {
-        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),ContentCaptureDir);
-        GetWorldTimerManager().SetTimer(ContentTimer,this,&AFiskBoardingController::RunContentSmoke,0.5f,true,2.0f);
+        FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),Smoke.ContentCaptureDir);
+        GetWorldTimerManager().SetTimer(Smoke.ContentTimer,this,&AFiskBoardingController::RunContentSmoke,0.5f,true,2.0f);
     }
     if (IsLocalController() && GetNetMode() != NM_Standalone
         && FParse::Param(FCommandLine::Get(), TEXT("FiskLanSmoke")))
     {
-        GetWorldTimerManager().SetTimer(LanSmokeTimer, this, &AFiskBoardingController::RunLanSmoke, 0.5f, true);
+        GetWorldTimerManager().SetTimer(Smoke.LanSmokeTimer, this, &AFiskBoardingController::RunLanSmoke, 0.5f, true);
     }
 #endif
 }
@@ -309,7 +309,7 @@ void AFiskBoardingController::ServerTransferCaptain_Implementation(int32 Expecte
     const bool bAccepted=Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState
         && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->TransferCaptain(PlayerState->GetPlayerId(),ExpectedRevision,Target);
 #if WITH_DEV_AUTOMATION_TESTS
-    if(!bAccepted) { ++RejectedCaptainRequests; }
+    if(!bAccepted) { ++Smoke.RejectedCaptainRequests; }
 #endif
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRANSFER_%s player=%d target=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,Target);
     ClientCaptainReply(bAccepted);

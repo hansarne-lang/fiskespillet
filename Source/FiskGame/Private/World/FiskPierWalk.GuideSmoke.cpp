@@ -29,8 +29,9 @@ void UFiskPierWalk::RunGuideSmoke()
     if(SmokeStage==1)
     {
         if(!bEnabled || !Own->bWalking) { if(Now-SmokeAt>15) { Fail(TEXT("walking_not_started")); }return; }
-        Key(EKeys::F10);Key(EKeys::Up);if(!bGuidePanel || GuideChoice!=13) { Fail(TEXT("destination_panel_input"));return; }Shot(TEXT("guide-destinations"));Key(EKeys::Enter);SmokeStage=2;SmokeAt=Now;return;
+        Key(EKeys::F10);Key(EKeys::Up);if(!bGuidePanel || GuideChoice!=13) { Fail(TEXT("destination_panel_input"));return; }Shot(TEXT("guide-destinations"));SmokeStage=15;SmokeAt=Now;return;
     }
+    if(SmokeStage==15 && Now-SmokeAt>.75) { Key(EKeys::Enter);SmokeStage=2;SmokeAt=Now;return; }
     if(SmokeStage==2 && Now-SmokeAt>1)
     {
         if(!bGuiding || FVector::Dist2D(Position,FiskPier::Spawn())<100) { Fail(TEXT("guide_did_not_send_ordinary_movement"));return; }Key(EKeys::W);if(bGuiding) { Fail(TEXT("manual_did_not_cancel"));return; }Select(13);Key(EKeys::H);SmokeStage=3;SmokeAt=Now;return;
@@ -58,7 +59,7 @@ void UFiskPierWalk::RunGuideSmoke()
     {
         if(Lan) { int32 Count=0;for(const auto& R:H->GetResidents()) { if(R.PlayerId>=0 && R.bWalking && FiskPier::Inside(R.WalkPosition)) { ++Count; } }if(Count<2) { if(Now-SmokeAt>35) { Fail(TEXT("remote_guided_walker_missing")); }return; }Shot(TEXT("guide-lan")); }
         if(GI->Career.Cash!=SmokeCash || !GI->GetJournal().GetEntries().IsEmpty() || FVector::Dist2D(Own->WalkPosition,Position)>80 || H->GetMessages().IsEmpty()) { Fail(TEXT("public_replication_or_private_state_changed"));return; }
-        if(!Lan) { Shot(TEXT("guide-farthest-house"));SmokeStage=11;SmokeAt=Now;return; }
+        if(!Lan) { Shot(TEXT("guide-farthest-house"));SmokeStage=14;SmokeAt=Now;return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_GUIDE_PASSED lan=1 role=%d"),Role);GetWorld()->GetTimerManager().ClearTimer(SmokeTimer);return;
     }
     if(SmokeStage==9)
@@ -66,8 +67,9 @@ void UFiskPierWalk::RunGuideSmoke()
         if(bGuiding) { if(Now-SmokeAt>140) { Fail(TEXT("return_to_boat_timeout")); }return; }
         if(!FiskPier::NearBoat(Position)) { Fail(TEXT("boarding_destination"));return; }Key(EKeys::E);SmokeStage=10;SmokeAt=Now;return;
     }
-    if(SmokeStage>=11 && SmokeStage<=13 && Now-SmokeAt>3)
-    { Shot(*FString::Printf(TEXT("coast-island-%d"),SmokeStage-11));++SmokeStage;SmokeAt=Now;if(SmokeStage==14) { Select(0);SmokeStage=9; }return; }
+    if(SmokeStage==14 && Now-SmokeAt>.75) { SmokeCoast=0;SmokeStage=11;SmokeAt=Now;return; }
+    if(SmokeStage==11 && Now-SmokeAt>3) { Shot(*FString::Printf(TEXT("coast-island-%d"),SmokeCoast));SmokeStage=12;SmokeAt=Now;return; }
+    if(SmokeStage==12 && Now-SmokeAt>.75) { if(++SmokeCoast<3) { SmokeStage=11;SmokeAt=Now; }else { SmokeCoast=-1;Select(0);SmokeStage=9; }return; }
     if(SmokeStage==10 && Now-SmokeAt>2)
     {
         const auto* Boat=P->FindStarterBoat();if(bEnabled || bGuiding || !Boat || !Boat->IsAboard(P->PlayerState->GetPlayerId())) { Fail(TEXT("normal_E_boarding_failed"));return; }

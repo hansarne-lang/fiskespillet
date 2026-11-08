@@ -26,7 +26,7 @@ public:
     void ServerInput(FGuid Profile,int32 Generation,int32 Serial,FVector2D Axis,bool Sprint);
     void ReceiveMode(bool Enable,FVector P,int32 Generation);
 #if WITH_DEV_AUTOMATION_TESTS
-    int32 CoastTestView() const { return SmokeMode==TEXT("guide") && SmokeStage>=11 && SmokeStage<=13?SmokeStage-11:-1; }
+    int32 CoastTestView() const { return SmokeCoast; }
 #endif
 private:
     UPROPERTY(Replicated) bool bEnabled=false;
@@ -51,7 +51,7 @@ private:
     void StopGuide(const FString& Reason);
     FVector2D GuideAxis(double Now);
 #if WITH_DEV_AUTOMATION_TESTS
-    FString SmokeMode,SmokeDir;FTimerHandle SmokeTimer;int32 SmokeStage=0,SmokeWaypoint=0;
+    FString SmokeMode,SmokeDir;FTimerHandle SmokeTimer;int32 SmokeStage=0,SmokeWaypoint=0,SmokeCoast=-1;
     double SmokeAt=0;FVector SmokeOrigin=FVector::ZeroVector;int64 SmokeCash=0;
     void RunSmoke();
     void RunGuideSmoke();

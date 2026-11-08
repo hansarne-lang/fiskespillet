@@ -15,6 +15,8 @@ public:
     virtual void TickComponent(float DeltaTime,ELevelTick TickType,FActorComponentTickFunction* Tick) override;
     bool HandleKey(const FInputKeyEventArgs& Args);
     bool IsVisible() const { return bVisible; }
+    // True while a favorite is being named; the chart then owns all typed keys (#125).
+    bool IsRenaming() const { return bVisible && bRenaming; }
     void Draw(AHUD& HUD,UCanvas& Canvas);
     bool IsAtlas() const { return bAtlas; }
     void SetMessage(const FString& Text) { Message=Text; }

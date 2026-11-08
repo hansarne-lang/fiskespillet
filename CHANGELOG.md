@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## SpilLan – under arbeid
+
+FISKELAGET kan publiseres til launcheren SpilLan med eget kortbilde, én mappe per versjon og lagring i brukermappa (`-SaveToUserDir`). Spillernavnet fra SpilLan blir standardnavn i naustet. Ingen spillregler er endret. [Oppskrift](Docs/Development/SPILLAN.md), issue #130.
+
 ## Raskere bygg og test – 8. november 2026
 
 Testklokke (`-FiskClockScale`, bare utenfor Shipping), felles port- og klokkeoppsett for testskriptene, parallell kjøring med tidsmåling (`Run-All.ps1`), valg av tester etter endrede filer, inkrementelt byggeskript med tidslogg og hodeløs kjøring av automasjonstestene. Ingen spillregler er endret. Bygget og automasjonstestet på Windows; testresultater i PR #117.

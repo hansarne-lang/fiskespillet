@@ -27,6 +27,7 @@ IGNORED = (
     '.github/CODEOWNERS', '.github/pull_request_template.md', '.github/project-blueprint.json',
     'Tools/Testing/select_tests.py', 'Tools/Testing/test_select_tests.py', 'Tools/Testing/Test-RunAllLib.ps1', 'Tools/Build/*',
     '*.docx', '.gitignore',
+    'Grafikk/*',  # SpilLan card image: shown by the launcher, never loaded by the game
 )
 
 # Shared foundations: a change here can affect any scenario.

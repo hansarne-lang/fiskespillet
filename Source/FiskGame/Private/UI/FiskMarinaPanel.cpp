@@ -18,6 +18,8 @@
 #include "Engine/World.h"
 #include "Engine/Canvas.h"
 #include "Engine/GameViewportClient.h"
+#include "FiskLaunchArgs.h"
+#include "Misc/CommandLine.h"
 #include "EngineUtils.h"
 #include "GameFramework/HUD.h"
 #include "GameFramework/PlayerState.h"
@@ -38,7 +40,8 @@ void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponent
     UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());if(!GI->Career.IsValid()) { return; }
     if(LoadedProfile!=GI->Career.Id)
     {
-        LoadedProfile=GI->Career.Id;Identity=FFiskMarinaIdentity();Identity.DisplayName=GI->Career.Name==TEXT("FISKER")?TEXT("FISKER-")+LoadedProfile.ToString(EGuidFormats::Digits).Left(4):GI->Career.Name;
+        LoadedProfile=GI->Career.Id;Identity=FFiskMarinaIdentity();const FString Launcher=FiskLaunchArgs::PlayerName(FCommandLine::Get());
+        Identity.DisplayName=GI->Career.Name!=TEXT("FISKER")?GI->Career.Name:!Launcher.IsEmpty()?Launcher:TEXT("FISKER-")+LoadedProfile.ToString(EGuidFormats::Digits).Left(4);
         const EFiskMarinaLoad Load=FFiskMarinaStore::Load(File(),LoadedProfile,Identity);bBlocked=Load==EFiskMarinaLoad::Blocked;
         if(Load==EFiskMarinaLoad::Empty) { bBlocked=!FFiskMarinaStore::Save(File(),LoadedProfile,Identity); }
         Draft=Identity;Status=bBlocked?TEXT("Naustfilen kunne ikke leses. Eksisterende filer er bevart."):Load==EFiskMarinaLoad::Recovered?TEXT("Naust hentet fra backup. Lagre for å reparere hovedfilen."):TEXT("Lagre valgene for å vise dem til venner.");

@@ -62,6 +62,9 @@ AFiskBoardingController::AFiskBoardingController()
 bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
 {
     const bool Press=Params.Event==IE_Pressed;
+    // Naming a favorite is modal: letters such as L (sea passport) must reach the name field
+    // before any global shortcut (#125).
+    if(SeaChart && SeaChart->IsRenaming() && SeaChart->HandleKey(Params)) { return true; }
     if(HandleFleetKey(Params)) { return true; }
     if(CollectionPanel->IsVisible()) { return CollectionPanel->HandleKey(Params); }
     if(Press && Params.Key==EKeys::Z && !AnglerPanel->IsVisible() && !SkipperPanel->IsVisible() && !MarinaPanel->IsVisible() && !ExpeditionPanel->IsVisible() && !JournalPanel->IsVisible() && !SeaChart->IsVisible() && !RigPanel->IsVisible() && !CrewPanel->IsVisible() && !DeckPanel->IsVisible() && !IsCareerVisible() && !bHelpVisible && !bResultsVisible && !bHistoryVisible) { CollectionPanel->Open();return true; }

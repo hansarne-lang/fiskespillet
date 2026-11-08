@@ -1,20 +1,21 @@
 param([Parameter(Mandatory)][string]$Package,[Parameter(Mandatory)][string]$LogDirectory,[ValidateSet('All','Solo','Lan')][string]$Phase='All',[string]$LegacyProfile='')
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference='Stop'
 $exe=Join-Path $Package 'FiskELaget/Binaries/Win64/FiskELaget.exe'
 if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged executable missing'}
-if(@(Get-NetUDPEndpoint -LocalPort 7777 -ErrorAction SilentlyContinue).Count){throw 'Port7777 occupied'}
+if(@(Get-NetUDPEndpoint -LocalPort $FiskPort0 -ErrorAction SilentlyContinue).Count){throw "Port $FiskPort0 occupied"}
 $run=Join-Path $LogDirectory (Get-Date -Format yyyyMMdd-HHmmss);New-Item -ItemType Directory -Path $run -Force | Out-Null
 $active=@();$logs=@()
 function Start-Case($name,$mode,$url,$data,$cash=-1){
  $capture=Join-Path $run $name;New-Item -ItemType Directory -Path $capture -Force | Out-Null
  $log=Join-Path $run "$name.log"
- $flags=@($url,'-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',"-FiskMarinaSmoke=$mode",('-FiskScreenshotDir="{0}"' -f $capture),('-abslog="{0}"' -f $log),('-UserDir="{0}"' -f (Join-Path $run $data)))
+ $flags=@($url,'-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag,"-port=$FiskPort0","-FiskMarinaSmoke=$mode",('-FiskScreenshotDir="{0}"' -f $capture),('-abslog="{0}"' -f $log),('-UserDir="{0}"' -f (Join-Path $run $data)))
  if($cash -ge 0){$flags+="-FiskMarinaExpectedCash=$cash"}
  Start-Process -FilePath $exe -WorkingDirectory $capture -ArgumentList $flags -PassThru -WindowStyle Hidden
 }
 function Stop-Case($app){if($app -and !$app.HasExited){Stop-Process -InputObject $app;$app.WaitForExit()}}
 function Wait-Tag($file,$pattern,$app,$seconds=180){
- $end=(Get-Date).AddSeconds($seconds)
+ $end=(Get-Date).AddSeconds((FiskTimeout $seconds))
  while((Get-Date) -lt $end){
   if($app.HasExited){throw "Process exited: $file"}
   foreach($other in $logs){if((Test-Path -LiteralPath $other) -and (Select-String -LiteralPath $other -Pattern 'FISKELAGET_MARINA_FAILED|Fatal error|Assertion failed|Unhandled Exception' -Quiet)){throw "Runtime failure: $other"}}
@@ -54,8 +55,8 @@ try{
  }
  if($Phase -eq 'Solo'){"Evidence: $run";return}
  $hostApp=Start-Case 'host' 'host' '/Engine/Maps/Entry?listen' 'host-profile';$active+=$hostApp;$logs+=Join-Path $run 'host.log'
- Wait-Tag $logs[-1] 'GameNetDriver.*listening on port 7777' $hostApp
- $guest=Start-Case 'guest' 'guest' '127.0.0.1:7777' 'guest-profile';$active+=$guest;$logs+=Join-Path $run 'guest.log'
+ Wait-Tag $logs[-1] "GameNetDriver.*listening on port $FiskPort0" $hostApp
+ $guest=Start-Case 'guest' 'guest' "127.0.0.1:$FiskPort0" 'guest-profile';$active+=$guest;$logs+=Join-Path $run 'guest.log'
  Wait-Tag (Join-Path $run 'host.log') 'FISKELAGET_MARINA_PASSED mode=host' $hostApp
  Wait-Tag (Join-Path $run 'guest.log') 'FISKELAGET_MARINA_PASSED mode=guest' $guest
  Start-Sleep -Seconds 2;Stop-Case $guest;Stop-Case $hostApp

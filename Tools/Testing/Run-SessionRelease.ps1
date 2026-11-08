@@ -1,13 +1,14 @@
 param([Parameter(Mandatory)][string]$Package,[Parameter(Mandatory)][string]$LogDirectory)
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference='Stop'
 $exe=Join-Path $Package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
 if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged executable missing'}
-if(@(Get-NetUDPEndpoint -LocalPort 7777 -ErrorAction SilentlyContinue).Count){throw 'Port 7777 is occupied'}
+if(@(Get-NetUDPEndpoint -LocalPort $FiskPort0 -ErrorAction SilentlyContinue).Count){throw "Port $FiskPort0 is occupied"}
 $run=Join-Path $LogDirectory (Get-Date -Format yyyyMMdd-HHmmss)
 New-Item -ItemType Directory -Path $run -Force | Out-Null
 $active=@();$clientApp=$null;$clientLog=$null
 function Wait-Tag($log,$tag,$app,$seconds){
- $until=(Get-Date).AddSeconds($seconds)
+ $until=(Get-Date).AddSeconds((FiskTimeout $seconds))
  while((Get-Date) -lt $until){
   if($app.HasExited){throw "Process exited before $tag"}
   foreach($file in @($log,$clientLog)){
@@ -23,7 +24,7 @@ function Start-Case($name,$url,$mode,$content,$profile){
  $capture=Join-Path $run $name;New-Item -ItemType Directory -Path $capture -Force | Out-Null
  $working=Join-Path $capture 'working';New-Item -ItemType Directory -Path $working -Force | Out-Null
  $log=Join-Path $run "$name.log"
- $flags=@($url,"-FiskSessionSmoke=$mode",'-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',('-abslog="{0}"' -f $log),('-FiskScreenshotDir="{0}"' -f $capture),('-UserDir="{0}"' -f (Join-Path $run $profile)))
+ $flags=@($url,"-FiskSessionSmoke=$mode",'-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag,"-port=$FiskPort0",('-abslog="{0}"' -f $log),('-FiskScreenshotDir="{0}"' -f $capture),('-UserDir="{0}"' -f (Join-Path $run $profile)))
  if($content){$flags += "-FiskContentSmoke=$content"}
  Start-Process -FilePath $exe -WorkingDirectory $working -ArgumentList $flags -PassThru -WindowStyle Hidden
 }
@@ -48,8 +49,8 @@ try{
  'PASS: settings/presets persist across processes and working directories, with isolated fresh defaults.'
  $hostLog=Join-Path $run 'host.log';$clientLog=Join-Path $run 'client.log'
  $hostApp=Start-Case 'host' '/Engine/Maps/Entry?listen' 'day' 'day' 'host-profile';$active+=$hostApp
- Wait-Tag $hostLog 'GameNetDriver.*listening on port 7777' $hostApp 120
- $clientApp=Start-Case 'client' '127.0.0.1:7777' 'day' 'day' 'client-profile';$active+=$clientApp
+ Wait-Tag $hostLog "GameNetDriver.*listening on port $FiskPort0" $hostApp 120
+ $clientApp=Start-Case 'client' "127.0.0.1:$FiskPort0" 'day' 'day' 'client-profile';$active+=$clientApp
  Wait-Tag $hostLog 'FISKELAGET_SESSION_PASSED' $hostApp 1530
  Wait-Tag $clientLog 'FISKELAGET_SESSION_PASSED' $clientApp 30
  Start-Sleep -Seconds 2
@@ -60,9 +61,9 @@ try{
    if(@(Select-String -LiteralPath $log -Pattern $tag).Count -ne 1){throw "Wrong event count $tag"}
   }
   $second=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SESSION_DAY number=2' | Select-Object -First 1
-  if(!$second -or ((Stamp $second)-(Stamp $start)).TotalSeconds -lt 1200){throw 'Day 2 started before full day 1'}
+  if(!$second -or (FiskGameSeconds ((Stamp $second)-(Stamp $start)).TotalSeconds) -lt 1200){throw 'Day 2 started before full day 1'}
   $reveal=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SETTLEMENT rows=2' | Select-Object -First 1
-  if(!$reveal -or ((Stamp $reveal)-(Stamp $start)).TotalSeconds -lt 1020){throw 'Early day 1 reveal'}
+  if(!$reveal -or (FiskGameSeconds ((Stamp $reveal)-(Stamp $start)).TotalSeconds) -lt 1020){throw 'Early day 1 reveal'}
   if(@(Select-String -LiteralPath $log -Pattern 'FISKELAGET_SETTLEMENT rows=').Count -ne 1){throw 'Unexpected second settlement'}
   if(Select-String -LiteralPath $log -Pattern 'FISKELAGET_MENU_NETWORK_FAILURE|FISKELAGET_MENU_TRAVEL_FAILURE' -Quiet){throw 'Connection broke across day transition'}
  }

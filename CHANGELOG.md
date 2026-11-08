@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## Raskere bygg og test – 8. november 2026
+
+Testklokke (`-FiskClockScale`, bare utenfor Shipping), felles port- og klokkeoppsett for testskriptene, parallell kjøring med tidsmåling (`Run-All.ps1`), valg av tester etter endrede filer, inkrementelt byggeskript med tidslogg og hodeløs kjøring av automasjonstestene. Ingen spillregler er endret. Bygget og automasjonstestet på Windows; testresultater i PR #117.
+
 ## v0.22 Øyhav og havneguide – 8. november 2026
 
 F10-havneguide til båt, strandbar og tolv naust, med rute på minikartet. Møbel- og kantklaring på bryggene, tre gåkameraer, hilsener mens du går og rikere terreng på de tre øyene. [Guide](Docs/Development/ISLAND_HARBOUR_V022.md), PR #111.

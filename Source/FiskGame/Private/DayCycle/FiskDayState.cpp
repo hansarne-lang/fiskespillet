@@ -1,5 +1,7 @@
 #include "DayCycle/FiskDayState.h"
 #include "HAL/PlatformTime.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Net/UnrealNetwork.h"
 #include "DayCycle/FiskSessionRules.h"
 
@@ -12,6 +14,11 @@ AFiskDayState::AFiskDayState()
 void AFiskDayState::StartDay()
 {
     if (!HasAuthority() || HasStarted()) { return; }
+    ClockScale = ParseTestClockScale(FCommandLine::Get());
+    if (ClockScale != 1)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("FISKELAGET_CLOCK_SCALE scale=%d (test only; not a normal day)"), ClockScale);
+    }
     StartedMonotonic = FPlatformTime::Seconds();
     Clock.Number = 1;
     Clock.ElapsedMs = 0;
@@ -31,7 +38,24 @@ int32 AFiskDayState::GetElapsedMilliseconds() const
 {
     if (!HasStarted()) { return 0; }
     if (!HasAuthority()) { return Clock.ElapsedMs; }
-    const double Delta = FMath::Clamp(FPlatformTime::Seconds() - StartedMonotonic, 0.0, static_cast<double>(DayEnd));
+    return ScaledElapsedMilliseconds(FPlatformTime::Seconds() - StartedMonotonic, ClockScale);
+}
+
+int32 AFiskDayState::ParseTestClockScale(const TCHAR* CommandLine)
+{
+#if UE_BUILD_SHIPPING
+    return 1;
+#else
+    int32 Scale = 1;
+    if (!CommandLine || !FParse::Value(CommandLine, TEXT("FiskClockScale="), Scale)) { return 1; }
+    return FMath::Clamp(Scale, 1, MaxTestClockScale);
+#endif
+}
+
+int32 AFiskDayState::ScaledElapsedMilliseconds(double WallSeconds, int32 Scale)
+{
+    const double Factor = static_cast<double>(FMath::Clamp(Scale, 1, MaxTestClockScale));
+    const double Delta = FMath::Clamp(WallSeconds * Factor, 0.0, static_cast<double>(DayEnd));
     return FMath::FloorToInt(Delta * 1000.0);
 }
 

@@ -5,6 +5,7 @@ param(
     [switch]$Audio,
     [string]$CaptureDirectory = ''
 )
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference = 'Stop'
 $exe = Join-Path $Package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
 if (!(Test-Path -LiteralPath $exe -PathType Leaf)) { throw 'Packaged executable missing' }
@@ -12,7 +13,7 @@ New-Item -ItemType Directory -Path $LogDirectory -Force | Out-Null
 $stamp = Get-Date -Format yyyyMMdd-HHmmss
 $hostLog = Join-Path $LogDirectory "repeat-host-$stamp.log"
 $clientLog = Join-Path $LogDirectory "repeat-client-$stamp.log"
-$flags = @('-FiskLanSmoke','-FiskRepeatSmoke','-unattended','-nosplash','-multihome=127.0.0.1','-ExecCmds="t.MaxFPS 30"')
+$flags = @('-FiskLanSmoke','-FiskRepeatSmoke','-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag,'-ExecCmds="t.MaxFPS 30"')
 if (!$Audio) { $flags += '-nosound' }
 if ($Graphics) { $flags += @('-windowed','-ResX=1280','-ResY=720','-RenderOffscreen') }
 else { $flags += '-nullrhi' }
@@ -28,7 +29,7 @@ function Exactly($log,$pattern,$count) {
     if ($found.Count -ne $count) { throw "Expected $count events for $pattern; got $($found.Count). Log: $log" }
 }
 function Wait-Event($log,$pattern,$process,$seconds) {
-    $deadline = (Get-Date).AddSeconds($seconds)
+    $deadline = (Get-Date).AddSeconds((FiskTimeout $seconds))
     while ((Get-Date) -lt $deadline) {
         if ($process.HasExited) { throw "Process exited before $pattern. Log: $log" }
         if (Test-Path -LiteralPath $log) {
@@ -44,10 +45,10 @@ function Time-Of($event) {
     [DateTime]::ParseExact($Matches[1],'yyyy.MM.dd-HH.mm.ss:fff',[Globalization.CultureInfo]::InvariantCulture)
 }
 $clientApp = $null
-$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen','-port=17782',('-abslog="{0}"' -f $hostLog)) + $flags + $hostCapture) -PassThru -WindowStyle Hidden
+$hostApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('/Engine/Maps/Entry?listen',"-port=$(FiskFixedPort 17782)",('-abslog="{0}"' -f $hostLog),('-UserDir="{0}"' -f ($hostLog -replace '\.log$','-profile'))) + $flags + $hostCapture) -PassThru -WindowStyle Hidden
 try {
     Wait-Event $hostLog 'FISKELAGET_BOOTSTRAP_READY' $hostApp 90
-    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@('127.0.0.1:17782',('-abslog="{0}"' -f $clientLog)) + $flags + $clientCapture) -PassThru -WindowStyle Hidden
+    $clientApp = Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -ArgumentList (@("127.0.0.1:$(FiskFixedPort 17782)",('-abslog="{0}"' -f $clientLog),('-UserDir="{0}"' -f ($clientLog -replace '\.log$','-profile'))) + $flags + $clientCapture) -PassThru -WindowStyle Hidden
     Wait-Event $hostLog 'FISKELAGET_DAY_STARTED' $hostApp 90
     Wait-Event $hostLog 'FISKELAGET_MARINA_REACHED crew=2' $hostApp 1000
     Wait-Event $clientLog 'FISKELAGET_MARINA_REACHED crew=2' $clientApp 20
@@ -68,7 +69,7 @@ try {
         foreach ($action in 0,2,6,7) { Exactly $hostLog "FISKELAGET_ROD_COMMAND_REJECTED player=$id action=$action expected=$old current=(?!$old)[0-9A-Fa-f]{32}$" $(if($action -eq 7){2}else{1}) }
         if (@(Events $hostLog "FISKELAGET_CAST_REJECTED player=$id expected=$old current=(?!$old)[0-9A-Fa-f]{32}$").Count -lt 1) { throw 'Stale cast not rejected' }
         $ready = @(Events $hostLog "FISKELAGET_ROD_CYCLE player=$id cast=[0-9A-Fa-f]{32} state=1$")[-1]
-        if (((Time-Of $ready) - (Time-Of $first)).TotalSeconds -lt 2.9) { throw 'New cast started before landing animation ended' }
+        if ((FiskGameSeconds ((Time-Of $ready) - (Time-Of $first)).TotalSeconds) -lt 2.9) { throw 'New cast started before landing animation ended' }
     }
     Exactly $hostLog 'FISKELAGET_ROD_CANCELLED player=' 3
     Exactly $hostLog 'FISKELAGET_REPEAT_CANCEL_FIGHT player=' 0
@@ -96,11 +97,11 @@ try {
         $start = @(Events $hostLog 'FISKELAGET_DAY_STARTED')[0]
         $settle = @(Events $log 'FISKELAGET_SETTLEMENT rows=2')[0]
         $end = @(Events $log 'FISKELAGET_TEST_DAY_END ms=1200000')[0]
-        if ([Math]::Abs(((Time-Of $settle) - (Time-Of $start)).TotalSeconds - 1020) -gt 2.0) { throw 'Settlement time drift' }
-        if ([Math]::Abs(((Time-Of $end) - (Time-Of $start)).TotalSeconds - 1200) -gt 2.0) { throw 'Day length drift' }
+        if ([Math]::Abs((FiskGameSeconds ((Time-Of $settle) - (Time-Of $start)).TotalSeconds) - 1020) -gt (2.0*$FiskClockScale)) { throw 'Settlement time drift' }
+        if ([Math]::Abs((FiskGameSeconds ((Time-Of $end) - (Time-Of $start)).TotalSeconds) - 1200) -gt (2.0*$FiskClockScale)) { throw 'Day length drift' }
         foreach ($sample in @(Events $log 'FISKELAGET_TEST_CLOCK ms=(\d+)')) {
             $game = [int]$sample.Matches[0].Groups[1].Value / 1000.0
-            if ([Math]::Abs(((Time-Of $sample) - (Time-Of $start)).TotalSeconds - $game) -gt 2.0) { throw 'Clock sample drift' }
+            if ([Math]::Abs((FiskGameSeconds ((Time-Of $sample) - (Time-Of $start)).TotalSeconds) - $game) -gt (2.0*$FiskClockScale)) { throw 'Clock sample drift' }
         }
     }
     $cap = @(Events $hostLog 'FISKELAGET_REPEAT_CAPTAIN_RETURN player=')

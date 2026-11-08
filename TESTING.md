@@ -32,7 +32,7 @@ Lagdelt kjøring:
 2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 4 som standard).
 3. **Utgivelse:** `Run-All.ps1 -Release`. Normal 20-minuttersdag (faktor 1) og alle skript. Bare dette gjelder som utgivelsesbevis for dagslengde, 17:00-frist og reisetid.
 
-Skript som kjøres direkte, uten miljøvariabler, oppfører seg som før: port 7777 og faktor 1. `Run-MainMenu` og `Run-SoloPlay` kjøres alene etter de andre, fordi spillkoden selv bruker port 7777 og 17784.
+Skript som kjøres direkte, uten miljøvariabler, oppfører seg som før: port 7777 og faktor 1. `Run-MainMenu` og `Run-SoloPlay` kjøres alene etter de andre, fordi spillkoden selv bruker port 7777 og 17784. `Run-SeaChart` kjøres alltid med faktor 1, fordi røyktesten tar et skjermbilde i et vindu på ett spillsekund.
 
 Kjente begrensninger: klokkefaktoren endrer også kampens tempo, så automatisk kamphjelp og pilot må vise at de består ved faktoren som brukes. Røykprøvene for Cargo, Collection, Fleet, Harbour, Help og Home har ingen `Run-*.ps1` i repoet og dekkes ikke av `Run-All.ps1`.
 

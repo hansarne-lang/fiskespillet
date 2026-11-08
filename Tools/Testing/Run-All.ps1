@@ -30,6 +30,9 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $exclusive = @('MainMenu', 'SoloPlay')   # use 7777/17784 from game code; cannot be moved yet
+# Scenarios with game-time windows too short for an accelerated clock always run at scale 1.
+# SeaChart: FiskGroundSmoke.cpp captures chart-underway only between 5 and 6 game seconds.
+$realtimeOnly = @('SeaChart')
 $all = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Run-*.ps1' | Where-Object { $_.BaseName -ne 'Run-All' } |
     ForEach-Object { $_.BaseName.Substring(4) } | Sort-Object)
 
@@ -76,6 +79,7 @@ function Start-Script([string]$name, [int]$slot) {
     # Start-Process -PassThru child with redirected output in Windows PowerShell 5.1.
     $splat = ($params.GetEnumerator() | ForEach-Object { "$($_.Key) = $(Quote $_.Value)" }) -join '; '
     $wrapper = @"
+`$ProgressPreference = 'SilentlyContinue'   # progress records would land in err.txt as CLIXML
 `$ErrorActionPreference = 'Stop'
 `$code = 1
 try {
@@ -92,9 +96,10 @@ try {
 exit `$code
 "@
     $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($wrapper))
-    $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', $encoded)
+    $arguments = @('-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-OutputFormat', 'Text', '-EncodedCommand', $encoded)
+    $scale = if ($realtimeOnly -contains $name) { 1 } else { $ClockScale }
     $env:FISK_TEST_PORT_BASE = [string](7777 + 100 * $slot)
-    $env:FISK_CLOCK_SCALE = [string]$ClockScale
+    $env:FISK_CLOCK_SCALE = [string]$scale
     try {
         $process = Start-Process -FilePath $shell -ArgumentList $arguments -PassThru -WindowStyle Hidden `
             -RedirectStandardOutput (Join-Path $run "$name.out.txt") -RedirectStandardError (Join-Path $run "$name.err.txt")
@@ -102,7 +107,26 @@ exit `$code
     } finally {
         Remove-Item Env:FISK_TEST_PORT_BASE, Env:FISK_CLOCK_SCALE -ErrorAction SilentlyContinue
     }
-    [pscustomobject]@{ Name = $name; Slot = $slot; Process = $process; CodeFile = $codeFile; Clock = [Diagnostics.Stopwatch]::StartNew() }
+    [pscustomobject]@{ Name = $name; Slot = $slot; Scale = $scale; Process = $process; CodeFile = $codeFile; Clock = [Diagnostics.Stopwatch]::StartNew() }
+}
+
+# True when err.txt holds anything other than PowerShell progress records. Windows PowerShell
+# can write progress ("Preparing modules for first use") to stderr as CLIXML; that is not an
+# error. Any other content, or CLIXML that cannot be read, counts as an error.
+function Test-ErrorOutput([string]$path) {
+    if (-not (Test-Path -LiteralPath $path) -or (Get-Item -LiteralPath $path).Length -eq 0) { return $false }
+    $text = Get-Content -LiteralPath $path -Raw
+    if ([string]::IsNullOrWhiteSpace($text)) { return $false }
+    $lines = $text -split "`r?`n", 2
+    if ($lines[0].Trim() -ne '#< CLIXML' -or $lines.Count -lt 2) { return $true }
+    try {
+        $xml = [xml]$lines[1]
+        $objects = @($xml.DocumentElement.ChildNodes | Where-Object { $_.LocalName -eq 'Obj' })
+        if (-not $objects.Count) { return $true }
+        return @($objects | Where-Object { $_.GetAttribute('S') -ne 'progress' }).Count -gt 0
+    } catch {
+        return $true
+    }
 }
 
 function Complete-Script($job) {
@@ -118,10 +142,10 @@ function Complete-Script($job) {
     }
     if ($null -eq $code) { $code = $job.Process.ExitCode }
     $err = Join-Path $run "$($job.Name).err.txt"
-    $failed = ($null -eq $code) -or $code -ne 0 -or ((Test-Path -LiteralPath $err) -and (Get-Item -LiteralPath $err).Length -gt 0)
+    $failed = ($null -eq $code) -or $code -ne 0 -or (Test-ErrorOutput $err)
     $row = [pscustomobject]@{
         Script = $job.Name; Result = $(if ($failed) { 'Failed' } else { 'Passed' }); ExitCode = $(if ($null -eq $code) { 'unknown' } else { $code })
-        Seconds = [Math]::Round($job.Clock.Elapsed.TotalSeconds); Slot = $job.Slot; ClockScale = $ClockScale
+        Seconds = [Math]::Round($job.Clock.Elapsed.TotalSeconds); Slot = $job.Slot; ClockScale = $job.Scale
     }
     $results.Add($row)
     '{0,-20} {1,-6} {2,6}s' -f $row.Script, $row.Result, $row.Seconds

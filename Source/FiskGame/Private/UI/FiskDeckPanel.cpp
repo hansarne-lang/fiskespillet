@@ -171,7 +171,7 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
     const bool Fight=State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand || State==EFiskRodState::InitialRun;
     if(Fight && Aboard && Progress==100 && Ms<1020000)
     {
-        const int32 Load=Rod->GetLoadPercent(),Limit=CastChecked<UFiskGameInstance>(PC.GetGameInstance())->Career.Has(0)?115:100;
+        const int32 Load=Rod->GetLoadPercent(),Limit=CastChecked<UFiskGameInstance>(PC.GetGameInstance())->Career.Has(FFiskCareerProfile::ItemLine)?static_cast<int32>(FFiskFightModel::StrongLineOverloadLoad):static_cast<int32>(FFiskFightModel::BaseOverloadLoad);
         const FLinearColor C=Load>Limit?FLinearColor(1,.3f,.25f):Load<20?Gold:Teal;
         Rect(400,430,860,186);
         Text(State==EFiskRodState::ReadyToLand?TEXT("KLAR TIL LANDING - MELLOMROM"):Rod->IsSurging() || State==EFiskRodState::InitialRun?TEXT("UTRAS - SLIPP SVEIVA OG SENK STANGA"):TEXT("FISKEKAMP - PUMP OG SVEIV"),420,448,1.3f,State==EFiskRodState::ReadyToLand?Teal:C);

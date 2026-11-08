@@ -99,7 +99,7 @@ void UFiskFishingHelp::RunSmoke()
         View->GetViewportSize(Size);const float Scale=FMath::Min(Size.X/1280.f,Size.Y/720.f);
         if(FiskQuickControls::ReturnBox(Scale).IsInside(Mouse) || FiskQuickControls::AssistBox(Scale).IsInside(Mouse)) { Fail(TEXT("chart_cursor_left_on_game_button"));return; }
         Key(EKeys::LeftMouseButton);
-        if(Boat->GetTripProgress()!=100) { Fail(TEXT("chart_cursor_returned_instead_of_pumping"));return; }
+        if(Boat->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot) { Fail(TEXT("chart_cursor_returned_instead_of_pumping"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HELP_CHART_CURSOR_PASSED mode=%s"),*SmokeMode);
         Key(Aa);SmokeAt=Now;SmokeStage=5;return;
     }

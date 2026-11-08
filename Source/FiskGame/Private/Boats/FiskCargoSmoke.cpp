@@ -48,8 +48,8 @@ void AFiskBoardingController::RunCargoSmoke()
     else if(CargoStage==2)
     {
         if(Real-CargoAt<1) { return; }if(GetSkipperPanel()->IsPhoto()) { Key(EKeys::F9); }
-        if(B->GetTripProgress()==-1 && Now>=120 && B->GetCaptainId()==PlayerState->GetPlayerId()) { Key(EKeys::R); }
-        if(B->GetTripProgress()==100) { Key(EKeys::F);CargoStage=Observer?50:3; }
+        if(B->GetTripProgress()==AFiskStarterBoat::AtDock && Now>=120 && B->GetCaptainId()==PlayerState->GetPlayerId()) { Key(EKeys::R); }
+        if(B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot) { Key(EKeys::F);CargoStage=Observer?50:3; }
     }
     else if(CargoStage==3)
     {
@@ -59,7 +59,7 @@ void AFiskBoardingController::RunCargoSmoke()
         if(State==EFiskRodState::ReadyToLand && (!Late || Now>=950))
         {
             Key(EKeys::SpaceBar);
-            if(HasAuthority() && B->GetCargo().bMustReturn && B->GetTripProgress()==100)
+            if(HasAuthority() && B->GetCargo().bMustReturn && B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot)
             {
                 FString Why;const int32 Revision=B->GetRouteRevision(),Serial=B->GetLegSerial();
                 if(const_cast<AFiskStarterBoat*>(B)->Relocate(PlayerState->GetPlayerId(),Revision,B->GetDestination()+FVector(1000,0,0),Why) || B->GetRouteRevision()!=Revision || B->GetLegSerial()!=Serial)
@@ -71,9 +71,9 @@ void AFiskBoardingController::RunCargoSmoke()
     }
     else if(CargoStage==4 && Real-CargoAt>=2)
     {
-        if(Full && CargoLandings<2) { if(Real-CargoAt<4) { return; }if(B->GetTripProgress()!=100 || B->GetCargoView().Mode!=1) { Fail(TEXT("first_half_load_forced_return"));return; }Key(EKeys::F);CargoStage=3;return; }
+        if(Full && CargoLandings<2) { if(Real-CargoAt<4) { return; }if(B->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot || B->GetCargoView().Mode!=1) { Fail(TEXT("first_half_load_forced_return"));return; }Key(EKeys::F);CargoStage=3;return; }
         if(Discard)
-        { if(Real-CargoAt<4) { return; }if(B->GetCargoView().bReturning || !B->GetCargoView().bDiscarded || B->GetTripProgress()!=100) { Fail(TEXT("untransportable_fish_state"));return; }Key(EKeys::F);CargoAt=Real;CargoStage=40;return; }
+        { if(Real-CargoAt<4) { return; }if(B->GetCargoView().bReturning || !B->GetCargoView().bDiscarded || B->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot) { Fail(TEXT("untransportable_fish_state"));return; }Key(EKeys::F);CargoAt=Real;CargoStage=40;return; }
         if(B->GetCargoView().Mode!=static_cast<uint8>(Full && !Loaded?EFiskCargoMode::Full:EFiskCargoMode::Towing) || B->GetTripProgress()<=100) { Fail(TEXT("automatic_return_missing"));return; }
         const int32 Expected=FFiskCargoModel::ReturnDuration(B->GetTravelMs(),!Full || Loaded);if(B->GetLegTravelMs()!=Expected) { Fail(TEXT("wrong_return_speed"));return; }
         Key(EKeys::F11);Shot(TEXT("cargo-return-hidden"));CargoAt=Real;CargoStage=42;
@@ -82,7 +82,7 @@ void AFiskBoardingController::RunCargoSmoke()
     { if(GetRod()->GetState()!=EFiskRodState::Fishing) { Fail(TEXT("cannot_continue_after_untransportable_fish"));return; }Key(EKeys::X);Key(EKeys::R);Key(EKeys::F11);Shot(TEXT("cargo-discard-hidden"));CargoAt=Real;CargoStage=42; }
     else if(CargoStage==42 && Real-CargoAt>=1) { Key(EKeys::F11);Key(EKeys::F9);for(int32 I=0;I<5;++I) { Key(EKeys::Right); }for(int32 I=0;I<3;++I) { Key(EKeys::Up); }Key(EKeys::PageDown);Key(EKeys::PageDown);Key(EKeys::H);Shot(TEXT("cargo-visible-return"));CargoAt=Real;CargoStage=43; }
     else if(CargoStage==43 && Real-CargoAt>=1) { Key(EKeys::F9);CargoStage=5; }
-    else if(CargoStage==50 && B->GetTripProgress()==100)
+    else if(CargoStage==50 && B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot)
     {
         const auto State=GetRod()->GetState();if(State==EFiskRodState::Lost || State==EFiskRodState::Ready || State==EFiskRodState::Cancelled)
         { Key(EKeys::F);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_OBSERVER_RECAST")); }
@@ -94,7 +94,7 @@ void AFiskBoardingController::RunCargoSmoke()
         Key(EKeys::F9);for(int32 I=0;I<5;++I) { Key(EKeys::Right); }for(int32 I=0;I<3;++I) { Key(EKeys::Up); }Key(EKeys::PageDown);Key(EKeys::PageDown);Key(EKeys::H);Shot(TEXT("cargo-observer-tow"));CargoAt=Real;CargoStage=51;
     }
     else if(CargoStage==51 && Real-CargoAt>=1) { Key(EKeys::F9);CargoStage=5; }
-    else if(CargoStage==5 && B->GetTripProgress()==200) { CargoStage=6; }
+    else if(CargoStage==5 && B->GetTripProgress()==AFiskStarterBoat::AtMarina) { CargoStage=6; }
     else if(CargoStage==6 && Now>=1080)
     {
         const auto& J=GI->GetJournal();const int32 Expected=Observer?0:Full?2:1;if(J.GetEntries().Num()!=Expected) { Fail(TEXT("confirmed_journal_count_wrong"));return; }

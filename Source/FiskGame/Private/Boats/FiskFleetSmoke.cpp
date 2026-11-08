@@ -93,9 +93,9 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(FleetRole==0 && IsFleetVisible() && Real-FleetAt>=1) { Key(EKeys::Tab); }
         if(Now<130) { return; }
-        if(Fishing && B->GetTripProgress()==-1) { Key(EKeys::R);return; }
+        if(Fishing && B->GetTripProgress()==AFiskStarterBoat::AtDock) { Key(EKeys::R);return; }
         if(!Fishing) { FleetStage=40;FleetAt=Real; }
-        else if(B->GetTripProgress()==100) { Key(EKeys::F);FleetStage=4;FleetAt=Real; }
+        else if(B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot) { Key(EKeys::F);FleetStage=4;FleetAt=Real; }
     }
     else if(FleetStage==4)
     {
@@ -110,7 +110,7 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(FleetRole==2)
         {
-            if(B->GetCargoView().Mode!=1 || B->GetTripProgress()!=100) { Fail(TEXT("other_boat_return_changed_offshore_trip"));return; }
+            if(B->GetCargoView().Mode!=1 || B->GetTripProgress()!=AFiskStarterBoat::AtFishingSpot) { Fail(TEXT("other_boat_return_changed_offshore_trip"));return; }
             if(Now<400) { return; }Key(EKeys::R);
         }
         else if(B->GetCargoView().Mode!=4 || B->GetTripProgress()<=100) { Fail(TEXT("independent_tow_return_missing"));return; }
@@ -143,7 +143,7 @@ void AFiskBoardingController::RunFleetSmoke()
     if(FleetStage==43 && HasAuthority() && D->GetDayNumber()==1 && Now>=1200) { Key(EKeys::N); }
     if(FleetStage==43 && D->GetDayNumber()==2 && D->GetElapsedRealSeconds()>=5)
     {
-        for(auto* Boat:FleetBoats()) { if(Boat->GetTripProgress()!=-1 || Boat->GetCargoView().Mode!=0 || Boat->GetCargoView().RevealedGrams!=-1 || Boat->GetVoyage()->GetRoute().Day!=2 || Boat->GetExpedition()->GetPlan().bLocked) { Fail(TEXT("per_boat_day_reset_failed"));return; } }
+        for(auto* Boat:FleetBoats()) { if(Boat->GetTripProgress()!=AFiskStarterBoat::AtDock || Boat->GetCargoView().Mode!=0 || Boat->GetCargoView().RevealedGrams!=-1 || Boat->GetVoyage()->GetRoute().Day!=2 || Boat->GetExpedition()->GetPlan().bLocked) { Fail(TEXT("per_boat_day_reset_failed"));return; } }
         if(bFleetResume && FleetRole==1 && !B->IsAboard(SelfId)) { if(auto* Original=OwnedBy(0)) { ServerFleetSelect(Original->GetFleetIndex(),false); }return; }
         if(FleetRole==1 && (!B->IsAboard(SelfId) || B->GetOwnerId()==SelfId)) { Fail(TEXT("crew_moved_by_rejected_request"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_PASSED role=%d boats=%d players=%d day=%d"),FleetRole,FleetBoats().Num(),D->PlayerArray.Num(),D->GetDayNumber());GetWorldTimerManager().ClearTimer(FleetTimer);

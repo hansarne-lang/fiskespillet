@@ -41,7 +41,7 @@ bool FiskJournalAuthority::RecoverIncome(const FString& Directory,FFiskCareerPro
     for(const FDay& D:Days)
     {
         const FFiskCareerReceipt* Receipt=Candidate.Receipts.FindByPredicate([&](const FFiskCareerReceipt& R){return R.Id==D.Id;});
-        if(Receipt) { if(Receipt->Kind!=2 || Receipt->Amount!=D.Income) { return false; } }
+        if(Receipt) { if(Receipt->Kind!=FFiskCareerReceipt::KindSettlement || Receipt->Amount!=D.Income) { return false; } }
         else if(!Candidate.Credit(D.Id,D.Income)) { return false; }
     }
     Career=MoveTemp(Candidate);return true;

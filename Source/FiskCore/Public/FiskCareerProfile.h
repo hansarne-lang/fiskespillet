@@ -7,7 +7,10 @@ struct FISKCORE_API FFiskCareerReceipt
 {
     GENERATED_BODY()
     UPROPERTY() FGuid Id;
-    UPROPERTY() int32 Kind=0; // 0 initial grant, 1 purchase, 2 settlement
+    static constexpr int32 KindInitialGrant=0;
+    static constexpr int32 KindPurchase=1;
+    static constexpr int32 KindSettlement=2;
+    UPROPERTY() int32 Kind=KindInitialGrant; // Stored value; never renumber.
     UPROPERTY() int32 Item=-1;
     UPROPERTY() int64 Amount=0;
     bool operator==(const FFiskCareerReceipt& Other) const
@@ -22,6 +25,12 @@ struct FISKCORE_API FFiskCareerProfile
     GENERATED_BODY()
     static constexpr int32 MaxReceipts=512;
     static constexpr int32 ItemCount=13;
+    // Item ids are stored in receipts and the Owned bit mask; never renumber.
+    static constexpr int32 ItemLine=0;          // Bedre snøre: higher line-break limit
+    static constexpr int32 ItemReel=1;          // Bedre snelle: faster reeling
+    static constexpr int32 ItemRod=2;           // Bedre stang: stronger pumping
+    static constexpr int32 ItemOffshoreBoat=3;
+    static constexpr int32 FightGearMask=(1<<ItemLine)|(1<<ItemReel)|(1<<ItemRod);
     static constexpr int32 OwnedMask=(1<<ItemCount)-1;
     static constexpr int64 InitialCash=3000000;
     static constexpr int64 MaxCash=1000000000000LL;

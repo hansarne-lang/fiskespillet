@@ -52,7 +52,7 @@ bool AFiskExpeditionState::Choose(int32 Player,int32 Revision,int32 Goal)
 bool AFiskExpeditionState::SetReady(int32 Player,int32 Revision,bool Ready)
 {
     Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
-    if(!HasAuthority() || !B || Plan.bLocked || Plan.bEvaluated || Revision!=Plan.Revision || B->GetTripProgress()!=-1 || !B->IsAboard(Player)) { return false; }
+    if(!HasAuthority() || !B || Plan.bLocked || Plan.bEvaluated || Revision!=Plan.Revision || B->GetTripProgress()!=AFiskStarterBoat::AtDock || !B->IsAboard(Player)) { return false; }
     if(Ready) { Plan.Ready.AddUnique(Player); }else { Plan.Ready.Remove(Player); }OnRep_Plan();ForceNetUpdate();return true;
 }
 bool AFiskExpeditionState::Say(int32 Player,int32 Code)

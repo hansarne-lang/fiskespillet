@@ -29,7 +29,7 @@ void AFiskVoyagePlan::Refresh()
     if(Route.Day!=Day->GetDayNumber()) { Route.Day=Day->GetDayNumber();Route.Next=0;Route.Active=-1;Changed=true; }
     if(Route.Points.IsValidIndex(Route.Active))
     {
-        if(B->GetTripProgress()==100 && FVector::Dist2D(B->GetActorLocation(),Route.Points[Route.Active])<500)
+        if(B->GetTripProgress()==AFiskStarterBoat::AtFishingSpot && FVector::Dist2D(B->GetActorLocation(),Route.Points[Route.Active])<500)
         { Route.Next=Route.Active+1;Route.Active=-1;Changed=true; }
         else if(B->GetTripProgress()>100) { Route.Active=-1;Changed=true; }
         else if(B->GetDestination()!=Route.Points[Route.Active]) { Route.Active=-1;Changed=true; }
@@ -41,7 +41,7 @@ bool AFiskVoyagePlan::Replace(int32 Player,int32 D,int32 R,const TArray<FVector>
     Refresh();const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* B=Cast<AFiskStarterBoat>(GetOwner());
     const auto* Day=GetWorld()->GetGameState<AFiskDayState>();
     if(!HasAuthority() || !B || !Day || !Route.Matches(D,R) || B->GetCaptainId()!=Player || !B->IsAboard(Player)
-        || B->GetTripProgress()!=-1 || Day->GetElapsedMilliseconds()>=1020000 || !FFiskVoyageRoute::Valid(Points))
+        || B->GetTripProgress()!=AFiskStarterBoat::AtDock || Day->GetElapsedMilliseconds()>=1020000 || !FFiskVoyageRoute::Valid(Points))
     { Message=TEXT("Plan avvist. Kapteinen redigerer ved brygga, med oppdatert dags- og rutestatus.");return false; }
     Route.Points=Points;Route.Next=0;Route.Active=-1;++Route.Revision;OnRep_Route();ForceNetUpdate();
     Message=TEXT("Felles turplan oppdatert. Enter velger neste stopp; R starter første avreise.");return true;

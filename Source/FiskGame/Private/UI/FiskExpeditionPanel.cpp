@@ -76,7 +76,7 @@ void UFiskExpeditionPanel::Draw(AHUD& HUD,UCanvas& C)
     const bool Revealed=P.bEvaluated && Ms>=1020000;
     T(Revealed?(P.bCompleted?TEXT("FULLFØRT – medalje til avreisemannskapet!"):TEXT("IKKE FULLFØRT – sent levert fisk teller ikke.")):TEXT("Resultatet åpnes kl. 17:00."),48,485,1.1f,Gold);
     T(FString::Printf(TEXT("Sjøpunkt: %.0f, %.0f m | Reise %d s"),P.Point.X/100,P.Point.Y/100,B->GetTravelMs()/1000),650,178,.98f,Teal);
-    const int32 Margin=B->ReturnMarginMs(Ms)/1000;T(B->GetTripProgress()==200?TEXT("Båten er tilbake i marinaen."):FString::Printf(TEXT("Returmargin ca. %s%d:%02d | Frist 17:00"),Margin<0?TEXT("-"):TEXT(""),FMath::Abs(Margin)/60,FMath::Abs(Margin)%60),650,213,1.f,Gold);
+    const int32 Margin=B->ReturnMarginMs(Ms)/1000;T(B->GetTripProgress()==AFiskStarterBoat::AtMarina?TEXT("Båten er tilbake i marinaen."):FString::Printf(TEXT("Returmargin ca. %s%d:%02d | Frist 17:00"),Margin<0?TEXT("-"):TEXT(""),FMath::Abs(Margin)/60,FMath::Abs(Margin)%60),650,213,1.f,Gold);
     for(int32 I=0;I<B->GetCrewCount();++I) { const int32 Id=B->GetCrewMemberId(I);T(FString::Printf(TEXT("Spiller %d%s: %s"),Id,Id==B->GetCaptainId()?TEXT(" (kaptein)"):TEXT(""),P.Ready.Contains(Id)?TEXT("KLAR"):TEXT("Venter")),650,258+27*I,.95f); }
     HUD.DrawRect(FLinearColor(.14f,.34f,.36f),650*S,371*S,545*S,39*S);T(TEXT("T / klikk: klar eller vent | R brukes etter at panelet er lukket"),661,384,.8f);
     for(int32 I=0;I<3;++I) { T(FString::Printf(TEXT("%d: %s"),I+6,FiskExpeditions::Phrase(I)),650,429+26*I,.88f,Teal); }

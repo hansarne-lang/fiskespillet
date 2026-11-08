@@ -24,7 +24,7 @@ void UFiskAnglerPanel::DrawSchool(AHUD& H,UCanvas& C)
         const auto& Score=Data.Scores[Species*2+(Gear==7?1:0)];T(FString::Printf(TEXT("%s | %s"),FiskCatches::Find(Species)->Name,Gear==7?TEXT("Virtuelt oppgradert utstyr"):TEXT("Standard øvingsutstyr")),48,202,1.4f,Gold);
         T(FString::Printf(TEXT("Øvingsforsøk %d | Fullført %d | Beste fullførte %.1f s"),Score.Attempts,Score.Completed,Score.BestMs/1000.0),48,245,1.02f,Teal);
         T(FString(FiskCatches::FightTip(Species)).Left(115),48,282,.92f);
-        const auto& F=Practice.Fight;const bool Running=Practice.HasStarted();const int32 Load=F.GetLoadPercent(),Limit=Practice.Equipment&1?115:100;
+        const auto& F=Practice.Fight;const bool Running=Practice.HasStarted();const int32 Load=F.GetLoadPercent(),Limit=static_cast<int32>(FFiskFightModel::OverloadLoad(Practice.Equipment,FFiskCareerProfile::ItemLine));
         T(Running?FString::Printf(TEXT("Line %.1f m | Brems %d%% | Belastning %d%% | Bruddgrense %d%%"),F.GetLine(),F.GetDragPercent(),Load,Limit):TEXT("Enter starter en treningskamp. Art og utstyr velges før start."),48,338,1.15f);
         H.DrawRect(FLinearColor(.05f,.15f,.18f),48*S,382*S,1120*S,24*S);H.DrawRect(Load>Limit?FLinearColor(1,.3f,.2f):Teal,48*S,382*S,1120*S*FMath::Clamp(Load/130.f,0.f,1.f),24*S);
         H.DrawLine((48+1120*Limit/130.f)*S,378*S,(48+1120*Limit/130.f)*S,412*S,Gold,3*S);

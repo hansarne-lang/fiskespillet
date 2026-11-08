@@ -41,7 +41,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
             TEXT("F5 lagrer bekreftet oppsett på PC-en. F9 henter det til servervalidering."),
             TEXT("1/2/3: velg egen stang. F: sett ut. X: trekk inn / avbryt valgt stang."),
             TEXT("P: marinabutikk, lagret saldo, utstyr og båtvalg. Kjøp ved brygga."),
-            TEXT("Kamp: løft med venstre mus, slipp for å senke. Sveiv med høyre mus."),
+            TEXT("Kamp: før musa opp for å pumpe og ned for å sveive, eller hold venstre/høyre knapp."),
 #if !UE_BUILD_SHIPPING
             TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander. Å: AI-testhjelp etter napp."),
 #else

@@ -6,6 +6,7 @@
 #include "Fishing/FiskRigSettings.h"
 #include "FiskCareerProfile.h"
 #include "FiskMarinaTypes.h"
+#include "FiskRodStick.h"
 #include "UI/FiskJournalModel.h"
 #include "Expedition/FiskExpeditionModel.h"
 #include "Angler/FiskAnglerModel.h"
@@ -53,6 +54,9 @@ class AFiskBoardingController final : public APlayerController
 public:
     AFiskBoardingController();
     UFiskFishingHelp* GetFishingHelp() const { return FishingHelp; }
+    // Mouse-steered rod (#132): the rod follows mouse movement once it moves during a fight.
+    const FFiskRodStick& GetRodStick() const { return RodStick; }
+    bool IsRodSteering() const { return bRodSteering; }
     UFUNCTION(Server,Reliable) void ServerReturnToMarina(int32 Revision,int32 Day,int32 Leg);
     UFiskPierWalk* GetPierWalk() const { return PierWalk; }
     UFUNCTION(Server,Reliable) void ServerPierMode(FGuid Profile,bool Enabled);
@@ -211,6 +215,11 @@ private:
     void ServerCastRod(FGuid ExpectedId);
     UFUNCTION(Server,Reliable) void ServerCastSelectedRod(FFiskRodSelection Expected,FGuid ExpectedId);
 
+    FFiskRodStick RodStick;
+    FGuid StickCast;
+    bool bRodSteering=false,bStickRaised=false,bStickReeling=false;
+    double StickSentAt=-10;
+    void TickRodStick(float DeltaTime);
     void RequestLift();
     void RequestLower();
     void RequestReel();

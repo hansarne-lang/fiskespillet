@@ -5,7 +5,8 @@ int32 FFiskMenuModel::Rows() const
     switch (Page)
     {
     case EFiskMenuPage::Home: case EFiskMenuPage::Session: return 4;
-    case EFiskMenuPage::Join: case EFiskMenuPage::Settings: return 3;
+    case EFiskMenuPage::Join: return 3;
+    case EFiskMenuPage::Settings: return 5;
     case EFiskMenuPage::Connecting: return 1;
     default: return 0;
     }
@@ -85,6 +86,8 @@ EFiskMenuAction FFiskMenuModel::Activate()
     {
         if (Selected == 0) { bSound = !bSound; return EFiskMenuAction::Sound; }
         if (Selected == 1) { FrameRate = FrameRate == 30 ? 60 : 30; return EFiskMenuAction::FrameRate; }
+        if (Selected == 2) { bMouseRod = !bMouseRod; return EFiskMenuAction::RodControl; }
+        if (Selected == 3) { RodSensitivity = RodSensitivity % 3 + 1; return EFiskMenuAction::RodControl; }
         Show(SettingsParent);
     }
     else if (Page == EFiskMenuPage::Connecting) { return EFiskMenuAction::Cancel; }

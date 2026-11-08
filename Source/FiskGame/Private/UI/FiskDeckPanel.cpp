@@ -174,14 +174,26 @@ void UFiskDeckPanel::DrawOverlay(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingCo
         const int32 Load=Rod->GetLoadPercent(),Limit=CastChecked<UFiskGameInstance>(PC.GetGameInstance())->Career.Has(FFiskCareerProfile::ItemLine)?static_cast<int32>(FFiskFightModel::StrongLineOverloadLoad):static_cast<int32>(FFiskFightModel::BaseOverloadLoad);
         const FLinearColor C=Load>Limit?FLinearColor(1,.3f,.25f):Load<20?Gold:Teal;
         Rect(400,430,860,186);
-        Text(State==EFiskRodState::ReadyToLand?TEXT("KLAR TIL LANDING - MELLOMROM"):Rod->IsSurging() || State==EFiskRodState::InitialRun?TEXT("UTRAS - SLIPP SVEIVA OG SENK STANGA"):TEXT("FISKEKAMP - PUMP OG SVEIV"),420,448,1.3f,State==EFiskRodState::ReadyToLand?Teal:C);
+        const bool Mouse=CastChecked<UFiskGameInstance>(PC.GetGameInstance())->bMouseRod;
+        Text(State==EFiskRodState::ReadyToLand?TEXT("KLAR TIL LANDING - MELLOMROM"):Rod->IsSurging() || State==EFiskRodState::InitialRun?(Mouse?TEXT("UTRAS - SENK STANGA ROLIG OG VENT"):TEXT("UTRAS - SLIPP SVEIVA OG SENK STANGA"))
+            :Mouse?TEXT("FISKEKAMP - MUSA OPP: PUMP, NED: SVEIV"):TEXT("FISKEKAMP - PUMP OG SVEIV"),420,448,1.3f,State==EFiskRodState::ReadyToLand?Teal:C);
+        if(Mouse)
+        {
+            // Rod angle gauge for the mouse-steered rod (#132). The gold mark is where a still rod keeps tension.
+            const FFiskRodStick& Stick=PC.GetRodStick();const int32 Dir=PC.IsRodSteering()?Stick.GetDirection():0;
+            const FLinearColor Move=Dir>0?Gold:Dir<0?Teal:FLinearColor(.75f,.82f,.84f);
+            Rect(1236,442,14,160,FLinearColor(.08f,.13f,.16f));
+            Rect(1236,442+160*(1-Stick.GetAngle()),14,160*Stick.GetAngle(),Move);
+            HUD.DrawLine(1230*S,(442+160*(1-FFiskRodStick::HoldHigh))*S,1256*S,(442+160*(1-FFiskRodStick::HoldHigh))*S,Gold,2*S);
+            Text(!PC.IsRodSteering()?TEXT("KNAPPER"):Dir>0?TEXT("PUMP"):Dir<0?(Rod->IsSurging()?TEXT("SLURER"):TEXT("SVEIV")):Stick.WantsRaised()?TEXT("HOLD"):TEXT("HVIL"),1140,448,.8f,Move);
+        }
         Text(FString::Printf(TEXT("Line %d m | Brems %d%% | Belastning %d%% | Bruddgrense %d%%"),Rod->GetLineOut(),Rod->GetDragPercent(),Load,Limit),420,487,1.05f);
         Rect(420,528,810,18,FLinearColor(.08f,.13f,.16f));
         Rect(420,528,810*FMath::Clamp(Load/120.f,0.f,1.f),18,C);
         HUD.DrawLine(555*S,524*S,555*S,550*S,Gold,2*S);
         HUD.DrawLine((420+810*Limit/120.f)*S,524*S,(420+810*Limit/120.f)*S,550*S,FLinearColor::Red,2*S);
         Text(Load>Limit?TEXT("BRUDDFARE: avlast stanga eller løsne bremsen med musehjulet."):Load<20?TEXT("SLAKK: løft stanga eller stram bremsen med musehjulet.")
-            :TEXT("Venstre: løft | Høyre: sveiv | Musehjul: brems | X: avbryt"),420,570,1.0f,C);
+            :Mouse?TEXT("Musa opp: løft | Musa ned: sveiv | Musehjul: brems | X: avbryt"):TEXT("Venstre: løft | Høyre: sveiv | Musehjul: brems | X: avbryt"),420,570,1.0f,C);
     }
     Rect(20,630,1240,76);Text(TEXT("NESTE HANDLING"),38,642,0.85f,Teal);
     Text(FiskNavigation::NextAction(Day && Day->HasStarted(),Ms,Progress,Aboard,Captain,PC.GetNetMode()==NM_ListenServer,static_cast<int32>(State),RigValid,Ms<Rod->GetAvailableAtMs()),38,672,1.05f);

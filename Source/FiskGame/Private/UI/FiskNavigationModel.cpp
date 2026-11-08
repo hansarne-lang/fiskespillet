@@ -63,7 +63,7 @@ FString FiskNavigation::NextAction(bool Started,int32 Ms,int32 Progress,bool Abo
     {
     case EFiskRodState::Fishing:return TEXT("Stanga fisker automatisk. F7: se ekkoloddet.");
     case EFiskRodState::InitialRun:return TEXT("Napp! Første utras går automatisk. Vent til det stopper.");
-    case EFiskRodState::Fighting:return TEXT("Pump med venstre mus, senk og sveiv med høyre. Følg belastningen.");
+    case EFiskRodState::Fighting:return TEXT("Pump med musa opp, sveiv ved å senke den. Følg belastningen.");
     case EFiskRodState::ReadyToLand:return TEXT("Mellomrom: land fisken nå.");
     case EFiskRodState::Landed:if(Busy) { return TEXT("Landing pågår. Stanga blir snart klar."); }break;
     default:break;

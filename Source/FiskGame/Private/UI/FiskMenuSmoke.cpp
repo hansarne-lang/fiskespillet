@@ -138,7 +138,7 @@ void UFiskFrontEnd::RunMenuSmoke()
                 if(GI->bSound || GI->FrameRate!=30) { Fail(TEXT("settings_not_applied")); return; }
                 Capture(TEXT("settings-after")); Step=41;
             }
-            else if(Step==41) { SmokeSelect(2); Step=5; }
+            else if(Step==41) { SmokeSelect(Model.Rows()-1); Step=5; }
             else if(Step==5) { Step=10; SmokeSelect(0); }
             else if(Step>=100 && Step<101)
             {

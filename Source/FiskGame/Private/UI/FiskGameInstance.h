@@ -19,6 +19,8 @@ public:
     void ApplySettings(bool bSave);
     bool bSound = true;
     int32 FrameRate = 60;
+    bool bMouseRod = true;
+    int32 RodSensitivity = 2;
     FString ConnectionMessage;
     FFiskCareerProfile Career;
     FString CareerMessage;

@@ -23,7 +23,7 @@ void UFiskFrontEnd::BeginPlay()
     if (!PC->IsLocalController()) { SetComponentTickEnabled(false); return; }
     bLocalFrontEnd = true;
     UFiskGameInstance* GI = CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
-    Model.bSound = GI->bSound; Model.FrameRate = GI->FrameRate;
+    Model.bSound = GI->bSound; Model.FrameRate = GI->FrameRate; Model.bMouseRod = GI->bMouseRod; Model.RodSensitivity = GI->RodSensitivity;
     GI->ApplySettings(false);
     Model.Show(GetNetMode() == NM_Standalone ? EFiskMenuPage::Home : EFiskMenuPage::Closed);
     Model.Message = GI->ConnectionMessage; GI->ConnectionMessage.Reset();
@@ -77,8 +77,8 @@ void UFiskFrontEnd::Dispatch(EFiskMenuAction Action)
         PC->ClientTravel(Endpoint, TRAVEL_Absolute);
     }
     else if (Action == EFiskMenuAction::Cancel) { CancelConnection(TEXT("Tilkoblingen ble avbrutt.")); UE_LOG(LogTemp, Display, TEXT("FISKELAGET_MENU_CANCELLED")); }
-    else if (Action == EFiskMenuAction::Sound || Action == EFiskMenuAction::FrameRate)
-    { GI->bSound = Model.bSound; GI->FrameRate = Model.FrameRate; GI->ApplySettings(true); }
+    else if (Action == EFiskMenuAction::Sound || Action == EFiskMenuAction::FrameRate || Action == EFiskMenuAction::RodControl)
+    { GI->bSound = Model.bSound; GI->FrameRate = Model.FrameRate; GI->bMouseRod = Model.bMouseRod; GI->RodSensitivity = Model.RodSensitivity; GI->ApplySettings(true); }
     else if (Action == EFiskMenuAction::Leave)
     {
         GI->ConnectionMessage.Reset();
@@ -194,7 +194,12 @@ FString UFiskFrontEnd::Label(int32 Row) const
     if (Model.Page == EFiskMenuPage::Join)
     { return Row == 0 ? Model.Address + (Model.Selected == 0 ? TEXT(" |") : TEXT("")) : Row == 1 ? TEXT("Koble til") : TEXT("Tilbake"); }
     if (Model.Page == EFiskMenuPage::Settings)
-    { return Row == 0 ? (Model.bSound ? TEXT("Hovedlyd: På") : TEXT("Hovedlyd: Av")) : Row == 1 ? FString::Printf(TEXT("Bildefrekvens: %d"), Model.FrameRate) : TEXT("Tilbake"); }
+    {
+        const TCHAR* Sensitivity[] = {TEXT("Lav"),TEXT("Middels"),TEXT("Høy")};
+        return Row == 0 ? (Model.bSound ? TEXT("Hovedlyd: På") : TEXT("Hovedlyd: Av")) : Row == 1 ? FString::Printf(TEXT("Bildefrekvens: %d"), Model.FrameRate)
+            : Row == 2 ? (Model.bMouseRod ? TEXT("Musstyrt stang: På") : TEXT("Musstyrt stang: Av"))
+            : Row == 3 ? FString::Printf(TEXT("Musfølsomhet: %s"), Sensitivity[FMath::Clamp(Model.RodSensitivity, 1, 3) - 1]) : TEXT("Tilbake");
+    }
     return TEXT("Avbryt");
 }
 void UFiskFrontEnd::Draw(AHUD& HUD, UCanvas& Canvas)

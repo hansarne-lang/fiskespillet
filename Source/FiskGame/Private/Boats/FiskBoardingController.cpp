@@ -133,9 +133,16 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     const bool Release=Params.Event==IE_Released;
     const bool RodKey=Params.Key==EKeys::F || Params.Key==EKeys::X || Params.Key==EKeys::LeftMouseButton
         || Params.Key==EKeys::RightMouseButton || Params.Key==EKeys::MouseScrollUp || Params.Key==EKeys::MouseScrollDown || Params.Key==EKeys::SpaceBar;
+    if((Press || Params.Event==IE_Repeat) && (Params.Key==EKeys::Up || Params.Key==EKeys::Down)
+        && CastChecked<UFiskGameInstance>(GetGameInstance())->bMouseRod && GetRod() && GetRod()->GetState()==EFiskRodState::Fighting)
+    {
+        // Arrow keys step the mouse-steered rod, so a fight also works without the mouse.
+        RodStick.Move(Params.Key==EKeys::Up?FFiskRodStick::KeyStep:-FFiskRodStick::KeyStep);bRodSteering=true;return true;
+    }
     if(RodKey)
     {
         if(PendingRod>=0) { return true; }
+        if(Press && (Params.Key==EKeys::LeftMouseButton || Params.Key==EKeys::RightMouseButton)) { bRodSteering=false; }
         if(Press && Params.Key==EKeys::F) { RequestCast(); }
         else if(Press && Params.Key==EKeys::X) { RequestWithdraw(); }
         else if(Press && Params.Key==EKeys::LeftMouseButton) { RequestLift(); }
@@ -162,6 +169,45 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     return Super::InputKey(Params);
 }
 void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); RequestStopReel(); }
+
+void AFiskBoardingController::TickRodStick(float DeltaTime)
+{
+    // Mouse-steered rod (#132). The client turns rod movement into the same Lift/Lower/Reel/StopReel
+    // commands the mouse buttons send, so the server's fight rules and limits are unchanged.
+    const UFiskGameInstance* GI=Cast<UFiskGameInstance>(GetGameInstance());
+    UFiskPrototypeRod* Current=MutableRod();
+    const EFiskRodState State=Current?Current->GetState():EFiskRodState::Ready;
+    const bool Fight=State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand;
+    if(!Fight || !GI || !GI->bMouseRod)
+    {
+        if(StickCast.IsValid()) { StickCast.Invalidate();RodStick.Reset();bRodSteering=bStickRaised=bStickReeling=false; }
+        return;
+    }
+    if(Current->GetCastId()!=StickCast) { StickCast=Current->GetCastId();RodStick.Reset();bRodSteering=bStickRaised=bStickReeling=false; }
+    const bool Menu=PendingRod>=0 || bHelpVisible || bResultsVisible || bHistoryVisible || bFleetVisible || FrontEnd->IsVisible() || RigPanel->IsVisible()
+        || SeaChart->IsVisible() || CrewPanel->IsVisible() || JournalPanel->IsVisible() || ExpeditionPanel->IsVisible() || MarinaPanel->IsVisible()
+        || AnglerPanel->IsVisible() || SkipperPanel->IsVisible() || CollectionPanel->IsVisible();
+    float DX=0,DY=0;GetInputMouseDelta(DX,DY);
+    // A held mouse button means the player fights with buttons; the rod waits for the next movement.
+    if(IsInputKeyDown(EKeys::LeftMouseButton) || IsInputKeyDown(EKeys::RightMouseButton)) { bRodSteering=false;DY=0; }
+    if(Menu) { DY=0; }
+    if(DY!=0 && FishingHelp->IsAssisting())
+    {
+        if(FMath::Abs(DY)<8.0f) { DY=0; }else { FishingHelp->StopAssist(true); }
+    }
+    if(DY!=0) { RodStick.Move(DY/FFiskRodStick::TravelForSensitivity(GI->RodSensitivity));bRodSteering=true; }
+    RodStick.Advance(DeltaTime,Current->IsSurging() || State==EFiskRodState::InitialRun);
+    if(Menu || !bRodSteering || FishingHelp->IsAssisting() || State!=EFiskRodState::Fighting) { return; }
+    const double Now=GetWorld()->GetRealTimeSeconds();
+    const bool Raise=RodStick.WantsRaised(),Reel=RodStick.WantsReeling();
+    // Resend when the server has not taken the wanted state, e.g. after a menu released the rod.
+    const bool Drift=(Raise!=Current->IsRaised() || Reel!=Current->IsReeling()) && Now-StickSentAt>0.3;
+    const bool Changed=(Raise!=bStickRaised || Reel!=bStickReeling) && Now-StickSentAt>=0.05;
+    if(!Changed && !Drift) { return; }
+    if(Drift || Raise!=bStickRaised) { if(Raise) { RequestLift(); }else { RequestLower(); } }
+    if(Drift || Reel!=bStickReeling) { if(Reel) { RequestReel(); }else { RequestStopReel(); } }
+    bStickRaised=Raise;bStickReeling=Reel;StickSentAt=Now;
+}
 
 void AFiskBoardingController::BeginPlay()
 {
@@ -463,6 +509,7 @@ void AFiskBoardingController::PlayerTick(float DeltaTime)
     Super::PlayerTick(DeltaTime);
 
     if (!IsLocalController() || !PlayerState) { return; }
+    TickRodStick(DeltaTime);
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
     if(Day && Day->HasStarted())
     {

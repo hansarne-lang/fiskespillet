@@ -1,0 +1,653 @@
+{
+  "_comment": "Existing cross-area includes from before the boundary check (issue #114). This list may only shrink. Remove entries with: python Tools/Validation/check_includes.py --prune",
+  "exceptions": {
+    "Source/FiskGame/Private/Angler/FiskAnglerModel.cpp": [
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/Angler/FiskAnglerModel.h": [
+      "Fishing/FiskCatchCatalog.h",
+      "Fishing/FiskFightModel.h",
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/Angler/FiskAnglerSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskAnglerPanel.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskUserSettings.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Angler.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Career.cpp": [
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "Career/FiskCareerStore.h",
+      "Career/FiskJournalAuthority.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "UI/FiskCrewPanel.h",
+      "UI/FiskDeckPanel.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskJournalPanel.h",
+      "UI/FiskRigPanel.h",
+      "UI/FiskSeaChart.h",
+      "UI/FiskUserSettings.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Fleet.cpp": [
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskAnglerPanel.h",
+      "UI/FiskCollectionPanel.h",
+      "UI/FiskCrewPanel.h",
+      "UI/FiskDeckPanel.h",
+      "UI/FiskExpeditionPanel.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskJournalPanel.h",
+      "UI/FiskMarinaPanel.h",
+      "UI/FiskRigPanel.h",
+      "UI/FiskSeaChart.h",
+      "UI/FiskSkipperPanel.h",
+      "Voyage/FiskVoyagePlan.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Marina.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskCatchCatalog.h",
+      "UI/FiskMarinaPanel.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Pier.cpp": [
+      "World/FiskPierWalk.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Recovery.cpp": [
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "Career/FiskJournalAuthority.h",
+      "Expedition/FiskExpeditionState.h",
+      "Expedition/FiskExpeditionStore.h",
+      "UI/FiskGameInstance.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Return.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskTestPilot.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.Voyage.cpp": [
+      "Voyage/FiskVoyagePlan.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.cpp": [
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h",
+      "DayCycle/FiskSessionRules.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskBiteAlert.h",
+      "Fishing/FiskCombatFeedback.h",
+      "Fishing/FiskFishingHelp.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskAnglerPanel.h",
+      "UI/FiskCollectionPanel.h",
+      "UI/FiskCrewPanel.h",
+      "UI/FiskDeckPanel.h",
+      "UI/FiskExpeditionPanel.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskJournalPanel.h",
+      "UI/FiskMarinaPanel.h",
+      "UI/FiskRigPanel.h",
+      "UI/FiskSeaChart.h",
+      "UI/FiskSkipperPanel.h",
+      "World/FiskMarinaHub.h",
+      "World/FiskOceanScene.h",
+      "World/FiskPierWalk.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoardingController.h": [
+      "Angler/FiskAnglerModel.h",
+      "Expedition/FiskExpeditionModel.h",
+      "Fishing/FiskRigSettings.h",
+      "Fishing/FiskRodSelection.h",
+      "UI/FiskJournalModel.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskBoatPresentation.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskFishPresentation.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskSkipperPanel.h",
+      "World/FiskMarineMesh.h",
+      "World/FiskVisualPrimitives.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskCaptainSmoke.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskCrewPanel.h",
+      "UI/FiskRigPanel.h",
+      "UI/FiskSeaChart.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskCargoSmoke.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskSkipperPanel.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskCargoTest.cpp": [
+      "Economy/FiskDayLedger.h",
+      "World/FiskMarineMesh.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskCrewFigures.cpp": [
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskCrewFigures.h": [
+      "World/FiskPersonVisual.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskFleetSmoke.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskExpeditionPanel.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskMarinaPanel.h",
+      "Voyage/FiskVoyagePlan.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskJourneyAudio.cpp": [
+      "Expedition/FiskExpeditionState.h",
+      "UI/FiskMarinaPanel.h",
+      "World/FiskPierWalk.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskMarinaZone.cpp": [
+      "World/FiskVisualPrimitives.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskStarterBoat.cpp": [
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "Fishing/FiskFishPresentation.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskSkipperPanel.h",
+      "Voyage/FiskVoyagePlan.h"
+    ],
+    "Source/FiskGame/Private/Boats/FiskStarterBoat.h": [
+      "Fishing/FiskFishVisualState.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskCareerStoreTest.cpp": [
+      "Fishing/FiskFightModel.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskHomeStoreTest.cpp": [
+      "Fishing/FiskFightModel.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskJournalAuthority.cpp": [
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskJournalAuthority.h": [
+      "UI/FiskJournalStore.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskJournalAuthorityTest.cpp": [
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskMarinaStoreTest.cpp": [
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskSeaPassport.cpp": [
+      "Fishing/FiskRigSettings.h",
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/Career/FiskSeaPassport.h": [
+      "Expedition/FiskExpeditionModel.h",
+      "UI/FiskJournalModel.h"
+    ],
+    "Source/FiskGame/Private/Collections/FiskCollectionModel.cpp": [
+      "Career/FiskSeaPassport.h",
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/Collections/FiskCollectionModel.h": [
+      "UI/FiskJournalModel.h"
+    ],
+    "Source/FiskGame/Private/Collections/FiskCollectionSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskCollectionPanel.h",
+      "UI/FiskExpeditionPanel.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskSkipperPanel.h"
+    ],
+    "Source/FiskGame/Private/Economy/FiskCatchContext.cpp": [
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/Economy/FiskDayLedger.h": [
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/Economy/FiskDaySettlement.cpp": [
+      "Boats/FiskStarterBoat.h",
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h"
+    ],
+    "Source/FiskGame/Private/Economy/FiskFleetLedgerTest.cpp": [
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/Economy/FiskFullDayTest.cpp": [
+      "Boats/FiskStarterBoat.h"
+    ],
+    "Source/FiskGame/Private/Expedition/FiskExpeditionModel.cpp": [
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/Expedition/FiskExpeditionModel.h": [
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/Expedition/FiskExpeditionSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskExpeditionPanel.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/Expedition/FiskExpeditionState.cpp": [
+      "Boats/FiskStarterBoat.h",
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "Career/FiskJournalAuthority.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskCatchCatalog.h",
+      "UI/FiskUserSettings.h"
+    ],
+    "Source/FiskGame/Private/Expedition/FiskExpeditionTest.cpp": [
+      "UI/FiskJournalStore.h",
+      "UI/FiskRigPresets.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskBiteAlert.cpp": [
+      "Boats/FiskBoardingController.h",
+      "UI/FiskGameInstance.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskCombatFeedback.cpp": [
+      "Boats/FiskBoardingController.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskFishPresentation.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskBoatPresentation.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "World/FiskVisualPrimitives.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskFishingHelp.Smoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskGameInstance.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskFishingHelp.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "World/FiskPierWalk.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskLanSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskPrototypeRod.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskRepeatedFishingSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h"
+    ],
+    "Source/FiskGame/Private/Fishing/FiskRigSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskRigPanel.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskAnglerPanel.Draw.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskAnglerPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskAnglerPanel.h": [
+      "Angler/FiskAnglerModel.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskCareerReleaseSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskCollectionPanel.cpp": [
+      "Boats/FiskBoardingController.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskCollectionPanel.h": [
+      "Collections/FiskCollectionModel.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskContentSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskCrewPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskDeckPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "DayCycle/FiskSessionRules.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskExpeditionPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskFishingReleaseSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskFrontEnd.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskGameInstance.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Career/FiskCareerStore.h",
+      "Economy/FiskDaySettlement.h",
+      "Expedition/FiskExpeditionStore.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskGameInstance.h": [
+      "Expedition/FiskExpeditionModel.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskHomeShop.cpp": [
+      "Boats/FiskBoardingController.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskHomeSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskJournalModel.h": [
+      "Economy/FiskDayLedger.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskJournalPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Career/FiskSeaPassport.h",
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskJournalSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskLivingHarbourSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "World/FiskHarbourLife.h",
+      "World/FiskHarbourSound.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskMarinaPanel.Harbour.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskMarinaPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Career/FiskMarinaStore.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskCatchCatalog.h",
+      "Fishing/FiskPrototypeRod.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskMarinaSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Career/FiskMarinaStore.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskCatchCatalog.h",
+      "World/FiskMarinaHub.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskMenuSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskNavigationModel.cpp": [
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskNavigationModel.h": [
+      "Economy/FiskDaySettlement.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskNavigationModelTest.cpp": [
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskNavigationSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskRigPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskRigPresets.h": [
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSeaChart.Atlas.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSeaChart.Favorites.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSeaChart.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSessionSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSkipperPanel.Book.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSkipperPanel.Cargo.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSkipperPanel.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Voyage/FiskVoyagePlan.h",
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/UI/FiskSkipperPanel.h": [
+      "Voyage/FiskSavedRoutes.h",
+      "Voyage/FiskSkipperTools.h",
+      "Voyage/FiskTripBook.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskSkipperSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskSkipperPanel.h",
+      "UI/FiskUserSettings.h",
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskSkipperTest.cpp": [
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskSkipperTools.cpp": [
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskSkipperToolsTest.cpp": [
+      "World/FiskOceanAtlas.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskTripBook.cpp": [
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskTripBook.h": [
+      "UI/FiskJournalModel.h"
+    ],
+    "Source/FiskGame/Private/Voyage/FiskVoyagePlan.cpp": [
+      "Boats/FiskStarterBoat.h",
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "DayCycle/FiskDayState.h"
+    ],
+    "Source/FiskGame/Private/World/FiskDeepseaTest.cpp": [
+      "Angler/FiskAnglerModel.h",
+      "Career/FiskSeaPassport.h",
+      "Collections/FiskCollectionModel.h",
+      "Fishing/FiskCatchCatalog.h"
+    ],
+    "Source/FiskGame/Private/World/FiskExplorationSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "Career/FiskSeaPassport.h",
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskJournalPanel.h",
+      "UI/FiskSeaChart.h",
+      "Voyage/FiskVoyagePlan.h"
+    ],
+    "Source/FiskGame/Private/World/FiskExplorationTest.cpp": [
+      "Career/FiskSeaPassport.h"
+    ],
+    "Source/FiskGame/Private/World/FiskGroundSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskPrototypeRod.h",
+      "UI/FiskRigPanel.h",
+      "UI/FiskSeaChart.h"
+    ],
+    "Source/FiskGame/Private/World/FiskGroundTest.cpp": [
+      "Boats/FiskStarterBoat.h",
+      "Fishing/FiskFightModel.h",
+      "Fishing/FiskRigSettings.h"
+    ],
+    "Source/FiskGame/Private/World/FiskHarbourLife.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskHarbourSound.cpp": [
+      "Boats/FiskBoardingController.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskMangroveTest.cpp": [
+      "Angler/FiskAnglerModel.h",
+      "Career/FiskSeaPassport.h",
+      "Fishing/FiskCatchCatalog.h",
+      "UI/FiskNavigationNotebook.h",
+      "Voyage/FiskSavedRoutes.h",
+      "Voyage/FiskVoyagePlan.h"
+    ],
+    "Source/FiskGame/Private/World/FiskMarinaHub.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskOceanScene.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "Expedition/FiskExpeditionState.h",
+      "UI/FiskGameInstance.h"
+    ],
+    "Source/FiskGame/Private/World/FiskPierWalk.Draw.cpp": [
+      "Boats/FiskBoardingController.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskPierWalk.Guide.cpp": [
+      "Boats/FiskBoardingController.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskPierWalk.GuideSmoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskPierWalk.Smoke.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "DayCycle/FiskDayState.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskMarinaPanel.h"
+    ],
+    "Source/FiskGame/Private/World/FiskPierWalk.cpp": [
+      "Boats/FiskBoardingController.h",
+      "Boats/FiskStarterBoat.h",
+      "UI/FiskAnglerPanel.h",
+      "UI/FiskCollectionPanel.h",
+      "UI/FiskCrewPanel.h",
+      "UI/FiskDeckPanel.h",
+      "UI/FiskExpeditionPanel.h",
+      "UI/FiskFrontEnd.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskJournalPanel.h",
+      "UI/FiskMarinaPanel.h",
+      "UI/FiskRigPanel.h",
+      "UI/FiskSeaChart.h",
+      "UI/FiskSkipperPanel.h"
+    ]
+  }
+}

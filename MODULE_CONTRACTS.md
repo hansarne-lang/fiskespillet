@@ -1,6 +1,6 @@
 # FISKELAGET – Modulkontrakter
 
-Status: godkjent kontraktgrunnlag v1.0 for videre implementasjon. Dette er dokumenterte datakontrakter, ikke implementert spillkode.
+Status: kontraktgrunnlag med dataskjema v1.0, samordnet med godkjent kravspesifikasjon v1.1. Dette er dokumenterte datakontrakter, ikke implementert spillkode.
 
 ## Typer og felles regler
 
@@ -9,6 +9,10 @@ Status: godkjent kontraktgrunnlag v1.0 for videre implementasjon. Dette er dokum
 Alle hendelser har `EventId:Id`, `SchemaVersion:String` (starter 1.0), `SessionId:Id`, `DayId:Id`, `CorrelationId:Id`, `CausationId:Optional<Id>`, `ServerSequence:Int64`, `OccurredAtServerMs:Int64` og `Producer:Enum<modul>`. Tid er autoritativ, monoton server-/sesjonstid; systemklokke i UTC brukes bare i diagnose og journal. Sekvens er unik innen sesjonen. Hendelses-ID beholdes ved gjentatt levering.
 
 Eiermodulen er eneste tillatte produsent etter servervalidering. Oppførte konsumenter abonnerer på immutable verdier; de skriver kun egne data. Klienter kan sende kommandoer, aldri utstede disse hendelsene som autoritative fakta. Privat serverpayload filtreres til klientlesemodeller. Dobbeltlevering av samme ID må være uten ekstra virkning; varige forbrukere fører mottakskvittering. Levering kan gjentas og er ikke «exactly once».
+
+Kravspesifikasjon v1.1 fastsetter at dagens bekreftede fangstresultater er serverprivate til minutt 17. Dette omfatter art, eksakte mål, antall, verdi, journal, statistikk, plasseringer og nye rekorder. Direkte eventkonsum hos Multiplayer/UI betyr filtrert lesemodell, ikke utsending av full serverpayload. Lager-/slepehendelser skal heller ikke røpe eksakt fangstvekt gjennom klientdata. Utholdenhet forblir skjult også etter avsløringen.
+
+Levering registreres ved ankomst, mens salg, fangstpremier og veddemålsgevinster først bokføres ved minutt-17-oppgjøret etter fristkontroll. Ingen slik transaksjon skal øke disponibel saldo eller kjøpekraft tidligere. Tidligere penger, gjennomførte kjøp og trukne innsatser behandles normalt. Dagens nye journal-/rekordresultater publiseres samlet ved samme barriere. Dataskjemaene nedenfor er fortsatt dokumenterte forslag uten implementerte mottakere; nødvendige protokoll- og lagringsrevisjoner fastsettes før implementasjon i #17.
 
 Alle radene arver felles felter, autoritet, duplikatregler og versjonering. Valideringsfeil gir avvist kommando med årsak og ingen hendelse. Forbigående leveringsfeil forsøkes begrenset på nytt; varige feil gir karantene, diagnostikk og kontrollert gjenoppretting. Oppgjør skal ikke rapporteres ferdig ved uavklart lagringsfeil.
 
@@ -36,7 +40,7 @@ Alle radene arver felles felter, autoritet, duplikatregler og versjonering. Vali
 - Felter: `CatchId:Id`, `FightId:Id`, `PlayerId:Id`, `BoatId:Id`, `SpeciesId:Id`, `WeightGrams:Int64`, `LengthMm:Int64`, `LocationId:Id`, `PositionMm:Vector3<Int64>`, `DepthMm:Int64`, `BaitId:Id`, `ProgramId:Id`, `EquipmentSnapshot:EquipmentRecord`, `FightDurationMs:Int64`, `LandedAtServerMs:Int64`.
 - `EquipmentRecord` har `RodId:Id`, `ReelId:Id`, `LineId:Id`, `HookId:Id` og `SetupRevision:Int32`.
 - Avsender: serverens Fishing. Konsumenter: Boats, Career, Multiplayer og UI.
-- Autoritet/feil: bare én CatchId per fullført FightId; ikke negativ vekt/lengde. Landing gir rekord/journalgrunnlag, men ingen salg før Boats har godkjent transport. Lagringsfeil beholder pending leveranse med samme ID.
+- Autoritet/feil: bare én CatchId per fullført FightId; ikke negativ vekt/lengde. Landing gir serverprivat rekord-/journalgrunnlag. Salg krever Boats-godkjent transport, levering i tide og åpnet oppgjør ved minutt 17. Lagringsfeil beholder pending leveranse med samme ID.
 - Versjonering: 1.0; art/vektenheter og eierskapssemantikk endres kun ved major.
 
 ### CatchStored
@@ -76,7 +80,7 @@ Alle radene arver felles felter, autoritet, duplikatregler og versjonering. Vali
 - Eier/formål: Boats; registrere båtens faktiske ankomst til marina.
 - Felter: `BoatId:Id`, `ReturnId:Id`, `MarinaId:Id`, `ArrivedAtServerMs:Int64`, `ManifestRevision:Int64`, `CatchIds:List<Id>`.
 - Avsender: serverens Boats. Konsumenter: Economy, DayCycle, Career, Multiplayer og UI.
-- Autoritet/feil: marinasone og ankomsttid kontrolleres på serveren. Klientens posisjon/klokke er ikke nok. Economy avgjør oppgjør med dagsfrist og manifest som samlet grunnlag; tilfeldig hendelsesrekkefølge gir aldri salgsrett.
+- Autoritet/feil: marinasone og ankomsttid kontrolleres på serveren. Klientens posisjon/klokke er ikke nok. Economy venter til minutt 17 og avgjør oppgjør med dagsfrist og manifest som samlet grunnlag; tilfeldig hendelsesrekkefølge gir aldri salgsrett.
 - Versjonering: 1.0; ankomstsonen er et separat godkjent designvalg.
 
 ### DayDeadlineReached
@@ -92,7 +96,7 @@ Alle radene arver felles felter, autoritet, duplikatregler og versjonering. Vali
 - Eier/formål: Economy; bekrefte en bokført salgsutbetaling.
 - Felter: `CatchId:Id`, `BoatId:Id`, `PlayerId:Id`, `TransactionId:Id`, `SettlementId:Id`, `PriceRevision:Int32`, `GrossAmountMinor:Int64`, `CurrencyId:String`.
 - Avsender: serverens Economy etter validert ankomst/frist/manifest. Konsumenter: Career, Multiplayer og UI.
-- Autoritet/feil: unik salgsnøkkel per CatchId; gjenkall gir samme transaksjon. Fangst med tapt oppgjør kan ikke selges. Bokføring og outbox lagres samlet før bekreftelse. Feil betales ikke ut optimistisk.
+- Autoritet/feil: bare ved minutt-17-oppgjøret etter fristkontroll; unik salgsnøkkel per CatchId; gjenkall gir samme transaksjon. Fangst med tapt oppgjør kan ikke selges. Bokføring og outbox lagres samlet før bekreftelse. Feil betales ikke ut optimistisk.
 - Versjonering: 1.0; valuta-/beløpssemantikk krever major. Rekordpremie er egen bokført transaksjon, ikke skjult dobbeltsalg.
 
 ### CatchLost
@@ -120,7 +124,7 @@ Felles kommando: `CommandId:Id`, `PlayerId:Id`, `SessionId:Id`, `DayId:Id`, `Exp
 | SetRodSetup | Fishing | RodId, EquipmentRecord, BaitId, ProgramId, DepthMm:Int64, DragPermille:Int32 | Eier, utstyr, felles stangplasser og maks tre kontrolleres; ugyldig oppsett avvises |
 | RequestVoluntaryReturn | Boats | BoatId:Id, CaptainRevision:Int64 | Bare nåværende kaptein; stale/not-captain avvises |
 | StoreCatch | Boats, kun serverintegrasjon | CatchId:Id, BoatId:Id, LandingEventId:Id | Krever autoritativ landing; duplikat returnerer tidligere utfall |
-| SellManifest | Economy, kun serverintegrasjon | BoatId:Id, ManifestRevision:Int64, SettlementId:Id | Frist/ankomst og unik fangst/transaksjon; klient kan ikke utstede salgsrett |
+| SellManifest | Economy, kun serverintegrasjon | BoatId:Id, ManifestRevision:Int64, SettlementId:Id | Åpnet minutt-17-oppgjør, frist/ankomst og unik fangst/transaksjon; klient kan ikke utstede salgsrett |
 | ApplyCareerEvents | Career, kun serverintegrasjon | PlayerId:Id, EventIds:List<Id>, ExpectedRevision:Int64 | Kun bekreftede hendelser; stale revisjon gir resynkronisering |
 
 Velg `ReasonCode` fra minst NotOwner, NotCaptain, WrongPhase, StaleRevision, CapacityExceeded, Duplicate, InvalidPayload, UnknownEntity og PersistenceUnavailable. Duplikat kan være vellykket gjenlevering av tidligere svar; skal ikke opprette ny effekt.
@@ -130,3 +134,13 @@ Velg `ReasonCode` fra minst NotOwner, NotCaptain, WrongPhase, StaleRevision, Cap
 Valgfrie felt med entydig standard kan legges til som minor. Fjerning, ny betydning, nye påkrevde felt eller nye enumverdier som gamle mottakere ikke håndterer, krever major. Ukjent major avvises med eksplisitt inkompatibilitet. Eventversjon, nettverksprotokollversjon, profilformat og spillversjon skal være separate verdier.
 
 Modulene skal kunne testes med kontraktfakes uten å instansiere hverandres private objekter. Test duplikater, feil rekkefølge, manglende referanser, gjenstart og oppgjørsgrensen. Kontraktendringer krever integrasjonsreview, og designendringer krever prosjekteieren.
+
+## v0.7 – konkret prototypekontrakt
+
+Eiergodkjent i [#72](https://github.com/hansarne-lang/fiskespillet/issues/72), som en avgrenset implementering ved siden av de fullstendige hendelseskontraktene ovenfor. `FFiskCareerProfile` i FiskCore er et eierprivat snapshot med profil-ID/navn, Int64-saldo i hundredeler, revisjon, eide varer og inntil512 varige kvitteringer. Profilformat1 og favorittformat2 versjoneres separat. Core bruker CoreUObject for refleksjon/serialisering av delte USTRUCT-er, uten Engine eller funksjonsavhengigheter.
+
+Serveradapteren binder tilkoblingens PlayerId til profil-ID, autoriserer kjøp etter brygge-/eierskapskontroll og bruker DayId som idempotent oppgjørsnøkkel. Kvitteringens ID/type/vare/beløp må samsvare ved gjentakelse; en gjenbrukt ID med annet innhold avvises. Bare serverens avslørte resultat etter1 020 000ms gir ny inntekt. Lokalt båteierskap gir ingen andel av andres fangster. Importert offline-historikk er ikke en autentisert fangsthendelse i gjeldende dag.
+
+Serverens profilkopi lagres før snapshot sendes; lokal fil lagres før klienten kvitterer profil-ID/revisjon. Feil gir ventende lagring/retry uten ny betaling. Neste dag krever varig oppgjørskvittering og lokal ACK fra hver tilkoblet profil. Motstridende historikk, ukjent format, ugyldig fil og full kvitteringskjede avvises. Lagring bruker validerte midlertidige filer, atomisk flytting og backup under fil-lås. Import fra annen LAN-server godtar bare en lengre kjede med identisk prefiks; bevisst offline-profilendring er utenfor denne prototypens tillitsmodell.
+
+`FiskBoatLayout` og `FiskRouteGeometry` deler holderfordeling og sjø-/øygeometri. Rute-/båtkommandoer bruker serverens eier/kaptein, rute-revisjon, båtmodell og gyldig koordinat. Kartet skriver aldri posisjon eller økonomi direkte. Faktisk reise, reiseestimat og fristkryssing bruker samme rute/tid. Den nye båten aktiverer ikke lager-/slepekontraktene. Detaljert flyt og avgrensning står i [v0.7-kontrakten](Docs/Development/CAREER_OFFSHORE_V07.md).

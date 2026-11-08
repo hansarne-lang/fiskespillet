@@ -1,20 +1,21 @@
 param([Parameter(Mandatory)][string]$Package,[Parameter(Mandatory)][string]$LogDirectory,[ValidateSet('All','Solo','Lan')][string]$Phase='All',[string]$LegacyProfile='')
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference='Stop'
 $exe=Join-Path $Package 'FiskELaget/Binaries/Win64/FiskELaget.exe'
 if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged executable missing'}
-if(@(Get-NetUDPEndpoint -LocalPort 7777 -ErrorAction SilentlyContinue).Count){throw 'Port 7777 is occupied'}
+if(@(Get-NetUDPEndpoint -LocalPort $FiskPort0 -ErrorAction SilentlyContinue).Count){throw "Port $FiskPort0 is occupied"}
 $run=Join-Path $LogDirectory (Get-Date -Format yyyyMMdd-HHmmss)
 New-Item -ItemType Directory -Path $run -Force | Out-Null
 $active=@();$logs=@()
 function Start-Case($name,$mode,$url,$profile,$cash=''){
  $capture=Join-Path $run $name;New-Item -ItemType Directory -Path $capture -Force | Out-Null
  $log=Join-Path $run "$name.log"
- $flags=@($url,'-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',"-FiskCareerReleaseSmoke=$mode",('-abslog="{0}"' -f $log),('-FiskScreenshotDir="{0}"' -f $capture),('-UserDir="{0}"' -f (Join-Path $run $profile)))
+ $flags=@($url,'-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag,"-port=$FiskPort0","-FiskCareerReleaseSmoke=$mode",('-abslog="{0}"' -f $log),('-FiskScreenshotDir="{0}"' -f $capture),('-UserDir="{0}"' -f (Join-Path $run $profile)))
  if($cash -ne ''){$flags += "-FiskCareerExpectedCash=$cash"}
  Start-Process -FilePath $exe -WorkingDirectory $capture -ArgumentList $flags -PassThru -WindowStyle Hidden
 }
 function Wait-Tag($log,$tag,$app,$seconds){
- $until=(Get-Date).AddSeconds($seconds)
+ $until=(Get-Date).AddSeconds((FiskTimeout $seconds))
  while((Get-Date) -lt $until){
   if($app.HasExited){throw "Process exited before $tag in $log"}
   foreach($file in $logs){if((Test-Path -LiteralPath $file) -and (Select-String -LiteralPath $file -Pattern 'FISKELAGET_CAREER_RELEASE_FAILED|Fatal error|Assertion failed|Unhandled Exception' -Quiet)){throw "Runtime failure: $file"}}
@@ -73,8 +74,8 @@ try{
  if($Phase -eq 'Solo'){"Evidence: $run";return}
  $roles=@('host','guest1','guest2','guest3');$apps=@{}
  $apps.host=Start-Case 'host' 'host' '/Engine/Maps/Entry?listen' 'host-profile';$active+=$apps.host;$hostLog=Join-Path $run 'host.log';$logs+=$hostLog
- Wait-Tag $hostLog 'GameNetDriver.*listening on port 7777' $apps.host 120
- foreach($role in $roles[1..3]){$apps[$role]=Start-Case $role $role '127.0.0.1:7777' "$role-profile";$active+=$apps[$role];$logs+=Join-Path $run "$role.log"}
+ Wait-Tag $hostLog "GameNetDriver.*listening on port $FiskPort0" $apps.host 120
+ foreach($role in $roles[1..3]){$apps[$role]=Start-Case $role $role "127.0.0.1:$FiskPort0" "$role-profile";$active+=$apps[$role];$logs+=Join-Path $run "$role.log"}
  Wait-Tag $hostLog 'FISKELAGET_CAREER_RELEASE_PASSED mode=host' $apps.host 1500
  foreach($role in $roles[1..3]){Wait-Tag (Join-Path $run "$role.log") "FISKELAGET_CAREER_RELEASE_PASSED mode=$role" $apps[$role] 90}
  Start-Sleep -Seconds 2
@@ -85,8 +86,8 @@ try{
   $log=Join-Path $run "$role.log"
   $reveal=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SETTLEMENT rows=4' | Select-Object -First 1
   $day2=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SESSION_DAY number=2' | Select-Object -First 1
-  if(!$reveal -or ((Stamp $reveal)-(Stamp $start)).TotalSeconds -lt 1020){throw "Early or missing reveal: $role"}
-  if(!$day2 -or ((Stamp $day2)-(Stamp $start)).TotalSeconds -lt 1200){throw "Day shortened: $role"}
+  if(!$reveal -or (FiskGameSeconds ((Stamp $reveal)-(Stamp $start)).TotalSeconds) -lt 1020){throw "Early or missing reveal: $role"}
+  if(!$day2 -or (FiskGameSeconds ((Stamp $day2)-(Stamp $start)).TotalSeconds) -lt 1200){throw "Day shortened: $role"}
   if(@(Select-String -LiteralPath $log -Pattern 'FISKELAGET_CAREER_REVEAL_PASSED').Count -ne 1){throw 'Wrong reveal count'}
   $allocation=Select-String -LiteralPath $log -Pattern 'FISKELAGET_OFFSHORE_ALLOCATION' | Select-Object -First 1
   $allocations += [int][regex]::Match($allocation.Line,'rods=(\d+)').Groups[1].Value
@@ -104,7 +105,7 @@ try{
   Start-Sleep -Seconds 1
  }
  if(!$left){throw 'Guest disconnect did not release crew slot'}
- $rejoin=Start-Case 'rejoin-guest3' 'rejoin' '127.0.0.1:7777' 'guest3-profile' $cash;$active+=$rejoin;$log=Join-Path $run 'rejoin-guest3.log';$logs+=$log
+ $rejoin=Start-Case 'rejoin-guest3' 'rejoin' "127.0.0.1:$FiskPort0" 'guest3-profile' $cash;$active+=$rejoin;$log=Join-Path $run 'rejoin-guest3.log';$logs+=$log
  Wait-Tag $log 'FISKELAGET_CAREER_RELEASE_PASSED mode=rejoin' $rejoin 90
  Start-Sleep -Seconds 2;Check-Shots 'rejoin-guest3' @('rejoined-day2');Stop-Case $rejoin
  foreach($role in $roles){Stop-Case $apps[$role]}

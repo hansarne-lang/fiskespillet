@@ -1,4 +1,5 @@
 param([Parameter(Mandatory)][string]$Package,[Parameter(Mandatory)][string]$LogDirectory)
+. (Join-Path $PSScriptRoot 'FiskTestCommon.ps1')
 $ErrorActionPreference='Stop'
 $exe=Join-Path $Package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
 if(!(Test-Path -LiteralPath $exe -PathType Leaf)){throw 'Packaged executable missing'}
@@ -6,12 +7,12 @@ $stamp=Get-Date -Format yyyyMMdd-HHmmss
 $run=Join-Path $LogDirectory $stamp
 New-Item -ItemType Directory -Path $run -Force | Out-Null
 $userDir=Join-Path $run 'settings'
-$flags=@('-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',('-UserDir="{0}"' -f $userDir))
+$flags=@('-windowed','-ResX=1280','-ResY=720','-RenderOffscreen','-unattended','-nosplash','-multihome=127.0.0.1',$FiskClockFlag,('-UserDir="{0}"' -f $userDir))
 $hostLog=Join-Path $run 'host.log';$clientLog=Join-Path $run 'client.log';$failureLog=Join-Path $run 'failure.log'
 function Events($log,$pattern){@(Select-String -LiteralPath $log -Pattern $pattern)}
 function Exactly($log,$pattern,$count){$found=@(Events $log $pattern);if($found.Count -ne $count){throw "Expected $count events for $pattern; got $($found.Count). $log"}}
 function Wait-Event($log,$pattern,$process,$seconds){
- $deadline=(Get-Date).AddSeconds($seconds)
+ $deadline=(Get-Date).AddSeconds((FiskTimeout $seconds))
  while((Get-Date) -lt $deadline){
   if($process.HasExited){throw "Process exited before $pattern. $log"}
   if(Test-Path -LiteralPath $log){

@@ -1,5 +1,7 @@
 # FISKELAGET assetliste og fremdrift
 
+> **Historisk status per 5. november 2026.** Listen og bildene er ikke oppdatert siden. Fra v0.17 lager spillet modeller, hav og fisk i kode (`ProceduralMeshComponent`), og Blender-/FBX-kildene som omtales her, er ikke tatt i bruk i hovedspillet. Hvilke punkter som fortsatt gjelder, avklares i en egen oppgave før listen brukes til planlegging.
+
 Her følger vi arbeidet med modeller, materialer, animasjoner, lyder og grafikk til spillet. Målet er først å få én komplett fiskesituasjon til å fungere, deretter fylle ut LAN-prototypen og senere utvide spillverdenen.
 
 Opprettet: 4. november 2026. Grunnlag: [Kravspesifikasjon v1.1](../Requirements/FISKELAGET_Kravspesifikasjon_v1.1.md) og [idébanken](../Requirements/FISKELAGET_Idebank_2026-11-03.md).

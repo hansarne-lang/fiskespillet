@@ -222,7 +222,7 @@ IDÉ-005 har godkjent hovedregel. Etter egen ankomst til marinaen skal spilleren
 
 Innsatsen skal trekkes én gang fra disponibel saldo. Vinnerne skal dele hele potten. Ved minutt 17 skal nye veddemål stenges, serveren skal fastslå hvilke fangster som er levert innen fristen, og gevinster skal utbetales som del av felles oppgjør. Bare levert fisk innen fristen teller. LAN-serveren skal registrere veddemål og sikre at samme oppgjør ikke utbetales flere ganger, heller ikke etter frakobling eller omstart.
 
-Innsatsgrenser, fordeling ved ulike innsatser, lik størstevekt, ingen riktige tips og ingen tellende fangst er åpne valg. Fiskens eierskap på delte båter må avklares før vinnergrunnlaget kan fastsettes entydig.
+Særreglene for innsats, pottfordeling, lik størstevekt, ingen riktige tips og ingen tellende fangst er avklart 8. november 2026. Se «Avklaring 8. november 2026 — veddemål» nederst og DECISIONS.md. Fisken tilhører stangeieren, også på delte båter.
 
 ## 7 Kart, ekkolodd og grensesnitt
 
@@ -359,7 +359,7 @@ Prøv dessuten tidlig levering uten saldoøkning, skjulte dagsdata i alle visnin
 
 - Omfang av grunnleggende hopp, kinematikk og vibrasjon i første prototype; avanserte hopp og effekter er utsatt.
 
-- Innsatsgrenser, pottfordeling ved ulike innsatser, lik størstevekt, ingen riktige tips og ingen tellende fangst. Ingen av disse særreglene er låst.
+- ~~Innsatsgrenser, pottfordeling ved ulike innsatser, lik størstevekt, ingen riktige tips og ingen tellende fangst.~~ Avklart 8. november 2026, se nederst.
 
 - Konkrete avstander og sannsynligheter for storfangst offshore.
 
@@ -386,3 +386,25 @@ K8: Den senere godkjente arkitekturen og masterpromptens valg av Unreal Engine 5
 Kapittel 2 og testprisene bygger på K2. Statistikkdetaljene bygger på K1, med utsatt resultatvisning etter K6. Den visuelle retningen bygger på K3 og K4. K5–K7 styrer de nye sosiale funksjonene, faste kameraer, hemmelige resultater og utsatt oppgjør. K8 bekrefter motorvalget. Øvrige krav er videreført fra v1.0.
 
 Samordning: Dagens bekreftede art, eksakte mål, verdi og resultater skal skjules til minutt 17, også etter landing og tidlig levering. Salg, fangstpremier og veddemålsgevinster venter til samme tidspunkt. Dette erstatter v1.0s tidligere resultatvisning og umiddelbare salg. Statistikk skal fortsatt være enkel, journalen detaljert og den første prototypen i realistisk 3D.
+
+
+## Avklaring 4. november 2026 — ankomst i marinaen
+
+Ankomst registreres av LAN-serveren når båtens midtpunkt krysser grensen til den synlige marinasonen. Ankomsttid mindre enn eller lik 1 020 000 ms fra fiskedagens start gir levering innen fristen. Serveren behandler kryssingen før oppgjøret, også når begge behandles i samme ramme. Klientens melding eller nettverksforsinkelse endrer ikke ankomsttidspunktet. Sonens størrelse er en testverdi som balanseres senere.
+
+## Avklaring 8. november 2026 — veddemål
+
+Prosjekteieren godkjente særreglene i [#15](https://github.com/hansarne-lang/fiskespillet/issues/15). Reglene står i DECISIONS.md. Kort: fast innsats på $50, $100 eller $250, ett veddemål per spiller per dag, deling i forhold til innsatsen, deling ved lik størstevekt, tilbakebetaling når ingen har riktig tips eller ingen tellende fangst finnes, avrunding i øre med restøren til størst innsats og deretter første registrering, og utbetaling som egen kvittering også etter frakobling.
+
+Regneeksempler. Alle bevarer hele potten:
+
+| # | Situasjon | Utfall |
+|---|---|---|
+| 1 | A $250 og B $50 på X, C $100 på Y. Pott $400. X leverer største fisk | A 250/300 × $400 = $333,33 + restøre $0,01 = **$333,34**. B 50/300 × $400 = **$66,66**. C $0. Sum $400,00 |
+| 2 | A $100 på X, C $100 på Y, B $100 på Z. X og Y leverer begge 28 200 g, som er største vekt. Pott $300 | A **$150**, C **$150**, B $0. Sum $300 |
+| 3 | Alle har satset på X eller Y, men Z leverer største fisk | Alle får innsatsen tilbake |
+| 4 | X ankommer 17:00:05 | X sin fangst teller ikke. Største av de andre fangstene som er levert i tide, avgjør. Leverte ingen i tide, får alle innsatsen tilbake |
+| 5 | Oppgjøret kjøres på nytt etter omstart | Samme kvitterings-ID gir ingen ny utbetaling |
+
+Word-utgaven av kravspesifikasjonen er ikke oppdatert med denne avklaringen. Markdown-utgaven og DECISIONS.md gjelder.
+

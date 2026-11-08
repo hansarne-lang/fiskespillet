@@ -26,8 +26,12 @@ jobs:
           python-version: '3.12'
       - name: Validate repository contracts and public files
         run: python Tools/Validation/check_repository.py
+      - name: Check include boundaries between FiskGame areas
+        run: python Tools/Validation/check_includes.py
       - name: Test validation failure cases
         run: python -m unittest discover -s Tools/Validation -p 'test_*.py' -v
+      - name: Test change-based test selection
+        run: python -m unittest discover -s Tools/Testing -p 'test_*.py' -v
       - name: Test fail-closed Broen review handshake
         run: python -m unittest discover -s Tools/Coordination -p 'test_*.py' -v
 

@@ -1,5 +1,7 @@
 # FISKELAGET assetdokumentasjon
 
+> **Historisk status per 5. november 2026.** Listen og bildene er ikke oppdatert siden. Fra v0.17 lager spillet modeller, hav og fisk i kode (`ProceduralMeshComponent`), og Blender-/FBX-kildene som omtales her, er ikke tatt i bruk i hovedspillet. Hvilke punkter som fortsatt gjelder, avklares i en egen oppgave før listen brukes til planlegging.
+
 Her kan alle se assetbehov, bygde leveranser, kontrollstatus og gjenstående arbeid. Oppdatert 5. november 2026: 79 assetpunkter, hvorav 15 har en første leveranse til kontroll. Ingen av disse er markert ferdig i hovedspillet.
 
 - [Felles assetliste og fremdrift](FISKELAGET_Assetliste.md)

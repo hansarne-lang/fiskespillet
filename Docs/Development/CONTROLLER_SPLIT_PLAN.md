@@ -30,7 +30,7 @@ Ingen spillregler, protokollregler eller lagringsformater endres. Navnene på ne
 | Steg | Innhold | Nettverkskall som flyttes | Risiko |
 |---|---|---|---|
 | 1 ✅ | Røyktesttilstand ut av headeren til `FFiskBoardingSmokeState` (`Boats/FiskBoardingSmokeState.h`) | Ingen | Lav: bare testkode, ingen nettverksendring |
-| 2 | Brygge: flytt kallene inn i den eksisterende `UFiskPierWalk` | `ServerPierMode`, `ServerPierInput`, `ClientPierMode` | Lav |
+| 2 ✅ | Brygge: flytt kallene inn i den eksisterende `UFiskPierWalk` | `ServerPierMode`, `ServerPierInput`, `ClientPierMode` | Lav |
 | 3 | `UFiskMarinaSync`: naust, bar og havn | `ServerMarinaIdentity`, `ClientMarinaIdentity`, `ServerMarinaRecords`, `ServerMarinaSay`, `ServerHarbourPlace` | Lav |
 | 4 | `UFiskRecoverySync`: gjenhenting av journal og ekspedisjonsposter (`.Recovery.cpp`) | `ClientJournalBatch`, `ServerJournalAck`, `ClientExpeditionBatch`, `ServerExpeditionAck` | Middels: må tåle frakobling og ny tilkobling |
 | 5 | `UFiskCareerSync`: karriere, butikk og båtvalg (`.Career.cpp`) | `ServerCareerHello`, `ClientCareerSnapshot`, `ServerCareerAck`, `ServerBuyCareer`, `ServerChooseBoat` | Middels: penger og lagring |

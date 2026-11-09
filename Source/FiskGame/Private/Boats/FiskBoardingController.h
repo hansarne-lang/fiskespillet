@@ -55,9 +55,6 @@ public:
     UFiskFishingHelp* GetFishingHelp() const { return FishingHelp; }
     UFUNCTION(Server,Reliable) void ServerReturnToMarina(int32 Revision,int32 Day,int32 Leg);
     UFiskPierWalk* GetPierWalk() const { return PierWalk; }
-    UFUNCTION(Server,Reliable) void ServerPierMode(FGuid Profile,bool Enabled);
-    UFUNCTION(Server,Unreliable) void ServerPierInput(FGuid Profile,int32 Generation,int32 Serial,FVector2D Axis,bool Sprint);
-    UFUNCTION(Client,Reliable) void ClientPierMode(bool Enabled,FVector Position,int32 Generation);
     UFiskSkipperPanel* GetSkipperPanel() const { return SkipperPanel; }
     UFiskCollectionPanel* GetCollectionPanel() const { return CollectionPanel; }
     UFiskAnglerPanel* GetAnglerPanel() const { return AnglerPanel; }

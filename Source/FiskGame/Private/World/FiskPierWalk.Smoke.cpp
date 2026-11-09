@@ -47,7 +47,7 @@ void UFiskPierWalk::RunSmoke()
     {
         if(!bEnabled || !Own->bWalking || P->GetViewTarget()!=H) { if(Now-SmokeAt>12) { Fail(TEXT("mode_camera_or_public_position_missing")); }return; }
         if(!Tour) { auto Identity=Panel->GetIdentity();Identity.Color=(Role+1)%6;P->ServerMarinaIdentity(GI->Career.Id,Identity);SmokeStage=30;SmokeWaypoint=0;return; }
-        P->ServerPierInput(FGuid::NewGuid(),Generation,200,{0,1},true);P->ServerPierInput(GI->Career.Id,Generation-1,201,{0,1},true);P->ServerPierInput(GI->Career.Id,Generation,0,{0,1},true);P->ServerPierInput(GI->Career.Id,Generation,202,{4,0},true);
+        ServerPierInput(FGuid::NewGuid(),Generation,200,{0,1},true);ServerPierInput(GI->Career.Id,Generation-1,201,{0,1},true);ServerPierInput(GI->Career.Id,Generation,0,{0,1},true);ServerPierInput(GI->Career.Id,Generation,202,{4,0},true);
         SmokeOrigin=Position;Key(EKeys::W);Key(EKeys::LeftShift);SmokeAt=Now;SmokeStage=2;return;
     }
     if(!Tour)
@@ -67,7 +67,7 @@ void UFiskPierWalk::RunSmoke()
     }
     if(SmokeStage==2 && Now-SmokeAt>=2)
     {
-        if(Position.Y-SmokeOrigin.Y<500 || FVector::Dist2D(Position,SmokeOrigin)>850) { Fail(TEXT("actual_W_shift_motion_not_bounded"));return; }Stop();NextSend=Now+1.7;P->ServerPierInput(GI->Career.Id,Generation,++Serial,{0,1},true);SmokeAt=Now;SmokeStage=20;return;
+        if(Position.Y-SmokeOrigin.Y<500 || FVector::Dist2D(Position,SmokeOrigin)>850) { Fail(TEXT("actual_W_shift_motion_not_bounded"));return; }Stop();NextSend=Now+1.7;ServerPierInput(GI->Career.Id,Generation,++Serial,{0,1},true);SmokeAt=Now;SmokeStage=20;return;
     }
     if(SmokeStage==20 && Now-SmokeAt>=.7) { SmokeOrigin=Position;SmokeAt=Now;SmokeStage=21;return; }
     if(SmokeStage==21 && Now-SmokeAt>=.6)
@@ -94,7 +94,7 @@ void UFiskPierWalk::RunSmoke()
     if(SmokeStage==12 && Now-SmokeAt>=2)
     {
         const auto* B=P->FindStarterBoat();if(bEnabled || !B || !B->IsAboard(P->PlayerState->GetPlayerId()) || GI->Career.Cash!=SmokeCash || !GI->GetJournal().GetEntries().IsEmpty()) { Fail(TEXT("boarding_or_private_state"));return; }
-        P->ServerPierMode(GI->Career.Id,true);SmokeAt=Now;SmokeStage=13;return;
+        ServerPierMode(GI->Career.Id,true);SmokeAt=Now;SmokeStage=13;return;
     }
     if(SmokeStage==13 && Now-SmokeAt>=1) { if(bEnabled) { Fail(TEXT("aboard_walk_accepted"));return; }Done(); }
 }

@@ -117,11 +117,13 @@ def select(paths, scripts: list[str] | None = None) -> list[str] | str:
     return sorted(chosen)
 
 
-def changed_paths(base: str) -> list[str]:
+def changed_paths(base: str, committed_only: bool = False) -> list[str]:
     merge_base = subprocess.run(['git', 'merge-base', base, 'HEAD'], cwd=ROOT, check=True,
                                 capture_output=True, text=True).stdout.strip()
     committed = subprocess.run(['git', 'diff', '--name-only', merge_base, 'HEAD'], cwd=ROOT, check=True,
                                capture_output=True, text=True).stdout.splitlines()
+    if committed_only:
+        return sorted(set(committed))
     working = subprocess.run(['git', 'diff', '--name-only', 'HEAD'], cwd=ROOT, check=True,
                              capture_output=True, text=True).stdout.splitlines()
     return sorted(set(committed) | set(working))
@@ -131,10 +133,12 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('paths', nargs='*', help='Changed repository-relative paths')
     parser.add_argument('--base', help='Git ref to compare with (uses the merge base with HEAD)')
+    parser.add_argument('--committed-only', action='store_true',
+                        help='Ignore uncommitted changes (CI: Unreal rewrites some tracked files while building)')
     args = parser.parse_args(argv)
     if bool(args.paths) == bool(args.base):
         parser.error('give either paths or --base')
-    paths = args.paths or changed_paths(args.base)
+    paths = args.paths or changed_paths(args.base, args.committed_only)
     result = select(paths)
     if result == ALL:
         print(ALL)

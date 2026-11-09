@@ -23,8 +23,10 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: windows-${{ github.ref }}
-  cancel-in-progress: true
+  # A new push to a PR replaces its old run. Other runs (main, release, the nightly Release run) are
+  # never cancelled; they wait their turn.
+  group: windows-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   windows:
     name: windows-build

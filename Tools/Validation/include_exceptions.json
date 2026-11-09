@@ -63,9 +63,6 @@
       "UI/FiskMarinaPanel.h",
       "World/FiskMarinaHub.h"
     ],
-    "Source/FiskGame/Private/Boats/FiskBoardingController.Pier.cpp": [
-      "World/FiskPierWalk.h"
-    ],
     "Source/FiskGame/Private/Boats/FiskBoardingController.Recovery.cpp": [
       "Bootstrap/FiskBootstrapGameMode.h",
       "Career/FiskJournalAuthority.h",

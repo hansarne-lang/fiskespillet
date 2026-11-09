@@ -25,6 +25,11 @@ public:
     void ServerMode(FGuid Profile,bool Enable);
     void ServerInput(FGuid Profile,int32 Generation,int32 Serial,FVector2D Axis,bool Sprint);
     void ReceiveMode(bool Enable,FVector P,int32 Generation);
+    // Network calls for walking on the pier. Moved here from AFiskBoardingController (#113 step 2) with the
+    // same names and parameters; the component is replicated and owned by the player's controller.
+    UFUNCTION(Server,Reliable) void ServerPierMode(FGuid Profile,bool Enabled);
+    UFUNCTION(Server,Unreliable) void ServerPierInput(FGuid Profile,int32 InGeneration,int32 InSerial,FVector2D Axis,bool bInSprint);
+    UFUNCTION(Client,Reliable) void ClientPierMode(bool Enabled,FVector InPosition,int32 InGeneration);
 #if WITH_DEV_AUTOMATION_TESTS
     int32 CoastTestView() const { return SmokeCoast; }
 #endif

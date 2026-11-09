@@ -8,14 +8,6 @@
       ],
       "match": "solo-home",
       "note": "Skjermbildet solo-home mangler selv om SOLO_TEST_PASSED logges"
-    },
-    {
-      "issue": 134,
-      "scripts": [
-        "RepeatedFishing"
-      ],
-      "match": "delivered=1 lost=1|cargo|CARGO",
-      "note": "Fire fangster overskrider lastgrensen"
     }
   ]
 }

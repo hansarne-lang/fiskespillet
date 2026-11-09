@@ -18,10 +18,10 @@
 void UFiskGameInstance::Init()
 {
     Super::Init();
-    FNetworkVersion::SetProjectVersion(TEXT("0.22.1"));
+    FNetworkVersion::SetProjectVersion(TEXT("0.22.2"));
     FNetworkVersion::SetGameNetworkProtocolVersion(22);
     FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(22);
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=22 release=0.22.1"));
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=22 release=0.22.2"));
     // SpilLan replaces the whole version folder, so saves must live in the user folder (-SaveToUserDir).
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_LAUNCHER spillan=%d name=%d userdir=%d"),FiskLaunchArgs::FromSpilLan(FCommandLine::Get()),!FiskLaunchArgs::PlayerName(FCommandLine::Get()).IsEmpty(),FPaths::ShouldSaveToUserDir());
     const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);

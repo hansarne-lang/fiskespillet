@@ -55,6 +55,12 @@ function Step([string]$name, [scriptblock]$action) {
     if ($code -ne 0) { throw "$name failed with exit code $code" }
 }
 
+# Check the source before the build: Unreal may rewrite some tracked files while it builds,
+# which says nothing about the code that was built.
+$sourceDirty = @(& git -C $root status --porcelain)
+if ($SpilLanExport -and $sourceDirty.Count) {
+    throw "Uncommitted changes before the build; commit before publishing to SpilLan:`n$($sourceDirty -join "`n")"
+}
 $cooked = Join-Path $root 'Saved\Cooked\Windows'
 $skipCook = $Mode -eq 'Code' -and (Test-Path -LiteralPath $cooked)
 if ($Mode -eq 'Code' -and -not $skipCook) { 'No earlier cook found; cooking once.' }
@@ -78,12 +84,13 @@ try {
 $exe = Join-Path $ArchiveDirectory 'Windows\FiskELaget\Binaries\Win64\FiskELaget.exe'
 if (Test-Path -LiteralPath $exe) {
     $commit = (& git -C $root rev-parse HEAD).Trim()
-    $dirty = [bool](& git -C $root status --porcelain)
+    $dirty = $sourceDirty.Count -gt 0
+    $touched = @(& git -C $root status --porcelain)
+    if (-not $dirty -and $touched.Count) { "Files changed by the build itself (not part of the source):`n$($touched -join "`n")" }
     "Package: $exe"
     "Source: $commit$(if ($dirty) { ' (uncommitted changes: not valid as test evidence)' })"
     "SHA256: $((Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash)"
 }
 if ($SpilLanExport) {
-    if ($dirty) { throw 'Uncommitted changes: commit before publishing to SpilLan' }
     & (Join-Path $PSScriptRoot 'Publish-SpilLan.ps1') -Package (Join-Path $ArchiveDirectory 'Windows') -ExportDirectory $SpilLanExport
 }

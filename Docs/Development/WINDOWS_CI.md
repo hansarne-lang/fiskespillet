@@ -6,8 +6,9 @@ Issue [#5](https://github.com/hansarne-lang/fiskespillet/issues/5). Prosjekteier
 
 | Hendelse | Nivå | SpilLan |
 |---|---|---|
-| PR fra en gren i dette repoet (ikke utkast) | `PR`: bygg, automasjonstester og røyktestene endringen trenger | Nei |
-| Push til `main` | `PR` (bare bygg og automasjon, siden ingenting er endret mot main) | Nei |
+| PR fra en gren i dette repoet (ikke utkast) | `PR`: bygg, automasjonstester og røyktestene endringen trenger. Krever endringen alle, hoppes de sju trege sanntidsskriptene over (de kjøres om natta) | Nei |
+| Push til `main` | `Quick`: bygg og automasjonstester (noen minutter) | Nei |
+| Hver natt kl. 01:17 | `Release` på `main`: alle røyktester med normal klokke (3–4 timer) | Nei |
 | Push til `release/**` | `Build` | **Ja**, publiseres |
 | Manuell kjøring (Actions → Windows build and test → Run workflow) | Valgfritt: Build, PR eller Release | Valgfritt |
 

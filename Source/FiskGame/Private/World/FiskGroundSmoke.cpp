@@ -35,7 +35,7 @@ void UFiskSeaChart::Smoke()
     const UFiskPrototypeRod& Rod=*PC->GetRod();const int32 Depth=GetNetMode()==NM_Client?90:80;
     const double Now=Day->GetElapsedRealSeconds();
     // Observe return immediately, even while the other player's landing animation finishes.
-    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now; }
+    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now;ExpectedReturn=Boat->GetReturnTravelMs()/1000.0; }
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_CHART_TEST_FAILED player=%d stage=%d %s"),Id,Stage,Why);};
     TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
     if(Settlement && !Settlement->GetView().Results.IsEmpty() && Day->GetElapsedSeconds()<1020) { Fail(TEXT("early_results"));return; }
@@ -129,7 +129,7 @@ void UFiskSeaChart::Smoke()
             TravelAt=Now;Key(EKeys::R);
         }
         if(Boat->GetTripProgress()<=100) { return; }
-        if(ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now; }
+        if(ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now;ExpectedReturn=Boat->GetReturnTravelMs()/1000.0; }
         PC->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::M);Capture(TEXT("chart-return"));Stage=12;
     }
     else if(Stage==12)
@@ -137,7 +137,9 @@ void UFiskSeaChart::Smoke()
         if(Boat->GetGroundId()!=1 || Rod.GetRig().Depth!=Depth) { Fail(TEXT("return_route_or_rig_changed"));return; }
         if(Progress!=200 || Boat->GetActorLocation().Size()>5) { return; }
         const double Duration=Now-ReturnAt;
-        if(Duration<39 || Duration>43) { Fail(TEXT("return_time"));return; }
+        // The planned return time includes towing: a towed catch makes the trip longer by the cargo rules (#136).
+        if(Duration<ExpectedReturn-1 || Duration>ExpectedReturn+3)
+        { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CHART_RETURN_TIME seconds=%.3f expected=%.3f"),Duration,ExpectedReturn);Fail(TEXT("return_time"));return; }
         if(Boat->GetMarinaArrivalMs(Day->GetElapsedMilliseconds())<0) { Fail(TEXT("missing_marina_crossing"));return; }
         Capture(TEXT("chart-home"));
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CHART_TEST_PASSED player=%d ground=%d depth=%d return_seconds=%.3f"),Id,Boat->GetGroundId(),Rod.GetRig().Depth,Duration);

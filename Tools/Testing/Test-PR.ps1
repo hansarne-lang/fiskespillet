@@ -5,9 +5,11 @@
 .DESCRIPTION
  -Level Build    Build and package only. For a playable version; no tests.
                  Add -SpilLanExport <folder> to publish it to SpilLan (Tools/Build/Publish-SpilLan.ps1).
+ -Level Quick    Build and automation tests only (minutes). Used for every push to main.
  -Level PR       Build, automation tests, the graphical scripts select_tests.py picks for the change
                  (compared with -Base), then the report. Scripts that already passed with the same
-                 build are skipped (see Run-All.ps1 -Force).
+                 build are skipped (see Run-All.ps1 -Force). When the change needs every script,
+                 the slow real-time scripts are left to the nightly Release run (Run-All.ps1 -Fast).
  -Level Release  Build, automation tests and every graphical script with the normal 20-minute day.
 
  Failures listed in known_failures.json are marked with their issue; the rest are NY. The exit code
@@ -18,7 +20,7 @@
  .\Tools\Testing\Test-PR.ps1 -Level PR -EngineRoot 'C:\Program Files\Epic Games\UE_5.8' -ArchiveDirectory C:\Fiskespillet\pakke -LogDirectory C:\Fiskespillet\logs
 #>
 param(
-    [ValidateSet('Build', 'PR', 'Release')][string]$Level = 'PR',
+    [ValidateSet('Build', 'Quick', 'PR', 'Release')][string]$Level = 'PR',
     [Parameter(Mandatory)][string]$EngineRoot,
     [Parameter(Mandatory)][string]$ArchiveDirectory,
     [Parameter(Mandatory)][string]$LogDirectory,
@@ -51,9 +53,11 @@ if ($Level -ne 'Build') {
         Where-Object { $_.LastWriteTime -ge $automationStarted } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if ($index) { $arguments += @('--automation', $index.FullName) } else { $problems.Add('Automation wrote no index.json'); $missingEvidence = $true }
 
+}
+if ($Level -eq 'PR' -or $Level -eq 'Release') {
     $started = Get-Date
     $runAll = @{ Package = $package; LogDirectory = $LogDirectory; Parallel = $Parallel }
-    if ($Level -eq 'Release') { $runAll.Release = $true } else { $runAll.ChangedSince = $Base; if ($Force) { $runAll.Force = $true } }
+    if ($Level -eq 'Release') { $runAll.Release = $true } else { $runAll.ChangedSince = $Base; $runAll.Fast = $true; if ($Force) { $runAll.Force = $true } }
     $runAllFailed = $false
     try { & (Join-Path $PSScriptRoot 'Run-All.ps1') @runAll }
     catch { $problems.Add("Run-All: $($_.Exception.Message)"); $runAllFailed = $true }

@@ -59,7 +59,9 @@ if ($Release) {
 } elseif ($ChangedSince) {
     $python = Get-Python
     if (-not $python) { throw 'Python is needed for -ChangedSince (select_tests.py)' }
-    $out = @(& $python (Join-Path $PSScriptRoot 'select_tests.py') --base $ChangedSince)
+    $selectArgs = @((Join-Path $PSScriptRoot 'select_tests.py'), '--base', $ChangedSince)
+    if ($env:GITHUB_ACTIONS -eq 'true') { $selectArgs += '--committed-only' }   # the build rewrites some tracked files
+    $out = @(& $python @selectArgs)
     if ($LASTEXITCODE -ne 0) { throw 'select_tests.py failed' }
     $selected = if ($out -contains 'ALL') { $all } else { $out }
     # -Fast (PR runs): when a change needs every script, leave the slow real-time scripts (20-30

@@ -14,6 +14,9 @@
  not run again (passed-cache.jsonl in the log folder, see run_cache.py). They show as Cached in
  summary.csv. -Force runs them anyway. -Release never skips anything.
 
+ -Fast is for PR runs: when select_tests.py answers ALL, the slow real-time scripts are skipped
+ and left to the nightly Release run. Scripts it names directly always run.
+
 .EXAMPLE
  # Quick check of what a branch changed, four times faster clock, two scripts at a time
  .\Tools\Testing\Run-All.ps1 -Package C:\Fiskespillet\pakke -LogDirectory C:\Fiskespillet\logs -ChangedSince origin/main
@@ -30,7 +33,8 @@ param(
     [ValidateRange(1,8)][int]$Parallel = 2,
     [ValidateRange(1,20)][int]$ClockScale = 4,
     [switch]$Release,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Fast
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'FiskRunAllLib.ps1')
@@ -58,6 +62,13 @@ if ($Release) {
     $out = @(& $python (Join-Path $PSScriptRoot 'select_tests.py') --base $ChangedSince)
     if ($LASTEXITCODE -ne 0) { throw 'select_tests.py failed' }
     $selected = if ($out -contains 'ALL') { $all } else { $out }
+    # -Fast (PR runs): when a change needs every script, leave the slow real-time scripts (20-30
+    # minutes each) to the nightly Release run. A script select_tests.py picks by name still runs.
+    if ($Fast -and $out -contains 'ALL') {
+        $slow = @($realtimeOnly | Where-Object { $_ -ne 'SeaChart' })
+        "Fast: left to the nightly Release run: $($slow -join ', ')"
+        $selected = @($selected | Where-Object { $slow -notcontains $_ })
+    }
 } else {
     $selected = $all
 }

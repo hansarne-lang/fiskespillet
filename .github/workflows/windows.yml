@@ -7,12 +7,14 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main, 'release/**']
+  schedule:
+    - cron: '17 0 * * *'   # Nightly full Release run on main (01:17 Norwegian winter time)
   workflow_dispatch:
     inputs:
       level:
-        description: Testnivå (Build = bare bygg, PR = tester for endringen, Release = alt med normal klokke)
+        description: Testnivå (Build = bare bygg, Quick = bygg og automasjon, PR = tester for endringen, Release = alt med normal klokke)
         type: choice
-        options: [Build, PR, Release]
+        options: [Build, Quick, PR, Release]
         default: PR
       publish:
         description: Publiser bygget til SpilLan på byggemaskinen
@@ -31,7 +33,7 @@ jobs:
       github.event_name != 'pull_request' ||
       (github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft)
     runs-on: [self-hosted, windows, fiskelaget]
-    timeout-minutes: 300
+    timeout-minutes: 360
     env:
       CI_ROOT: C:\Fiskespillet\ci
       UE_ROOT: ${{ vars.UE_ROOT }}
@@ -56,8 +58,12 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $engine = if ($env:UE_ROOT) { $env:UE_ROOT } else { 'C:\Program Files\Epic Games\UE_5.8' }
-          # Level: manual choice, Build for release branches, otherwise PR.
-          $level = if ($env:INPUT_LEVEL) { $env:INPUT_LEVEL } elseif ($env:GIT_REF -like 'refs/heads/release/*') { 'Build' } else { 'PR' }
+          # Level: manual choice; Build for release branches; Release at night; Quick for pushes to main; PR for pull requests.
+          $level = if ($env:INPUT_LEVEL) { $env:INPUT_LEVEL }
+              elseif ($env:GIT_REF -like 'refs/heads/release/*') { 'Build' }
+              elseif ($env:EVENT_NAME -eq 'schedule') { 'Release' }
+              elseif ($env:EVENT_NAME -eq 'push') { 'Quick' }
+              else { 'PR' }
           $base = if ($env:BASE_REF) { "origin/$env:BASE_REF" } else { 'origin/main' }
           $logs = Join-Path $env:CI_ROOT 'logs'
           $params = @{ Level = $level; EngineRoot = $engine; ArchiveDirectory = (Join-Path $env:CI_ROOT 'pakke'); LogDirectory = $logs; Base = $base }

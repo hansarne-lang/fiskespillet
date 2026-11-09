@@ -20,7 +20,8 @@ Verktøyene er lagt til 8. november 2026. Ingen av dem er kjørt på Windows enn
 
 | Verktøy | Formål |
 |---|---|
-| `Tools/Build/Build-Fisk.ps1` | Inkrementelt bygg og pakking. `-Mode Code` gjenbruker forrige cook ved rene C++-endringer. Tiden for hvert steg legges i `build-times.csv` i arkivmappen. |
+| `Tools/Build/Build-Fisk.ps1` | Inkrementelt bygg og pakking. `-Mode Code` gjenbruker forrige cook ved rene C++-endringer. Tiden for hvert steg legges i `build-times.csv` i arkivmappen. `-SpilLanExport` publiserer til SpilLan til slutt. |
+| `Tools/Build/Publish-SpilLan.ps1` | Kopierer pakken til `v<versjon>` med kortbilde og kjører `SpilLan.exe publiser`. Se [SPILLAN.md](Docs/Development/SPILLAN.md). |
 | `Tools/Build/Test-Automation.ps1` | Kjører `Fiskelaget.*`-automasjonstestene uten grafikk (`-nullrhi`). Krever bygget Editor. |
 | `Tools/Testing/Run-All.ps1` | Kjører grafiske `Run-*.ps1` i parallell med egne porter (`7777 + 100 × plass`), og lager `summary.csv` med resultat og varighet. |
 | `Tools/Testing/Test-RunAllLib.ps1` | Regresjonsprøver for hvordan `Run-All.ps1` klassifiserer `err.txt` (bare PowerShell-fremdrift ignoreres). |

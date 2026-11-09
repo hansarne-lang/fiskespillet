@@ -4,6 +4,7 @@
 
 .DESCRIPTION
  -Level Build    Build and package only. For a playable version; no tests.
+                 Add -SpilLanExport <folder> to publish it to SpilLan (Tools/Build/Publish-SpilLan.ps1).
  -Level PR       Build, automation tests, the graphical scripts select_tests.py picks for the change
                  (compared with -Base), then the report. Scripts that already passed with the same
                  build are skipped (see Run-All.ps1 -Force).
@@ -23,7 +24,8 @@ param(
     [Parameter(Mandatory)][string]$LogDirectory,
     [string]$Base = 'origin/main',
     [ValidateRange(1,8)][int]$Parallel = 2,
-    [switch]$Force
+    [switch]$Force,
+    [string]$SpilLanExport = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -33,7 +35,9 @@ New-Item -ItemType Directory -Path $LogDirectory -Force | Out-Null
 $problems = [System.Collections.Generic.List[string]]::new()
 $missingEvidence = $false   # A step that failed without leaving a report never counts as a pass
 
-& (Join-Path $root 'Tools\Build\Build-Fisk.ps1') -EngineRoot $EngineRoot -ArchiveDirectory $ArchiveDirectory
+$build = @{ EngineRoot = $EngineRoot; ArchiveDirectory = $ArchiveDirectory }
+if ($SpilLanExport) { $build.SpilLanExport = $SpilLanExport }
+& (Join-Path $root 'Tools\Build\Build-Fisk.ps1') @build
 $package = Join-Path $ArchiveDirectory 'Windows'
 $exe = Join-Path $package 'FiskELaget\Binaries\Win64\FiskELaget.exe'
 $arguments = @((Join-Path $PSScriptRoot 'report.py'), '--level', $Level, '--exe', $exe)

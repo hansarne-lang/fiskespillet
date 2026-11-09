@@ -29,6 +29,7 @@ IGNORED = (
     'Tools/Testing/report.py', 'Tools/Testing/test_report.py', 'Tools/Testing/known_failures.json',
     'Tools/Testing/run_cache.py', 'Tools/Testing/test_run_cache.py', 'Tools/Testing/Test-PR.ps1',
     '*.docx', '.gitignore',
+    'Grafikk/*',  # SpilLan card image: shown by the launcher, never loaded by the game
 )
 
 # Shared foundations: a change here can affect any scenario.

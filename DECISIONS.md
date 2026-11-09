@@ -79,3 +79,10 @@ Innsatsgrensen begrenser også virkningen av saldo fra andre verter, som ikke ka
 - Windows-bygg og -tester kjøres av Claude Code i en økt på prosjekteierens PC (lokal terminal eller Remote Control), eller av prosjekteieren med `Tools/Testing/Test-PR.ps1`.
 - Broen-reviewen med Codex som koordinator ([BROEN_REVIEW.md](Docs/Development/BROEN_REVIEW.md)) er satt på pause. Statusen `claude-review` kreves ikke. Kode og tester beholdes som historikk.
 - Testing følger [testbudsjettet](TESTING.md#testbudsjett): faste nivåer, én kort rapport, kjente feil merket med issue og ingen ny kjøring av samme bygg. Issue #137.
+
+## 2026-11-09 — Windows-bygg på prosjekteierens PC
+
+- Prosjekteieren valgte å la sin egen PC være byggemaskin for GitHub Actions (self-hosted runner) i stedet for at bygg og tester startes for hånd. Issue #5.
+- Fordi repoet er offentlig, kjører jobben aldri kode fra forks: bare PR-er fra grener i repoet, push og manuell kjøring. Eksterne bidragsytere må godkjennes i GitHub. Jobben har bare lesetilgang.
+- Runneren kjører i prosjekteierens innloggede skrivebordsøkt (ikke som tjeneste), fordi røyktestene trenger skjerm og SpilLan-publiseringen må kjøre som brukeren.
+- `windows-build` er ikke påkrevd for fletting, så main stoppes ikke når PC-en er av. Oppsett: [WINDOWS_CI.md](Docs/Development/WINDOWS_CI.md).

@@ -45,6 +45,13 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     { CatchData.Species=6;CatchData.WeightGrams=RodOwner->Smoke.CargoMode==TEXT("discard")?250000:RodOwner->Smoke.CargoMode==TEXT("loaded")?200000:150000;const auto& S=*FiskCatches::Find(6);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
 #endif
 #if WITH_DEV_AUTOMATION_TESTS
+    // RepeatedFishing lands four fish on one starter boat. Fixed catalog fish (4 x 8 kg snapper) keep the
+    // hold far below its 100 kg limit, so the smoke tests repeated fishing and not the cargo rules (#134).
+    // Bite clocks, fights, landing and settlement still run normally.
+    if(FParse::Param(FCommandLine::Get(),TEXT("FiskRepeatSmoke")))
+    { CatchData.Species=0;CatchData.WeightGrams=8000;const auto& S=*FiskCatches::Find(0);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
+#endif
+#if WITH_DEV_AUTOMATION_TESTS
     if(FParse::Param(FCommandLine::Get(),TEXT("FiskFleetHarness")) && RodOwner->PlayerState && RodOwner->PlayerState->GetPlayerName().StartsWith(TEXT("FLEET")))
     { CatchData.Species=6;CatchData.WeightGrams=150000;const auto& S=*FiskCatches::Find(6);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
 #endif

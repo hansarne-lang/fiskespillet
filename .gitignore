@@ -3,6 +3,9 @@ Binaries/
 Intermediate/
 Saved/
 DerivedDataCache/
+# Written by the engine during packaging and editor start (seen on the build machine, #5)
+/Build/
+Config/DefaultInput.ini
 .vs/
 *.sln
 *.VC.db

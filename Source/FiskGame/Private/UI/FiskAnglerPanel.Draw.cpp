@@ -1,4 +1,5 @@
 #include "UI/FiskAnglerPanel.h"
+#include "UI/FiskGameInstance.h"
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Fishing/FiskPrototypeRod.h"
@@ -13,9 +14,19 @@ void UFiskAnglerPanel::DrawSchool(AHUD& H,UCanvas& C)
     H.DrawRect(FLinearColor(.012f,.045f,.06f,1),24*S,28*S,1232*S,650*S);T(TEXT("FISKESKOLEN"),48,55,2.f);
     T(TEXT("Lokal øving | Ingen fiskedag, penger, fangster eller karriererekorder"),48,107,1.08f,Teal);
     T(bControls?TEXT("KONTROLLØVELSE | Tab: treningskamp | Enter: begynn øvelsen på nytt"):TEXT("TRENINGSKAMP | Tab: kontroller | Piler: art | G: øvingsutstyr | Enter: start / start på nytt"),48,146,.98f);
+    const bool Mouse=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->bMouseRod;
+    if(Mouse)
+    {
+        // Rod angle gauge, as in the fight HUD (#132).
+        H.DrawRect(FLinearColor(.05f,.15f,.18f),1200*S,212*S,16*S,300*S);
+        H.DrawRect(SchoolStick.GetDirection()>0?Gold:SchoolStick.GetDirection()<0?Teal:FLinearColor(.75f,.82f,.84f),1200*S,(212+300*(1-SchoolStick.GetAngle()))*S,16*S,300*SchoolStick.GetAngle()*S);
+        H.DrawLine(1194*S,(212+300*(1-FFiskRodStick::HoldHigh))*S,1222*S,(212+300*(1-FFiskRodStick::HoldHigh))*S,Gold,2*S);
+    }
     if(bControls)
     {
-        const TCHAR* Steps[]={TEXT("Trykk venstre museknapp: løft stanga"),TEXT("Slipp venstre museknapp: senk stanga"),TEXT("Trykk høyre museknapp: sveiv"),TEXT("Slipp høyre museknapp: stopp sveiva"),TEXT("Musehjul opp: stram bremsen"),TEXT("Musehjul ned: løsne bremsen"),TEXT("Mellomrom: land når fisken er klar")};
+        const TCHAR* ButtonSteps[]={TEXT("Trykk venstre museknapp: løft stanga"),TEXT("Slipp venstre museknapp: senk stanga"),TEXT("Trykk høyre museknapp: sveiv"),TEXT("Slipp høyre museknapp: stopp sveiva"),TEXT("Musehjul opp: stram bremsen"),TEXT("Musehjul ned: løsne bremsen"),TEXT("Mellomrom: land når fisken er klar")};
+        const TCHAR* MouseSteps[]={TEXT("Før musa rolig opp: løft stanga (pump)"),TEXT("Før musa ned: stanga senkes"),TEXT("... og snella sveiver inn av seg selv"),TEXT("La musa ligge: sveiva stopper"),TEXT("Musehjul opp: stram bremsen"),TEXT("Musehjul ned: løsne bremsen"),TEXT("Mellomrom: land når fisken er klar")};
+        const TCHAR* const* Steps=Mouse?MouseSteps:ButtonSteps;
         for(int32 I=0;I<7;++I) { const float Y=212+44*I;H.DrawRect(I==Lesson.Step?FLinearColor(.15f,.34f,.35f):FLinearColor(.035f,.12f,.15f),48*S,Y*S,1120*S,36*S);T(FString::Printf(TEXT("%s %d. %s"),I<Lesson.Step?TEXT("+"):TEXT(" "),I+1,Steps[I]),62,Y+9,1.05f,I<Lesson.Step?Teal:I==Lesson.Step?Gold:FLinearColor::White); }
         T(Lesson.Complete()?TEXT("Kontrollene er utført! Tab åpner en kamp med samme modell som i spillet."):TEXT("Utfør stegene i rekkefølge. Øvelsen endrer ingen ekte stenger."),48,548,1.03f,Gold);
     }
@@ -33,12 +44,12 @@ void UFiskAnglerPanel::DrawSchool(AHUD& H,UCanvas& C)
         else if(Running && F.GetOutcome()==EFiskFightOutcome::LineBreak) { Coach=TEXT("SNØRET RØK – avlast tidligere. Enter prøver igjen."); }
         else if(Running && F.GetOutcome()==EFiskFightOutcome::Slack) { Coach=TEXT("FOR MYE SLAKK – hold kontakt med fisken. Enter prøver igjen."); }
         else if(Running && F.GetOutcome()==EFiskFightOutcome::ReadyToLand) { Coach=TEXT("KLAR TIL LANDING – trykk mellomrom."); }
-        else if(F.IsSurging()) { Coach=TEXT("UTRAS – slipp sveiva og senk stanga."); }
+        else if(F.IsSurging()) { Coach=Mouse?TEXT("UTRAS – senk stanga rolig og vent. Snella slurer."):TEXT("UTRAS – slipp sveiva og senk stanga."); }
         else if(F.IsRaised() && F.IsReeling()) { Coach=TEXT("SENK STANGA FØR DU SVEIVER – bruk pumpetak."); }
         else if(Load>Limit) { Coach=TEXT("HØY BELASTNING – løsne bremsen eller avlast stanga."); }
         T(Coach,48,438,1.2f,Gold);
         T(FString::Printf(TEXT("Tid %.1f s | Tid med ugunstig belastning %.1f s | Sveiving under utras %.1f s"),Practice.Seconds,Practice.BadLoadSeconds,Practice.SurgeReelSeconds),48,487,1.f,Teal);
-        T(TEXT("Venstre: løft | Slipp: senk | Høyre: sveiv | Musehjul: brems | Mellomrom: land"),48,536,1.f);
+        T(Mouse?TEXT("Musa opp: løft | Musa ned: senk og sveiv | Pil opp/ned uten mus | Musehjul: brems | Mellomrom: land"):TEXT("Venstre: løft | Slipp: senk | Høyre: sveiv | Musehjul: brems | Mellomrom: land"),48,536,1.f);
     }
     T(Message,48,597,.9f,Gold);T(TEXT("F6 / Escape: tilbake til hovedmenyen | Resultater lagres bare som øving på denne profilen"),48,642,.94f,Teal);
 }

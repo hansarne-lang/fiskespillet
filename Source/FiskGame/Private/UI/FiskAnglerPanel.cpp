@@ -22,7 +22,30 @@ void UFiskAnglerPanel::Load()
 bool UFiskAnglerPanel::OpenSchool()
 {
     const auto* D=GetWorld()->GetGameState<AFiskDayState>();if(GetNetMode()!=NM_Standalone || (D && D->HasStarted())) { return false; }
-    Load();Page=2;bControls=true;Lesson=FFiskControlLesson();Practice=FFiskPracticeSession();CastChecked<AFiskBoardingController>(GetOwner())->ReleaseRodInputsForMenu();return true;
+    Load();Page=2;bControls=true;Lesson=FFiskControlLesson();Practice=FFiskPracticeSession();ResetSchoolStick();CastChecked<AFiskBoardingController>(GetOwner())->ReleaseRodInputsForMenu();return true;
+}
+void UFiskAnglerPanel::ResetSchoolStick()
+{ SchoolStick.Reset();SchoolEngage.Reset();bSchoolRaised=bSchoolReeling=bSchoolButtons=bSchoolLiftHeld=bSchoolReelHeld=false; }
+void UFiskAnglerPanel::LessonAct(EFiskLessonAction Action)
+{ if(bControls && Lesson.Act(Action) && Lesson.Complete()) { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_LESSON_PASSED")); } }
+void UFiskAnglerPanel::TickSchoolStick(float Dt)
+{
+    // Same rules as AFiskBoardingController::TickRodStick: buttons win while held, and a deliberate
+    // movement hands the rod back to the mouse.
+    const auto* PC=CastChecked<AFiskBoardingController>(GetOwner());const auto* GI=CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance());
+    float DX=0,DY=0;PC->GetInputMouseDelta(DX,DY);
+    if(bSchoolLiftHeld || bSchoolReelHeld) { DY=0; }
+    if(bSchoolButtons)
+    {
+        if(!SchoolEngage.Feed(DY,Dt)) { DY=0; }
+        else { SchoolEngage.Reset();bSchoolButtons=false;bSchoolRaised=Practice.Fight.IsRaised();bSchoolReeling=Practice.Fight.IsReeling(); }
+    }
+    if(DY!=0) { SchoolStick.Move(DY/FFiskRodStick::TravelForSensitivity(GI->RodSensitivity)); }
+    SchoolStick.Advance(Dt,!bControls && Practice.Fight.IsSurging());
+    if(bSchoolButtons) { return; }
+    const bool Raise=SchoolStick.WantsRaised(),Reel=SchoolStick.WantsReeling();
+    if(Raise!=bSchoolRaised) { LessonAct(Raise?EFiskLessonAction::Lift:EFiskLessonAction::Lower);Practice.Fight.SetRaised(Raise);bSchoolRaised=Raise; }
+    if(Reel!=bSchoolReeling) { LessonAct(Reel?EFiskLessonAction::Reel:EFiskLessonAction::StopReel);Practice.Fight.SetReeling(Reel);bSchoolReeling=Reel; }
 }
 void UFiskAnglerPanel::StartPractice()
 {
@@ -35,6 +58,7 @@ void UFiskAnglerPanel::StartPractice()
 void UFiskAnglerPanel::TickComponent(float Dt,ELevelTick Type,FActorComponentTickFunction* F)
 {
     Super::TickComponent(Dt,Type,F);const auto* PC=Cast<AFiskBoardingController>(GetOwner());if(!PC || !PC->IsLocalController()) { return; }
+    if(Page==2 && CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->bMouseRod) { TickSchoolStick(Dt); }
     if(Page==2 && !bControls) { Practice.Advance(Dt); }
     const auto* D=GetWorld()->GetGameState<AFiskDayState>();const auto* B=PC->FindStarterBoat();if(!D || !D->HasStarted() || !B || !PC->PlayerState || !B->IsAboard(PC->PlayerState->GetPlayerId())) { return; }
     for(int32 I=0;I<PC->GetRodCapacity();++I)
@@ -62,14 +86,18 @@ bool UFiskAnglerPanel::HandleKey(const FInputKeyEventArgs& A)
     { Page=0;Practice=FFiskPracticeSession();return true; }
     if(Page==2)
     {
-        if(Press && K==EKeys::Tab) { bControls=!bControls;Practice=FFiskPracticeSession();return true; }
+        if(Press && K==EKeys::Tab) { bControls=!bControls;Practice=FFiskPracticeSession();ResetSchoolStick();return true; }
         if((Press || Repeat) && !Practice.IsRunning())
         {
             if(K==EKeys::Left) { Species=(Species+FiskCatches::Count-1)%FiskCatches::Count;Practice=FFiskPracticeSession(); }if(K==EKeys::Right) { Species=(Species+1)%FiskCatches::Count;Practice=FFiskPracticeSession(); }
             if(K==EKeys::G) { Gear=Gear==0?7:0;Practice=FFiskPracticeSession(); }
         }
-        if(Press && K==EKeys::Enter) { if(bControls) { Lesson=FFiskControlLesson(); }else { StartPractice(); } }
-        auto Act=[&](EFiskLessonAction V){if(bControls && Lesson.Act(V) && Lesson.Complete()) { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_LESSON_PASSED")); }};
+        if(Press && K==EKeys::Enter) { if(bControls) { Lesson=FFiskControlLesson(); }else { StartPractice(); }ResetSchoolStick(); }
+        auto Act=[&](EFiskLessonAction V){LessonAct(V);};
+        if(K==EKeys::LeftMouseButton && (Press || A.Event==IE_Released)) { bSchoolLiftHeld=Press;if(Press) { bSchoolButtons=true;SchoolEngage.Reset(); } }
+        if(K==EKeys::RightMouseButton && (Press || A.Event==IE_Released)) { bSchoolReelHeld=Press;if(Press) { bSchoolButtons=true;SchoolEngage.Reset(); } }
+        if((Press || Repeat) && (K==EKeys::Up || K==EKeys::Down) && CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->bMouseRod && !(!bControls && !Practice.IsRunning()))
+        { SchoolStick.Move(K==EKeys::Up?FFiskRodStick::KeyStep:-FFiskRodStick::KeyStep);bSchoolButtons=false;return true; }
         if(K==EKeys::LeftMouseButton) { if(Press) { Act(EFiskLessonAction::Lift);Practice.Fight.SetRaised(true); }else if(A.Event==IE_Released) { Act(EFiskLessonAction::Lower);Practice.Fight.SetRaised(false); } }
         if(K==EKeys::RightMouseButton) { if(Press) { Act(EFiskLessonAction::Reel);Practice.Fight.SetReeling(true); }else if(A.Event==IE_Released) { Act(EFiskLessonAction::StopReel);Practice.Fight.SetReeling(false); } }
         if(Press && K==EKeys::MouseScrollUp) { Act(EFiskLessonAction::Tighten);Practice.Fight.AdjustDrag(1); }if(Press && K==EKeys::MouseScrollDown) { Act(EFiskLessonAction::Loosen);Practice.Fight.AdjustDrag(-1); }

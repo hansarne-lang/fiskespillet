@@ -26,6 +26,8 @@ IGNORED = (
     '*.md', 'Docs/*', 'Tools/Validation/*', 'Tools/Coordination/*', '.github/ISSUE_TEMPLATE/*',
     '.github/CODEOWNERS', '.github/pull_request_template.md', '.github/project-blueprint.json',
     'Tools/Testing/select_tests.py', 'Tools/Testing/test_select_tests.py', 'Tools/Testing/Test-RunAllLib.ps1', 'Tools/Build/*',
+    'Tools/Testing/report.py', 'Tools/Testing/test_report.py', 'Tools/Testing/known_failures.json',
+    'Tools/Testing/run_cache.py', 'Tools/Testing/test_run_cache.py', 'Tools/Testing/Test-PR.ps1',
     '*.docx', '.gitignore',
 )
 

@@ -1,6 +1,6 @@
 {
   "name": "Utviklingsoppgave",
-  "description": "Avgrenset arbeid for Codex, Claude eller menneskelige utviklere.",
+  "description": "Avgrenset arbeid for Claude Code eller menneskelige utviklere.",
   "body": [
     {
       "type": "markdown",

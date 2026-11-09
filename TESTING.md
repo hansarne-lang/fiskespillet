@@ -7,7 +7,7 @@ Status: testplan. Ingen UE-bygg, modell-samarbeidsprøve eller spillregeltest er
 | Kontroll | Når | Akseptanse |
 |---|---|---|
 | repo-contracts | Alle PR-er | Dokumentlenker, kontraktformat, enum-/versjonsregler, fileierskap og ulovlige includes kontrolleres |
-| unreal-build | Kode-/Config-/buildendringer | Editor/Win64 bygger med registrert verktøykjede |
+| unreal-build | Kode-/Config-/buildendringer | Editor/Win64 bygger med registrert verktøykjede. Kjøres som `windows-build` på prosjekteierens PC (self-hosted runner), se [WINDOWS_CI.md](Docs/Development/WINDOWS_CI.md) |
 | unreal-tests | Relevante endringer | UE Automation gir eksplisitte resultater med commit og motorversjon |
 | package-smoke | Integrasjons-/releasekandidat | Windows-build produseres, starter på test-PC og har nødvendig runtime |
 | lan-smoke | Nettverk/protokoll/release | To Windows-klienter finner/tilkobler LAN, matcher protokoll og avviser feil versjon |

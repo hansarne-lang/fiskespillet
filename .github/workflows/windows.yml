@@ -1,0 +1,88 @@
+name: Windows build and test
+# Runs on the project owner's own PC, registered as a self-hosted runner with the label
+# "fiskelaget" (see Docs/Development/WINDOWS_CI.md). The repository is public, so this job never
+# runs code from forks: only branches in this repository, manual runs and pushes. Issue #5.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main, 'release/**']
+  workflow_dispatch:
+    inputs:
+      level:
+        description: Testnivå (Build = bare bygg, PR = tester for endringen, Release = alt med normal klokke)
+        type: choice
+        options: [Build, PR, Release]
+        default: PR
+      publish:
+        description: Publiser bygget til SpilLan på byggemaskinen
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    name: windows-build
+    # Never for forks or drafts. A fork's code must not run on the owner's PC.
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft)
+    runs-on: [self-hosted, windows, fiskelaget]
+    timeout-minutes: 300
+    env:
+      CI_ROOT: C:\Fiskespillet\ci
+      UE_ROOT: ${{ vars.UE_ROOT }}
+      EVENT_NAME: ${{ github.event_name }}
+      GIT_REF: ${{ github.ref }}
+      BASE_REF: ${{ github.base_ref }}
+      INPUT_LEVEL: ${{ inputs.level }}
+      INPUT_PUBLISH: ${{ inputs.publish }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          lfs: true
+          fetch-depth: 0        # select_tests.py compares with the base branch
+          clean: false          # keep Intermediate and the cook between runs (incremental build)
+          persist-credentials: false
+
+      - name: Build and test (Test-PR.ps1)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $engine = if ($env:UE_ROOT) { $env:UE_ROOT } else { 'C:\Program Files\Epic Games\UE_5.8' }
+          # Level: manual choice, Build for release branches, otherwise PR.
+          $level = if ($env:INPUT_LEVEL) { $env:INPUT_LEVEL } elseif ($env:GIT_REF -like 'refs/heads/release/*') { 'Build' } else { 'PR' }
+          $base = if ($env:BASE_REF) { "origin/$env:BASE_REF" } else { 'origin/main' }
+          $logs = Join-Path $env:CI_ROOT 'logs'
+          $params = @{ Level = $level; EngineRoot = $engine; ArchiveDirectory = (Join-Path $env:CI_ROOT 'pakke'); LogDirectory = $logs; Base = $base }
+          # Publish to SpilLan for release branches and when asked for in a manual run.
+          if ($env:GIT_REF -like 'refs/heads/release/*' -or $env:INPUT_PUBLISH -eq 'true') { $params.SpilLanExport = 'C:\Fiskespillet\eksport' }
+          "Level: $level  Base: $base  Publish: $([bool]$params.SpilLanExport)"
+          $started = Get-Date
+          & .\Tools\Testing\Test-PR.ps1 @params
+          $code = $LASTEXITCODE
+          $report = Get-ChildItem -LiteralPath $logs -Filter 'report-*.md' -ErrorAction SilentlyContinue |
+              Where-Object { $_.LastWriteTime -ge $started } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($report) {
+              # AppendAllText writes UTF-8 without a byte order mark, which the job summary expects.
+              [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, [IO.File]::ReadAllText($report.FullName))
+              New-Item -ItemType Directory -Path report -Force | Out-Null
+              Copy-Item -LiteralPath $report.FullName -Destination report\report.md
+          } else {
+              [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "Ingen testrapport ble skrevet. Se loggen for steget over.`n")
+              if (-not $code) { $code = 1 }
+          }
+          exit $code
+
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: testrapport
+          path: report/report.md
+          if-no-files-found: ignore
+          retention-days: 30

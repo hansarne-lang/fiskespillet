@@ -4,14 +4,14 @@ Gjelder v0.22. Detaljene for hver versjon står i [versjonsguidene](#versjonsgui
 
 ## Starte spillet
 
-1. Pakk ut hele Windows-pakken og start `Start-FISKELAGET.bat`. Unreal Editor trengs ikke.
+1. Installer og start FISKELAGET fra SpilLan, eller pakk ut hele Windows-pakken og start `Start-FISKELAGET.bat`. Unreal Editor trengs ikke. Fra SpilLan brukes spillernavnet ditt som standardnavn i naustet.
 2. I hovedmenyen velger du med mus, piltaster eller Tab, Enter aktiverer og Escape går tilbake.
    - **Spill** starter en dag. Du kan spille alene, og venner kan koble seg til underveis.
    - **Bli med venner** kobler til vertens LAN-adresse. Standardporten er 7777. På samme PC brukes `127.0.0.1`.
    - **Innstillinger** og **Avslutt**.
 3. Alle på LAN må bruke samme versjon. Inntil tolv spillere kan være med.
 
-Lagringer (karriere, journal, naust, favoritter, oppsett) ligger lokalt på hver PC. GitHub synkroniserer dem ikke.
+Lagringer (karriere, journal, naust, favoritter, oppsett) ligger lokalt på hver PC. GitHub synkroniserer dem ikke. Fra SpilLan ligger de i `%LOCALAPPDATA%\FiskELaget\Saved`. Slik flytter du lagringer fra en eldre pakke: se [SpilLan-oppskriften](Development/SPILLAN.md#lagring).
 
 ## Fiskedagen
 

@@ -4,7 +4,7 @@ Status: vedtatt oppgavemodell; se GitHub Issues for faktisk fremdrift og eventue
 
 ## Én sannhetskilde
 
-Hver utviklingsoppgave er én GitHub Issue. GitHub Projects viser de samme issue-postene og deres metadata. Ikke bruk lokale markdownavkryssinger, brodatabasen eller Codex/Claude-planer som autoritativ oppgaveliste. En lokal arbeidsplan kan beskrive fremgangsmåten for den tilordnede issuen, men må lenke dit og ikke overstyre statusen.
+Hver utviklingsoppgave er én GitHub Issue. GitHub Projects viser de samme issue-postene og deres metadata. Ikke bruk lokale markdownavkryssinger, brodatabasen eller agentplaner som autoritativ oppgaveliste. En lokal arbeidsplan kan beskrive fremgangsmåten for den tilordnede issuen, men må lenke dit og ikke overstyre statusen.
 
 TaskId er issue-URL-en; repository-ID, issue-nummer og GitHub node-ID lagres som tekniske referanser. Lokale midlertidige utkast får ikke TaskId og kan ikke startes før GitHub har bekreftet opprettelsen. Ikke opprett lokale oppgavenummer som senere konkurrerer med GitHub-numrene.
 
@@ -13,8 +13,8 @@ TaskId er issue-URL-en; repository-ID, issue-nummer og GitHub node-ID lagres som
 | Felt | Autoritativ plassering | Regel |
 |---|---|---|
 | ID og beskrivelse | Issue-URL og issue-body | Formål, avgrensning og akseptansekriterier er obligatoriske |
-| Ansvarlig | GitHub assignee | Ansvarlig menneske eller godkjent botkonto; ingen oppdiktede Codex-/Claude-kontoer |
-| Utførende agent | Project-felt `Agent` | Codex-Integration, Codex-Fishing, Claude-BoatsWorld, Claude-EconomyCareer, Human eller Unassigned |
+| Ansvarlig | GitHub assignee | Ansvarlig menneske eller godkjent botkonto; ingen oppdiktede agentkontoer |
+| Utførende agent | Project-felt `Agent` | Claude-Integration, Claude-Fishing, Claude-BoatsWorld, Claude-EconomyCareer, Human eller Unassigned. Codex-verdiene er historiske (Codex er tatt ut 9. november 2026) |
 | Prioritet | Project single-select `Priority` | P0 Kritisk, P1 Høy, P2 Normal, P3 Lav |
 | Modul | Project single-select `Module` | Én av ni moduler, Platform eller CrossModule |
 | Status | Project `Status` | De seks tilstandene nedenfor; issues er ellers open/closed |
@@ -58,7 +58,7 @@ Samarbeid på samme issue krever eksplisitt registrert koordinering med primære
 
 ## Dashboard for prosjekteieren
 
-Ett Project med disse lagrede visningene: oversikt som board etter Status; «Codex» og «Claude» filtrert på agentfeltene; «Blokkert» med årsak og Next Action Owner; «Venter på godkjenning»; «Til gjennomgang» med PR/testlenker; og «Ferdig» med integrert commit. Alle bygger på samme GitHub-data. Ingen egen lokal statusfarge skal overstyre Project; en lokal visning viser sist synkronisert tidspunkt og tydelig frakobling.
+Ett Project med disse lagrede visningene: oversikt som board etter Status; «Claude» filtrert på agentfeltet; «Blokkert» med årsak og Next Action Owner; «Venter på godkjenning»; «Til gjennomgang» med PR/testlenker; og «Ferdig» med integrert commit. Alle bygger på samme GitHub-data. Ingen egen lokal statusfarge skal overstyre Project; en lokal visning viser sist synkronisert tidspunkt og tydelig frakobling.
 
 ## GitHub-integrasjon
 
@@ -72,6 +72,6 @@ Lokal outbox kan kun inneholde leveringsstatus og idempotente forespørsler. Git
 
 ## Akseptanseprøve
 
-Opprett etter godkjenning to separate GitHub-issues for dokumentendringer: Codex eier en testprosedyre, Claude eier en onboardingtekst. Begge skal lese de samme to issue-ID-ene via godkjent integrasjon, claim hver sin og se motpartens In Progress-status etter GitHub-synkronisering uten manuell meldingskopiering.
+Opprett etter godkjenning to separate GitHub-issues for dokumentendringer: én Claude Code-sesjon eier en testprosedyre, en annen eier en onboardingtekst. Begge skal lese de samme to issue-ID-ene via godkjent integrasjon, claim hver sin og se motpartens In Progress-status etter GitHub-synkronisering uten manuell meldingskopiering.
 
 Hver leverer egen gren, worktree, commit og PR. Dokumentkontroller skal kjøres og review gis av annen autorisert person før integrasjon. Done skal først registreres etter beståtte sjekker og merge. Demonstrer også avvist dobbelt-claim, Awaiting Approval-blokkering, uløst avhengighet, filkonflikt og gjenoppretting etter GitHub-brudd. Bevisloggen skal inneholde issue-/Project-/PR-lenker, commit-SHA-er og faktisk teststatus. Denne prøven er planlagt og ikke gjennomført.

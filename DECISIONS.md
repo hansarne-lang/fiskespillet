@@ -72,3 +72,10 @@ Prosjekteieren godkjente forslaget i [#15](https://github.com/hansarne-lang/fisk
 8. **Frakobling:** Veddemålet står. Utbetalingen er en egen oppgjørskvittering med unik ID per dag og veddemål, og godskrives ved neste tilkobling. Samme kvittering gir aldri ny utbetaling.
 
 Innsatsgrensen begrenser også virkningen av saldo fra andre verter, som ikke kan kontrolleres ([#112](https://github.com/hansarne-lang/fiskespillet/issues/112)). Regneeksemplene står i kravspesifikasjonen. Gjennomføringen gjøres i [#22](https://github.com/hansarne-lang/fiskespillet/issues/22).
+
+## 2026-11-09 — Codex tas ut av utviklingen, og testing får budsjett
+
+- Prosjekteieren har bestemt at Codex ikke brukes i utviklingen fremover. Alle agentroller i [AGENTS.md](AGENTS.md) er Claude Code-sesjoner.
+- Windows-bygg og -tester kjøres av Claude Code i en økt på prosjekteierens PC (lokal terminal eller Remote Control), eller av prosjekteieren med `Tools/Testing/Test-PR.ps1`.
+- Broen-reviewen med Codex som koordinator ([BROEN_REVIEW.md](Docs/Development/BROEN_REVIEW.md)) er satt på pause. Statusen `claude-review` kreves ikke. Kode og tester beholdes som historikk.
+- Testing følger [testbudsjettet](TESTING.md#testbudsjett): faste nivåer, én kort rapport, kjente feil merket med issue og ingen ny kjøring av samme bygg. Issue #137.

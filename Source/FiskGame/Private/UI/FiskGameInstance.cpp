@@ -11,6 +11,8 @@
 #include "Economy/FiskDaySettlement.h"
 #include "Career/FiskCareerStore.h"
 #include "Misc/NetworkVersion.h"
+#include "Misc/CommandLine.h"
+#include "FiskLaunchArgs.h"
 #include "Expedition/FiskExpeditionStore.h"
 
 void UFiskGameInstance::Init()
@@ -20,6 +22,8 @@ void UFiskGameInstance::Init()
     FNetworkVersion::SetGameNetworkProtocolVersion(22);
     FNetworkVersion::SetGameCompatibleNetworkProtocolVersion(22);
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PROTOCOL version=22 release=0.22.0"));
+    // SpilLan replaces the whole version folder, so saves must live in the user folder (-SaveToUserDir).
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_LAUNCHER spillan=%d name=%d userdir=%d"),FiskLaunchArgs::FromSpilLan(FCommandLine::Get()),!FiskLaunchArgs::PlayerName(FCommandLine::Get()).IsEmpty(),FPaths::ShouldSaveToUserDir());
     const EFiskCareerLoad CareerLoad=FFiskCareerStore::Load(CareerFile(),Career);
     bCareerBlocked=CareerLoad==EFiskCareerLoad::Blocked;
     if(CareerLoad==EFiskCareerLoad::Empty)

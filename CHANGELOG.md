@@ -6,6 +6,14 @@ Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PL
 
 I fiskekampen styres stanga med musa, uten å holde knapper. Musa opp pumper, musa ned sveiver inn av seg selv, og musehjulet er bremsen. Piltastene virker også. Det er standard og kan slås av under Innstillinger, sammen med musfølsomhet. Fiskekampens regler og nettverksprotokollen er uendret. Innstillingsfila får versjon 2. Issue #132.
 
+## SpilLan – 9. november 2026
+
+FISKELAGET kan publiseres til launcheren SpilLan med eget kortbilde, én mappe per versjon og lagring i brukermappa (`-SaveToUserDir`). Spillernavnet fra SpilLan blir standardnavn i naustet. Ingen spillregler er endret. [Oppskrift](Docs/Development/SPILLAN.md), issue #130.
+
+## Testbudsjett – 9. november 2026
+
+`Test-PR.ps1` med tre nivåer (Build, PR, Release), én kort testrapport (`report.py`), kjente feil merket med issue (`known_failures.json`) og cache som hopper over skript som allerede har bestått med samme bygg. Codex er tatt ut av utviklingen. Issue #137.
+
 ## Raskere bygg og test – 8. november 2026
 
 Testklokke (`-FiskClockScale`, bare utenfor Shipping), felles port- og klokkeoppsett for testskriptene, parallell kjøring med tidsmåling (`Run-All.ps1`), valg av tester etter endrede filer, inkrementelt byggeskript med tidslogg og hodeløs kjøring av automasjonstestene. Ingen spillregler er endret. Bygget og automasjonstestet på Windows; testresultater i PR #117.

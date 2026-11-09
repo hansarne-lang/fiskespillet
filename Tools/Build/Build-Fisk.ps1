@@ -10,6 +10,9 @@
  -Mode Code  For C++-only changes: build Game, reuse the previous cook (-skipcook) and repackage.
              Falls back to a full cook when no earlier cook exists.
  -SkipEditor Do not build the Editor target (Full mode then cooks with the existing Editor binary).
+ -SpilLanExport  After packaging, copy the build to <folder>\v<version> and publish it to the SpilLan
+             launcher (Tools/Build/Publish-SpilLan.ps1). Publishing is skipped with a warning when
+             SpilLan is not installed.
 
  build-times.csv in the archive folder records every step, so before/after timings can be compared.
 
@@ -17,12 +20,15 @@
  .\Tools\Build\Build-Fisk.ps1 -EngineRoot 'C:\Program Files\Epic Games\UE_5.8' -ArchiveDirectory C:\Fiskespillet\pakke
 .EXAMPLE
  .\Tools\Build\Build-Fisk.ps1 -EngineRoot 'C:\Program Files\Epic Games\UE_5.8' -ArchiveDirectory C:\Fiskespillet\pakke -Mode Code
+.EXAMPLE
+ .\Tools\Build\Build-Fisk.ps1 -EngineRoot 'C:\Program Files\Epic Games\UE_5.8' -ArchiveDirectory C:\Fiskespillet\pakke -SpilLanExport C:\Fiskespillet\eksport
 #>
 param(
     [Parameter(Mandatory)][string]$EngineRoot,
     [Parameter(Mandatory)][string]$ArchiveDirectory,
     [ValidateSet('Full', 'Code')][string]$Mode = 'Full',
-    [switch]$SkipEditor
+    [switch]$SkipEditor,
+    [string]$SpilLanExport = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -76,4 +82,8 @@ if (Test-Path -LiteralPath $exe) {
     "Package: $exe"
     "Source: $commit$(if ($dirty) { ' (uncommitted changes: not valid as test evidence)' })"
     "SHA256: $((Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash)"
+}
+if ($SpilLanExport) {
+    if ($dirty) { throw 'Uncommitted changes: commit before publishing to SpilLan' }
+    & (Join-Path $PSScriptRoot 'Publish-SpilLan.ps1') -Package (Join-Path $ArchiveDirectory 'Windows') -ExportDirectory $SpilLanExport
 }

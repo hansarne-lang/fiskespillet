@@ -2,11 +2,11 @@
 
 ## Vedtatt retning
 
-Codex og Claude Code skal bruke egne worktrees og GitHub Issues som autoritativ oppgaveliste. GitHub Projects viser de samme oppgavene. En lokal, prosjektisolert koordinator skal håndtere meldinger, filreservasjoner, begrensede kjøringer og GitHub-synkronisering. En lokal database skal ikke eie en konkurrerende TODO-liste.
+Fra 9. november 2026 brukes bare Claude Code. Codex er tatt ut av utviklingen (se [DECISIONS.md](DECISIONS.md)). Flere Claude Code-sesjoner skal bruke egne worktrees og GitHub Issues som autoritativ oppgaveliste. GitHub Projects viser de samme oppgavene. En lokal, prosjektisolert koordinator skal håndtere meldinger, filreservasjoner, begrensede kjøringer og GitHub-synkronisering. En lokal database skal ikke eie en konkurrerende TODO-liste.
 
 Eksisterende Broen er identifisert som mulig grunnlag. FISKELAGET skal få eget prosjektrom og egne agentidentiteter uten å endre andre prosjekters aktive instanser. Implementasjon og faktisk samarbeidsdemonstrasjon spores som separate GitHub-issues. Ingen automatisert agentkjøring er aktivert av denne dokumentasjonen.
 
-Prosjekteieren har særskilt valgt lesende Claude-review med SHA-bundet handshake i #24. Denne avgrensede, manuelt startede reviewflyten bruker et isolert FISKELAGET-rom og erstatter ikke produksjonskoordinatoren i #4. [Reviewprotokollen](Docs/Development/BROEN_REVIEW.md) beskriver forespørsel, resultat, ACK, tester og den påkrevde GitHub-statusen `claude-review`.
+Reviewflyten under er **satt på pause** fordi den forutsetter Codex som koordinator. Koden og testene beholdes som historikk til en ny koordinator eventuelt avtales i #4. Prosjekteieren hadde særskilt valgt lesende Claude-review med SHA-bundet handshake i #24. Denne avgrensede, manuelt startede reviewflyten bruker et isolert FISKELAGET-rom og erstatter ikke produksjonskoordinatoren i #4. [Reviewprotokollen](Docs/Development/BROEN_REVIEW.md) beskriver forespørsel, resultat, ACK, tester og den påkrevde GitHub-statusen `claude-review`.
 
 ## Meldingskontrakt
 
@@ -28,6 +28,6 @@ Første samarbeidsprøve begrenses til to dokumentoppgaver, 15 minutter per oppg
 
 ## Klientgrensesnitt
 
-Begge klientene kan kobles til prosjektets MCP-verktøy. En koordinatoradapter kan bruke Codex exec/app-server og Claude Code print/strukturert output når installerte versjoner er kvalifisert. MCP er verktøytransport, ikke en komplett oppgavekø. Versjoner, tillatelser, stopp og ressursgrenser skal testes før aktivering.
+Claude Code-sesjonene kan kobles til prosjektets MCP-verktøy. En koordinatoradapter kan bruke Claude Code print/strukturert output når installerte versjoner er kvalifisert. MCP er verktøytransport, ikke en komplett oppgavekø. Versjoner, tillatelser, stopp og ressursgrenser skal testes før aktivering.
 
 Se [TASK_SYSTEM.md](TASK_SYSTEM.md), [AGENTS.md](AGENTS.md) og [TESTING.md](TESTING.md) for portene som må håndheves. Ingen eksisterende globale konto-/MCP-innstillinger skal endres uten avklaring.

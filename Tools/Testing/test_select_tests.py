@@ -7,7 +7,9 @@ import select_tests as st
 
 class SelectTests(unittest.TestCase):
     def test_docs_only_selects_nothing(self):
-        self.assertEqual(st.select(['README.md', 'Docs/Development/FISH_FIGHT.md', 'Tools/Validation/check_repository.py']), [])
+        self.assertEqual(st.select(['README.md', 'Docs/Development/FISH_FIGHT.md', 'Tools/Validation/check_repository.py',
+                                     'Grafikk/spillan.png', 'Tools/Build/Publish-SpilLan.ps1',
+                                     'Tools/Testing/report.py', 'Tools/Testing/Test-PR.ps1', 'Tools/Testing/known_failures.json']), [])
 
     def test_core_and_controller_select_everything(self):
         for path in ('Source/FiskCore/Public/FiskCareerProfile.h', 'Source/FiskGame/FiskGame.Build.cs',

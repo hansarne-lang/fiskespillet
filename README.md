@@ -6,7 +6,7 @@ FISKELAGET er et planlagt realistisk, sosialt fiskespill for Windows PC. Inntil 
 
 Spillbar Unreal Engine 5.8-utviklingsversjon, **v0.22**. Spill alene eller inntil tolv sammen over LAN, med egne eller delte båter, 15 arter i fem habitater, 20-minutters fiskedager og lagret karriere. Modeller og figurer er stiliserte; ferdig realistisk grafikk påstås ikke. Fysisk LAN og ytelse på flere PC-er må fortsatt prøves.
 
-- **Spille:** start Windows-pakken med `Start-FISKELAGET.bat`. Unreal Editor trengs ikke. Alle på LAN må bruke samme versjon. Taster og spillflyt står i [spillerguiden](Docs/PLAYER_GUIDE.md).
+- **Spille:** installer og start spillet fra launcheren SpilLan ([oppskrift](Docs/Development/SPILLAN.md)), eller start Windows-pakken med `Start-FISKELAGET.bat`. Unreal Editor trengs ikke. Alle på LAN må bruke samme versjon. Taster og spillflyt står i [spillerguiden](Docs/PLAYER_GUIDE.md).
 - **Nytt i hver versjon:** [endringsloggen](CHANGELOG.md).
 - **Utvikle:** Unreal 5.8.4 og verktøyene i [DEVELOPMENT.md](DEVELOPMENT.md). Hver Windows-pakke inneholder faktisk test-SHA, kontrollsummer, resultater og kjente begrensninger.
 

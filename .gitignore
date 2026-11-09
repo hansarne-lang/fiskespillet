@@ -6,6 +6,7 @@ DerivedDataCache/
 # Written by the engine during packaging and editor start (seen on the build machine, #5)
 /Build/
 Config/DefaultInput.ini
+/report/
 .vs/
 *.sln
 *.VC.db

@@ -1,0 +1,12 @@
+{
+  "about": "Kjente testfeil med åpen issue. report.py merker treff som kjent (#issue) og alt annet som NY. Fjern en linje når issuen er løst. match er et regulært uttrykk mot feillinjen; scripts begrenser treffet til de oppgitte skriptene (tom liste = alle).",
+  "known": [
+    {"issue": 135, "scripts": ["SoloPlay"], "match": "solo-home", "note": "Skjermbildet solo-home mangler selv om SOLO_TEST_PASSED logges"},
+    {"issue": 134, "scripts": ["RepeatedFishing"], "match": "delivered=1 lost=1|cargo|CARGO", "note": "Fire fangster overskrider lastgrensen"},
+    {"issue": 136, "scripts": [], "match": "atlas_not_open|shared_plan_not_replicated|travel_vote_never_unanimous", "note": "Panel og delt plan med klokkefaktor 4"},
+    {"issue": 136, "scripts": [], "match": "day2_career_or_rods_reset_wrong|confirmed_goal_or_history_missing", "note": "Dag 2 og ekspedisjonsmål med klokkefaktor 4"},
+    {"issue": 136, "scripts": ["NavigationRelease", "FishingRelease"], "match": "favorite-live|camera_one", "note": "Skjermbilde favorite-live og kamerasteg"},
+    {"issue": 136, "scripts": ["SeaChart"], "match": "return_time", "note": "Slep gir lengre retur enn testen forventer"},
+    {"issue": 136, "scripts": ["RigSetup"], "match": "Timeout FISKELAGET_RIG_TEST_PASSED", "note": "Vertens kamp når ikke landing innen tidsgrensen"}
+  ]
+}

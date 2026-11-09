@@ -2,9 +2,13 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
-## SpilLan – under arbeid
+## SpilLan – 9. november 2026
 
 FISKELAGET kan publiseres til launcheren SpilLan med eget kortbilde, én mappe per versjon og lagring i brukermappa (`-SaveToUserDir`). Spillernavnet fra SpilLan blir standardnavn i naustet. Ingen spillregler er endret. [Oppskrift](Docs/Development/SPILLAN.md), issue #130.
+
+## Testbudsjett – 9. november 2026
+
+`Test-PR.ps1` med tre nivåer (Build, PR, Release), én kort testrapport (`report.py`), kjente feil merket med issue (`known_failures.json`) og cache som hopper over skript som allerede har bestått med samme bygg. Codex er tatt ut av utviklingen. Issue #137.
 
 ## Raskere bygg og test – 8. november 2026
 

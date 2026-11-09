@@ -1,5 +1,7 @@
 # FISKELAGET review via Broen
 
+> **Satt på pause 9. november 2026.** Flyten bruker Codex som koordinator, og Codex er tatt ut av utviklingen (se [DECISIONS.md](../../DECISIONS.md)). Beskrivelsen, `Tools/Coordination/review_handshake.py` og testene beholdes som historikk. Statusen `claude-review` kreves ikke.
+
 Prosjekteieren har valgt Claude Code som reviewer og et sporbart handshake på Broen som review-port. GitHub skal kreve både `repo-contracts` og `claude-review` på gjeldende commit. Dette erstatter behovet for en separat GitHub-identitet til formell Approve. PR og testkrav består, og ingen automatisk merge inngår.
 
 ## Avgrensning og tillit

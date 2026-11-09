@@ -21,6 +21,12 @@ FISKELAGET kan installeres, oppdateres og startes fra launcheren SpilLan (`hansa
 .\Tools\Build\Build-Fisk.ps1 -EngineRoot 'C:\Program Files\Epic Games\UE_5.8' -ArchiveDirectory C:\Fiskespillet\pakke -SpilLanExport C:\Fiskespillet\eksport
 ```
 
+Eller med testnivået Build fra [testbudsjettet](../../TESTING.md#testbudsjett), som også lager en kort rapport:
+
+```powershell
+.\Tools\Testing\Test-PR.ps1 -Level Build -EngineRoot 'C:\Program Files\Epic Games\UE_5.8' -ArchiveDirectory C:\Fiskespillet\pakke -LogDirectory C:\Fiskespillet\logs -SpilLanExport C:\Fiskespillet\eksport
+```
+
 Til slutt kjører byggeskriptet `Tools/Build/Publish-SpilLan.ps1`. Det gjør dette:
 
 1. Kopierer pakken (`pakke\Windows`) til `eksport\v<versjon>`. `Saved`-mapper fra tidligere testkjøringer blir ikke med.

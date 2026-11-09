@@ -44,7 +44,8 @@ Testing skal gi svar med færrest mulig kjøringer og minst mulig tekst. Det gje
 
 1. **Velg nivå etter oppgaven, og kjør bare det:**
    - `Build`: spillbar versjon eller publisering. Ingen tester.
-   - `PR`: vanlig kodeendring.
+   - `Quick`: bygg og automasjonstester. Brukes for hver push til `main`.
+   - `PR`: vanlig kodeendring. Krever endringen alle røyktestene, hoppes de sju trege sanntidsskriptene over. De dekkes av nattens Release-kjøring.
    - `Release`: før en versjon slippes, eller når prosjekteieren ber om det.
 2. **Én kommando:** `Tools/Testing/Test-PR.ps1 -Level <nivå> ...`. Ikke sett sammen egne løp av enkeltskript uten grunn.
 3. **Post rapporten, ikke logger.** `report-<tid>.md` er hele PR-kommentaren. Logger åpnes bare for feil merket NY, og da bare filen og linjen rapporten viser.

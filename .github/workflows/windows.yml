@@ -44,6 +44,7 @@ jobs:
       BASE_REF: ${{ github.base_ref }}
       INPUT_LEVEL: ${{ inputs.level }}
       INPUT_PUBLISH: ${{ inputs.publish }}
+      PYTHONIOENCODING: utf-8   # report.py prints æøå; the Windows console default would garble them
     steps:
       - name: Check out
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
@@ -80,8 +81,10 @@ jobs:
           if ($report) {
               # AppendAllText writes UTF-8 without a byte order mark, which the job summary expects.
               [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, [IO.File]::ReadAllText($report.FullName))
-              New-Item -ItemType Directory -Path report -Force | Out-Null
-              Copy-Item -LiteralPath $report.FullName -Destination report\report.md
+              # Outside the checkout: a leftover folder in the repository counts as an uncommitted change.
+              $keep = Join-Path $env:RUNNER_TEMP 'testrapport'
+              New-Item -ItemType Directory -Path $keep -Force | Out-Null
+              Copy-Item -LiteralPath $report.FullName -Destination (Join-Path $keep 'report.md') -Force
           } else {
               [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "Ingen testrapport ble skrevet. Se loggen for steget over.`n")
               if (-not $code) { $code = 1 }
@@ -93,6 +96,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: testrapport
-          path: report/report.md
+          path: ${{ runner.temp }}/testrapport/report.md
           if-no-files-found: ignore
           retention-days: 30

@@ -34,7 +34,7 @@ TArray<FFiskBetPayout> FFiskBetBook::Settle(const TArray<FFiskBetCatch>& Countin
     for (const FFiskBet& Bet : Bets) { if (Wins(Bet)) { WinningStake += Bet.Stake; } }
     // Rules 5 and 6: no correct tip, or no counting catch, gives everyone their stake back.
     const bool bRefund = WinningStake == 0;
-    const int64 Pot = this->Pot();
+    const int64 Total = Pot();
     int64 Paid = 0;
     int32 RemainderTo = INDEX_NONE;
     for (const FFiskBet& Bet : Bets)
@@ -44,7 +44,7 @@ TArray<FFiskBetPayout> FFiskBetBook::Settle(const TArray<FFiskBetCatch>& Countin
         else if (Wins(Bet))
         {
             // Rule 3 and 7: share by stake, rounded down to whole cents.
-            Payout.Amount = Pot * Bet.Stake / WinningStake;
+            Payout.Amount = Total * Bet.Stake / WinningStake;
             if (RemainderTo == INDEX_NONE || Bet.Stake > Bets[RemainderTo].Stake) { RemainderTo = Out.Num(); }
         }
         Paid += Payout.Amount;
@@ -52,6 +52,6 @@ TArray<FFiskBetPayout> FFiskBetBook::Settle(const TArray<FFiskBetCatch>& Countin
     }
     // Rule 7: the leftover cents go to the largest winning stake; on a tie, the earliest bet (Bets is in
     // registration order and only a strictly larger stake moves RemainderTo).
-    if (!bRefund && RemainderTo != INDEX_NONE) { Out[RemainderTo].Amount += Pot - Paid; }
+    if (!bRefund && RemainderTo != INDEX_NONE) { Out[RemainderTo].Amount += Total - Paid; }
     return Out;
 }

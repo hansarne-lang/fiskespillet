@@ -217,7 +217,8 @@ private:
 
     FFiskRodStick RodStick;
     FGuid StickCast;
-    bool bRodSteering=false,bStickRaised=false,bStickReeling=false;
+    FFiskStickEngage StickEngage;
+    bool bRodSteering=false,bStickRaised=false,bStickReeling=false,bLiftHeld=false,bReelHeld=false;
     double StickSentAt=-10;
     void TickRodStick(float DeltaTime);
     void RequestLift();

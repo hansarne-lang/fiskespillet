@@ -141,8 +141,11 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     }
     if(RodKey)
     {
+        // This handler consumes the buttons before PlayerInput sees them, so track held buttons here.
+        if(Params.Key==EKeys::LeftMouseButton && (Press || Release)) { bLiftHeld=Press; }
+        if(Params.Key==EKeys::RightMouseButton && (Press || Release)) { bReelHeld=Press; }
+        if(Press && (Params.Key==EKeys::LeftMouseButton || Params.Key==EKeys::RightMouseButton)) { bRodSteering=false;StickEngage.Reset(); }
         if(PendingRod>=0) { return true; }
-        if(Press && (Params.Key==EKeys::LeftMouseButton || Params.Key==EKeys::RightMouseButton)) { bRodSteering=false; }
         if(Press && Params.Key==EKeys::F) { RequestCast(); }
         else if(Press && Params.Key==EKeys::X) { RequestWithdraw(); }
         else if(Press && Params.Key==EKeys::LeftMouseButton) { RequestLift(); }
@@ -168,7 +171,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     }
     return Super::InputKey(Params);
 }
-void AFiskBoardingController::ReleaseRodInputsForMenu() { RequestLower(); RequestStopReel(); }
+void AFiskBoardingController::ReleaseRodInputsForMenu() { bLiftHeld=bReelHeld=false; RequestLower(); RequestStopReel(); }
 
 void AFiskBoardingController::TickRodStick(float DeltaTime)
 {
@@ -180,22 +183,28 @@ void AFiskBoardingController::TickRodStick(float DeltaTime)
     const bool Fight=State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand;
     if(!Fight || !GI || !GI->bMouseRod)
     {
-        if(StickCast.IsValid()) { StickCast.Invalidate();RodStick.Reset();bRodSteering=bStickRaised=bStickReeling=false; }
+        if(StickCast.IsValid()) { StickCast.Invalidate();RodStick.Reset();StickEngage.Reset();bRodSteering=bStickRaised=bStickReeling=false; }
         return;
     }
-    if(Current->GetCastId()!=StickCast) { StickCast=Current->GetCastId();RodStick.Reset();bRodSteering=bStickRaised=bStickReeling=false; }
+    if(Current->GetCastId()!=StickCast) { StickCast=Current->GetCastId();RodStick.Reset();StickEngage.Reset();bRodSteering=bStickRaised=bStickReeling=false; }
     const bool Menu=PendingRod>=0 || bHelpVisible || bResultsVisible || bHistoryVisible || bFleetVisible || FrontEnd->IsVisible() || RigPanel->IsVisible()
         || SeaChart->IsVisible() || CrewPanel->IsVisible() || JournalPanel->IsVisible() || ExpeditionPanel->IsVisible() || MarinaPanel->IsVisible()
         || AnglerPanel->IsVisible() || SkipperPanel->IsVisible() || CollectionPanel->IsVisible();
     float DX=0,DY=0;GetInputMouseDelta(DX,DY);
     // A held mouse button means the player fights with buttons; the rod waits for the next movement.
-    if(IsInputKeyDown(EKeys::LeftMouseButton) || IsInputKeyDown(EKeys::RightMouseButton)) { bRodSteering=false;DY=0; }
+    if(bLiftHeld || bReelHeld) { bRodSteering=false;DY=0; }
     if(Menu) { DY=0; }
-    if(DY!=0 && FishingHelp->IsAssisting())
+    // Only a deliberate movement takes over the rod (or stops the AI helper), never a single jump.
+    if(!bRodSteering)
     {
-        if(FMath::Abs(DY)<8.0f) { DY=0; }else { FishingHelp->StopAssist(true); }
+        if(!StickEngage.Feed(DY,DeltaTime)) { DY=0; }
+        else
+        {
+            StickEngage.Reset();bRodSteering=true;
+            if(FishingHelp->IsAssisting()) { FishingHelp->StopAssist(true); }
+        }
     }
-    if(DY!=0) { RodStick.Move(DY/FFiskRodStick::TravelForSensitivity(GI->RodSensitivity));bRodSteering=true; }
+    if(DY!=0 && bRodSteering && !FishingHelp->IsAssisting()) { RodStick.Move(DY/FFiskRodStick::TravelForSensitivity(GI->RodSensitivity)); }
     RodStick.Advance(DeltaTime,Current->IsSurging() || State==EFiskRodState::InitialRun);
     if(Menu || !bRodSteering || FishingHelp->IsAssisting() || State!=EFiskRodState::Fighting) { return; }
     const double Now=GetWorld()->GetRealTimeSeconds();

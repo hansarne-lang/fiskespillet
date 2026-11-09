@@ -24,3 +24,14 @@ void FFiskRodStick::Advance(float Seconds, bool bSurging)
     bRaised = Direction > 0 || (Direction == 0 && Angle >= HoldHigh);
     bReeling = Direction < 0 && !bSurging;
 }
+bool FFiskStickEngage::Feed(float MouseDelta, float Seconds)
+{
+    if (MouseDelta == 0.0f)
+    {
+        Quiet += FMath::Max(0.0f, Seconds);
+        if (Quiet > Gap) { Reset(); }
+        return false;
+    }
+    Quiet = 0.0f; ++MovingFrames; Travel += FMath::Abs(MouseDelta);
+    return MovingFrames >= Frames && Travel >= Distance;
+}

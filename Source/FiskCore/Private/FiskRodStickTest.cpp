@@ -36,4 +36,21 @@ bool FFiskRodStickTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Higher sensitivity needs less travel"), FFiskRodStick::TravelForSensitivity(3) < FFiskRodStick::TravelForSensitivity(2) && FFiskRodStick::TravelForSensitivity(2) < FFiskRodStick::TravelForSensitivity(1));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskStickEngageTest,"Fiskelaget.Fishing.RodStickEngage",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskStickEngageTest::RunTest(const FString& Parameters)
+{
+    FFiskStickEngage E;
+    TestFalse(TEXT("One big jump (window focus) does not take over"), E.Feed(400.0f, 1.0f / 60));
+    for (int32 I = 0; I < 30; ++I) { E.Feed(0.0f, 1.0f / 60); }
+    TestFalse(TEXT("Second jump after a pause does not take over"), E.Feed(-300.0f, 1.0f / 60));
+    E.Reset();
+    bool Engaged = false;
+    for (int32 I = 0; I < 3 && !Engaged; ++I) { Engaged = E.Feed(1.0f, 1.0f / 60); }
+    TestFalse(TEXT("Tiny tremor does not take over"), Engaged);
+    E.Reset();
+    TestFalse(TEXT("First frame of a stroke"), E.Feed(8.0f, 1.0f / 60));
+    TestFalse(TEXT("Second frame of a stroke"), E.Feed(8.0f, 1.0f / 60));
+    TestTrue(TEXT("Deliberate stroke takes over"), E.Feed(8.0f, 1.0f / 60));
+    return true;
+}
 #endif

@@ -29,3 +29,20 @@ private:
     int32 Direction = 0;
     bool bRaised = false, bReeling = false;
 };
+
+// Decides when mouse movement is deliberate enough to take over the rod. A single jump, such as the
+// cursor being recaptured when the window gets focus, never counts: the mouse must move in several
+// frames close together and cover some distance.
+class FISKCORE_API FFiskStickEngage
+{
+public:
+    static constexpr int32 Frames = 3;          // Frames with movement
+    static constexpr float Distance = 15.0f;    // Mouse units in total
+    static constexpr float Gap = 0.3f;          // Seconds without movement that start over
+    void Reset() { MovingFrames = 0; Travel = 0.0f; Quiet = 0.0f; }
+    // Returns true when the movement so far is deliberate.
+    bool Feed(float MouseDelta, float Seconds);
+private:
+    int32 MovingFrames = 0;
+    float Travel = 0.0f, Quiet = 0.0f;
+};

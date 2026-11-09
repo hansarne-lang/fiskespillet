@@ -25,6 +25,10 @@ Verktøyene er lagt til 8. november 2026. Ingen av dem er kjørt på Windows enn
 | `Tools/Testing/Run-All.ps1` | Kjører grafiske `Run-*.ps1` i parallell med egne porter (`7777 + 100 × plass`), og lager `summary.csv` med resultat og varighet. |
 | `Tools/Testing/Test-RunAllLib.ps1` | Regresjonsprøver for hvordan `Run-All.ps1` klassifiserer `err.txt` (bare PowerShell-fremdrift ignoreres). |
 | `Tools/Testing/select_tests.py` | Velger skript ut fra endrede filer. Ukjente stier gir alle skript. Dokumentasjon gir ingen. |
+| `Tools/Testing/Test-PR.ps1` | Ett fast løp per nivå (`-Level Build`, `PR` eller `Release`) som ender i én kort `report-<tid>.md`. Exit 0 betyr ingen nye feil. |
+| `Tools/Testing/report.py` | Lager rapporten fra `summary.csv`, `index.json` og spillbinærens SHA256. Viser bare første `FISKELAGET_*_FAILED`-linjer (høyst tre per skript) med fil og linje, og skjuler personlige stier. |
+| `Tools/Testing/known_failures.json` | Kjente feil med åpen issue. Rapporten merker dem «kjent (#nr)» og resten «NY». Fjern linjen når issuen er løst. |
+| `Tools/Testing/run_cache.py` | Husker skript som har bestått med samme spillbinær, testskript, testoppsett og klokkefaktor. `Run-All.ps1` hopper over dem (vises som `Cached`). `-Force` kjører alt, og `-Release` hopper aldri over noe. |
 | `-FiskClockScale=N` / `FISK_CLOCK_SCALE` | Testklokke 1–20 ganger raskere. Dag, avreise, reisetid, napp og kamp følger den samme klokken. Kompileres bort i Shipping. |
 
 Lagdelt kjøring:
@@ -32,6 +36,21 @@ Lagdelt kjøring:
 1. **Hver endring:** `check_repository.py`, `check_bootstrap.py`, Python-testene og `Test-Automation.ps1`.
 2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 4 som standard).
 3. **Utgivelse:** `Run-All.ps1 -Release`. Normal 20-minuttersdag (faktor 1) og alle skript. Bare dette gjelder som utgivelsesbevis for dagslengde, 17:00-frist og reisetid.
+
+## Testbudsjett
+
+Testing skal gi svar med færrest mulig kjøringer og minst mulig tekst. Det gjelder både mennesker og AI-agenter:
+
+1. **Velg nivå etter oppgaven, og kjør bare det:**
+   - `Build`: spillbar versjon eller publisering. Ingen tester.
+   - `PR`: vanlig kodeendring.
+   - `Release`: før en versjon slippes, eller når prosjekteieren ber om det.
+2. **Én kommando:** `Tools/Testing/Test-PR.ps1 -Level <nivå> ...`. Ikke sett sammen egne løp av enkeltskript uten grunn.
+3. **Post rapporten, ikke logger.** `report-<tid>.md` er hele PR-kommentaren. Logger åpnes bare for feil merket NY, og da bare filen og linjen rapporten viser.
+4. **Kjente feil undersøkes ikke på nytt.** Feil merket «kjent (#nr)» hører til den issuen. En ny kjent feil legges i `known_failures.json` sammen med issuen sin.
+5. **Kjør et skript på nytt høyst én gang** for å skille en ustabil test fra en ekte feil. Samme bygg testes ikke to ganger. Cachen hopper over det som allerede har bestått.
+6. **Manuelle kontroller forsøkes ikke av AI.** Ekte mus, to fysiske PC-er og lytting føres i PR-en som «Venter på menneske».
+7. **Rapporten skal være kort:** commit, SHA256, tabellen fra `report.py`, kjente avvik og hva som venter på menneske. Ingen avskrift av logger.
 
 Skript som kjøres direkte, uten miljøvariabler, oppfører seg som før: port 7777 og faktor 1. `Run-MainMenu` og `Run-SoloPlay` kjøres alene etter de andre, fordi spillkoden selv bruker port 7777 og 17784. `Run-SeaChart` kjøres alltid med faktor 1, fordi røyktesten tar et skjermbilde i et vindu på ett spillsekund.
 
@@ -74,7 +93,7 @@ For napp måles også fordelinger i spilltest; en kort tilfeldig prøve kan ikke
 
 Test fire agentidentiteter, ruteisolasjon mellom prosjekter, idempotent send/retry, krasj før/etter ack, køgjenoppretting, filkonflikt på Windows-stier, utløpt lease, bekreftet stopp, grense for tid/forsøk/samtidighet og nektet handling uten godkjenning. API-feil, rate limit og delvis Project-/Issue-skriving skal ikke starte uavklart arbeid.
 
-TODO-akseptansen i TASK_SYSTEM.md skal demonstreres med ekte Codex og Claude Code på hver sin issue. En simulert agenttest er nyttig før dette, men oppfyller ikke brukerens krav om faktisk samarbeid. Begge leser samme GitHub-liste og motpartens status, oppdaterer sin egen issue og leverer separate PR-er. Test at Done avvises før beståtte tester, review og merge.
+TODO-akseptansen i TASK_SYSTEM.md skal demonstreres med to ekte Claude Code-sesjoner på hver sin issue (Codex er tatt ut 9. november 2026). En simulert agenttest er nyttig før dette, men oppfyller ikke brukerens krav om faktisk samarbeid. Begge leser samme GitHub-liste og motpartens status, oppdaterer sin egen issue og leverer separate PR-er. Test at Done avvises før beståtte tester, review og merge.
 
 ## Beviskrav
 

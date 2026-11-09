@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## Testbudsjett – under arbeid
+
+`Test-PR.ps1` med tre nivåer (Build, PR, Release), én kort testrapport (`report.py`), kjente feil merket med issue (`known_failures.json`) og cache som hopper over skript som allerede har bestått med samme bygg. Codex er tatt ut av utviklingen. Issue #137.
+
 ## Raskere bygg og test – 8. november 2026
 
 Testklokke (`-FiskClockScale`, bare utenfor Shipping), felles port- og klokkeoppsett for testskriptene, parallell kjøring med tidsmåling (`Run-All.ps1`), valg av tester etter endrede filer, inkrementelt byggeskript med tidslogg og hodeløs kjøring av automasjonstestene. Ingen spillregler er endret. Bygget og automasjonstestet på Windows; testresultater i PR #117.

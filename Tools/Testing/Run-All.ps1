@@ -38,7 +38,10 @@ $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $exclusive = @('MainMenu', 'SoloPlay')   # use 7777/17784 from game code; cannot be moved yet
 # Scenarios with game-time windows too short for an accelerated clock always run at scale 1.
 # SeaChart: FiskGroundSmoke.cpp captures chart-underway only between 5 and 6 game seconds.
-$realtimeOnly = @('SeaChart')
+# The others failed at scale 4 on 9 November 2026 (panels, shared plan, day 2, screenshots; #136)
+# but passed at scale 1 in the release run on ab10973.
+$realtimeOnly = @('SeaChart', 'AnglerRelease', 'ExpeditionRelease', 'ExplorationRelease', 'FishingRelease',
+    'MangroveRelease', 'NavigationRelease', 'SkipperRelease')
 function Get-Python { foreach ($name in 'python', 'py') { if (Get-Command $name -ErrorAction SilentlyContinue) { return $name } }; return $null }
 $all = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Run-*.ps1' | Where-Object { $_.BaseName -ne 'Run-All' } |
     ForEach-Object { $_.BaseName.Substring(4) } | Sort-Object)

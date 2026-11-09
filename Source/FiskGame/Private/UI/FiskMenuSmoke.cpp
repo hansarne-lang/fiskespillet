@@ -45,11 +45,13 @@ void UFiskFrontEnd::SmokeAddress(const FString& Address)
         else { SmokeKey(Digits[C-TEXT('0')]); }
     }
 }
-void UFiskFrontEnd::Capture(const FString& Name)
+bool UFiskFrontEnd::Capture(const FString& Name)
 {
-    if (ScreenshotDirectory.IsEmpty() || FScreenshotRequest::IsScreenshotRequested()) { return; }
+    if (ScreenshotDirectory.IsEmpty()) { return true; }
+    if (FScreenshotRequest::IsScreenshotRequested()) { return false; }
     IFileManager::Get().MakeDirectory(*ScreenshotDirectory,true);
     FScreenshotRequest::RequestScreenshot(FPaths::Combine(ScreenshotDirectory,Name+TEXT(".png")),false,false);
+    return true;
 }
 void UFiskFrontEnd::RunMenuSmoke()
 {
@@ -66,7 +68,8 @@ void UFiskFrontEnd::RunMenuSmoke()
             if(Step==0)
             {
                 if(!Day || Day->HasStarted() || Model.Page!=EFiskMenuPage::Home) { Fail(TEXT("solo_menu_started_day"));return; }
-                Capture(TEXT("solo-menu"));Step=1;SmokeSelect(0);
+                if(!Capture(TEXT("solo-menu"))) { return; }
+                Step=1;SmokeSelect(0);
             }
             return;
         }
@@ -96,17 +99,20 @@ void UFiskFrontEnd::RunMenuSmoke()
         else if(Step==2 && Now-GI->SmokeAt>=2.0)
         {
             if(Day->GetElapsedMilliseconds()<GI->SmokeClockAt+1000) { Fail(TEXT("solo_menu_paused_day"));return; }
-            SmokeKey(EKeys::Escape);Capture(TEXT("solo-ready"));Step=3;
+            SmokeKey(EKeys::Escape);Step=21;
         }
+        else if(Step==21) { if(Capture(TEXT("solo-ready"))) { Step=3; } }
         else if(Step==3 && Day->GetElapsedSeconds()>=120) { SmokeKey(EKeys::R);Step=4; }
         else if(Step==4 && Boat->GetTripProgress()==AFiskStarterBoat::AtFishingSpot)
         { SmokeKey(EKeys::F);Step=5; }
         else if(Step==5 && PC->GetRod()->GetState()==EFiskRodState::Fishing)
-        { Capture(TEXT("solo-fishing"));GI->SmokeAt=Now;Step=6; }
+        { if(Capture(TEXT("solo-fishing"))) { GI->SmokeAt=Now;Step=6; } }
         else if(Step==6 && Now-GI->SmokeAt>=2.0) { SmokeKey(EKeys::R);Step=7; }
         else if(Step==7 && Boat->GetTripProgress()==AFiskStarterBoat::AtMarina)
         {
-            Capture(TEXT("solo-home"));Step=8;
+            // Another smoke (stage-N.png) may hold the screenshot request; never pass without our own picture.
+            if(!Capture(TEXT("solo-home"))) { return; }
+            Step=8;
             UE_LOG(LogTemp,Display,TEXT("FISKELAGET_SOLO_TEST_PASSED players=1 crew=1"));
             GetWorld()->GetTimerManager().ClearTimer(SmokeTimer);
         }

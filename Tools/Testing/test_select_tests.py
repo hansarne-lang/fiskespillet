@@ -62,5 +62,16 @@ class SelectTests(unittest.TestCase):
         self.assertEqual(st.select(['Tools\\Testing\\Run-SeaChart.ps1']), ['SeaChart'])
 
 
+    def test_committed_only_ignores_working_changes(self):
+        import subprocess, unittest.mock as mock
+        calls = []
+        def fake(cmd, **kw):
+            calls.append(cmd)
+            out = {'merge-base': 'abc\n'}.get(cmd[1], 'Source/FiskCore/x.h\n' if cmd[-1] == 'HEAD' and len(cmd) == 4 else 'Docs/a.md\n')
+            return subprocess.CompletedProcess(cmd, 0, stdout=out)
+        with mock.patch.object(st.subprocess, 'run', side_effect=fake):
+            self.assertEqual(st.changed_paths('origin/main', committed_only=True), ['Docs/a.md'])
+            self.assertIn('Source/FiskCore/x.h', st.changed_paths('origin/main'))
+
 if __name__ == '__main__':
     unittest.main()

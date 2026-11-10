@@ -122,7 +122,7 @@ void UFiskMarinaPanel::RunSmoke()
         Shot(TEXT("naust-eget"));SmokeAt=Now;SmokeStage=2;
     }
     else if(SmokeStage==2 && Now-SmokeAt>=2)
-    { Key(EKeys::Escape);Key(EKeys::B);Key(EKeys::One);Key(EKeys::Two);PC->ServerMarinaSay(99);SmokeAt=Now;SmokeStage=3; }
+    { Key(EKeys::Escape);Key(EKeys::B);Key(EKeys::One);Key(EKeys::Two);PC->GetMarinaSync()->ServerMarinaSay(99);SmokeAt=Now;SmokeStage=3; }
     else if(SmokeStage==3 && Now-SmokeAt>=2)
     {
         int32 Count=0;for(const FFiskMarinaMessage& M:Hub->GetMessages()) { if(M.Name==Name) { ++Count;if(M.Code!=0) { Fail(TEXT("rate_limiter_or_invalid_code_failed"));return; } } }
@@ -132,9 +132,9 @@ void UFiskMarinaPanel::RunSmoke()
     { Key(EKeys::Escape);Key(EKeys::I);for(int32 I=0;I<FiskCatches::Count-1;++I) { Key(EKeys::Right); }if(Species!=FiskCatches::Count-1 || FiskCatches::Count!=15) { Fail(TEXT("species_book_incomplete"));return; }Shot(TEXT("artsbok-marlin"));SmokeAt=Now;SmokeStage=5; }
     else if(SmokeStage==5 && Now-SmokeAt>=2)
     {
-        Key(EKeys::Escape);FFiskMarinaIdentity Other=Identity;Other.HouseName=TEXT("FORFALSKET");PC->ServerMarinaIdentity(FGuid::NewGuid(),Other);
+        Key(EKeys::Escape);FFiskMarinaIdentity Other=Identity;Other.HouseName=TEXT("FORFALSKET");PC->GetMarinaSync()->ServerMarinaIdentity(FGuid::NewGuid(),Other);
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());if(!Settlement) { return; }FFiskMarinaTrophy Fake;Fake.DayId=Settlement->GetView().DayId;Fake.Grams=2000;Fake.LengthMm=300;
-        PC->ServerMarinaRecords(LoadedProfile,TArray<FFiskMarinaTrophy>{Fake});SmokeAt=Now;SmokeStage=6;
+        PC->GetMarinaSync()->ServerMarinaRecords(LoadedProfile,TArray<FFiskMarinaTrophy>{Fake});SmokeAt=Now;SmokeStage=6;
     }
     else if(SmokeStage==6 && Now-SmokeAt>=2)
     {

@@ -45,7 +45,7 @@ void AFiskBoardingController::RunFleetSmoke()
     if(Smoke.FleetStage==0)
     {
         const auto Identity=GetMarinaPanel()->GetIdentity();const FString Name=FString::Printf(TEXT("FLEET%02d"),Smoke.FleetRole);
-        if(Identity.DisplayName!=Name || PlayerState->GetPlayerName()!=Name) { auto Changed=Identity;Changed.DisplayName=Name;ServerMarinaIdentity(GI->Career.Id,Changed);return; }
+        if(Identity.DisplayName!=Name || PlayerState->GetPlayerName()!=Name) { auto Changed=Identity;Changed.DisplayName=Name;MarinaSync->ServerMarinaIdentity(GI->Career.Id,Changed);return; }
         if(Smoke.bFleetResume && Smoke.FleetRole==1) { Smoke.FleetBaseCash=GI->Career.Cash;ServerFleetSelect(-1,true);Key(EKeys::E);Smoke.FleetAt=Real;Smoke.FleetStage=60; }
         else { Key(EKeys::Tab);Key(EKeys::C);Key(EKeys::Tab);Smoke.FleetAt=Real;Smoke.FleetStage=1; }
     }

@@ -41,7 +41,7 @@ void UFiskMarinaPanel::RunHarbourSmoke()
         else if(HarbourStage==4 && Real-HarbourAt>=1)
         { Key(EKeys::Home);Key(EKeys::V);if(IsGallery() || GalleryYaw!=0 || GalleryZoom!=1) { Fail(TEXT("gallery_reset_or_close"));return; }Key(EKeys::I);Key(EKeys::B);HarbourAt=Real;HarbourStage=5; }
         else if(HarbourStage==5 && Real-HarbourAt>=2)
-        { if(Own->Place!=2 || Life->GetVisiblePeople()<1 || !Sound || !Sound->HasConsumedAudio()) { if(Real-HarbourAt>15) { Fail(TEXT("bar_presence_or_audio_not_consumed")); }return; }Key(EKeys::One);Shot(TEXT("bar-with-fisher"));PC->ServerHarbourPlace(FGuid::NewGuid(),2);PC->ServerHarbourPlace(LoadedProfile,3);Key(EKeys::M);HarbourAt=Real;HarbourStage=6; }
+        { if(Own->Place!=2 || Life->GetVisiblePeople()<1 || !Sound || !Sound->HasConsumedAudio()) { if(Real-HarbourAt>15) { Fail(TEXT("bar_presence_or_audio_not_consumed")); }return; }Key(EKeys::One);Shot(TEXT("bar-with-fisher"));PC->GetMarinaSync()->ServerHarbourPlace(FGuid::NewGuid(),2);PC->GetMarinaSync()->ServerHarbourPlace(LoadedProfile,3);Key(EKeys::M);HarbourAt=Real;HarbourStage=6; }
         else if(HarbourStage==6 && Real-HarbourAt>=2) { if(IsHarbourMusic()) { Fail(TEXT("music_not_disabled"));return; }Key(EKeys::M);Key(EKeys::V);Shot(TEXT("harbour-panorama"));HarbourAt=Real;HarbourStage=7; }
         else if(HarbourStage==7 && Real-HarbourAt>=1) { Key(EKeys::V);Shot(TEXT("follow-boat-at-dock"));HarbourAt=Real;HarbourStage=8; }
         else if(HarbourStage==8 && Real-HarbourAt>=1)
@@ -55,7 +55,7 @@ void UFiskMarinaPanel::RunHarbourSmoke()
     if(PC->Smoke.FleetRole>=0 && PC->Smoke.FleetStage<3) { return; }
     if(Crew)
     {
-        if(HarbourStage==0 && Elapsed>=250) { PC->ServerHarbourPlace(LoadedProfile,2);HarbourAt=Real;HarbourStage=1; }
+        if(HarbourStage==0 && Elapsed>=250) { PC->GetMarinaSync()->ServerHarbourPlace(LoadedProfile,2);HarbourAt=Real;HarbourStage=1; }
         else if(HarbourStage==1 && Real-HarbourAt>=2) { if(Own->Place!=3) { Fail(TEXT("sea_profile_moved_to_bar"));return; }UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HARBOUR_SEA_PRESENCE_REJECTED"));Done(); }return;
     }
     if(HarbourStage==0 && Elapsed>=250) { HarbourInitialCash=GI->Career.Cash;Key(EKeys::B);HarbourAt=Real;HarbourStage=1; }

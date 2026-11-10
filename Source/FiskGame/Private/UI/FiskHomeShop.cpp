@@ -19,7 +19,7 @@ void UFiskMarinaPanel::ChooseHomeItem()
     FFiskMarinaIdentity Choice=Identity;
     if(ShopCategory==0) { Choice.Lighting=ShopLevel; }if(ShopCategory==1) { Choice.Pier=ShopLevel; }if(ShopCategory==2) { Choice.Display=ShopLevel; }
     if(!Choice.IsOwnedBy(GI->Career)) { Status=TEXT("Dette nivået må kjøpes først.");return; }
-    Draft=Choice;bSending=true;Status=TEXT("Venter på bekreftet naustvalg ...");PC->ServerMarinaIdentity(LoadedProfile,Choice);
+    Draft=Choice;bSending=true;Status=TEXT("Venter på bekreftet naustvalg ...");PC->GetMarinaSync()->ServerMarinaIdentity(LoadedProfile,Choice);
 }
 void UFiskMarinaPanel::DrawHomeShop(AHUD& HUD,UCanvas& C)
 {

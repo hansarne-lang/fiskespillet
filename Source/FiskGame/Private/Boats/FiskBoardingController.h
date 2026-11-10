@@ -10,6 +10,7 @@
 #include "UI/FiskJournalModel.h"
 #include "Expedition/FiskExpeditionModel.h"
 #include "Angler/FiskAnglerModel.h"
+#include "Boats/Controller/FiskMarinaSync.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -71,12 +72,8 @@ public:
     UFUNCTION(Server,Reliable) void ServerVoyageReplace(int32 Day,int32 Revision,const TArray<FVector>& Points);
     UFUNCTION(Server,Reliable) void ServerVoyageNext(int32 Day,int32 Revision,int32 BoatRevision);
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
+    UFiskMarinaSync* GetMarinaSync() const { return MarinaSync; }   // Boathouse, bar and harbour calls (#113 step 3)
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
-    UFUNCTION(Server,Reliable) void ServerMarinaIdentity(FGuid Profile,FFiskMarinaIdentity Identity);
-    UFUNCTION(Client,Reliable) void ClientMarinaIdentity(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason);
-    UFUNCTION(Server,Reliable) void ServerMarinaRecords(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records);
-    UFUNCTION(Server,Reliable) void ServerMarinaSay(int32 Code);
-    UFUNCTION(Server,Reliable) void ServerHarbourPlace(FGuid Profile,int32 Place);
     UFUNCTION(Client,Reliable) void ClientJournalBatch(FGuid Profile,int32 Serial,const TArray<FFiskJournalEntry>& Entries);
     UFUNCTION(Server,Reliable) void ServerJournalAck(FGuid Profile,int32 Serial);
     void TickJournalRecovery();
@@ -182,7 +179,7 @@ private:
     UPROPERTY() TObjectPtr<UFiskExpeditionPanel> ExpeditionPanel;
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskPierWalk> PierWalk;
-    double LastMarinaMessage=-10;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskMarinaSync> MarinaSync;
     FFiskJournalModel RecoverySnapshot;
     TArray<FFiskExpeditionRecord> ExpeditionSnapshot;
     int32 ExpeditionOffset=0,ExpeditionSerial=0,ExpeditionSentCount=0,ClientExpeditionSerial=0;

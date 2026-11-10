@@ -33,7 +33,8 @@ private:
     void SmokeKey(FKey Key);
     void SmokeSelect(int32 Row);
     void SmokeAddress(const FString& Address);
-    void Capture(const FString& Name);
+    // False when another screenshot is still pending; the caller then tries again on the next tick (#135).
+    bool Capture(const FString& Name);
     FString SmokeCase, ScreenshotDirectory;
     FTimerHandle SmokeTimer;
     double SmokeOpenedAt = 0.0;

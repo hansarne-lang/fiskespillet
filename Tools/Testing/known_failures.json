@@ -1,21 +1,4 @@
 {
   "about": "Kjente testfeil med åpen issue. report.py merker treff som kjent (#issue) og alt annet som NY. Fjern en linje når issuen er løst. match er et regulært uttrykk mot feillinjen; scripts begrenser treffet til de oppgitte skriptene (tom liste = alle).",
-  "known": [
-    {
-      "issue": 135,
-      "scripts": [
-        "SoloPlay"
-      ],
-      "match": "solo-home",
-      "note": "Skjermbildet solo-home mangler selv om SOLO_TEST_PASSED logges"
-    },
-    {
-      "issue": 134,
-      "scripts": [
-        "RepeatedFishing"
-      ],
-      "match": "delivered=1 lost=1|cargo|CARGO",
-      "note": "Fire fangster overskrider lastgrensen"
-    }
-  ]
+  "known": []
 }

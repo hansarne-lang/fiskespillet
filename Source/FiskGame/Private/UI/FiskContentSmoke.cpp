@@ -89,14 +89,15 @@ void AFiskBoardingController::RunContentSmoke()
         RequestRig(0,Depth,0);Smoke.ContentStage=2;
     }
     else if(Smoke.ContentStage==2 && Matches(0,Depth,0))
-    { Key(EKeys::F1);Capture(TEXT("help"));Smoke.ContentAt=Now;Smoke.ContentStage=3; }
+    { if(FScreenshotRequest::IsScreenshotRequested()) { return; }Key(EKeys::F1);Capture(TEXT("help"));Smoke.ContentAt=Now;Smoke.ContentStage=3; }
     else if(Smoke.ContentStage==3 && Now-Smoke.ContentAt>=1)
-    { Key(EKeys::F1);Key(EKeys::F2);Capture(TEXT("results-locked"));Smoke.ContentAt=Now;Smoke.ContentStage=4; }
+    { if(FScreenshotRequest::IsScreenshotRequested()) { return; }Key(EKeys::F1);Key(EKeys::F2);Capture(TEXT("results-locked"));Smoke.ContentAt=Now;Smoke.ContentStage=4; }
     else if(Smoke.ContentStage==4 && Now-Smoke.ContentAt>=1)
     { Key(EKeys::F2);Key(EKeys::R);Smoke.ContentStage=5; }
     else if(Smoke.ContentStage==5 && !GetActionFeedback().IsEmpty())
     {
-        Capture(TEXT("departure-feedback"));Smoke.ContentStage=6;
+        if(!Capture(TEXT("departure-feedback"))) { return; }
+        Smoke.ContentStage=6;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CONTENT_READY player=%d"),Self);
     }
     else if(Smoke.ContentStage==6)
@@ -106,7 +107,7 @@ void AFiskBoardingController::RunContentSmoke()
     }
     else if(Smoke.ContentStage==7 && Progress==100) { Key(EKeys::F);Smoke.ContentStage=8; }
     else if(Smoke.ContentStage==8 && CurrentRod.GetState()==EFiskRodState::Fighting)
-    { Capture(TEXT("fish-fight"));Smoke.ContentFightAt=Now;Smoke.ContentStage=9; }
+    { if(!Capture(TEXT("fish-fight"))) { return; }Smoke.ContentFightAt=Now;Smoke.ContentStage=9; }
     else if(Smoke.ContentStage==9)
     {
         if(CurrentRod.GetState()==EFiskRodState::Lost) { Fail(TEXT("fight_lost"));return; }
@@ -117,7 +118,7 @@ void AFiskBoardingController::RunContentSmoke()
         Input(EKeys::RightMouseButton,!CurrentRod.IsSurging() && !Lift?IE_Pressed:IE_Released);
     }
     else if(Smoke.ContentStage==10 && CurrentRod.GetState()==EFiskRodState::Landed)
-    { Capture(TEXT("fish-landed"));Smoke.ContentAt=Now;Smoke.ContentStage=11; }
+    { if(!Capture(TEXT("fish-landed"))) { return; }Smoke.ContentAt=Now;Smoke.ContentStage=11; }
     else if(Smoke.ContentStage==11 && Now-Smoke.ContentAt>=4)
     {
         if(Host && Progress==100)
@@ -154,12 +155,14 @@ void AFiskBoardingController::RunContentSmoke()
             Ids.Add(Catch.CatchId);
         }
         if(Ids.Num()!=2) { Fail(TEXT("duplicate_catch_id"));return; }
-        Capture(TEXT("results-revealed"));Smoke.ContentStage=16;
+        if(!Capture(TEXT("results-revealed"))) { return; }
+        Smoke.ContentStage=16;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CONTENT_REVEAL_PASSED player=%d"),Self);
     }
     else if(Smoke.ContentStage==16 && Day->GetElapsedMilliseconds()==1200000)
     {
-        Capture(TEXT("day-finished"));Smoke.ContentStage=17;
+        if(!Capture(TEXT("day-finished"))) { return; }
+        Smoke.ContentStage=17;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CONTENT_DAY_PASSED player=%d ms=1200000"),Self);
         GetWorldTimerManager().ClearTimer(Smoke.ContentTimer);
     }

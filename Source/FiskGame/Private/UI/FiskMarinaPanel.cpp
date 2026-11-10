@@ -55,7 +55,7 @@ void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponent
     }
     if(WantsCamera() && !IsAtDock()) { Show(0); }
     if(GetWorld()->GetRealTimeSeconds()<NextUpdate) { return; }NextUpdate=GetWorld()->GetRealTimeSeconds()+2;
-    if(Page==2 && PC->IsCareerReady()) { PC->ServerBetBoard(); }
+    if(Page==2 && PC->IsCareerReady()) { PC->GetCareerSync()->ServerBetBoard(); }
     if(bPendingSave && FFiskMarinaStore::Save(File(),LoadedProfile,Pending)) { bPendingSave=false;Status=TEXT("Naust og navn er lagret lokalt."); }
     if(!bSent && !bBlocked && PC->IsCareerReady()) { bSent=true;PC->GetMarinaSync()->ServerMarinaIdentity(LoadedProfile,Identity); }
     if(bSent && PC->IsCareerReady() && SentJournalRevision!=GI->GetJournalRevision())
@@ -81,7 +81,7 @@ void UFiskMarinaPanel::Show(int32 NewPage)
     if(Page) { PC->SetInputMode(FInputModeGameAndUI()); }else { PC->SetInputMode(FInputModeGameOnly()); }
     if(Page==1 || Page==5) { if(const AFiskMarinaHub* H=FindHub()) { const int32 Own=H->GetResidents().IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});HouseIndex=FMath::Max(0,Own); } }
     if(PC->PlayerCameraManager) { PC->PlayerCameraManager->SetGameCameraCutThisFrame(); }
-    if(Page==2 && PC->IsCareerReady()) { PC->ServerBetBoard(); }
+    if(Page==2 && PC->IsCareerReady()) { PC->GetCareerSync()->ServerBetBoard(); }
 }
 TArray<TPair<FGuid,FString>> UFiskMarinaPanel::BetCandidates() const
 {
@@ -104,12 +104,12 @@ void UFiskMarinaPanel::ChooseBet(int32 Action)
     {
         if(Fishers.IsEmpty()) { PC->ClientActionFeedback(TEXT("Ingen fiskere er ute på sjøen nå."));return; }
         // A new ID per press: the server accepts only one bet per player and day, so a double press is refused, not charged.
-        PC->ServerPlaceBet(FGuid::NewGuid(),Fishers[BetFisher%Fishers.Num()].Key,FFiskCareerProfile::BetStake(BetStake));
+        PC->GetCareerSync()->ServerPlaceBet(FGuid::NewGuid(),Fishers[BetFisher%Fishers.Num()].Key,FFiskCareerProfile::BetStake(BetStake));
     }
 }
 void UFiskMarinaPanel::DrawBets(AHUD& HUD,float S) const
 {
-    const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());const FFiskBetBoardView& B=PC->GetBetBoard();
+    const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());const FFiskBetBoardView& B=PC->GetCareerSync()->GetBetBoard();
     auto T=[&](const FString& Text,float Y,float Size,const FLinearColor& Color){HUD.DrawText(Text,Color,46*S,Y*S,nullptr,Size*S);};
     const TArray<TPair<FGuid,FString>> Fishers=BetCandidates();FString Name=TEXT("en fisker");
     if(const AFiskMarinaHub* Hub=FindHub()) { for(const FFiskMarinaResident& R:Hub->GetResidents()) { if(R.Profile==B.Fisher) { Name=R.Identity.DisplayName; } } }

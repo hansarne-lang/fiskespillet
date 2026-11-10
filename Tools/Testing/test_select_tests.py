@@ -14,7 +14,7 @@ class SelectTests(unittest.TestCase):
     def test_core_and_controller_select_everything(self):
         for path in ('Source/FiskCore/Public/FiskCareerProfile.h', 'Source/FiskGame/FiskGame.Build.cs',
                      'Source/FiskGame/Private/DayCycle/FiskDayState.cpp', 'Config/DefaultGame.ini',
-                     'Source/FiskGame/Private/Boats/FiskBoardingController.Career.cpp',
+                     'Source/FiskGame/Private/Boats/FiskBoardingController.Fleet.cpp',
                      'Tools/Testing/FiskTestCommon.ps1'):
             self.assertEqual(st.select([path]), st.ALL, path)
 

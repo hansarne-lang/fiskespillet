@@ -31,7 +31,7 @@ void UFiskMarinaPanel::RunHomeSmoke()
         { if(GI->Career.Cash!=2030000 || GI->Career.Owned!=8176 || Identity.Lighting!=3 || Identity.Pier!=3 || Identity.Display!=3) { Fail(TEXT("paid_profile_missing_before_fishing"));return; }HomeStage=20; }
         else if(HomeStage==20)
         {
-            for(int32 I=0;I<3;++I) { if(!GI->Career.Has(I)) { PC->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,I);return; } }
+            for(int32 I=0;I<3;++I) { if(!GI->Career.Has(I)) { PC->GetCareerSync()->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,I);return; } }
             if(GI->Career.Cash!=1755000 || GI->Career.Owned!=8183) { Fail(TEXT("gear_after_cosmetics_wrong"));return; }
             if(!B->IsAboard(PC->PlayerState->GetPlayerId())) { Key(EKeys::E);return; }HomeStage=21;
         }
@@ -97,7 +97,7 @@ void UFiskMarinaPanel::RunHomeSmoke()
     {
         const FString Block=FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("Authority"),LoadedProfile.ToString(EGuidFormats::Digits)+TEXT(".ini.tmp"));
         if(!IFileManager::Get().MakeDirectory(*Block)) { Fail(TEXT("could_not_block_test_write"));return; }
-        PC->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,4);IFileManager::Get().DeleteDirectory(*Block);
+        PC->GetCareerSync()->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,4);IFileManager::Get().DeleteDirectory(*Block);
         if(GI->Career.Cash!=3000000 || GI->Career.Has(4) || PC->GetServerCareer().Has(4)) { Fail(TEXT("failed_server_save_debited"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HOME_WRITE_FAILURE_NO_DEBIT"));HomeStage=2;
     }
@@ -110,7 +110,7 @@ void UFiskMarinaPanel::RunHomeSmoke()
         if(HomeItem==4)
         {
             const int64 Cash=GI->Career.Cash;const int32 Revision=GI->Career.Revision;
-            PC->ServerBuyCareer(ShopBuyCommand,1,4);PC->ServerBuyCareer(ShopBuyCommand,Revision,5);
+            PC->GetCareerSync()->ServerBuyCareer(ShopBuyCommand,1,4);PC->GetCareerSync()->ServerBuyCareer(ShopBuyCommand,Revision,5);
             if(GI->Career.Cash!=Cash || GI->Career.Revision!=Revision) { Fail(TEXT("retry_or_conflict_changed_money"));return; }
             UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HOME_REPLAY_NO_DUPLICATE_DEBIT"));
         }
@@ -122,7 +122,7 @@ void UFiskMarinaPanel::RunHomeSmoke()
     else if(HomeStage==3 && Now-HomeAt>1)
     {
         if(GI->Career.Cash!=2030000 || GI->Career.Owned!=8176 || GI->Career.Revision!=10 || bPendingSave) { Fail(TEXT("nine_paid_items_not_saved"));return; }
-        PC->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,3);
+        PC->GetCareerSync()->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,3);
         if(GI->Career.Cash!=2030000 || GI->Career.Has(3)) { Fail(TEXT("insufficient_money_purchase_accepted"));return; }
         // Switching back to the free level retains ownership and costs nothing.
         Key(EKeys::Home);Key(EKeys::Enter);HomeAt=Now;HomeStage=4;

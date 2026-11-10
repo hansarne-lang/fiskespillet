@@ -10,6 +10,7 @@
 #include "Angler/FiskAnglerModel.h"
 #include "Boats/Controller/FiskMarinaSync.h"
 #include "Boats/Controller/FiskRecoverySync.h"
+#include "Boats/Controller/FiskCareerSync.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -32,9 +33,6 @@ class UFiskAnglerPanel;
 class UFiskCollectionPanel;
 class UFiskPierWalk;
 class UFiskFishingHelp;
-
-// What the beach bar shows of the server's bet book (#22 step 2): own bet, pot and own result.
-struct FFiskBetBoardView { FGuid Fisher;int64 Stake=0,Pot=0,Payout=-1;int32 Count=0;bool bOpen=false,bKnown=false;FString Message; };
 
 UENUM()
 enum class EFiskRodAction : uint8
@@ -73,31 +71,22 @@ public:
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
     UFiskMarinaSync* GetMarinaSync() const { return MarinaSync; }   // Boathouse, bar and harbour calls (#113 step 3)
     UFiskRecoverySync* GetRecoverySync() const { return RecoverySync; }   // Journal and medal recovery (#113 step 4)
-    FString CareerAuthorityFile() const;   // Host copy of this player's career; its folder holds the journal archive
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
     UFUNCTION(Server,Reliable) void ServerExpeditionChoose(int32 Revision,int32 Goal);
     UFUNCTION(Server,Reliable) void ServerExpeditionReady(int32 Revision,bool Ready);
     UFUNCTION(Server,Reliable) void ServerExpeditionSay(int32 Code);
-    bool IsCareerReady() const { return bCareerReady; }
-    bool IsCareerSynced() const { return bCareerReady && CareerAck>=ServerCareer.Revision; }
-    const FFiskCareerProfile& GetServerCareer() const { return ServerCareer; }
-    bool HasEquipment(int32 Item) const { return bCareerReady && ServerCareer.Has(Item); }
+    // The career itself lives in UFiskCareerSync (#113 step 5); these forward to it.
+    UFiskCareerSync* GetCareerSync() const { return CareerSync; }
+    bool IsCareerReady() const { return CareerSync->IsReady(); }
+    bool IsCareerSynced() const { return CareerSync->IsSynced(); }
+    const FFiskCareerProfile& GetServerCareer() const { return CareerSync->GetServerCareer(); }
+    bool HasEquipment(int32 Item) const { return IsCareerReady() && GetServerCareer().Has(Item); }
     bool HandleCareerKey(const FInputKeyEventArgs& Args);
     void DrawCareer(class AHUD& HUD,class UCanvas& Canvas);
     bool IsCareerVisible() const { return bCareerVisible; }
     void TickCareer();
-    UFUNCTION(Server,Reliable) void ServerCareerHello(FFiskCareerProfile Profile);
-    UFUNCTION(Client,Reliable) void ClientCareerSnapshot(FFiskCareerProfile Profile,const FString& Message);
-    UFUNCTION(Server,Reliable) void ServerCareerAck(FGuid Profile,int32 Revision);
-    UFUNCTION(Server,Reliable) void ServerBuyCareer(FGuid Command,int32 Revision,int32 Item);
-    UFUNCTION(Server,Reliable) void ServerChooseBoat(int32 Revision,int32 Kind);
     UFUNCTION(Server,Reliable) void ServerSelectSeaPoint(int32 Revision,FVector_NetQuantize Point);
     UFUNCTION(Server,Reliable) void ServerTravelVote(int32 Leg,bool Vote);
-    // Beach bar bets (#22 step 2). The server owns the book; the client only sees its own bet and the pot.
-    UFUNCTION(Server,Reliable) void ServerPlaceBet(FGuid Bet,FGuid Fisher,int64 Stake);
-    UFUNCTION(Server,Reliable) void ServerBetBoard();
-    UFUNCTION(Client,Reliable) void ClientBetBoard(FGuid Fisher,int64 Stake,int64 Pot,int32 Count,int64 Payout,bool bOpen,const FString& Message);
-    const FFiskBetBoardView& GetBetBoard() const { return BetBoard; }
     virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
@@ -177,17 +166,11 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskPierWalk> PierWalk;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskMarinaSync> MarinaSync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskRecoverySync> RecoverySync;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskCareerSync> CareerSync;
     double LastExpeditionMessage=-10;
-    FFiskCareerProfile ServerCareer,PendingCareer;
-    int32 CareerAck=0,ShopRow=0;
-    bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;
-    double CareerRetryAt=0;
+    int32 ShopRow=0;
+    bool bCareerVisible=false;
     FTimerHandle CareerTimer;
-    bool SaveServerCareer(const FFiskCareerProfile& Candidate,const FString& Message);
-    FFiskBetBoardView BetBoard;
-    void SendBetBoard(const FString& Message);
-    void ClaimBetPayouts();
-    void RefundOrphanBets(FFiskCareerProfile& Profile) const;
     FFiskRodSelection Selection;
     int32 PendingRod=-1,CameraView=0;
     void ReconcileRodCapacity();

@@ -33,8 +33,8 @@ void AFiskBoardingController::RunCargoSmoke()
     if(HasAuthority() && D->GetDayNumber()==1 && Now<1020 && (GI->GetJournal().GetEntries().Num()!=0 || B->GetCargoView().RevealedGrams!=-1)) { Fail(TEXT("early_catch_or_weight_revealed"));return; }
     if(Smoke.CargoStage==0)
     {
-        if(!Observer) { for(int32 I=0;I<(Full?4:3);++I) { if(!GI->Career.Has(I)) { ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,I);return; } } }
-        if(Full && B->GetKind()!=1) { ServerChooseBoat(B->GetRouteRevision(),1);return; }
+        if(!Observer) { for(int32 I=0;I<(Full?4:3);++I) { if(!GI->Career.Has(I)) { CareerSync->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,I);return; } } }
+        if(Full && B->GetKind()!=1) { CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);return; }
         if(!B->IsAboard(PlayerState->GetPlayerId())) { Key(EKeys::E);return; }
         if(Smoke.CargoMode==TEXT("tow") && B->GetCrewCount()!=2) { return; }
         if(B->GetGroundId()!=2) { if(B->GetCaptainId()==PlayerState->GetPlayerId()) { ServerSelectSeaPoint(B->GetRouteRevision(),Full?FVector(80000,-30000,0):FiskGrounds::Find(2)->Position); }return; }

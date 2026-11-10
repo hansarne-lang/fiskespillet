@@ -69,6 +69,7 @@ RULES: tuple[tuple[str, list[str]], ...] = (
     ('Source/FiskGame/Private/Boats/FiskMarinaZone*', ['SeaChart', 'NavigationRelease', 'FullDay']),
     ('Source/FiskGame/Private/Boats/Controller/FiskMarinaSync*', ['MarinaRelease', 'HarbourGuide']),
     ('Source/FiskGame/Private/Boats/Controller/FiskRecoverySync*', CAREER),
+    ('Source/FiskGame/Private/Boats/Controller/FiskCareerSync*', CAREER + ['FullDay', 'SessionRelease']),
     ('Source/FiskGame/Private/Fishing/*', FISHING),
     ('Source/FiskGame/Private/Angler/*', ['AnglerRelease', 'MangroveRelease']),
     ('Source/FiskGame/Private/Boats/*', NAVIGATION + ['FullDay', 'HarbourGuide']),

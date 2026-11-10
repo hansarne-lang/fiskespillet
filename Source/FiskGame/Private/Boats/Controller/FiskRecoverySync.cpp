@@ -17,7 +17,7 @@ void UFiskRecoverySync::TickJournalRecovery()
 {
     AFiskBoardingController& PC=Controller();
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();if(!Mode || !PC.IsCareerReady()) { return; }
-    const FFiskCareerProfile& ServerCareer=PC.GetServerCareer();const FString Folder=FPaths::GetPath(PC.CareerAuthorityFile());
+    const FFiskCareerProfile& ServerCareer=PC.GetServerCareer();const FString Folder=FPaths::GetPath(PC.GetCareerSync()->AuthorityFile());
     if(RecoveryRevision!=Mode->GetArchiveRevision())
     {
         FFiskJournalModel Snapshot;

@@ -41,7 +41,7 @@ void AFiskBoardingController::ServerFleetSelect_Implementation(int32 Index,bool 
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const auto* D=GetWorld()->GetGameState<AFiskDayState>();
     const int32 PlayerId=PlayerState?PlayerState->GetPlayerId():-1;auto* Old=M?M->GetBoatForPlayer(PlayerId):nullptr;
     auto Reject=[&](){ClientActionFeedback(TEXT("Båtbytte avvist. Velg en ledig båt ved brygga før avreise; etter turen venter du til neste dag."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_SELECT_REJECTED player=%d index=%d"),PlayerId,Index);};
-    if(!M || !D || !D->HasStarted() || !IsCareerSynced() || !M->CanJoinFleet(ServerCareer.Id) || PlayerId<0 || D->GetElapsedMilliseconds()>=1020000
+    if(!M || !D || !D->HasStarted() || !IsCareerSynced() || !M->CanJoinFleet(GetServerCareer().Id) || PlayerId<0 || D->GetElapsedMilliseconds()>=1020000
         || (Old && Old->IsAboard(PlayerId) && Old->GetTripProgress()!=AFiskStarterBoat::AtDock)) { Reject();return; }
     for(int32 Slot=0;Slot<3;++Slot) { if(!GetRodAt(Slot)->CanConfigure()) { Reject();return; } }
     AFiskStarterBoat* Target=CreateOwn?M->CreateOwnedBoat(this):M->GetFleet().IsValidIndex(Index)?M->GetFleet()[Index].Get():nullptr;
@@ -106,18 +106,32 @@ void AFiskBoardingController::DrawFleet(AHUD& H,UCanvas& C)
 void AFiskBoardingController::ServerExpeditionChoose_Implementation(int32 Revision,int32 Goal)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!bCareerReady || !PlayerState || !M || !FindExpedition() || !FindExpedition()->Choose(PlayerState->GetPlayerId(),Revision,Goal))
+    if(!IsCareerReady() || !PlayerState || !M || !FindExpedition() || !FindExpedition()->Choose(PlayerState->GetPlayerId(),Revision,Goal))
     { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPEDITION_CHOOSE_REJECTED"));ClientActionFeedback(TEXT("Bare kapteinen kan velge dagens mål ved brygga. Åpne J på nytt.")); }
 }
 void AFiskBoardingController::ServerExpeditionReady_Implementation(int32 Revision,bool Ready)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!bCareerReady || !PlayerState || !M || !FindExpedition() || !FindExpedition()->SetReady(PlayerState->GetPlayerId(),Revision,Ready))
+    if(!IsCareerReady() || !PlayerState || !M || !FindExpedition() || !FindExpedition()->SetReady(PlayerState->GetPlayerId(),Revision,Ready))
     { ClientActionFeedback(TEXT("Gå om bord ved brygga for å markere deg klar.")); }
 }
 void AFiskBoardingController::ServerExpeditionSay_Implementation(int32 Code)
 {
     auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const double Now=GetWorld()->GetRealTimeSeconds();
-    if(!bCareerReady || !PlayerState || !M || !FindExpedition() || Now-LastExpeditionMessage<2) { return; }
+    if(!IsCareerReady() || !PlayerState || !M || !FindExpedition() || Now-LastExpeditionMessage<2) { return; }
     if(FindExpedition()->Say(PlayerState->GetPlayerId(),Code)) { LastExpeditionMessage=Now; }
+}
+// Sea point and travel vote stay on the controller until #113 step 8 (UFiskBoatCommands).
+void AFiskBoardingController::ServerSelectSeaPoint_Implementation(int32 Revision,FVector_NetQuantize Point)
+{
+    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();FString Message;
+    if(Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState) { Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->SelectPoint(PlayerState->GetPlayerId(),Revision,Point,Message); }
+    ClientGroundReply(Message);
+}
+void AFiskBoardingController::ServerTravelVote_Implementation(int32 Leg,bool Vote)
+{
+    auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    const bool Accepted=IsCareerReady() && PlayerState && Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->VoteTravel(PlayerState->GetPlayerId(),Leg,Vote);
+    if(!Accepted) { ClientActionFeedback(TEXT("Reisevisning kan velges av dem om bord mens båten er underveis.")); }
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TRAVEL_VOTE_REPLY accepted=%d"),Accepted);
 }

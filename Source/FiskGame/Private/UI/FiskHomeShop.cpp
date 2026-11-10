@@ -14,7 +14,7 @@ void UFiskMarinaPanel::ChooseHomeItem()
     {
         if(GI->Career.Cash<FFiskCareerProfile::Price(Item)) { Status=TEXT("Du har ikke nok disponible fiskepenger. Dagens inntekt kommer først 17:00.");return; }
         if(ShopBuyItem!=Item || !ShopBuyCommand.IsValid()) { ShopBuyItem=Item;ShopBuyCommand=FGuid::NewGuid(); }
-        PC->ServerBuyCareer(ShopBuyCommand,GI->Career.Revision,Item);Status=TEXT("Kjøp sendt. Velg varen igjen etter bekreftelse for å sette den på naustet.");return;
+        PC->GetCareerSync()->ServerBuyCareer(ShopBuyCommand,GI->Career.Revision,Item);Status=TEXT("Kjøp sendt. Velg varen igjen etter bekreftelse for å sette den på naustet.");return;
     }
     FFiskMarinaIdentity Choice=Identity;
     if(ShopCategory==0) { Choice.Lighting=ShopLevel; }if(ShopCategory==1) { Choice.Pier=ShopLevel; }if(ShopCategory==2) { Choice.Display=ShopLevel; }

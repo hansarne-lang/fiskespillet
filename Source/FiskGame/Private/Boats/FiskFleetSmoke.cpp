@@ -39,8 +39,8 @@ void AFiskBoardingController::RunFleetSmoke()
     // The offshore skipper expands before three other crew join.
     if(Smoke.FleetRole==2 && Smoke.FleetStage==1 && OwnedBy(2) && Now>=30)
     {
-        for(int32 Item=0;Item<4;++Item) { if(!GI->Career.Has(Item)) { ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }
-        if(OwnedBy(2)->GetKind()!=1) { ServerChooseBoat(OwnedBy(2)->GetRouteRevision(),1);return; }
+        for(int32 Item=0;Item<4;++Item) { if(!GI->Career.Has(Item)) { CareerSync->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }
+        if(OwnedBy(2)->GetKind()!=1) { CareerSync->ServerChooseBoat(OwnedBy(2)->GetRouteRevision(),1);return; }
     }
     if(Smoke.FleetStage==0)
     {
@@ -77,7 +77,7 @@ void AFiskBoardingController::RunFleetSmoke()
         if((Expected>0 && (!B->IsAboard(SelfId) || B->GetCrewCount()!=Expected)) || (Expected==0 && B->IsAboard(SelfId))) { if(Real-Smoke.FleetAt>30) { Fail(TEXT("crew_assignment_wrong")); }return; }
         if(Fishing)
         {
-            for(int32 Item=0;Item<3;++Item) { if(!GI->Career.Has(Item)) { ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }
+            for(int32 Item=0;Item<3;++Item) { if(!GI->Career.Has(Item)) { CareerSync->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }
             const FVector Point=Smoke.FleetRole==2?FVector(80000,-30000,0):FVector(100000,-75000,0);
             if(B->GetDestination()!=Point) { ServerSelectSeaPoint(B->GetRouteRevision(),Point);return; }
             auto* E=FindExpedition();const int32 Goal=Smoke.FleetRole==0?3:Smoke.FleetRole==2?2:4;
@@ -120,7 +120,7 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(Smoke.FleetRole==1 && Now>220 && !Smoke.bFleetAttackSent)
         {
-            const auto* Other=OwnedBy(6);if(!Other) { return; }ServerFleetSelect(Other->GetFleetIndex(),false);ServerChooseBoat(B->GetRouteRevision(),1);
+            const auto* Other=OwnedBy(6);if(!Other) { return; }ServerFleetSelect(Other->GetFleetIndex(),false);CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);
             ServerSelectGround(Other->GetRouteRevision(),0);Smoke.bFleetAttackSent=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_ATTACK_SENT"));
         }
         if(Smoke.FleetRole==8 && Now>=220 && !Smoke.bFleetPrivacyLogged)

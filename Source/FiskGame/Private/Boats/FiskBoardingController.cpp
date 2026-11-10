@@ -16,6 +16,9 @@
 #include "UI/FiskCrewPanel.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/HUD.h"
+#include "Engine/Canvas.h"
+#include "Engine/GameViewportClient.h"
 #include "InputCoreTypes.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
@@ -55,6 +58,7 @@ AFiskBoardingController::AFiskBoardingController()
     PierWalk=CreateDefaultSubobject<UFiskPierWalk>(TEXT("PierWalk"));
     MarinaSync=CreateDefaultSubobject<UFiskMarinaSync>(TEXT("MarinaSync"));
     RecoverySync=CreateDefaultSubobject<UFiskRecoverySync>(TEXT("RecoverySync"));
+    CareerSync=CreateDefaultSubobject<UFiskCareerSync>(TEXT("CareerSync"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
     CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));
@@ -314,7 +318,7 @@ void AFiskBoardingController::ServerBoardStarterBoat_Implementation()
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
     {
-        if(!bCareerReady || !Mode->CanJoinFleet(ServerCareer.Id)) { ClientActionFeedback(TEXT("Karrieren må være klar. Har profilen reist i dag, venter ombordstigning til neste døgn – også etter gjenoppkobling."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_BOARD_LOCKED player=%d"),PlayerState->GetPlayerId());return; }
+        if(!IsCareerReady() || !Mode->CanJoinFleet(GetServerCareer().Id)) { ClientActionFeedback(TEXT("Karrieren må være klar. Har profilen reist i dag, venter ombordstigning til neste døgn – også etter gjenoppkobling."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_BOARD_LOCKED player=%d"),PlayerState->GetPlayerId());return; }
         auto* B=Mode->GetBoatForPlayer(PlayerState->GetPlayerId());B->Board(PlayerState->GetPlayerId());
         if(!B->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Denne båten er full eller har reist. Tab åpner flåten; C henter din egen båt ved brygga.")); }
     }
@@ -441,7 +445,7 @@ void AFiskBoardingController::ServerCastSelectedRod_Implementation(FFiskRodSelec
 
 bool AFiskBoardingController::CanUseRod() const
 {
-    if(!bCareerReady) { return false; }
+    if(!IsCareerReady()) { return false; }
     const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskStarterBoat* Boat = Mode ? Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) : nullptr;
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
@@ -642,4 +646,60 @@ void AFiskBoardingController::ReconcileRodCapacity()
         for(int32 I=GetRodCapacity();I<3;++I) { UFiskPrototypeRod* R=const_cast<UFiskPrototypeRod*>(GetRodAt(I));R->Lower();R->StopReel();R->Withdraw(); }
         Selection.Reset(Selection.Day);ClientRodSelection(true,Selection);
     }
+}
+void AFiskBoardingController::TickCareer()
+{
+    if(HasAuthority()) { ReconcileRodCapacity(); }
+    CareerSync->TickSync();
+}
+// Career panel (P): shop and boat choice. The career data and its network calls are in UFiskCareerSync.
+bool AFiskBoardingController::HandleCareerKey(const FInputKeyEventArgs& A)
+{
+    const bool Press=A.Event==IE_Pressed;
+    if(!bCareerVisible && Press && A.Key==EKeys::P)
+    {
+        // The chart owns typed letters while naming a favorite.
+        if(SeaChart->IsVisible()) { return false; }
+        if(FrontEnd->IsVisible() || RigPanel->IsVisible() || SeaChart->IsVisible() || CrewPanel->IsVisible() || JournalPanel->IsVisible() || DeckPanel->IsVisible()
+            || bHelpVisible || bResultsVisible || bHistoryVisible) { ClientActionFeedback_Implementation(TEXT("Lukk panelet først med Escape."));return true; }
+        bCareerVisible=true;ReleaseRodInputsForMenu();bShowMouseCursor=true;SetInputMode(FInputModeGameAndUI());return true;
+    }
+    if(!bCareerVisible) { return false; }
+    if(!Press) { return true; }
+    if(A.Key==EKeys::P || A.Key==EKeys::Escape) { bCareerVisible=false;bShowMouseCursor=false;SetInputMode(FInputModeGameOnly());return true; }
+    if(A.Key==EKeys::Up) { ShopRow=(ShopRow+5)%6; }
+    if(A.Key==EKeys::Down) { ShopRow=(ShopRow+1)%6; }
+    bool Choose=A.Key==EKeys::Enter;
+    if(A.Key==EKeys::LeftMouseButton)
+    {
+        FVector2D Mouse;int32 W=0,H=0;GetViewportSize(W,H);const float S=FMath::Min(W/1280.f,H/720.f);
+        if(S>0 && GetWorld()->GetGameViewport() && GetWorld()->GetGameViewport()->GetMousePosition(Mouse))
+        { for(int32 I=0;I<6;++I) { if(FBox2D(FVector2D(52*S,(180+58*I)*S),FVector2D(1210*S,(230+58*I)*S)).IsInside(Mouse)) { ShopRow=I;Choose=true; } } }
+    }
+    UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());
+    if(A.Key==EKeys::F5) { CareerSync->RetryLocalSave(); }
+    if(Choose)
+    { if(ShopRow<4) { CareerSync->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,ShopRow); }else if(const AFiskStarterBoat* Boat=FindStarterBoat()) { CareerSync->ServerChooseBoat(Boat->GetRouteRevision(),ShopRow-4); } }
+    return true;
+}
+void AFiskBoardingController::DrawCareer(AHUD& HUD,UCanvas& C)
+{
+    const UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());const FFiskCareerProfile& P=GI->Career;
+    const float S=FMath::Min(C.ClipX/1280.f,C.ClipY/720.f);const FLinearColor Teal(.45f,.94f,.82f),Gold(1,.79f,.36f);
+    auto T=[&](const FString& Text,float X,float Y,float Size=1.f,FLinearColor Color=FLinearColor::White){HUD.DrawText(Text,Color,X*S,Y*S,nullptr,Size*S);};
+    HUD.DrawRect(FLinearColor(.012f,.045f,.06f,.98f),24*S,28*S,1232*S,650*S);
+    T(TEXT("KARRIERE OG MARINABUTIKK"),52,55,2);T(P.Money(),990,61,1.8f,Gold);
+    T(FString::Printf(TEXT("%s | Profil %s | Kvitteringer %d/512"),*P.Name,*P.Id.ToString(EGuidFormats::Digits).Left(8),P.Revision),52,105,1.f,Teal);
+    T(TEXT("Kjøp ved brygga. Dagens nye fangstinntekt bokføres først ved 17:00."),52,143,1.f);
+    const TCHAR* Effects[]={TEXT("15% høyere grense for linebrudd"),TEXT("15% raskere innsveiving"),TEXT("10% sterkere pumping"),TEXT("4 plasser | 6 holdere | 25% raskere"),TEXT("Velg startbåt: 2 plasser / 2 holdere"),TEXT("Velg eid offshorebåt: 4 plasser / 6 holdere")};
+    for(int32 I=0;I<6;++I)
+    {
+        const float Y=180+58*I;HUD.DrawRect(I==ShopRow?FLinearColor(.14f,.34f,.38f):FLinearColor(.035f,.12f,.16f),52*S,Y*S,1158*S,50*S);
+        const FString Label=I<4?FFiskCareerProfile::ItemName(I):I==4?TEXT("Bruk startbåt"):TEXT("Bruk offshorebåt");
+        T(Label,68,Y+7,1.1f);T(Effects[I],440,Y+12,.95f,Teal);
+        T(I<4?(P.Has(I)?TEXT("EID"):FString::Printf(TEXT("$%lld"),static_cast<long long>(FFiskCareerProfile::Price(I)/100))):TEXT("VELG"),1050,Y+12,1.f,Gold);
+    }
+    T(GI->CareerMessage,52,551,.95f,Gold);T(GetActionFeedback(),52,581,.85f);
+    T(TEXT("Piler / klikk: velg | Enter: kjøp eller bruk båt | F5: lagre igjen | P / Escape: lukk"),52,622,.95f,Teal);
+    T(TEXT("Testøkonomi: ny karriere starter med $30 000 én gang. Egen fangst gir egen inntekt."),52,648,.85f);
 }

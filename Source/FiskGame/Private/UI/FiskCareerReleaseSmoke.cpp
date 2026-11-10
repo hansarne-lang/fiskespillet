@@ -72,7 +72,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     else if(Smoke.CareerSmokeStage==4 && GI->Career.Owned==15)
     {
         if(GI->Career.Cash!=225000) { Fail(TEXT("shop_total_wrong"));return; }
-        const FFiskCareerReceipt R=GI->Career.Receipts[1];ServerBuyCareer(R.Id,1,0);ServerBuyCareer(FGuid::NewGuid(),1,1);
+        const FFiskCareerReceipt R=GI->Career.Receipts[1];CareerSync->ServerBuyCareer(R.Id,1,0);CareerSync->ServerBuyCareer(FGuid::NewGuid(),1,1);
         Shot(TEXT("career-owned"));Smoke.CareerSmokeAt=Now;Smoke.CareerSmokeStage=5;
     }
     else if(Smoke.CareerSmokeStage==5 && Now-Smoke.CareerSmokeAt>=2)
@@ -187,7 +187,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
         if(GI->Career.Cash!=Expected || GI->GetJournal().GetEntries().Num()!=1) { if(Now<1030) { return; }Fail(TEXT("income_or_journal_not_applied"));return; }
         Smoke.CareerSmokeCash=GI->Career.Cash;Smoke.CareerSmokeRevision=GI->Career.Revision;
         if(bResultsVisible || bHistoryVisible || bHelpVisible) { Key(EKeys::Escape); }
-        Key(EKeys::P);Shot(TEXT("career-after17"));ServerCareerHello(GI->Career);Smoke.CareerSmokeAt=Now;Smoke.CareerSmokeStage=28;
+        Key(EKeys::P);Shot(TEXT("career-after17"));CareerSync->ServerCareerHello(GI->Career);Smoke.CareerSmokeAt=Now;Smoke.CareerSmokeStage=28;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAREER_REVEAL_PASSED player=%d income=%d cash=%lld"),Self,Own->SessionBalance,static_cast<long long>(GI->Career.Cash));
     }
     else if(Smoke.CareerSmokeStage==28 && Now-Smoke.CareerSmokeAt>=2)

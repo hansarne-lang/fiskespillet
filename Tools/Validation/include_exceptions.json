@@ -19,6 +19,15 @@
       "UI/FiskGameInstance.h",
       "UI/FiskUserSettings.h"
     ],
+    "Source/FiskGame/Private/Boats/Controller/FiskCareerSync.cpp": [
+      "Bootstrap/FiskBootstrapGameMode.h",
+      "Career/FiskCareerStore.h",
+      "Career/FiskJournalAuthority.h",
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "UI/FiskGameInstance.h",
+      "UI/FiskUserSettings.h"
+    ],
     "Source/FiskGame/Private/Boats/Controller/FiskMarinaSync.cpp": [
       "DayCycle/FiskDayState.h",
       "Economy/FiskDaySettlement.h",
@@ -39,21 +48,6 @@
     "Source/FiskGame/Private/Boats/FiskBoardingController.Angler.cpp": [
       "DayCycle/FiskDayState.h",
       "Fishing/FiskPrototypeRod.h"
-    ],
-    "Source/FiskGame/Private/Boats/FiskBoardingController.Career.cpp": [
-      "Bootstrap/FiskBootstrapGameMode.h",
-      "Career/FiskCareerStore.h",
-      "Career/FiskJournalAuthority.h",
-      "DayCycle/FiskDayState.h",
-      "Economy/FiskDaySettlement.h",
-      "UI/FiskCrewPanel.h",
-      "UI/FiskDeckPanel.h",
-      "UI/FiskFrontEnd.h",
-      "UI/FiskGameInstance.h",
-      "UI/FiskJournalPanel.h",
-      "UI/FiskRigPanel.h",
-      "UI/FiskSeaChart.h",
-      "UI/FiskUserSettings.h"
     ],
     "Source/FiskGame/Private/Boats/FiskBoardingController.Fleet.cpp": [
       "Bootstrap/FiskBootstrapGameMode.h",

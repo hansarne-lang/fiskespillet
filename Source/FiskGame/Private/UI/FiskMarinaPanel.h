@@ -55,6 +55,11 @@ private:
     FString File() const;
     void Show(int32 NewPage);
     void Choose();
+    // Beach bar bets (#22 step 2): fishers out at sea, chosen fisher and stake.
+    int32 BetFisher=0,BetStake=1;
+    TArray<TPair<FGuid,FString>> BetCandidates() const;
+    void ChooseBet(int32 Action);
+    void DrawBets(AHUD& HUD,float Scale) const;
 #if WITH_DEV_AUTOMATION_TESTS
     FString HarbourMode,HarbourDirectory;
     FTimerHandle HarbourTimer;

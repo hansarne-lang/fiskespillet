@@ -26,6 +26,11 @@
 #include "Misc/Paths.h"
 #include "Fishing/FiskPrototypeRod.h"
 
+namespace
+{
+    FString BarDollars(int64 Cents)
+    { return Cents%100==0?FString::Printf(TEXT("$%lld"),static_cast<long long>(Cents/100)):FString::Printf(TEXT("$%lld.%02lld"),static_cast<long long>(Cents/100),static_cast<long long>(Cents%100)); }
+}
 UFiskMarinaPanel::UFiskMarinaPanel() { PrimaryComponentTick.bCanEverTick=true;PrimaryComponentTick.TickInterval=.5f; }
 FString UFiskMarinaPanel::File() const { return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetMarina-")+LoadedProfile.ToString(EGuidFormats::Digits)+TEXT(".ini")); }
 AFiskMarinaHub* UFiskMarinaPanel::FindHub() const { TActorIterator<AFiskMarinaHub> Hub(GetWorld());return Hub?*Hub:nullptr; }
@@ -50,6 +55,7 @@ void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponent
     }
     if(WantsCamera() && !IsAtDock()) { Show(0); }
     if(GetWorld()->GetRealTimeSeconds()<NextUpdate) { return; }NextUpdate=GetWorld()->GetRealTimeSeconds()+2;
+    if(Page==2 && PC->IsCareerReady()) { PC->ServerBetBoard(); }
     if(bPendingSave && FFiskMarinaStore::Save(File(),LoadedProfile,Pending)) { bPendingSave=false;Status=TEXT("Naust og navn er lagret lokalt."); }
     if(!bSent && !bBlocked && PC->IsCareerReady()) { bSent=true;PC->ServerMarinaIdentity(LoadedProfile,Identity); }
     if(bSent && PC->IsCareerReady() && SentJournalRevision!=GI->GetJournalRevision())
@@ -75,6 +81,48 @@ void UFiskMarinaPanel::Show(int32 NewPage)
     if(Page) { PC->SetInputMode(FInputModeGameAndUI()); }else { PC->SetInputMode(FInputModeGameOnly()); }
     if(Page==1 || Page==5) { if(const AFiskMarinaHub* H=FindHub()) { const int32 Own=H->GetResidents().IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});HouseIndex=FMath::Max(0,Own); } }
     if(PC->PlayerCameraManager) { PC->PlayerCameraManager->SetGameCameraCutThisFrame(); }
+    if(Page==2 && PC->IsCareerReady()) { PC->ServerBetBoard(); }
+}
+TArray<TPair<FGuid,FString>> UFiskMarinaPanel::BetCandidates() const
+{
+    TArray<TPair<FGuid,FString>> Out;const AFiskMarinaHub* Hub=FindHub();if(!Hub) { return Out; }
+    const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
+    for(const FFiskMarinaResident& R:Hub->GetResidents())
+    {
+        if(R.PlayerId<0 || R.Profile==LoadedProfile) { continue; }
+        for(const AFiskStarterBoat* B:PC->FleetBoats())
+        { if(B && B->IsAboard(R.PlayerId) && B->GetTripProgress()!=AFiskStarterBoat::AtDock && B->GetTripProgress()!=AFiskStarterBoat::AtMarina) { Out.Emplace(R.Profile,R.Identity.DisplayName);break; } }
+    }
+    return Out;
+}
+void UFiskMarinaPanel::ChooseBet(int32 Action)
+{
+    AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());const TArray<TPair<FGuid,FString>> Fishers=BetCandidates();
+    if(Action==0 && !Fishers.IsEmpty()) { BetFisher=(BetFisher+1)%Fishers.Num(); }
+    if(Action==1) { BetStake=(BetStake+1)%3; }
+    if(Action==2)
+    {
+        if(Fishers.IsEmpty()) { PC->ClientActionFeedback(TEXT("Ingen fiskere er ute på sjøen nå."));return; }
+        // A new ID per press: the server accepts only one bet per player and day, so a double press is refused, not charged.
+        PC->ServerPlaceBet(FGuid::NewGuid(),Fishers[BetFisher%Fishers.Num()].Key,FFiskCareerProfile::BetStake(BetStake));
+    }
+}
+void UFiskMarinaPanel::DrawBets(AHUD& HUD,float S) const
+{
+    const AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());const FFiskBetBoardView& B=PC->GetBetBoard();
+    auto T=[&](const FString& Text,float Y,float Size,const FLinearColor& Color){HUD.DrawText(Text,Color,46*S,Y*S,nullptr,Size*S);};
+    const TArray<TPair<FGuid,FString>> Fishers=BetCandidates();FString Name=TEXT("en fisker");
+    if(const AFiskMarinaHub* Hub=FindHub()) { for(const FFiskMarinaResident& R:Hub->GetResidents()) { if(R.Profile==B.Fisher) { Name=R.Identity.DisplayName; } } }
+    FString Main;
+    if(!B.bKnown) { Main=TEXT("VEDDEMÅL: henter tavla fra verten ..."); }
+    else if(B.Stake>0 && B.Payout>=0) { Main=FString::Printf(TEXT("VEDDEMÅL GJORT OPP: %s på %s ga %s."),*BarDollars(B.Stake),*Name,*BarDollars(B.Payout)); }
+    else if(B.Stake>0) { Main=FString::Printf(TEXT("DITT VEDDEMÅL: %s på %s. Avgjøres ved 17:00."),*BarDollars(B.Stake),*Name); }
+    else if(!B.bOpen) { Main=TEXT("VEDDEMÅL: stengt for i dag."); }
+    else if(Fishers.IsEmpty()) { Main=TEXT("VEDDEMÅL: ingen fiskere er ute på sjøen nå."); }
+    else { Main=FString::Printf(TEXT("VEDDEMÅL  F: %s  |  S: %s  |  Enter: sett"),*Fishers[BetFisher%Fishers.Num()].Value,*BarDollars(FFiskCareerProfile::BetStake(BetStake))); }
+    T(Main,380,.8f,FLinearColor(1,.8f,.4f));
+    if(B.bKnown) { T(FString::Printf(TEXT("Potten: %s fra %d veddemål. Største fisk levert innen 17:00 vinner."),*BarDollars(B.Pot),B.Count),402,.7f,FLinearColor(.5f,.9f,.84f)); }
+    if(!B.Message.IsEmpty()) { T(B.Message,424,.7f,FLinearColor::White); }
 }
 void UFiskMarinaPanel::Choose()
 {
@@ -146,6 +194,7 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
         if(A.Key==EKeys::V && A.Event==IE_Pressed) { HarbourView=(HarbourView+1)%3; }
         if(A.Key==EKeys::M && A.Event==IE_Pressed) { bHarbourMusic=!bHarbourMusic; }
         const int32 Count=PC->FleetBoats().Num();if(Count>0) { if(A.Key==EKeys::PageDown || A.Key==EKeys::Right) { FollowIndex=(FollowIndex+1)%Count; }if(A.Key==EKeys::PageUp || A.Key==EKeys::Left) { FollowIndex=(FollowIndex+Count-1)%Count; } }
+        if(A.Event==IE_Pressed && (A.Key==EKeys::F || A.Key==EKeys::S || A.Key==EKeys::Enter)) { ChooseBet(A.Key==EKeys::F?0:A.Key==EKeys::S?1:2);return true; }
         for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->ServerMarinaSay(I); } }return true;
     }
     if(Page==1 && Hub && !Hub->GetResidents().IsEmpty() && (A.Key==EKeys::PageDown || A.Key==EKeys::PageUp))
@@ -213,12 +262,13 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
                 T(R.Identity.DisplayName+TEXT(" | ")+(R.PlayerId<0?TEXT("Frakoblet"):Sea?TEXT("På sjøen"):TEXT("Ved marinaen")),46+(I/6)*285,158+(I%6)*26,.84f);++I;
             }
             const int32 Start=FMath::Max(0,Hub->GetMessages().Num()-3);
-            for(int32 MessageIndex=Start;MessageIndex<Hub->GetMessages().Num();++MessageIndex) { const auto& M=Hub->GetMessages()[MessageIndex];T(M.Name+TEXT(": ")+AFiskMarinaHub::Phrase(M.Code),46,328+(MessageIndex-Start)*27,.72f,Teal); }
+            for(int32 MessageIndex=Start;MessageIndex<Hub->GetMessages().Num();++MessageIndex) { const auto& M=Hub->GetMessages()[MessageIndex];T(M.Name+TEXT(": ")+AFiskMarinaHub::Phrase(M.Code),46,312+(MessageIndex-Start)*22,.72f,Teal); }
         }
+        DrawBets(HUD,S);
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
-        if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("Spiller %d | %d levert | $%lld"),R.PlayerId,R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,425+(I%4)*24,.75f,Gold);++I; } }
-        else { T(TEXT("Dagens tavle åpner ved 17:00. Tab viser flåten utenfor baren."),46,440,.85f,Gold); }
-        for(int32 I=0;I<5;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46,535+20*I,.73f); }T(FString::Printf(TEXT("V: %s | PgUp/PgDn: båt | M: musikk %s"),HarbourView==0?TEXT("BAR"):HarbourView==1?TEXT("HAVN"):TEXT("FØLG BÅT"),bHarbourMusic?TEXT("PÅ"):TEXT("AV")),46,628,.76f,Gold);T(TEXT("2 s mellom meldinger. B / Escape: tilbake. Klokken går."),46,652,.78f,Teal);return;
+        if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("Spiller %d | %d levert | $%lld"),R.PlayerId,R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,450+(I%4)*21,.75f,Gold);++I; } }
+        else { T(TEXT("Dagens tavle åpner ved 17:00. Tab viser flåten utenfor baren."),46,452,.85f,Gold); }
+        for(int32 I=0;I<5;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46,535+20*I,.73f); }T(FString::Printf(TEXT("V: %s | PgUp/PgDn: båt | M: musikk %s"),HarbourView==0?TEXT("BAR"):HarbourView==1?TEXT("HAVN"):TEXT("FØLG BÅT"),bHarbourMusic?TEXT("PÅ"):TEXT("AV")),46,628,.76f,Gold);T(TEXT("F/S/Enter: veddemål | 2 s mellom meldinger | B / Escape: tilbake"),46,652,.78f,Teal);return;
     }
     T(TEXT("NAUST OG TROFÉVEGG"),46,55,1.65f);T(TEXT("PgUp/PgDn: alle 12 | 1–4: besøk | N: naustbutikk"),46,105,.85f,Teal);
     const FFiskMarinaResident* R=Hub && Hub->GetResidents().IsValidIndex(HouseIndex)?&Hub->GetResidents()[HouseIndex]:nullptr;

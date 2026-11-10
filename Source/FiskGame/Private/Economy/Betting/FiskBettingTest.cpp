@@ -46,7 +46,7 @@ bool FFiskBettingExamplesTest::RunTest(const FString& Parameters)
         TestTrue(TEXT("4: nobody delivered in time refunds"), BetAmount(None, A) == 10000 && BetAmount(None, B) == 10000);
     }
     {
-        // 5: the payout receipt is the bet ID, so settling again after a restart credits once.
+        // 5: the payout receipt is derived from the bet ID, so settling again after a restart credits once.
         FFiskBetBook Book; const FGuid Bet = FGuid::NewGuid();
         Book.Register(Bet, A, X, 10000); Book.Register(FGuid::NewGuid(), B, Y, 25000);
         FFiskCareerProfile Career = FFiskCareerProfile::Create(TEXT("BAR"));
@@ -75,6 +75,8 @@ bool FFiskBettingRulesTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Closed at 17:00"), Book.Register(FGuid::NewGuid(), B, X, 5000) == EFiskBetResult::Closed);
     TestTrue(TEXT("Retry after closing is still recognised"), Book.Register(Bet, A, X, 10000) == EFiskBetResult::AlreadyRegistered);
     TestTrue(TEXT("Empty book pays nothing"), FFiskBetBook().Settle({}).IsEmpty());
+    for (int32 I = 0; I < 3; ++I) { TestEqual(TEXT("Bar menu offers the book's stakes"), FFiskCareerProfile::BetStake(I), FFiskBetBook::Stakes[I]); }
+    TestEqual(TEXT("No fourth stake"), FFiskCareerProfile::BetStake(3), -1LL);
 
     // Rule 7: equal largest stakes give the leftover cent to the earliest bet.
     FFiskBetBook Even; const FGuid P1 = FGuid::NewGuid(), P2 = FGuid::NewGuid(), P3 = FGuid::NewGuid(), Q = FGuid::NewGuid(), R = FGuid::NewGuid();
@@ -95,6 +97,29 @@ bool FFiskBettingRulesTest::RunTest(const FString& Parameters)
         int64 S = 0; bool bNegative = false; for (const auto& P : Paid) { S += P.Amount; bNegative |= P.Amount < 0; }
         if (S != Random12.Pot() || bNegative) { AddError(FString::Printf(TEXT("Pot not conserved in round %d"), Round)); return false; }
     }
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskBettingCountingTest,"Fiskelaget.Economy.BettingCountingCatches",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskBettingCountingTest::RunTest(const FString& Parameters)
+{
+    const FGuid X = FGuid::NewGuid(), Y = FGuid::NewGuid(), Shore = FGuid::NewGuid();
+    // Positive grams: delivered in time. Negative grams: the same fish weight, but not delivered in time.
+    auto Row = [](int32 Player, const TArray<int32>& Fish)
+    {
+        FFiskDayResult R; R.PlayerId = Player;
+        for (const int32 Weight : Fish) { FFiskCatchResult C; C.Fish.WeightGrams = FMath::Abs(Weight); C.bDelivered = Weight > 0; R.Catches.Add(C); }
+        return R;
+    };
+    // X reconnected during the day (two player IDs, one career). Y's biggest fish came in too late.
+    const TArray<FFiskDayResult> Rows = { Row(1, {4000, -9000}), Row(2, {-12000, 3000}), Row(3, {6500}), Row(4, {50000}) };
+    const TMap<int32, FGuid> Careers = {{1, X}, {2, Y}, {3, X}, {4, Shore}};
+    const TArray<FFiskBetCatch> Out = FFiskBetBook::CountingCatches(Rows, Careers, TSet<FGuid>{X, Y});
+    auto Grams = [&](const FGuid& Fisher) { const FFiskBetCatch* C = Out.FindByPredicate([&](const FFiskBetCatch& V) { return V.Fisher == Fisher; }); return C ? C->Grams : -1; };
+    TestEqual(TEXT("Largest delivered fish across the career's player IDs"), Grams(X), 6500);
+    TestEqual(TEXT("A late fish does not count"), Grams(Y), 3000);
+    TestEqual(TEXT("A player who was ashore is not compared"), Grams(Shore), -1);
+    TestEqual(TEXT("Unbound rows are ignored"), FFiskBetBook::CountingCatches(Rows, {}, TSet<FGuid>{X}).Num(), 0);
+    TestTrue(TEXT("No delivered fish leaves the fisher out"), FFiskBetBook::CountingCatches({Row(1, {-9000})}, Careers, TSet<FGuid>{X}).IsEmpty());
     return true;
 }
 #endif

@@ -82,7 +82,7 @@ Napp kommer etter noen minutter og varsles med en tydelig lyd. Pump ved å føre
 | Tast | Funksjon |
 |---|---|
 | H | Ditt naust. N åpner naustbutikken, der V forhåndsviser hele naustet. U viser lagrede stangoppsett |
-| B | Strandbaren. 1–5 sender hilsener, V bytter mellom bar, havn og følg båt |
+| B | Strandbaren. 1–5 sender hilsener, V bytter mellom bar, havn og følg båt. Veddemål når du er i land: F velger fisker på sjøen, S innsats ($50/$100/$250), Enter setter. Ett per dag, avgjøres ved 17:00 |
 | T | Bryggeliv i land: W/A/S/D går, Shift løper, piltaster dreier kameraet, musehjul zoomer, Home nullstiller |
 | F10 | I bryggeliv (trykk T først): havneguide til båt, strandbar eller ett av tolv naust |
 

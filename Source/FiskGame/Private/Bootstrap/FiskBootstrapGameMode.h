@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "FiskFleetMembership.h"
+#include "Economy/Betting/FiskBetting.h"
 #include "FiskBootstrapGameMode.generated.h"
 
 class AFiskStarterBoat;
@@ -37,6 +38,19 @@ public:
     int32 GetArchiveRevision() const { return ArchiveRevision; }
     const TMap<int32,FGuid>& GetDayProfiles() const { return DayProfiles; }
 
+    // Beach bar bets (#22 step 2), FiskBootstrapBetting.cpp. The book lives here for one day; payouts
+    // wait in UnclaimedBets until the bettor's controller has credited and saved them (rule 8).
+    bool IsAtSea(int32 Player) const;
+    bool AreBetsOpen() const;
+    EFiskBetResult PlaceBet(int32 Player,const FGuid& Bettor,const FGuid& Bet,const FGuid& Fisher,int64 Stake,TFunctionRef<bool()> Charge);
+    void SettleBets();
+    TArray<FFiskBetPayout> UnclaimedBetPayouts(const FGuid& Bettor) const;
+    void ClaimBetPayout(const FGuid& Receipt) { UnclaimedBets.Remove(Receipt); }
+    bool IsBetPending(const FGuid& Bet) const;
+    void BetBoard(const FGuid& Bettor,FGuid& Fisher,int64& Stake,int64& Payout) const;
+    int64 BetPot() const { return BetBook.Pot(); }
+    int32 BetCount() const { return BetBook.GetBets().Num(); }
+
 private:
     AFiskStarterBoat* SpawnFleetBoat(int32 Player);
     UPROPERTY() TArray<TObjectPtr<AFiskStarterBoat>> Fleet;
@@ -44,6 +58,12 @@ private:
     FFiskFleetMembership FleetMembership;
     UPROPERTY() TObjectPtr<AFiskExpeditionState> Expedition;
     TMap<int32,FGuid> DayProfiles;
+    FFiskBetBook BetBook;
+    TSet<FGuid> BetFishers;                    // Careers out at sea when a bet was registered (2026-11-10)
+    TMap<FGuid,FFiskBetPayout> UnclaimedBets;  // By payout receipt; kept across days until claimed
+    TMap<FGuid,int64> BetResults;              // Today's payout per bettor, for the bar board
+    bool bBetsSettled=false;
+    void ResetBetsForDay();
     FGuid ArchivedDay;
     int32 ArchiveRevision=0;
     double ArchiveRetryAt=0;

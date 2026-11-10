@@ -40,6 +40,7 @@ void AFiskBoardingController::ServerCareerHello_Implementation(FFiskCareerProfil
     { ServerCareer=FFiskCareerProfile();ClientActionFeedback(TEXT("Vertens profilkopi er skadet eller i konflikt. Filene er bevart."));return; }
     if(Known.IsValid() && Known.Revision>P.Revision) { P=Known; }
     if(!FiskJournalAuthority::RecoverIncome(FPaths::GetPath(CareerAuthorityFile()),P)) { ClientActionFeedback(TEXT("Vertens bekreftede journal/inntekt kan ikke leses. Eksisterende data er bevart."));return; }
+    RefundOrphanBets(P);
     if(!SaveServerCareer(P,TEXT("Karriere bekreftet av verten."))) { return; }
     bCareerReady=true;
     if(auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>()) { M->RegisterFleetCareer(PlayerState->GetPlayerId(),P.Id); }
@@ -72,7 +73,7 @@ void AFiskBoardingController::TickCareer()
     { UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());if(GI->AcceptCareer(PendingCareer)) { if(!HasAuthority()) { bCareerReady=true; }ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); } }
     if(!HasAuthority() || !bCareerReady) { return; }
     TickJournalRecovery();
-    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const AFiskDaySettlement* Settlement=Mode?Mode->GetSettlement():nullptr;
     if(Day && Settlement && Day->GetElapsedMilliseconds()>=1020000 && Settlement->GetView().bRevealed)
     {
@@ -85,7 +86,81 @@ void AFiskBoardingController::TickCareer()
             else { ClientActionFeedback(TEXT("Karriereoppgjør venter på lagring eller ledig kvitteringskapasitet. Neste dag er sperret."));CareerAck=0; }
         }
     }
+    if(Mode && Day && Day->GetElapsedMilliseconds()>=1020000) { Mode->SettleBets(); }
+    ClaimBetPayouts();
     if(CareerAck<ServerCareer.Revision) { ClientCareerSnapshot(ServerCareer,TEXT("Venter på lokal lagringsbekreftelse.")); }
+}
+void AFiskBoardingController::ServerPlaceBet_Implementation(FGuid Bet,FGuid Fisher,int64 Stake)
+{
+    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+    EFiskBetResult Result=EFiskBetResult::Closed;
+    if(bCareerReady && PlayerState && Mode)
+    {
+        Result=Mode->PlaceBet(PlayerState->GetPlayerId(),ServerCareer.Id,Bet,Fisher,Stake,[&]()
+            { FFiskCareerProfile P=ServerCareer;return P.Stake(Bet,Stake) && SaveServerCareer(P,TEXT("Veddemålet er registrert. Innsatsen er trukket.")); });
+    }
+    FString Message;
+    switch(Result)
+    {
+    case EFiskBetResult::Registered: Message=TEXT("Veddemålet er registrert. Resultatet kommer ved 17:00.");break;
+    case EFiskBetResult::AlreadyRegistered: Message=TEXT("Veddemålet var allerede registrert. Ingen ny innsats er trukket.");break;
+    case EFiskBetResult::InvalidStake: Message=TEXT("Innsatsen må være $50, $100 eller $250.");break;
+    case EFiskBetResult::AlreadyBetToday: Message=TEXT("Du har allerede et veddemål i dag.");break;
+    case EFiskBetResult::SelfBet: Message=TEXT("Du kan ikke satse på deg selv.");break;
+    case EFiskBetResult::Conflict: Message=TEXT("Veddemålet er i konflikt med et registrert veddemål. Ingen endring.");break;
+    case EFiskBetResult::NotAshore: Message=TEXT("Veddemål settes i strandbaren når du er i land.");break;
+    case EFiskBetResult::FisherNotAtSea: Message=TEXT("Den fiskeren er ikke ute på sjøen nå.");break;
+    case EFiskBetResult::NotCharged: Message=TEXT("Innsatsen kunne ikke trekkes (saldo, kvitteringer eller lagring). Ingen endring.");break;
+    default: Message=TEXT("Veddemål er stengt: dagen har ikke startet eller klokka har passert 17:00.");break;
+    }
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_BET_REPLY player=%d result=%d stake=%lld cash=%lld"),PlayerState?PlayerState->GetPlayerId():-1,static_cast<int32>(Result),static_cast<long long>(Stake),static_cast<long long>(ServerCareer.Cash));
+    SendBetBoard(Message);
+}
+void AFiskBoardingController::ServerBetBoard_Implementation() { if(bCareerReady) { SendBetBoard(FString()); } }
+void AFiskBoardingController::SendBetBoard(const FString& Message)
+{
+    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();if(!Mode) { return; }
+    FGuid Fisher;int64 Stake=0,Payout=-1;Mode->BetBoard(ServerCareer.Id,Fisher,Stake,Payout);
+    ClientBetBoard(Fisher,Stake,Mode->BetPot(),Mode->BetCount(),Payout,Mode->AreBetsOpen(),Message);
+}
+void AFiskBoardingController::ClientBetBoard_Implementation(FGuid Fisher,int64 Stake,int64 Pot,int32 Count,int64 Payout,bool bOpen,const FString& Message)
+{
+    BetBoard.Fisher=Fisher;BetBoard.Stake=Stake;BetBoard.Pot=Pot;BetBoard.Count=Count;BetBoard.Payout=Payout;BetBoard.bOpen=bOpen;BetBoard.bKnown=true;
+    if(!Message.IsEmpty()) { BetBoard.Message=Message; }
+}
+void AFiskBoardingController::ClaimBetPayouts()
+{
+    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();if(!Mode || !bCareerReady) { return; }
+    const TArray<FFiskBetPayout> Due=Mode->UnclaimedBetPayouts(ServerCareer.Id);if(Due.IsEmpty()) { return; }
+    // Rule 8: one settlement receipt per bet. A receipt already in the career (for example a refund
+    // from another host) is never paid again.
+    FFiskCareerProfile P=ServerCareer;TArray<FGuid> Done;int64 Paid=0;
+    for(const FFiskBetPayout& Payout:Due)
+    {
+        if(P.HasReceipt(Payout.Receipt)) { Done.Add(Payout.Receipt);continue; }
+        if(P.Credit(Payout.Receipt,Payout.Amount)) { Done.Add(Payout.Receipt);Paid+=Payout.Amount; }
+    }
+    if(P.Revision!=ServerCareer.Revision)
+    {
+        const FString Message=Paid>0?FString::Printf(TEXT("Strandbaren: veddemålet ga $%lld.%02lld."),static_cast<long long>(Paid/100),static_cast<long long>(Paid%100)):TEXT("Strandbaren: veddemålet ga ingen gevinst denne gangen.");
+        if(!SaveServerCareer(P,Message)) { return; }
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_BET_PAID player=%d receipts=%d amount=%lld cash=%lld"),PlayerState?PlayerState->GetPlayerId():-1,Done.Num(),static_cast<long long>(Paid),static_cast<long long>(P.Cash));
+    }
+    for(const FGuid& Receipt:Done) { Mode->ClaimBetPayout(Receipt); }
+}
+void AFiskBoardingController::RefundOrphanBets(FFiskCareerProfile& P) const
+{
+    // A stake whose bet this host no longer knows (the host restarted, or the bet was placed on another
+    // host) is refunded under the bet's payout receipt, so a later payout of the same bet is ignored.
+    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();if(!Mode) { return; }
+    const TArray<FFiskCareerReceipt> Receipts=P.Receipts;
+    for(const FFiskCareerReceipt& R:Receipts)
+    {
+        const FGuid Payout=FFiskCareerProfile::BetPayoutId(R.Id);
+        if(R.Kind!=FFiskCareerReceipt::KindBet || P.HasReceipt(Payout) || Mode->IsBetPending(R.Id)) { continue; }
+        const bool Refunded=P.Credit(Payout,-R.Amount);
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_BET_ORPHAN_REFUND refunded=%d amount=%lld"),Refunded,static_cast<long long>(-R.Amount));
+    }
 }
 void AFiskBoardingController::ServerBuyCareer_Implementation(FGuid Command,int32 Revision,int32 Item)
 {

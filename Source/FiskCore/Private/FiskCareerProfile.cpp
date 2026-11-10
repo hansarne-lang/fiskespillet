@@ -35,6 +35,8 @@ bool FFiskCareerProfile::IsValid() const
             if(Price(R.Item)<0 || (Items&(1<<R.Item))!=0 || R.Amount!=-Price(R.Item)) { return false; }
             Items|=1<<R.Item;
         }
+        else if(R.Kind==FFiskCareerReceipt::KindBet)
+        { if(R.Item!=-1 || R.Amount>=0 || R.Amount<-MaxCash) { return false; } }
         else if(R.Kind!=FFiskCareerReceipt::KindSettlement || R.Item!=-1 || R.Amount<0 || R.Amount>MaxCash) { return false; }
         if(R.Amount>0 && Balance>MaxCash-R.Amount) { return false; }
         Balance+=R.Amount;if(Balance<0 || Balance>MaxCash) { return false; }
@@ -62,5 +64,16 @@ bool FFiskCareerProfile::Credit(const FGuid& Settlement,int64 Amount)
     if(Revision>=MaxReceipts || Cash>MaxCash-Amount) { return false; }
     FFiskCareerReceipt R;R.Id=Settlement;R.Kind=FFiskCareerReceipt::KindSettlement;R.Amount=Amount;Receipts.Add(R);Cash+=Amount;++Revision;return true;
 }
+bool FFiskCareerProfile::Stake(const FGuid& Bet,int64 Amount)
+{
+    if(!IsValid() || !Bet.IsValid() || Amount<=0 || Amount>MaxCash) { return false; }
+    for(const FFiskCareerReceipt& R:Receipts) { if(R.Id==Bet) { return R.Kind==FFiskCareerReceipt::KindBet && R.Amount==-Amount; } }
+    if(Revision>=MaxReceipts-1 || Cash<Amount) { return false; }   // Keeps room for the payout receipt
+    FFiskCareerReceipt R;R.Id=Bet;R.Kind=FFiskCareerReceipt::KindBet;R.Amount=-Amount;Receipts.Add(R);Cash-=Amount;++Revision;return true;
+}
+FGuid FFiskCareerProfile::BetPayoutId(const FGuid& Bet)
+{ return Bet.IsValid()?FGuid(Bet.A^0x50415954u,Bet.B^0x4F555421u,Bet.C,Bet.D):FGuid(); }
+int64 FFiskCareerProfile::BetStake(int32 Index)
+{ static constexpr int64 Stakes[]={5000,10000,25000};return Index>=0 && Index<3?Stakes[Index]:-1; }
 FString FFiskCareerProfile::Money() const
 { return FString::Printf(TEXT("$%lld.%02lld"),static_cast<long long>(Cash/100),static_cast<long long>(Cash%100)); }

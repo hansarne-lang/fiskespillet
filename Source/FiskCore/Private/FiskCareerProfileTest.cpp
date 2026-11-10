@@ -62,6 +62,7 @@ bool FFiskCareerStoredIdsTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Initial grant kind"),FFiskCareerReceipt::KindInitialGrant,0);
     TestEqual(TEXT("Purchase kind"),FFiskCareerReceipt::KindPurchase,1);
     TestEqual(TEXT("Settlement kind"),FFiskCareerReceipt::KindSettlement,2);
+    TestEqual(TEXT("Bet kind"),FFiskCareerReceipt::KindBet,3);
     TestEqual(TEXT("Line item"),FFiskCareerProfile::ItemLine,0);
     TestEqual(TEXT("Reel item"),FFiskCareerProfile::ItemReel,1);
     TestEqual(TEXT("Rod item"),FFiskCareerProfile::ItemRod,2);
@@ -69,6 +70,27 @@ bool FFiskCareerStoredIdsTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Fight gear bits"),FFiskCareerProfile::FightGearMask,7);
     TestEqual(TEXT("Offshore boat name"),FFiskCareerProfile::ItemName(FFiskCareerProfile::ItemOffshoreBoat),FString(TEXT("Offshorebåt")));
     TestEqual(TEXT("New profile starts with initial grant"),FFiskCareerProfile::Create(TEXT("FISKER")).Receipts[0].Kind,FFiskCareerReceipt::KindInitialGrant);
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskCareerStakeTest,"Fiskelaget.Career.BetStakeReceipts",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskCareerStakeTest::RunTest(const FString& Parameters)
+{
+    FFiskCareerProfile P=FFiskCareerProfile::Create(TEXT("FISKER"));const FFiskCareerProfile Initial=P;const FGuid Bet=FGuid::NewGuid();
+    TestFalse(TEXT("Zero stake denied"),P.Stake(Bet,0));TestFalse(TEXT("Invalid bet id denied"),P.Stake(FGuid(),5000));
+    TestTrue(TEXT("Stake drawn"),P.Stake(Bet,10000));TestEqual(TEXT("Stake deducted"),P.Cash,2990000LL);
+    TestTrue(TEXT("Retry is accepted"),P.Stake(Bet,10000));TestEqual(TEXT("Stake drawn once"),P.Revision,2);
+    TestFalse(TEXT("Same id other stake rejected"),P.Stake(Bet,25000));TestFalse(TEXT("Stake id cannot be a credit"),P.Credit(Bet,10000));
+    TestTrue(TEXT("Stake chain is valid"),P.IsValid());TestTrue(TEXT("Extends the initial profile"),P.Extends(Initial));
+    const FGuid Payout=FFiskCareerProfile::BetPayoutId(Bet);
+    TestTrue(TEXT("Payout id differs from the bet"),Payout.IsValid() && Payout!=Bet);TestEqual(TEXT("Payout id is stable"),FFiskCareerProfile::BetPayoutId(Bet),Payout);
+    TestFalse(TEXT("No payout before settlement"),P.HasReceipt(Payout));
+    TestTrue(TEXT("Payout credited"),P.Credit(Payout,25000));TestTrue(TEXT("Payout credited once"),P.Credit(Payout,25000));
+    TestEqual(TEXT("Winnings added"),P.Cash,3015000LL);TestTrue(TEXT("Has payout"),P.HasReceipt(Payout));
+    FFiskCareerProfile Forged=P;Forged.Receipts[1].Amount=10000;TestFalse(TEXT("Positive stake receipt rejected"),Forged.IsValid());
+    FFiskCareerProfile Poor=FFiskCareerProfile::Create(TEXT("FISKER"));TestTrue(TEXT("Spend almost everything"),Poor.Buy(FGuid::NewGuid(),1,3));
+    TestFalse(TEXT("Stake above balance denied"),Poor.Stake(FGuid::NewGuid(),FFiskCareerProfile::MaxCash));
+    while(Poor.Revision<FFiskCareerProfile::MaxReceipts-1) { if(!Poor.Credit(FGuid::NewGuid(),0)) { AddError(TEXT("Could not fill receipt log"));return false; } }
+    TestFalse(TEXT("No stake without room for its payout"),Poor.Stake(FGuid::NewGuid(),5000));
     return true;
 }
 #endif

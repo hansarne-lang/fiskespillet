@@ -1,16 +1,19 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "Economy/FiskDayLedger.h"
+#include "FiskCareerProfile.h"
 
-// Beach bar bets (#22), rules 1-8 in DECISIONS.md (2026-11-08). Pure server-side model: no UI, network
-// or saving yet. Money is in cents, like FFiskCareerProfile::Cash. People are career profile IDs, so a
-// bet survives a disconnect (rule 8). Which catches count (delivered in time, rod owner, which fishers
-// are compared) is decided by the caller; this model only splits the pot.
+// Beach bar bets (#22), rules 1-8 in DECISIONS.md (2026-11-08). Pure model; the server (Bootstrap)
+// owns one book per day. Money is in cents, like FFiskCareerProfile::Cash. People are career profile
+// IDs, so a bet survives a disconnect (rule 8). CountingCatches picks the catches that are compared
+// (decision 2026-11-10); Settle only splits the pot.
 
-enum class EFiskBetResult : uint8 { Registered, AlreadyRegistered, InvalidStake, AlreadyBetToday, SelfBet, Closed, Conflict };
+enum class EFiskBetResult : uint8 { Registered, AlreadyRegistered, InvalidStake, AlreadyBetToday, SelfBet, Closed, Conflict,
+    NotAshore, FisherNotAtSea, NotCharged };   // Checked by the server before the book (step 2)
 
 struct FFiskBet
 {
-    FGuid Id;          // Unique per bet; also the receipt ID for its payout (rule 8)
+    FGuid Id;          // Unique per bet; the stake receipt ID. The payout uses FFiskCareerProfile::BetPayoutId(Id) (rule 8)
     FGuid Bettor;
     FGuid Fisher;
     int64 Stake = 0;   // Cents
@@ -25,7 +28,7 @@ struct FFiskBetCatch
 
 struct FFiskBetPayout
 {
-    FGuid Receipt;     // = FFiskBet::Id
+    FGuid Receipt;     // = FFiskCareerProfile::BetPayoutId(FFiskBet::Id)
     FGuid Bettor;
     int64 Amount = 0;  // Cents; 0 for a losing bet
     bool bRefund = false;
@@ -34,7 +37,7 @@ struct FFiskBetPayout
 class FFiskBetBook
 {
 public:
-    static constexpr int64 Stakes[3] = {5000, 10000, 25000};  // $50, $100, $250 (rule 1)
+    static constexpr int64 Stakes[3] = {5000, 10000, 25000};  // $50, $100, $250 (rule 1); same as FFiskCareerProfile::BetStake
     static bool ValidStake(int64 Cents) { return Cents == Stakes[0] || Cents == Stakes[1] || Cents == Stakes[2]; }
 
     // Rule 1 and 2. Retrying the same bet (same ID and content) is AlreadyRegistered and must not be
@@ -47,6 +50,12 @@ public:
 
     // Rules 3-7. One payout per bet; the amounts always add up to the pot.
     TArray<FFiskBetPayout> Settle(const TArray<FFiskBetCatch>& Counting) const;
+
+    // Decision 2026-11-10: the largest fish delivered in time (bDelivered; the ledger books a fish on
+    // its rod owner) for each fisher who was out at sea while bets could be registered. Rows are
+    // matched to careers through the day's player-to-career binding; a fisher without a delivered
+    // fish is left out.
+    static TArray<FFiskBetCatch> CountingCatches(const TArray<FFiskDayResult>& Rows, const TMap<int32, FGuid>& Careers, const TSet<FGuid>& OutAtSea);
 private:
     TArray<FFiskBet> Bets;
     bool bClosed = false;

@@ -1,4 +1,5 @@
 #include "Economy/Betting/FiskBetting.h"
+#include "FiskCareerProfile.h"
 
 EFiskBetResult FFiskBetBook::Register(const FGuid& Id, const FGuid& Bettor, const FGuid& Fisher, int64 Stake)
 {
@@ -39,7 +40,7 @@ TArray<FFiskBetPayout> FFiskBetBook::Settle(const TArray<FFiskBetCatch>& Countin
     int32 RemainderTo = INDEX_NONE;
     for (const FFiskBet& Bet : Bets)
     {
-        FFiskBetPayout Payout; Payout.Receipt = Bet.Id; Payout.Bettor = Bet.Bettor; Payout.bRefund = bRefund;
+        FFiskBetPayout Payout; Payout.Receipt = FFiskCareerProfile::BetPayoutId(Bet.Id); Payout.Bettor = Bet.Bettor; Payout.bRefund = bRefund;
         if (bRefund) { Payout.Amount = Bet.Stake; }
         else if (Wins(Bet))
         {
@@ -53,5 +54,24 @@ TArray<FFiskBetPayout> FFiskBetBook::Settle(const TArray<FFiskBetCatch>& Countin
     // Rule 7: the leftover cents go to the largest winning stake; on a tie, the earliest bet (Bets is in
     // registration order and only a strictly larger stake moves RemainderTo).
     if (!bRefund && RemainderTo != INDEX_NONE) { Out[RemainderTo].Amount += Total - Paid; }
+    return Out;
+}
+
+TArray<FFiskBetCatch> FFiskBetBook::CountingCatches(const TArray<FFiskDayResult>& Rows, const TMap<int32, FGuid>& Careers, const TSet<FGuid>& OutAtSea)
+{
+    TMap<FGuid, int32> Largest;
+    for (const FFiskDayResult& Row : Rows)
+    {
+        const FGuid* Career = Careers.Find(Row.PlayerId);
+        if (!Career || !OutAtSea.Contains(*Career)) { continue; }
+        for (const FFiskCatchResult& Catch : Row.Catches)
+        {
+            if (!Catch.bDelivered || Catch.Fish.WeightGrams <= 0) { continue; }
+            int32& Best = Largest.FindOrAdd(*Career, 0);
+            Best = FMath::Max(Best, Catch.Fish.WeightGrams);
+        }
+    }
+    TArray<FFiskBetCatch> Out;
+    for (const TPair<FGuid, int32>& Pair : Largest) { FFiskBetCatch Catch; Catch.Fisher = Pair.Key; Catch.Grams = Pair.Value; Out.Add(Catch); }
     return Out;
 }

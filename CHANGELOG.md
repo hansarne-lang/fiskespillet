@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## Veddemål i strandbaren – under arbeid
+
+Når du er i land, kan du i strandbaren (B) satse $50, $100 eller $250 på en fisker som fortsatt er ute. Innsatsen trekkes med en egen kvittering, og oppgjøret kommer ved 17:00 sammen med dagens oppgjør. Største fisk levert innen fristen vinner; bare fiskere som var ute da veddemålene ble satt, sammenlignes. Reglene er eierens beslutninger 8. og 10. november 2026. Issue #22.
+
 ## Musstyrt stang – under arbeid
 
 I fiskekampen styres stanga med musa, uten å holde knapper. Musa opp pumper, musa ned sveiver inn av seg selv, og musehjulet er bremsen. Piltastene virker også. Det er standard og kan slås av under Innstillinger, sammen med musfølsomhet. Fiskekampens regler og nettverksprotokollen er uendret. Innstillingsfila får versjon 2. Issue #132.

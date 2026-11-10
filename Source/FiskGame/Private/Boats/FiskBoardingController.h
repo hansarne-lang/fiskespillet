@@ -33,6 +33,9 @@ class UFiskCollectionPanel;
 class UFiskPierWalk;
 class UFiskFishingHelp;
 
+// What the beach bar shows of the server's bet book (#22 step 2): own bet, pot and own result.
+struct FFiskBetBoardView { FGuid Fisher;int64 Stake=0,Pot=0,Payout=-1;int32 Count=0;bool bOpen=false,bKnown=false;FString Message; };
+
 UENUM()
 enum class EFiskRodAction : uint8
 {
@@ -97,6 +100,11 @@ public:
     UFUNCTION(Server,Reliable) void ServerChooseBoat(int32 Revision,int32 Kind);
     UFUNCTION(Server,Reliable) void ServerSelectSeaPoint(int32 Revision,FVector_NetQuantize Point);
     UFUNCTION(Server,Reliable) void ServerTravelVote(int32 Leg,bool Vote);
+    // Beach bar bets (#22 step 2). The server owns the book; the client only sees its own bet and the pot.
+    UFUNCTION(Server,Reliable) void ServerPlaceBet(FGuid Bet,FGuid Fisher,int64 Stake);
+    UFUNCTION(Server,Reliable) void ServerBetBoard();
+    UFUNCTION(Client,Reliable) void ClientBetBoard(FGuid Fisher,int64 Stake,int64 Pot,int32 Count,int64 Payout,bool bOpen,const FString& Message);
+    const FFiskBetBoardView& GetBetBoard() const { return BetBoard; }
     virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
@@ -190,6 +198,10 @@ private:
     FTimerHandle CareerTimer;
     FString CareerAuthorityFile() const;
     bool SaveServerCareer(const FFiskCareerProfile& Candidate,const FString& Message);
+    FFiskBetBoardView BetBoard;
+    void SendBetBoard(const FString& Message);
+    void ClaimBetPayouts();
+    void RefundOrphanBets(FFiskCareerProfile& Profile) const;
     FFiskRodSelection Selection;
     int32 PendingRod=-1,CameraView=0;
     void ReconcileRodCapacity();

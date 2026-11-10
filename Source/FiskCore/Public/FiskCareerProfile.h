@@ -10,6 +10,7 @@ struct FISKCORE_API FFiskCareerReceipt
     static constexpr int32 KindInitialGrant=0;
     static constexpr int32 KindPurchase=1;
     static constexpr int32 KindSettlement=2;
+    static constexpr int32 KindBet=3;         // Beach bar stake (#22): Amount is minus the stake
     UPROPERTY() int32 Kind=KindInitialGrant; // Stored value; never renumber.
     UPROPERTY() int32 Item=-1;
     UPROPERTY() int64 Amount=0;
@@ -48,6 +49,12 @@ struct FISKCORE_API FFiskCareerProfile
     bool Extends(const FFiskCareerProfile& Older) const;
     bool Buy(const FGuid& Command,int32 ExpectedRevision,int32 Item);
     bool Credit(const FGuid& Settlement,int64 Amount);
+    // Beach bar bet (#22, rule 1 and 8): the stake is drawn once under the bet's ID, and the payout
+    // (win, loss as 0 or refund) is a settlement receipt under BetPayoutId(Bet). Retrying is harmless.
+    bool Stake(const FGuid& Bet,int64 Amount);
+    static FGuid BetPayoutId(const FGuid& Bet);
+    static int64 BetStake(int32 Index);   // 0-2: $50, $100, $250 (#22 rule 1); -1 otherwise
+    bool HasReceipt(const FGuid& Receipt) const { return Receipts.ContainsByPredicate([&](const FFiskCareerReceipt& R){return R.Id==Receipt;}); }
     bool Has(int32 Item) const { return Item>=0 && Item<ItemCount && (Owned&(1<<Item))!=0; }
     FString Money() const;
 };

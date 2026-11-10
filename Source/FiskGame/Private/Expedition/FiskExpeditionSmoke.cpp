@@ -30,7 +30,7 @@ void AFiskBoardingController::RunExpeditionSmoke()
     if(Recovery || Reload)
     {
         if(Smoke.ExpeditionSmokeStage==0)
-        { ServerJournalAck(FGuid::NewGuid(),1);ServerExpeditionAck(FGuid::NewGuid(),1);Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=1; }
+        { RecoverySync->ServerJournalAck(FGuid::NewGuid(),1);RecoverySync->ServerExpeditionAck(FGuid::NewGuid(),1);Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=1; }
         if(GI->GetJournal().GetEntries().Num()!=1 || GI->Expeditions.Num()!=1 || !GI->Expeditions[0].bCompleted || GI->Career.Revision!=6)
         { if(Real-Smoke.ExpeditionSmokeAt>60) { Fail(TEXT("own_recovery_missing_or_duplicate")); }return; }
         const auto* Saved=GI->RigPresets.Get(0);

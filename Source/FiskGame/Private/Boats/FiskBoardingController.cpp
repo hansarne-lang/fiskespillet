@@ -54,6 +54,7 @@ AFiskBoardingController::AFiskBoardingController()
     MarinaPanel=CreateDefaultSubobject<UFiskMarinaPanel>(TEXT("MarinaPanel"));
     PierWalk=CreateDefaultSubobject<UFiskPierWalk>(TEXT("PierWalk"));
     MarinaSync=CreateDefaultSubobject<UFiskMarinaSync>(TEXT("MarinaSync"));
+    RecoverySync=CreateDefaultSubobject<UFiskRecoverySync>(TEXT("RecoverySync"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
     CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));

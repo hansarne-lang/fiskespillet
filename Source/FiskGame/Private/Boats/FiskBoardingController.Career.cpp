@@ -72,7 +72,7 @@ void AFiskBoardingController::TickCareer()
     if(IsLocalController() && PendingCareer.IsValid())
     { UFiskGameInstance* GI=CastChecked<UFiskGameInstance>(GetGameInstance());if(GI->AcceptCareer(PendingCareer)) { if(!HasAuthority()) { bCareerReady=true; }ServerCareerAck(PendingCareer.Id,PendingCareer.Revision);PendingCareer=FFiskCareerProfile(); } }
     if(!HasAuthority() || !bCareerReady) { return; }
-    TickJournalRecovery();
+    RecoverySync->TickJournalRecovery();
     AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const AFiskDaySettlement* Settlement=Mode?Mode->GetSettlement():nullptr;
     if(Day && Settlement && Day->GetElapsedMilliseconds()>=1020000 && Settlement->GetView().bRevealed)

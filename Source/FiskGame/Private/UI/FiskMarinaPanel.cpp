@@ -57,12 +57,12 @@ void UFiskMarinaPanel::TickComponent(float Delta,ELevelTick Type,FActorComponent
     if(GetWorld()->GetRealTimeSeconds()<NextUpdate) { return; }NextUpdate=GetWorld()->GetRealTimeSeconds()+2;
     if(Page==2 && PC->IsCareerReady()) { PC->ServerBetBoard(); }
     if(bPendingSave && FFiskMarinaStore::Save(File(),LoadedProfile,Pending)) { bPendingSave=false;Status=TEXT("Naust og navn er lagret lokalt."); }
-    if(!bSent && !bBlocked && PC->IsCareerReady()) { bSent=true;PC->ServerMarinaIdentity(LoadedProfile,Identity); }
+    if(!bSent && !bBlocked && PC->IsCareerReady()) { bSent=true;PC->GetMarinaSync()->ServerMarinaIdentity(LoadedProfile,Identity); }
     if(bSent && PC->IsCareerReady() && SentJournalRevision!=GI->GetJournalRevision())
     {
         TArray<FFiskMarinaTrophy> Records;
         for(int32 I=0;I<FiskCatches::Count;++I) { if(const FFiskJournalEntry* Best=GI->GetJournal().Best(I)) { FFiskMarinaTrophy T;T.Species=I;T.Grams=Best->Fish.WeightGrams;T.LengthMm=Best->Fish.LengthMm;T.DayId=Best->DayId;Records.Add(T); } }
-        PC->ServerMarinaRecords(LoadedProfile,Records);SentJournalRevision=GI->GetJournalRevision();
+        PC->GetMarinaSync()->ServerMarinaRecords(LoadedProfile,Records);SentJournalRevision=GI->GetJournalRevision();
     }
 }
 void UFiskMarinaPanel::ReceiveIdentity(const FFiskMarinaIdentity& Value)
@@ -77,7 +77,7 @@ void UFiskMarinaPanel::ReceiveIdentity(const FFiskMarinaIdentity& Value)
 void UFiskMarinaPanel::Show(int32 NewPage)
 {
     Page=NewPage;bGallery=false;HarbourView=0;bShopPreview=false;ShopCategory=0;ShopLevel=0;bEditing=false;Row=0;Draft=Identity;AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
-    PC->ReleaseRodInputsForMenu();PC->ServerHarbourPlace(LoadedProfile,Page==2?2:(Page==1 || Page==4 || Page==5)?1:0);PC->bShowMouseCursor=Page!=0;
+    PC->ReleaseRodInputsForMenu();PC->GetMarinaSync()->ServerHarbourPlace(LoadedProfile,Page==2?2:(Page==1 || Page==4 || Page==5)?1:0);PC->bShowMouseCursor=Page!=0;
     if(Page) { PC->SetInputMode(FInputModeGameAndUI()); }else { PC->SetInputMode(FInputModeGameOnly()); }
     if(Page==1 || Page==5) { if(const AFiskMarinaHub* H=FindHub()) { const int32 Own=H->GetResidents().IndexOfByPredicate([&](const FFiskMarinaResident& R){return R.Profile==LoadedProfile;});HouseIndex=FMath::Max(0,Own); } }
     if(PC->PlayerCameraManager) { PC->PlayerCameraManager->SetGameCameraCutThisFrame(); }
@@ -129,7 +129,7 @@ void UFiskMarinaPanel::Choose()
     if(bBlocked || bSending) { return; }AFiskBoardingController* PC=CastChecked<AFiskBoardingController>(GetOwner());
     if(Row<2) { bEditing=true;EditText=Row==0?Draft.DisplayName:Draft.HouseName;return; }
     if(Row==2) { Draft.Color=(Draft.Color+1)%6; }if(Row==3) { Draft.Style=(Draft.Style+1)%3; }if(Row==4) { Draft.Decor=(Draft.Decor+1)%3; }
-    if(Row==5 && Draft.IsValid()) { bSending=true;Status=TEXT("Venter på vertens bekreftelse ...");PC->ServerMarinaIdentity(LoadedProfile,Draft); }
+    if(Row==5 && Draft.IsValid()) { bSending=true;Status=TEXT("Venter på vertens bekreftelse ...");PC->GetMarinaSync()->ServerMarinaIdentity(LoadedProfile,Draft); }
 }
 bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
 {
@@ -195,7 +195,7 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
         if(A.Key==EKeys::M && A.Event==IE_Pressed) { bHarbourMusic=!bHarbourMusic; }
         const int32 Count=PC->FleetBoats().Num();if(Count>0) { if(A.Key==EKeys::PageDown || A.Key==EKeys::Right) { FollowIndex=(FollowIndex+1)%Count; }if(A.Key==EKeys::PageUp || A.Key==EKeys::Left) { FollowIndex=(FollowIndex+Count-1)%Count; } }
         if(A.Event==IE_Pressed && (A.Key==EKeys::F || A.Key==EKeys::S || A.Key==EKeys::Enter)) { ChooseBet(A.Key==EKeys::F?0:A.Key==EKeys::S?1:2);return true; }
-        for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->ServerMarinaSay(I); } }return true;
+        for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->GetMarinaSync()->ServerMarinaSay(I); } }return true;
     }
     if(Page==1 && Hub && !Hub->GetResidents().IsEmpty() && (A.Key==EKeys::PageDown || A.Key==EKeys::PageUp))
     { HouseIndex=(HouseIndex+(A.Key==EKeys::PageDown?1:Hub->GetResidents().Num()-1))%Hub->GetResidents().Num();Draft=Identity;Row=0;return true; }

@@ -77,7 +77,7 @@ void UFiskMarinaPanel::RunHomeSmoke()
         if(!Buyer) { return; }
         if(HomeStage==0)
         {
-            FFiskMarinaIdentity Invalid=Identity;Invalid.Lighting=3;PC->ServerMarinaIdentity(LoadedProfile,Invalid);PC->ServerMarinaIdentity(Buyer->Profile,Invalid);HomeAt=Now;HomeStage=1;
+            FFiskMarinaIdentity Invalid=Identity;Invalid.Lighting=3;PC->GetMarinaSync()->ServerMarinaIdentity(LoadedProfile,Invalid);PC->GetMarinaSync()->ServerMarinaIdentity(Buyer->Profile,Invalid);HomeAt=Now;HomeStage=1;
         }
         else if(HomeStage==1 && Now-HomeAt>2)
         {

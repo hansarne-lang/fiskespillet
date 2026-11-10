@@ -19,6 +19,13 @@
       "UI/FiskGameInstance.h",
       "UI/FiskUserSettings.h"
     ],
+    "Source/FiskGame/Private/Boats/Controller/FiskMarinaSync.cpp": [
+      "DayCycle/FiskDayState.h",
+      "Economy/FiskDaySettlement.h",
+      "Fishing/FiskCatchCatalog.h",
+      "UI/FiskMarinaPanel.h",
+      "World/FiskMarinaHub.h"
+    ],
     "Source/FiskGame/Private/Boats/FiskBoardingController.Angler.cpp": [
       "DayCycle/FiskDayState.h",
       "Fishing/FiskPrototypeRod.h"
@@ -55,13 +62,6 @@
       "UI/FiskSeaChart.h",
       "UI/FiskSkipperPanel.h",
       "Voyage/FiskVoyagePlan.h"
-    ],
-    "Source/FiskGame/Private/Boats/FiskBoardingController.Marina.cpp": [
-      "DayCycle/FiskDayState.h",
-      "Economy/FiskDaySettlement.h",
-      "Fishing/FiskCatchCatalog.h",
-      "UI/FiskMarinaPanel.h",
-      "World/FiskMarinaHub.h"
     ],
     "Source/FiskGame/Private/Boats/FiskBoardingController.Recovery.cpp": [
       "Bootstrap/FiskBootstrapGameMode.h",

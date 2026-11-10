@@ -1,3 +1,4 @@
+#include "Boats/Controller/FiskMarinaSync.h"
 #include "Boats/FiskBoardingController.h"
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskMarinaHub.h"
@@ -9,9 +10,13 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerState.h"
 
-void AFiskBoardingController::ServerMarinaIdentity_Implementation(FGuid Profile,FFiskMarinaIdentity Identity)
+UFiskMarinaSync::UFiskMarinaSync() { SetIsReplicatedByDefault(true); }
+AFiskBoardingController& UFiskMarinaSync::Controller() const { return *CastChecked<AFiskBoardingController>(GetOwner()); }
+
+void UFiskMarinaSync::ServerMarinaIdentity_Implementation(FGuid Profile,FFiskMarinaIdentity Identity)
 {
-    TActorIterator<AFiskMarinaHub> Hub(GetWorld());const bool Allowed=bCareerReady && ServerCareer.Id==Profile && Identity.IsOwnedBy(ServerCareer) && PlayerState && MarinaPanel->IsAtDock() && Hub;
+    AFiskBoardingController& PC=Controller();APlayerState* PlayerState=PC.PlayerState;const bool bCareerReady=PC.IsCareerReady();const FFiskCareerProfile& ServerCareer=PC.GetServerCareer();
+    TActorIterator<AFiskMarinaHub> Hub(GetWorld());const bool Allowed=bCareerReady && ServerCareer.Id==Profile && Identity.IsOwnedBy(ServerCareer) && PlayerState && PC.GetMarinaPanel()->IsAtDock() && Hub;
     TArray<FFiskMarinaTrophy> Records;
     if(Allowed) { if(const FFiskMarinaResident* R=Hub->GetResidents().FindByPredicate([&](const FFiskMarinaResident& V){return V.Profile==Profile;})) { Records=R->Trophies; } }
     const bool Accepted=Allowed && Hub->Upsert(Profile,PlayerState->GetPlayerId(),Identity,Records);
@@ -19,10 +24,11 @@ void AFiskBoardingController::ServerMarinaIdentity_Implementation(FGuid Profile,
     ClientMarinaIdentity(Accepted,Identity,Accepted?TEXT("Naust og navn bekreftet."):TEXT("Naustendring avvist. Egen profil, kjøpt pynt og marina kreves."));
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_IDENTITY accepted=%d player=%d style=%d color=%d decor=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Identity.Style,Identity.Color,Identity.Decor);
 }
-void AFiskBoardingController::ClientMarinaIdentity_Implementation(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason)
-{ if(Accepted) { MarinaPanel->ReceiveIdentity(Identity); }else { MarinaPanel->RejectIdentity(Reason); } }
-void AFiskBoardingController::ServerMarinaRecords_Implementation(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records)
+void UFiskMarinaSync::ClientMarinaIdentity_Implementation(bool Accepted,FFiskMarinaIdentity Identity,const FString& Reason)
+{ UFiskMarinaPanel* Panel=Controller().GetMarinaPanel();if(Accepted) { Panel->ReceiveIdentity(Identity); }else { Panel->RejectIdentity(Reason); } }
+void UFiskMarinaSync::ServerMarinaRecords_Implementation(FGuid Profile,const TArray<FFiskMarinaTrophy>& Records)
 {
+    AFiskBoardingController& PC=Controller();APlayerState* PlayerState=PC.PlayerState;const bool bCareerReady=PC.IsCareerReady();const FFiskCareerProfile& ServerCareer=PC.GetServerCareer();
     TActorIterator<AFiskMarinaHub> Hub(GetWorld());TActorIterator<AFiskDaySettlement> Settlement(GetWorld());const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
     if(!bCareerReady || Profile!=ServerCareer.Id || !PlayerState || !Hub || !Day || Records.Num()>FiskCatches::Count) { return; }
     const FFiskMarinaResident* Existing=Hub->GetResidents().FindByPredicate([&](const FFiskMarinaResident& R){return R.Profile==Profile;});if(!Existing) { return; }
@@ -40,17 +46,19 @@ void AFiskBoardingController::ServerMarinaRecords_Implementation(FGuid Profile,c
     Hub->Upsert(Profile,PlayerState->GetPlayerId(),Existing->Identity,Combined);
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_RECORDS player=%d records=%d"),PlayerState->GetPlayerId(),Combined.Num());
 }
-void AFiskBoardingController::ServerMarinaSay_Implementation(int32 Code)
+void UFiskMarinaSync::ServerMarinaSay_Implementation(int32 Code)
 {
+    AFiskBoardingController& PC=Controller();APlayerState* PlayerState=PC.PlayerState;const bool bCareerReady=PC.IsCareerReady();
     TActorIterator<AFiskMarinaHub> Hub(GetWorld());const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const double Now=GetWorld()->GetRealTimeSeconds();
-    const bool Accepted=bCareerReady && PlayerState && Day && Hub && Code>=0 && Code<5 && MarinaPanel->IsAtDock() && Now-LastMarinaMessage>=2 && Hub->Say(PlayerState->GetPlayerId(),Code,Day->GetElapsedMilliseconds());
-    if(Accepted) { LastMarinaMessage=Now; }else { ClientActionFeedback(TEXT("Melding avvist. Vent 2 sekunder og bruk strandbaren ved marinaen.")); }
+    const bool Accepted=bCareerReady && PlayerState && Day && Hub && Code>=0 && Code<5 && PC.GetMarinaPanel()->IsAtDock() && Now-LastMarinaMessage>=2 && Hub->Say(PlayerState->GetPlayerId(),Code,Day->GetElapsedMilliseconds());
+    if(Accepted) { LastMarinaMessage=Now; }else { PC.ClientActionFeedback(TEXT("Melding avvist. Vent 2 sekunder og bruk strandbaren ved marinaen.")); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_MESSAGE accepted=%d player=%d code=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Code);
 }
 
-void AFiskBoardingController::ServerHarbourPlace_Implementation(FGuid Profile,int32 Place)
+void UFiskMarinaSync::ServerHarbourPlace_Implementation(FGuid Profile,int32 Place)
 {
+    AFiskBoardingController& PC=Controller();APlayerState* PlayerState=PC.PlayerState;const bool bCareerReady=PC.IsCareerReady();const FFiskCareerProfile& ServerCareer=PC.GetServerCareer();
     TActorIterator<AFiskMarinaHub> Hub(GetWorld());
-    const bool Accepted=Hub && PlayerState && FiskHarbour::CanChoose(bCareerReady,Profile==ServerCareer.Id,MarinaPanel->IsAtDock(),Place) && Hub->SetPlace(PlayerState->GetPlayerId(),Place);
+    const bool Accepted=Hub && PlayerState && FiskHarbour::CanChoose(bCareerReady,Profile==ServerCareer.Id,PC.GetMarinaPanel()->IsAtDock(),Place) && Hub->SetPlace(PlayerState->GetPlayerId(),Place);
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HARBOUR_PRESENCE accepted=%d player=%d place=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Place);
 }

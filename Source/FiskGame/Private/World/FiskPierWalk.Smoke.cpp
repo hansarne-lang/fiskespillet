@@ -46,7 +46,7 @@ void UFiskPierWalk::RunSmoke()
     if(SmokeStage==1)
     {
         if(!bEnabled || !Own->bWalking || P->GetViewTarget()!=H) { if(Now-SmokeAt>12) { Fail(TEXT("mode_camera_or_public_position_missing")); }return; }
-        if(!Tour) { auto Identity=Panel->GetIdentity();Identity.Color=(Role+1)%6;P->ServerMarinaIdentity(GI->Career.Id,Identity);SmokeStage=30;SmokeWaypoint=0;return; }
+        if(!Tour) { auto Identity=Panel->GetIdentity();Identity.Color=(Role+1)%6;P->GetMarinaSync()->ServerMarinaIdentity(GI->Career.Id,Identity);SmokeStage=30;SmokeWaypoint=0;return; }
         ServerPierInput(FGuid::NewGuid(),Generation,200,{0,1},true);ServerPierInput(GI->Career.Id,Generation-1,201,{0,1},true);ServerPierInput(GI->Career.Id,Generation,0,{0,1},true);ServerPierInput(GI->Career.Id,Generation,202,{4,0},true);
         SmokeOrigin=Position;Key(EKeys::W);Key(EKeys::LeftShift);SmokeAt=Now;SmokeStage=2;return;
     }

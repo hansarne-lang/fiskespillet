@@ -88,7 +88,7 @@ bool UFiskPierWalk::HandleKey(const FInputKeyEventArgs& A)
     if(Press && A.Key==EKeys::E) { Interact();return true; }
     if(Press && A.Key==EKeys::M) { P->GetMarinaPanel()->ToggleHarbourMusic();return true; }
     if(Press && A.Key==EKeys::C) { CameraMode=(CameraMode+1)%3;return true; }
-    const FKey Greetings[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};for(int32 I=0;I<5;++I) { if(Press && A.Key==Greetings[I]) { P->ServerMarinaSay(I);return true; } }
+    const FKey Greetings[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};for(int32 I=0;I<5;++I) { if(Press && A.Key==Greetings[I]) { P->GetMarinaSync()->ServerMarinaSay(I);return true; } }
     if(Press && A.Key==EKeys::Left) { CameraYaw-=15;return true; }if(Press && A.Key==EKeys::Right) { CameraYaw+=15;return true; }
     if(Press && A.Key==EKeys::MouseScrollUp) { Zoom=FMath::Clamp(Zoom-.1f,.7f,1.6f);return true; }if(Press && A.Key==EKeys::MouseScrollDown) { Zoom=FMath::Clamp(Zoom+.1f,.7f,1.6f);return true; }
     if(Press && A.Key==EKeys::Home) { Zoom=1;CameraYaw=0;CameraMode=0;return true; }

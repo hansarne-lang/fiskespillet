@@ -43,7 +43,6 @@ struct FFiskBoardingSmokeState
     int32 ExpeditionSmokeStage=0;
     double ExpeditionSmokeAt=0;
     FTimerHandle ExpeditionSmokeTimer;
-    bool bTestJournalAckDropped=false;
     FString CareerSmokeMode,CareerSmokeDir;
     FTimerHandle CareerSmokeTimer;
     int32 CareerSmokeStage=0,CareerSmokeRevision=0;

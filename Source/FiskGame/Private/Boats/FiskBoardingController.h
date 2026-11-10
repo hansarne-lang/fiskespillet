@@ -7,10 +7,9 @@
 #include "FiskCareerProfile.h"
 #include "FiskMarinaTypes.h"
 #include "FiskRodStick.h"
-#include "UI/FiskJournalModel.h"
-#include "Expedition/FiskExpeditionModel.h"
 #include "Angler/FiskAnglerModel.h"
 #include "Boats/Controller/FiskMarinaSync.h"
+#include "Boats/Controller/FiskRecoverySync.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -73,12 +72,9 @@ public:
     UFUNCTION(Server,Reliable) void ServerVoyageNext(int32 Day,int32 Revision,int32 BoatRevision);
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
     UFiskMarinaSync* GetMarinaSync() const { return MarinaSync; }   // Boathouse, bar and harbour calls (#113 step 3)
+    UFiskRecoverySync* GetRecoverySync() const { return RecoverySync; }   // Journal and medal recovery (#113 step 4)
+    FString CareerAuthorityFile() const;   // Host copy of this player's career; its folder holds the journal archive
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
-    UFUNCTION(Client,Reliable) void ClientJournalBatch(FGuid Profile,int32 Serial,const TArray<FFiskJournalEntry>& Entries);
-    UFUNCTION(Server,Reliable) void ServerJournalAck(FGuid Profile,int32 Serial);
-    void TickJournalRecovery();
-    UFUNCTION(Client,Reliable) void ClientExpeditionBatch(FGuid Profile,int32 Serial,const TArray<FFiskExpeditionRecord>& Entries);
-    UFUNCTION(Server,Reliable) void ServerExpeditionAck(FGuid Profile,int32 Serial);
     UFUNCTION(Server,Reliable) void ServerExpeditionChoose(int32 Revision,int32 Goal);
     UFUNCTION(Server,Reliable) void ServerExpeditionReady(int32 Revision,bool Ready);
     UFUNCTION(Server,Reliable) void ServerExpeditionSay(int32 Code);
@@ -180,20 +176,13 @@ private:
     UPROPERTY() TObjectPtr<UFiskMarinaPanel> MarinaPanel;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskPierWalk> PierWalk;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskMarinaSync> MarinaSync;
-    FFiskJournalModel RecoverySnapshot;
-    TArray<FFiskExpeditionRecord> ExpeditionSnapshot;
-    int32 ExpeditionOffset=0,ExpeditionSerial=0,ExpeditionSentCount=0,ClientExpeditionSerial=0;
-    bool bExpeditionAwaiting=false;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskRecoverySync> RecoverySync;
     double LastExpeditionMessage=-10;
-    void TickExpeditionRecovery();
-    int32 RecoveryRevision=-1,RecoveryOffset=0,RecoverySerial=0,RecoverySentCount=0,ClientRecoverySerial=0;
-    bool bRecoveryAwaiting=false,bRecoveryReported=false;
     FFiskCareerProfile ServerCareer,PendingCareer;
     int32 CareerAck=0,ShopRow=0;
     bool bCareerReady=false,bCareerVisible=false,bCareerHelloSent=false;
     double CareerRetryAt=0;
     FTimerHandle CareerTimer;
-    FString CareerAuthorityFile() const;
     bool SaveServerCareer(const FFiskCareerProfile& Candidate,const FString& Message);
     FFiskBetBoardView BetBoard;
     void SendBetBoard(const FString& Message);

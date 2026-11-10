@@ -44,8 +44,12 @@ $exclusive = @('MainMenu', 'SoloPlay')   # use 7777/17784 from game code; cannot
 # SeaChart: FiskGroundSmoke.cpp captures chart-underway only between 5 and 6 game seconds.
 # The others failed at scale 4 on 9 November 2026 (panels, shared plan, day 2, screenshots; #136)
 # but passed at scale 1 in the release run on ab10973.
-$realtimeOnly = @('SeaChart', 'AnglerRelease', 'ExpeditionRelease', 'ExplorationRelease', 'FishingRelease',
+# RigSetup: the host's fight timed out at scale 4 on main and in three PR runs, but passed at scale 1.
+$realtimeOnly = @('SeaChart', 'RigSetup', 'AnglerRelease', 'ExpeditionRelease', 'ExplorationRelease', 'FishingRelease',
     'MangroveRelease', 'NavigationRelease', 'SkipperRelease')
+# Real-time scripts that take 20-30 minutes; -Fast leaves them to the nightly Release run.
+$slowRealtime = @('AnglerRelease', 'ExpeditionRelease', 'ExplorationRelease', 'FishingRelease', 'MangroveRelease',
+    'NavigationRelease', 'SkipperRelease')
 function Get-Python { foreach ($name in 'python', 'py') { if (Get-Command $name -ErrorAction SilentlyContinue) { return $name } }; return $null }
 $all = @(Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Run-*.ps1' | Where-Object { $_.BaseName -ne 'Run-All' } |
     ForEach-Object { $_.BaseName.Substring(4) } | Sort-Object)
@@ -67,7 +71,7 @@ if ($Release) {
     # -Fast (PR runs): when a change needs every script, leave the slow real-time scripts (20-30
     # minutes each) to the nightly Release run. A script select_tests.py picks by name still runs.
     if ($Fast -and $out -contains 'ALL') {
-        $slow = @($realtimeOnly | Where-Object { $_ -ne 'SeaChart' })
+        $slow = $slowRealtime
         "Fast: left to the nightly Release run: $($slow -join ', ')"
         $selected = @($selected | Where-Object { $slow -notcontains $_ })
     }

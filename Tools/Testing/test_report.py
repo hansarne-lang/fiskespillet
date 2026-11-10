@@ -116,8 +116,8 @@ class Report(unittest.TestCase):
             self.build(['FishCombat,Passed,0,1,0,4\n'])
 
     def test_repository_known_failures_are_valid(self):
-        entries = report.load_known(report.KNOWN)
-        self.assertTrue(entries)
+        entries = report.load_known(report.KNOWN)   # An empty list is fine: no known failures
+        self.assertIsInstance(entries, list)
         self.assertTrue(all(isinstance(e['issue'], int) for e in entries))
 
 

@@ -18,7 +18,7 @@ Tester: `Fiskelaget.Economy.BettingExamples` (de fem eksemplene) og `Fiskelaget.
 
 ## Gjenstår
 
-1. **Hvilke fangster sammenlignes?** Modellen tar imot de tellende fangstene fra kalleren: levert innen fristen, fisken tilhører stangeieren. Reglene sier at det satses på fiskere «som fortsatt er ute». Eksempel 3 viser at en fisker ingen har satset på, kan ha største fisk. Før koblingen må prosjekteieren bekrefte at sammenligningen gjelder fiskerne som var ute da veddemålene kunne registreres, og ikke spillere som allerede var i land.
+1. **Hvilke fangster sammenlignes?** Avgjort 10. november 2026 (DECISIONS.md): bare tellende fangster fra fiskere som var ute på sjøen da veddemålene kunne registreres. Spillere som allerede var i land, er ikke med. Serveren må derfor huske hvilke fiskere som var ute ved første registrering, og gi bare deres fangster til `Settle`.
 2. **Belastning av innsatsen:** karrieren trenger en idempotent trekk-kvittering for innsats (FiskCore), etter samme mønster som `Buy`/`Credit`.
 3. **Server og nettverk:** registrering i strandbaren, kontroll av at spilleren er i land og fiskeren ute, lagring av boka for dagen og utbetaling ved 17:00 sammen med det felles oppgjøret.
 4. **Brukerflate:** valg av fisker og innsats i strandbaren (B). Resultatene vises først ved 17:00.

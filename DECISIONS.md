@@ -86,3 +86,7 @@ Innsatsgrensen begrenser også virkningen av saldo fra andre verter, som ikke ka
 - Fordi repoet er offentlig, kjører jobben aldri kode fra forks: bare PR-er fra grener i repoet, push og manuell kjøring. Eksterne bidragsytere må godkjennes i GitHub. Jobben har bare lesetilgang.
 - Runneren kjører i prosjekteierens innloggede skrivebordsøkt (ikke som tjeneste), fordi røyktestene trenger skjerm og SpilLan-publiseringen må kjøre som brukeren.
 - `windows-build` er ikke påkrevd for fletting, så main stoppes ikke når PC-en er av. Oppsett: [WINDOWS_CI.md](Docs/Development/WINDOWS_CI.md).
+
+## 2026-11-10 — Veddemål: hvilke fiskere som sammenlignes
+
+Prosjekteieren godkjente forslaget fra #143: Ved kåring av største fisk sammenlignes bare tellende fangster (levert innen fristen, fisken tilhører stangeieren) fra fiskere som var ute på sjøen da veddemålene kunne registreres. Spillere som allerede var i land, er ikke med i sammenligningen, selv om de har levert fisk. Gjelder #22 steg 2.

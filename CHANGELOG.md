@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## Musstyrt stang – under arbeid
+
+I fiskekampen styres stanga med musa, uten å holde knapper. Musa opp pumper, musa ned sveiver inn av seg selv, og musehjulet er bremsen. Piltastene virker også. Det er standard og kan slås av under Innstillinger, sammen med musfølsomhet. Fiskekampens regler og nettverksprotokollen er uendret. Innstillingsfila får versjon 2. Issue #132.
+
 ## SpilLan – 9. november 2026
 
 FISKELAGET kan publiseres til launcheren SpilLan med eget kortbilde, én mappe per versjon og lagring i brukermappa (`-SaveToUserDir`). Spillernavnet fra SpilLan blir standardnavn i naustet. Ingen spillregler er endret. [Oppskrift](Docs/Development/SPILLAN.md), issue #130.

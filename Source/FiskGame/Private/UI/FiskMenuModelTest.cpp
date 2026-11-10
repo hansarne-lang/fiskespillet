@@ -28,6 +28,13 @@ bool FFiskMenuNavigationTest::RunTest(const FString& Parameters)
     M.Address=TEXT("127.0.0.1"); TestTrue(TEXT("Valid join"),M.Activate()==EFiskMenuAction::Join);
     M.Back(); M.Selected=2; M.Activate(); TestTrue(TEXT("Settings"),M.Page==EFiskMenuPage::Settings);
     M.Activate(); TestFalse(TEXT("Mute"),M.bSound); M.Move(1); M.Activate(); TestEqual(TEXT("30 FPS"),M.FrameRate,30);
+    TestEqual(TEXT("Five settings rows"),M.Rows(),5);
+    M.Move(1); TestTrue(TEXT("Rod control toggles off"),M.Activate()==EFiskMenuAction::RodControl && !M.bMouseRod);
+    M.Activate(); TestTrue(TEXT("Rod control toggles back on"),M.bMouseRod);
+    M.Move(1); M.Activate(); TestEqual(TEXT("Sensitivity medium to high"),M.RodSensitivity,3);
+    M.Activate(); TestEqual(TEXT("Sensitivity wraps to low"),M.RodSensitivity,1);
+    M.Move(1); TestTrue(TEXT("Last row returns"),M.Activate()==EFiskMenuAction::None && M.Page==EFiskMenuPage::Home);
+    M.Selected=2; M.Activate(); TestTrue(TEXT("Reopen settings"),M.Page==EFiskMenuPage::Settings);
     M.Back(); TestTrue(TEXT("Back to home"),M.Page==EFiskMenuPage::Home);
     M.Show(EFiskMenuPage::Session); M.Selected=1; M.Activate(); M.Back(); TestTrue(TEXT("Back to session"),M.Page==EFiskMenuPage::Session);
     TestTrue(TEXT("Resume without pausing world"),M.Back()==EFiskMenuAction::Resume && M.Page==EFiskMenuPage::Closed);

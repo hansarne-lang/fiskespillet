@@ -52,13 +52,15 @@ Lukk kart og paneler før du trykker R.
 | 1 / 2 / 3 | Velg din stang (opptil tre, avhengig av båt og mannskap) |
 | F | Sett ut valgt stang |
 | X | Trekk inn stanga eller avbryt kampen |
-| Venstre mus (hold) | Løft stanga, slipp for å senke |
-| Høyre mus (hold) | Sveiv inn |
+| Musa opp | Løft stanga (pump). Stanga blir stående der du slipper musa |
+| Musa ned | Senk stanga. Snella sveiver inn av seg selv, men slurer under utras |
+| Pil opp / pil ned | Løft eller senk stanga trinnvis uten mus |
+| Venstre / høyre mus (hold) | Gammel knappestyring: løft og sveiv. Et klikk gir knappene kontrollen til du flytter musa igjen |
 | Musehjul | Stram eller løsne bremsen |
 | Mellomrom | Land fisken når den er nær og under kontroll |
 | Å | AI-testhjelp: forsøker én vanlig kamp og landing etter napp. Å eller manuell kontroll tar over igjen. Finnes i Development-pakken, ikke i Shipping-bygg |
 
-Napp kommer etter noen minutter og varsles med en tydelig lyd. Pump ved å løfte uten å sveive, og senk så mens du sveiver inn. Stram ikke bremsen for hardt under utras, ellers ryker lina. Slakk line for lenge mister fisken. F6 i hovedmenyen åpner fiskeskolen, der du kan øve uten at det påvirker karrieren.
+Napp kommer etter noen minutter og varsles med en tydelig lyd. Pump ved å føre musa rolig opp, og før den så ned mens snella sveiver inn. Du trenger ikke holde noen knapp. Måleren til høyre i kampfeltet viser stangvinkelen. Over gullstreken holder stanga spenningen når du lar musa ligge. Musstyrt stang og musfølsomhet (lav, middels, høy) velges under Innstillinger. Slår du av musstyringen, gjelder knappene som før. Stram ikke bremsen for hardt under utras, ellers ryker lina. Slakk line for lenge mister fisken. F6 i hovedmenyen åpner fiskeskolen, der du kan øve uten at det påvirker karrieren.
 
 ## Resultater og samlinger
 

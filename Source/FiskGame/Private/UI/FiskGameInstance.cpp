@@ -53,13 +53,14 @@ void UFiskGameInstance::Init()
     FFiskUserSettings UserSettings;
     UserSettings.Load(FPaths::Combine(FFiskUserSettings::DataDirectory(), TEXT("FiskelagetSettings.ini")));
     bSound = UserSettings.bSound; FrameRate = UserSettings.FrameRate;
+    bMouseRod = UserSettings.bMouseRod; RodSensitivity = UserSettings.RodSensitivity;
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_USER_DATA directory=%s"), *FFiskUserSettings::DataDirectory());
     if (GEngine)
     {
         GEngine->OnNetworkFailure().AddUObject(this, &UFiskGameInstance::NetworkFailure);
         GEngine->OnTravelFailure().AddUObject(this, &UFiskGameInstance::TravelFailure);
     }
-    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_LOADED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate);
+    UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_LOADED sound=%d fps=%d mouse_rod=%d sensitivity=%d"), bSound ? 1 : 0, FrameRate, bMouseRod ? 1 : 0, RodSensitivity);
 }
 FString UFiskGameInstance::CareerFile() const
 { return FPaths::Combine(FFiskUserSettings::DataDirectory(),TEXT("FiskelagetCareer.ini")); }
@@ -166,6 +167,7 @@ void UFiskGameInstance::ApplySettings(bool bSave)
     if (bSave)
     {
         FFiskUserSettings UserSettings; UserSettings.bSound = bSound; UserSettings.FrameRate = FrameRate;
+        UserSettings.bMouseRod = bMouseRod; UserSettings.RodSensitivity = RodSensitivity;
         const bool Saved = UserSettings.Save(FPaths::Combine(FFiskUserSettings::DataDirectory(), TEXT("FiskelagetSettings.ini")));
         if (Saved) { UE_LOG(LogTemp, Display, TEXT("FISKELAGET_SETTINGS_SAVED sound=%d fps=%d"), bSound ? 1 : 0, FrameRate); }
         else

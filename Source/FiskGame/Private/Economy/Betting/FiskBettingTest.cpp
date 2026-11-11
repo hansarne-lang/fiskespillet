@@ -122,4 +122,21 @@ bool FFiskBettingCountingTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("No delivered fish leaves the fisher out"), FFiskBetBook::CountingCatches({Row(1, {-9000})}, Careers, TSet<FGuid>{X}).IsEmpty());
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskBettingSummaryTest,"Fiskelaget.Economy.BettingBarSummary",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskBettingSummaryTest::RunTest(const FString& Parameters)
+{
+    const FGuid A = FGuid::NewGuid(), B = FGuid::NewGuid(), C = FGuid::NewGuid(), X = FGuid::NewGuid(), Y = FGuid::NewGuid();
+    FFiskBetBook Book;
+    Book.Register(FGuid::NewGuid(), A, X, 10000); Book.Register(FGuid::NewGuid(), B, X, 5000); Book.Register(FGuid::NewGuid(), C, Y, 25000);
+    const TArray<FFiskBetCatch> Counting = {{X, 9100}, {Y, 4200}};
+    const FFiskBetSummary S = FFiskBetBook::Summarize(Book.GetBets(), Book.Settle(Counting), Counting);
+    TestEqual(TEXT("Pot"), S.Pot, 40000LL); TestEqual(TEXT("Bets"), S.Bets, 3); TestFalse(TEXT("Not a refund"), S.bRefund);
+    TestEqual(TEXT("Two winning bettors"), S.Winners, 2); TestTrue(TEXT("Winning fisher"), S.WinningFishers.Num() == 1 && S.WinningFishers[0] == X);
+    TestEqual(TEXT("Winning weight"), S.WinningGrams, 9100);
+    const FFiskBetSummary R = FFiskBetBook::Summarize(Book.GetBets(), Book.Settle({}), {});
+    TestTrue(TEXT("No counting catch is a refund without winners"), R.bRefund && R.Winners == 0 && R.WinningFishers.IsEmpty() && R.Pot == 40000);
+    const FFiskBetSummary E = FFiskBetBook::Summarize({}, {}, {});
+    TestTrue(TEXT("No bets"), E.Bets == 0 && E.Pot == 0 && !E.bRefund);
+    return true;
+}
 #endif

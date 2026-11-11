@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## Strandbaren og brygga – under arbeid
+
+Navn i stedet for spillernummer på bartavla, i ekspedisjons- og dekkpanelet og på resultatskjermen. Etter 17:00 viser bartavla dagens veddemålsresultat: potten, hvem vinnerne satset på og med hvilken fisk. Figurer som går på brygga holder en kroppsbredde avstand og viker til siden når de møtes. To nye hilsener i baren: 6 «Skål!» og 7 «Gratulerer med fangsten!». Nye nettverkskall krever ny protokollversjon (24) i neste testversjon. Issue #18.
+
 ## v0.23 Testversjon – 11. november 2026
 
 Samler alt siden v0.22 i én spillbar versjon for SpilLan og LAN-test: veddemål i strandbaren, musstyrt stang, testbudsjett og Windows-bygg på byggemaskinen. Spillerkontrolleren er delt i komponenter per område (#113); nettverkskallene har samme navn, men ligger nå på komponentene, så nettverksprotokollen er økt til 23. Versjoner før 0.23 kan derfor ikke spille sammen med 0.23. Røyktestene måler reisetid fra serverens etappe (#162). Ingen spillregler er endret utover veddemål og musstyring.

@@ -132,11 +132,18 @@ void UFiskCareerSync::SendBetBoard(const FString& Message)
     const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();if(!Mode) { return; }
     FGuid Fisher;int64 Stake=0,Payout=-1;Mode->BetBoard(ServerCareer.Id,Fisher,Stake,Payout);
     ClientBetBoard(Fisher,Stake,Mode->BetPot(),Mode->BetCount(),Payout,Mode->AreBetsOpen(),Message);
+    if(Mode->AreBetsSettled())
+    { const FFiskBetSummary& S=Mode->GetBetSummary();ClientBetSummary(S.Pot,S.Bets,S.bRefund,S.WinningFishers,S.WinningGrams,S.Winners); }
 }
 void UFiskCareerSync::ClientBetBoard_Implementation(FGuid Fisher,int64 Stake,int64 Pot,int32 Count,int64 Payout,bool bOpen,const FString& Message)
 {
+    if(bOpen) { BetBoard.bSettled=false;BetBoard.WinningFishers.Reset(); }
     BetBoard.Fisher=Fisher;BetBoard.Stake=Stake;BetBoard.Pot=Pot;BetBoard.Count=Count;BetBoard.Payout=Payout;BetBoard.bOpen=bOpen;BetBoard.bKnown=true;
     if(!Message.IsEmpty()) { BetBoard.Message=Message; }
+}
+void UFiskCareerSync::ClientBetSummary_Implementation(int64 Pot,int32 Bets,bool bRefund,const TArray<FGuid>& WinningFishers,int32 WinningGrams,int32 Winners)
+{
+    BetBoard.bSettled=true;BetBoard.Pot=Pot;BetBoard.Count=Bets;BetBoard.bRefund=bRefund;BetBoard.WinningFishers=WinningFishers;BetBoard.WinningGrams=WinningGrams;BetBoard.Winners=Winners;
 }
 void UFiskCareerSync::ClaimBetPayouts()
 {

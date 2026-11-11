@@ -50,7 +50,7 @@ void UFiskMarinaSync::ServerMarinaSay_Implementation(int32 Code)
 {
     AFiskBoardingController& PC=Controller();APlayerState* PlayerState=PC.PlayerState;const bool bCareerReady=PC.IsCareerReady();
     TActorIterator<AFiskMarinaHub> Hub(GetWorld());const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const double Now=GetWorld()->GetRealTimeSeconds();
-    const bool Accepted=bCareerReady && PlayerState && Day && Hub && Code>=0 && Code<5 && PC.GetMarinaPanel()->IsAtDock() && Now-LastMarinaMessage>=2 && Hub->Say(PlayerState->GetPlayerId(),Code,Day->GetElapsedMilliseconds());
+    const bool Accepted=bCareerReady && PlayerState && Day && Hub && Code>=0 && Code<AFiskMarinaHub::PhraseCount && PC.GetMarinaPanel()->IsAtDock() && Now-LastMarinaMessage>=2 && Hub->Say(PlayerState->GetPlayerId(),Code,Day->GetElapsedMilliseconds());
     if(Accepted) { LastMarinaMessage=Now; }else { PC.ClientActionFeedback(TEXT("Melding avvist. Vent 2 sekunder og bruk strandbaren ved marinaen.")); }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_MESSAGE accepted=%d player=%d code=%d"),Accepted,PlayerState?PlayerState->GetPlayerId():-1,Code);
 }

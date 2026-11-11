@@ -27,4 +27,23 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskGreetingDays,"Fiskelaget.Pier.GreetingDoes
 bool FFiskGreetingDays::RunTest(const FString&) { FFiskGreetingClock C;C.Observe(1,TEXT("A"),267);TestTrue(TEXT("Fresh wave"),C.IsWaving(TEXT("A"),268));TestFalse(TEXT("Expires"),C.IsWaving(TEXT("A"),272));C.Observe(1,TEXT("A"),1467);TestFalse(TEXT("Old message does not retrigger"),C.IsWaving(TEXT("A"),1468));return true; }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskGreetingOwners,"Fiskelaget.Pier.GreetingsSeparatePeople",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FFiskGreetingOwners::RunTest(const FString&) { FFiskGreetingClock C;C.Observe(1,TEXT("A"),1);C.Observe(2,TEXT("B"),3);TestFalse(TEXT("A expired"),C.IsWaving(TEXT("A"),5));TestTrue(TEXT("B active"),C.IsWaving(TEXT("B"),5));TestFalse(TEXT("Other name"),C.IsWaving(TEXT("C"),5));return true; }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPierPeople,"Fiskelaget.Pier.WalkersKeepApartAndPass",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FFiskPierPeople::RunTest(const FString&)
+{
+    // Two walkers meet head-on on the main pier. They keep a body's width apart and still get past each other.
+    FVector A(-1300,0,130),B(-1300,300,130);bool Passed=false;double Closest=FVector::Dist2D(A,B);
+    for(int32 I=0;I<400 && !Passed;++I)
+    {
+        A=FiskPier::StepAmong(A,{0,1},.1,false,{B});B=FiskPier::StepAmong(B,{0,-1},.1,false,{A});
+        Closest=FMath::Min(Closest,FVector::Dist2D(A,B));Passed=A.Y>B.Y+FiskPier::PersonGap;
+        if(!FiskPier::Inside(A) || !FiskPier::Inside(B)) { AddError(TEXT("Sidestep left the pier"));return false; }
+    }
+    TestTrue(TEXT("Head-on walkers pass each other"),Passed);
+    TestTrue(TEXT("Never closer than the gap"),Closest>=FiskPier::PersonGap-.01);
+    // Walkers that start on the same spot can always separate.
+    const FVector Same=FiskPier::Spawn();TestTrue(TEXT("Same spot can separate"),FVector::Dist2D(Same,FiskPier::StepAmong(Same,{1,0},.1,false,{Same}))>1);
+    // Nobody else around: the same step as before.
+    TestEqual(TEXT("Unchanged alone"),FiskPier::StepAmong(Same,{0,1},.1,false,{}),FiskPier::Step(Same,{0,1},.1,false));
+    return true;
+}
 #endif

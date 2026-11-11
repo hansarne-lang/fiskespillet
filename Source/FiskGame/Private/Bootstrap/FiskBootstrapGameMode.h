@@ -50,6 +50,8 @@ public:
     void BetBoard(const FGuid& Bettor,FGuid& Fisher,int64& Stake,int64& Payout) const;
     int64 BetPot() const { return BetBook.Pot(); }
     int32 BetCount() const { return BetBook.GetBets().Num(); }
+    bool AreBetsSettled() const { return bBetsSettled; }
+    const FFiskBetSummary& GetBetSummary() const { return BetSummary; }   // Public after 17:00 (#18)
 
 private:
     AFiskStarterBoat* SpawnFleetBoat(int32 Player);
@@ -63,6 +65,7 @@ private:
     TMap<FGuid,FFiskBetPayout> UnclaimedBets;  // By payout receipt; kept across days until claimed
     TMap<FGuid,int64> BetResults;              // Today's payout per bettor, for the bar board
     bool bBetsSettled=false;
+    FFiskBetSummary BetSummary;
     void ResetBetsForDay();
     FGuid ArchivedDay;
     int32 ArchiveRevision=0;

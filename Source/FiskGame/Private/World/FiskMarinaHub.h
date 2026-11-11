@@ -23,6 +23,7 @@ public:
     bool SetWalking(int32 Player,bool Enabled,FVector Position,float Yaw,float Speed);
     const TArray<FFiskMarinaResident>& GetResidents() const { return Residents; }
     const TArray<FFiskMarinaMessage>& GetMessages() const { return Messages; }
+    static constexpr int32 PhraseCount=7;   // Fixed bar messages; codes are sent over the network, never renumber
     static const TCHAR* Phrase(int32 Code);
     static FVector HousePosition(int32 Slot) { return FVector(-3000-1700*(FMath::Clamp(Slot,0,11)%4),4500+2300*(FMath::Clamp(Slot,0,11)/4),0); }
 private:

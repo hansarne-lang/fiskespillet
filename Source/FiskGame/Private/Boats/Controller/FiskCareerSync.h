@@ -6,7 +6,12 @@
 class AFiskBoardingController;
 
 // What the beach bar shows of the server's bet book (#22 step 2): own bet, pot and own result.
-struct FFiskBetBoardView { FGuid Fisher;int64 Stake=0,Pot=0,Payout=-1;int32 Count=0;bool bOpen=false,bKnown=false;FString Message; };
+struct FFiskBetBoardView
+{
+    FGuid Fisher;int64 Stake=0,Pot=0,Payout=-1;int32 Count=0;bool bOpen=false,bKnown=false;FString Message;
+    // The day's public result, sent only after the 17:00 settlement (#18)
+    bool bSettled=false,bRefund=false;TArray<FGuid> WinningFishers;int32 WinningGrams=0,Winners=0;
+};
 
 // The player's career on the host: hello and snapshots, local save acknowledgements, the shop, boat
 // choice, the 17:00 settlement and beach bar bets (#113 step 5). Moved from AFiskBoardingController
@@ -33,6 +38,7 @@ public:
     UFUNCTION(Server,Reliable) void ServerPlaceBet(FGuid Bet,FGuid Fisher,int64 Stake);
     UFUNCTION(Server,Reliable) void ServerBetBoard();
     UFUNCTION(Client,Reliable) void ClientBetBoard(FGuid Fisher,int64 Stake,int64 Pot,int32 Count,int64 Payout,bool bOpen,const FString& Message);
+    UFUNCTION(Client,Reliable) void ClientBetSummary(int64 Pot,int32 Bets,bool bRefund,const TArray<FGuid>& WinningFishers,int32 WinningGrams,int32 Winners);
 private:
     AFiskBoardingController& PC() const;
     bool SaveServerCareer(const FFiskCareerProfile& Candidate,const FString& Message);

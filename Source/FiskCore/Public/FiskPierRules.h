@@ -18,6 +18,23 @@ namespace FiskPier
         const int32 N=FMath::Max(1,FMath::CeilToInt(D/10));const FVector V(A.X*D/N,A.Y*D/N,0);
         for(int32 I=0;I<N;++I) { FVector Q=P+V;if(Inside(Q)) { P=Q;continue; }Q=P+FVector(V.X,0,0);if(Inside(Q)) { P=Q; }Q=P+FVector(0,V.Y,0);if(Inside(Q)) { P=Q; } }return P;
     }
+    // Walkers keep a body's width apart (#18). A move that ends closer to another walker than the gap,
+    // and closer than before, is refused; moving away is always allowed, so walkers that start on the same
+    // spot can separate. A blocked walker tries to step 60 degrees aside, so two people meeting on a narrow
+    // pier pass each other instead of locking up.
+    inline constexpr double PersonGap=2*BodyRadius;
+    inline bool PersonClear(FVector From,FVector To,const TArray<FVector>& Others)
+    {
+        for(const FVector& O:Others) { const double D=FVector::Dist2D(To,O);if(D<PersonGap && D<FVector::Dist2D(From,O)-.01) { return false; } }
+        return true;
+    }
+    inline FVector StepAmong(FVector P,FVector2D Axis,double Delta,bool Sprint,const TArray<FVector>& Others)
+    {
+        const FVector Q=Step(P,Axis,Delta,Sprint);if(PersonClear(P,Q,Others)) { return Q; }
+        const double Turns[]={-60.,60.};
+        for(const double Turn:Turns) { const FVector S=Step(P,Axis.GetRotated(Turn),Delta,Sprint);if(PersonClear(P,S,Others)) { return S; } }
+        return P;
+    }
     inline FVector HouseDoor(int32 I) { return FVector(-3000-1700*(FMath::Clamp(I,0,11)%4),3850+2300*(FMath::Clamp(I,0,11)/4),130); }
     inline bool NearBar(FVector P) { return FVector::Dist2D(P,FVector(-4200,-2700,130))<650; }
     inline bool NearBoat(FVector P) { return FVector::Dist2D(P,FVector(-550,0,130))<550; }

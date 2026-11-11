@@ -34,6 +34,18 @@ struct FFiskBetPayout
     bool bRefund = false;
 };
 
+// The day's public result for the bar board, shown after 17:00 (#18): pot, how many bet, whether all
+// stakes went back, which fishers won and with how many grams, and how many bettors won.
+struct FFiskBetSummary
+{
+    int64 Pot = 0;
+    int32 Bets = 0;
+    bool bRefund = false;
+    TArray<FGuid> WinningFishers;
+    int32 WinningGrams = 0;
+    int32 Winners = 0;
+};
+
 class FFiskBetBook
 {
 public:
@@ -55,6 +67,7 @@ public:
     // its rod owner) for each fisher who was out at sea while bets could be registered. Rows are
     // matched to careers through the day's player-to-career binding; a fisher without a delivered
     // fish is left out.
+    static FFiskBetSummary Summarize(const TArray<FFiskBet>& Bets, const TArray<FFiskBetPayout>& Payouts, const TArray<FFiskBetCatch>& Counting);
     static TArray<FFiskBetCatch> CountingCatches(const TArray<FFiskDayResult>& Rows, const TMap<int32, FGuid>& Careers, const TSet<FGuid>& OutAtSea);
 private:
     TArray<FFiskBet> Bets;

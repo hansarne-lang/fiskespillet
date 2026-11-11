@@ -77,6 +77,27 @@ void AFiskBoardingController::RunLanSmoke()
         return;
     }
 
+    // A fish too big for the hold is towed and the cargo rules send the boat home at once (#136), so the
+    // boat may already be returning when this 0.5 s timer first sees the landed rod. The duplicate landing
+    // must still be tried; the server rejects it either way (#162).
+    auto TryDuplicateLanding = [&]()
+    {
+        if (Smoke.bSmokeTriedDuplicateLanding) { return; }
+        Smoke.bSmokeTriedDuplicateLanding = true;
+        UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_%s player=%d"),
+            Rod->GetState() == EFiskRodState::Landed ? TEXT("DUPLICATE_LANDING") : TEXT("LOSS_LANDING"), PlayerId);
+        RequestLand(); RequestLand();
+        if (!bCaptain)
+        {
+            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_GUEST_RETURN player=%d"), PlayerId);
+            RequestDeparture();
+        }
+    };
+    if (Progress > AFiskStarterBoat::AtFishingSpot && Progress < AFiskStarterBoat::AtMarina
+        && (Rod->GetState() == EFiskRodState::Landed || Rod->GetState() == EFiskRodState::Lost))
+    {
+        TryDuplicateLanding();
+    }
     if (Progress != AFiskStarterBoat::AtFishingSpot)
     {
         return;
@@ -131,18 +152,7 @@ void AFiskBoardingController::RunLanSmoke()
     case EFiskRodState::ReadyToLand: RequestLand(); break;
     case EFiskRodState::Landed:
     case EFiskRodState::Lost:
-        if (!Smoke.bSmokeTriedDuplicateLanding)
-        {
-            Smoke.bSmokeTriedDuplicateLanding = true;
-            UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_%s player=%d"),
-                Rod->GetState() == EFiskRodState::Landed ? TEXT("DUPLICATE_LANDING") : TEXT("LOSS_LANDING"), PlayerId);
-            RequestLand(); RequestLand();
-            if (!bCaptain)
-            {
-                UE_LOG(LogTemp, Display, TEXT("FISKELAGET_TEST_GUEST_RETURN player=%d"), PlayerId);
-                RequestDeparture();
-            }
-        }
+        TryDuplicateLanding();
         break;
     default: break;
     }

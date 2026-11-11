@@ -1,4 +1,5 @@
 #include "UI/FiskDeckPanel.h"
+#include "UI/FiskPlayerNames.h"
 #include "UI/FiskNavigationModel.h"
 #include "UI/FiskGameInstance.h"
 #include "Boats/FiskBoardingController.h"
@@ -16,7 +17,7 @@
 namespace FiskDeckStyle
 {
 const FLinearColor Ink(0.012f,0.045f,0.06f,0.94f),Teal(0.45f,0.94f,0.82f),Muted(0.64f,0.81f,0.85f),Gold(1,0.79f,0.36f);
-FString Who(int32 Player,int32 Self) { return Player==Self?TEXT("Deg"):FString::Printf(TEXT("Spiller %d"),Player); }
+FString Who(const UWorld* World,int32 Player,int32 Self) { return Player==Self?TEXT("Deg"):FiskPlayerNames::Name(World,Player); }
 }
 void UFiskDeckPanel::Open(bool Sonar)
 {
@@ -105,7 +106,7 @@ void UFiskDeckPanel::Draw(AHUD& HUD,UCanvas& Canvas)
     {
         const FFiskBoardRow& R=Rows[Page*6+I];const float Y=208+I*57;
         Rect(52,Y,1160,49,R.Player==Self?FLinearColor(0.09f,0.25f,0.27f):FLinearColor(0.025f,0.10f,0.13f));
-        Text(FString::Printf(TEXT("%d.  %s"),R.Rank,*Who(R.Player,Self)),68,Y+14,1.1f,R.Player==Self?Teal:FLinearColor::White);
+        Text(FString::Printf(TEXT("%d.  %s"),R.Rank,*Who(GetWorld(),R.Player,Self)),68,Y+14,1.1f,R.Player==Self?Teal:FLinearColor::White);
         if(bRecords)
         {
             const FFiskSpecies* Species=FiskCatches::Find(R.Species);

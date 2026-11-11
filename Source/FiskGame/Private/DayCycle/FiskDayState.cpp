@@ -59,6 +59,30 @@ int32 AFiskDayState::ScaledElapsedMilliseconds(double WallSeconds, int32 Scale)
     return FMath::FloorToInt(Delta * 1000.0);
 }
 
+int32 AFiskDayState::NextMilestone(int32 ElapsedSeconds)
+{
+    static constexpr int32 Milestones[]={PreparationEnd,900,SettlementStart,DayEnd};
+    for(const int32 M:Milestones) { if(ElapsedSeconds<M) { return M; } }
+    return -1;
+}
+
+bool AFiskDayState::SkipToNextMilestone(int32& OutSeconds)
+{
+    OutSeconds=-1;
+#if UE_BUILD_SHIPPING
+    return false;
+#else
+    if(!HasAuthority() || !HasStarted()) { return false; }
+    const int32 Target=NextMilestone(GetElapsedSeconds());if(Target<0) { return false; }
+    // Move the day's start back so the scaled clock reads the milestone now. Everything that reads the
+    // day clock (boats, rods, the 17:00 settlement) sees the jump on its next tick.
+    StartedMonotonic=FPlatformTime::Seconds()-(Target+0.001)/static_cast<double>(FMath::Clamp(ClockScale,1,MaxTestClockScale));
+    Clock.ElapsedMs=GetElapsedMilliseconds();LastMinute=-1;OutSeconds=Target;
+    UE_LOG(LogTemp,Warning,TEXT("FISKELAGET_CLOCK_SKIPPED day=%d ms=%d (test only)"),Clock.Number,Clock.ElapsedMs);
+    OnRep_Clock();ForceNetUpdate();return true;
+#endif
+}
+
 void AFiskDayState::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);

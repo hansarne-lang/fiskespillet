@@ -35,7 +35,9 @@ void UFiskSeaChart::Smoke()
     const UFiskPrototypeRod& Rod=*PC->GetRod();const int32 Depth=GetNetMode()==NM_Client?90:80;
     const double Now=Day->GetElapsedRealSeconds();
     // Observe return immediately, even while the other player's landing animation finishes.
-    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now;ExpectedReturn=Boat->GetLegTravelMs()/1000.0; }
+    // The return may start before the captain presses R: a fish too big for the hold is towed and the
+    // cargo rules send the boat home at once (#136). Measure from the server's own leg start (#162).
+    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=Boat->GetLegStartedMs()/1000.0;ExpectedReturn=Boat->GetLegTravelMs()/1000.0; }
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_CHART_TEST_FAILED player=%d stage=%d %s"),Id,Stage,Why);};
     TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
     if(Settlement && !Settlement->GetView().Results.IsEmpty() && Day->GetElapsedSeconds()<1020) { Fail(TEXT("early_results"));return; }
@@ -129,14 +131,15 @@ void UFiskSeaChart::Smoke()
             TravelAt=Now;Key(EKeys::R);
         }
         if(Boat->GetTripProgress()<=100) { return; }
-        if(ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now;ExpectedReturn=Boat->GetLegTravelMs()/1000.0; }
+        if(ReturnAt<0) { ReturnAt=Boat->GetLegStartedMs()/1000.0;ExpectedReturn=Boat->GetLegTravelMs()/1000.0; }
         PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::M);Capture(TEXT("chart-return"));Stage=12;
     }
     else if(Stage==12)
     {
         if(Boat->GetGroundId()!=1 || Rod.GetRig().Depth!=Depth) { Fail(TEXT("return_route_or_rig_changed"));return; }
         if(Progress!=200 || Boat->GetActorLocation().Size()>5) { return; }
-        const double Duration=Now-ReturnAt;
+        // Read the leg at arrival, so the values belong to the return leg even if replication lagged when it began.
+        ExpectedReturn=Boat->GetLegTravelMs()/1000.0;const double Duration=Now-Boat->GetLegStartedMs()/1000.0;
         // Expect the server's actual return leg (LegTravelMs), which includes towing by the cargo rules (#136).
         if(Duration<ExpectedReturn-1 || Duration>ExpectedReturn+3)
         { Fail(*FString::Printf(TEXT("return_time seconds=%.1f expected=%.1f"),Duration,ExpectedReturn));return; }

@@ -33,6 +33,8 @@ private:
     FTimerHandle SmokeTimer;
     int32 Stage=0,InitialRevision=-1;
     double MarkAt=0,TripAt=-1,ReturnAt=-1;
+    int32 ReturnLegSerial=-1,ReturnLegMs=0,ReturnLegStartMs=0;   // Server leg seen when the return began (#162)
+    int32 TripLegSerial=-1,TripLegMs=0;                          // Server leg seen when the trip out began (#162)
     FString CaptureDir;
 #endif
 };

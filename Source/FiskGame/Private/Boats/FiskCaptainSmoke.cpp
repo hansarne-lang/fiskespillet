@@ -40,7 +40,7 @@ void UFiskCrewPanel::Smoke()
     const int32 Progress=Boat->GetTripProgress(),Rev=Boat->GetRouteRevision();const double Now=Day->GetElapsedRealSeconds();
     const UFiskPrototypeRod& Rod=*PC->GetRod();
     auto Fail=[&](const TCHAR* Why){UE_LOG(LogTemp,Error,TEXT("FISKELAGET_CAPTAIN_TEST_FAILED player=%d stage=%d %s"),Self,Stage,Why);};
-    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=Now; }
+    if(Progress>100 && Progress<200 && ReturnAt<0) { ReturnAt=Now;ReturnLegSerial=Boat->GetLegSerial();ReturnLegMs=Boat->GetLegTravelMs();ReturnLegStartMs=Boat->GetLegStartedMs(); }
     if(Stage==0)
     {
         if(!Boat->IsAboard(Self)) { Key(EKeys::E);return; }
@@ -105,6 +105,7 @@ void UFiskCrewPanel::Smoke()
     else if(Stage==6)
     {
         if(Progress<0 || Progress>=100) { return; }
+        TripLegSerial=Boat->GetLegSerial();TripLegMs=Boat->GetLegTravelMs();
         if(Host) { TripAt=Now; }
         else { ChooseOther(); }
         Stage=7;
@@ -132,7 +133,10 @@ void UFiskCrewPanel::Smoke()
     else if(Stage==9)
     {
         if(Progress!=100 || FVector::Dist(Boat->GetActorLocation(),FiskGrounds::Find(0)->Position)>5) { return; }
-        if(Now-TripAt<11 || Now-TripAt>15) { Fail(TEXT("handoff_changed_travel_time"));return; }
+        // Same rule as the return below: the handoff must not restart or change the leg (#162).
+        if(Boat->GetLegSerial()!=TripLegSerial || Boat->GetLegTravelMs()!=TripLegMs || TripLegMs<11000 || TripLegMs>15000
+            || Now<(Boat->GetLegStartedMs()+TripLegMs)/1000.0-1)
+        { Fail(*FString::Printf(TEXT("handoff_changed_travel_time leg=%d/%d ms=%d/%d"),TripLegSerial,Boat->GetLegSerial(),TripLegMs,Boat->GetLegTravelMs()));return; }
         Key(EKeys::F);MarkAt=Now;Stage=10;
     }
     else if(Stage==10)
@@ -183,9 +187,13 @@ void UFiskCrewPanel::Smoke()
     else if(Stage==15)
     {
         if(Progress!=200 || Boat->GetActorLocation().Size()>5) { return; }
-        if(Now-ReturnAt<11 || Now-ReturnAt>15) { Fail(TEXT("handoff_changed_return_time"));return; }
+        // The handoff must not start a new leg or change its length. Compare the server's leg, not the
+        // time this 0.5 s test timer happened to notice the return (2 game seconds at clock scale 4) (#162).
+        if(Boat->GetLegSerial()!=ReturnLegSerial || Boat->GetLegTravelMs()!=ReturnLegMs || Boat->GetLegStartedMs()!=ReturnLegStartMs
+            || ReturnLegMs<11000 || ReturnLegMs>15000 || Now<(ReturnLegStartMs+ReturnLegMs)/1000.0-1)
+        { Fail(*FString::Printf(TEXT("handoff_changed_return_time leg=%d/%d ms=%d/%d"),ReturnLegSerial,Boat->GetLegSerial(),ReturnLegMs,Boat->GetLegTravelMs()));return; }
         if(Rod.GetState()==EFiskRodState::Fishing || Boat->GetCaptainId()!=Guest) { Fail(TEXT("return_status"));return; }
-        Capture(TEXT("crew-home"));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TEST_PASSED player=%d revision=%d return_seconds=%.3f"),Self,Rev,Now-ReturnAt);
+        Capture(TEXT("crew-home"));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TEST_PASSED player=%d revision=%d return_seconds=%.3f leg_ms=%d"),Self,Rev,Now-ReturnAt,ReturnLegMs);
         Stage=16;if(!Host) { GetWorld()->GetTimerManager().ClearTimer(SmokeTimer); }
     }
     else if(Stage==16 && Host && Boat->GetCrewCount()==1)

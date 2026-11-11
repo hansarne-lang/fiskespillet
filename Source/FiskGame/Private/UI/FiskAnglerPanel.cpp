@@ -118,14 +118,14 @@ bool UFiskAnglerPanel::HandleKey(const FInputKeyEventArgs& A)
     if(Press && (K==EKeys::One || K==EKeys::Two || K==EKeys::Three)) { PC->RequestRodSelection(K==EKeys::One?0:K==EKeys::Two?1:2); }
     const auto* B=PC->FindStarterBoat();const auto Advice=FiskAngler::Advice(B?B->GetGroundId():0,Bait);
     if(Press && K==EKeys::Enter) { PC->RequestRig(Advice.Bait,Advice.Depth,Advice.Program); }
-    if(Press && K==EKeys::F4) { TArray<FFiskRigSettings> Rigs;Rigs.Init(Advice,PC->GetRodCapacity());PC->ServerApplyRigBundle(PC->MakeRigBundle(Rigs)); }
+    if(Press && K==EKeys::F4) { TArray<FFiskRigSettings> Rigs;Rigs.Init(Advice,PC->GetRodCapacity());PC->GetRodCommands()->ServerApplyRigBundle(PC->MakeRigBundle(Rigs)); }
     if(Press && K==EKeys::F2) { bRenaming=true;EditName=Data.Loadouts[Slot].Name; }
     if(Press && K==EKeys::F5)
     {
         auto Candidate=Data;auto& Rigs=Candidate.Loadouts[Slot].Rigs;Rigs.Reset();for(int32 I=0;I<PC->GetRodCapacity();++I) { auto R=PC->GetRodAt(I)->GetRig();R.Revision=0;Rigs.Add(R); }
         if(!Rigs.IsEmpty() && Candidate.Save(File(),LoadedProfile)) { Data=Candidate;Message=TEXT("Hele ditt stangsett er lagret."); }else { Message=TEXT("Stangsettet kunne ikke lagres. Kontroller egne holdere og lagringsfil."); }
     }
-    if(Press && K==EKeys::F8) { PC->ServerApplyRigBundle(PC->MakeRigBundle(Data.Loadouts[Slot].Rigs)); }return true;
+    if(Press && K==EKeys::F8) { PC->GetRodCommands()->ServerApplyRigBundle(PC->MakeRigBundle(Data.Loadouts[Slot].Rigs)); }return true;
 }
 void UFiskAnglerPanel::Draw(AHUD& H,UCanvas& C) { if(Page==2) { DrawSchool(H,C); }else if(Page==1) { DrawWorkbench(H,C); } }
 void UFiskAnglerPanel::DrawNotice(AHUD& H,UCanvas& C) const

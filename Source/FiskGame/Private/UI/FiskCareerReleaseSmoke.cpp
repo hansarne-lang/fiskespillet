@@ -116,7 +116,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     else if(Smoke.CareerSmokeStage==12 && GetSelectedRod()==0 && !IsRodSelectionPending())
     {
         if(Solo && GetRodAt(2)->GetRig().Depth!=(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))?110:50)) { return; }
-        ServerSelectRod(Selection.Revision,Selection.Day,3);Shot(TEXT("offshore-ready"));Smoke.CareerSmokeStage=120;
+        RodCommands->ServerSelectRod(Selection.Revision,Selection.Day,3);Shot(TEXT("offshore-ready"));Smoke.CareerSmokeStage=120;
     }
     else if(Smoke.CareerSmokeStage==120)
     { if(Host && !Solo) { Key(EKeys::K);Shot(TEXT("offshore-crew"));Smoke.CareerSmokeStage=121; }else { Smoke.CareerSmokeStage=13; } }

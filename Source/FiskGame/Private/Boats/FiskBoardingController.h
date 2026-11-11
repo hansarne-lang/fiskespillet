@@ -2,18 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "Fishing/FiskRodSelection.h"
-#include "Fishing/FiskRigSettings.h"
 #include "FiskCareerProfile.h"
 #include "FiskMarinaTypes.h"
 #include "FiskRodStick.h"
-#include "Angler/FiskAnglerModel.h"
 #include "Boats/Controller/FiskMarinaSync.h"
 #include "Boats/Controller/FiskRecoverySync.h"
 #include "Boats/Controller/FiskCareerSync.h"
 #include "Boats/Controller/FiskFleetSync.h"
 #include "Boats/Controller/FiskExpeditionCommands.h"
 #include "Boats/Controller/FiskBoatCommands.h"
+#include "Boats/Controller/FiskRodCommands.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -37,19 +35,6 @@ class UFiskCollectionPanel;
 class UFiskPierWalk;
 class UFiskFishingHelp;
 
-UENUM()
-enum class EFiskRodAction : uint8
-{
-    Lift,
-    Lower,
-    Reel,
-    StopReel,
-    DragUp,
-    DragDown,
-    Withdraw,
-    Land
-};
-
 UCLASS()
 class AFiskBoardingController final : public APlayerController
 {
@@ -66,13 +51,20 @@ public:
     UFiskCollectionPanel* GetCollectionPanel() const { return CollectionPanel; }
     UFiskAnglerPanel* GetAnglerPanel() const { return AnglerPanel; }
     FFiskRigBundle MakeRigBundle(const TArray<FFiskRigSettings>& Rigs) const;
-    UFUNCTION(Server,Reliable) void ServerApplyRigBundle(FFiskRigBundle Bundle);
-    UFUNCTION(Client,Reliable) void ClientRigBundleReply(bool Accepted);
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
     UFiskMarinaSync* GetMarinaSync() const { return MarinaSync; }   // Boathouse, bar and harbour calls (#113 step 3)
     UFiskRecoverySync* GetRecoverySync() const { return RecoverySync; }   // Journal and medal recovery (#113 step 4)
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
     UFiskExpeditionCommands* GetExpeditionCommands() const { return ExpeditionCommands; }   // Goal, ready and crew messages (#113 step 7)
+    UFiskRodCommands* GetRodCommands() const { return RodCommands; }   // Own rods: selection, rig, cast and fight (#113 step 9)
+    // Rod state used by UFiskRodCommands. The rods and the chosen rod stay on the controller.
+    const FFiskRodSelection& GetRodSelection() const { return Selection; }
+    bool ApplyRodSelection(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot);   // Server: select and calm all rods
+    void ReceiveRodSelection(bool bAccepted,const FFiskRodSelection& Snapshot);  // Owning client
+    UFiskPrototypeRod* GetActiveRodForCommand() const { return MutableRod(); }   // The rod Selection points at
+    void SetRodRig(int32 Slot,const FFiskRigSettings& NewRig);                 // Server: rig set from the tackle shop
+    void ShowRigReply(bool bAccepted);                                            // Client: rig panel answer
+    bool CanUseRod() const;
     UFiskBoatCommands* GetBoatCommands() const { return BoatCommands; }   // Boarding, trip, route, travel votes and captain (#113 step 8)
     void ShowCaptainReply(bool bAccepted);       // Client: crew panel message for UFiskBoatCommands::ClientCaptainReply
     void ShowGroundReply(const FString& Message); // Client: sea chart message for UFiskBoatCommands::ClientGroundReply
@@ -109,8 +101,6 @@ public:
     int32 GetRejectedCaptainRequests() const { return BoatCommands->GetRejectedCaptainRequests(); }
 #endif
     void RequestRodSelection(int32 Slot);
-    UFUNCTION(Server,Reliable) void ServerSelectRod(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot);
-    UFUNCTION(Client,Reliable) void ClientRodSelection(bool bAccepted,FFiskRodSelection Snapshot);
     UFiskRigPanel* GetRigPanel() const { return RigPanel; }
     UFiskSeaChart* GetSeaChart() const { return SeaChart; }
     UFiskCrewPanel* GetCrewPanel() const { return CrewPanel; }
@@ -124,7 +114,6 @@ public:
     int32 GetResultPage() const { return ResultPage; }
     FString GetActionFeedback() const;
     UFUNCTION(Client,Reliable) void ClientActionFeedback(const FString& Message);
-    UFUNCTION(Client,Reliable) void ClientRigReply(bool bAccepted);
     const AFiskStarterBoat* FindStarterBoat() const;
     AFiskStarterBoat* GetSelectedFleetBoat() const { return SelectedFleetBoat; }
     AFiskVoyagePlan* FindVoyage() const;
@@ -140,7 +129,6 @@ public:
     bool CanOpenRig() const;
     void RequestRig(int32 Bait, int32 Depth, int32 Program);
     void ServerConfigureRig(FGuid ExpectedCast, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program);
-    UFUNCTION(Server,Reliable) void ServerConfigureSelectedRod(FFiskRodSelection Expected,FGuid ExpectedCast,int32 ExpectedRevision,int32 Bait,int32 Depth,int32 Program);
 
 protected:
     virtual void SetupInputComponent() override;
@@ -165,6 +153,7 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskFleetSync> FleetSync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskExpeditionCommands> ExpeditionCommands;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskBoatCommands> BoatCommands;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskRodCommands> RodCommands;
     int32 ShopRow=0;
     bool bCareerVisible=false;
     FTimerHandle CareerTimer;
@@ -186,7 +175,6 @@ private:
     void RequestCast();
 
     void ServerCastRod(FGuid ExpectedId);
-    UFUNCTION(Server,Reliable) void ServerCastSelectedRod(FFiskRodSelection Expected,FGuid ExpectedId);
 
     FFiskRodStick RodStick;
     FGuid StickCast;
@@ -202,10 +190,8 @@ private:
     void RequestDragDown();
     void RequestWithdraw();
     void RequestLand();
-    bool CanUseRod() const;
 
     void ServerActOnRod(EFiskRodAction Action, FGuid ExpectedId);
-    UFUNCTION(Server,Reliable) void ServerActOnSelectedRod(EFiskRodAction Action,FFiskRodSelection Expected,FGuid ExpectedId);
 
     UPROPERTY()
     TObjectPtr<UFiskPrototypeRod> Rod;

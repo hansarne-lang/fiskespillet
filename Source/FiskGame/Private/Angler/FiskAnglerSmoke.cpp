@@ -72,8 +72,8 @@ void AFiskBoardingController::RunAnglerSmoke()
     else if(Smoke.AnglerStage==1 && Real-Smoke.AnglerAt>=2)
     {
         if(GetRod()->GetRig().Bait!=1 || GetRod()->GetRig().Program!=1) { Fail(TEXT("advice_not_server_applied"));return; }AnglerChangedRigs=Rigs();
-        auto Bad=MakeRigBundle(AnglerChangedRigs);--Bad.Day;ServerApplyRigBundle(Bad);Bad=MakeRigBundle(AnglerChangedRigs);Bad.Casts[0]=FGuid::NewGuid();ServerApplyRigBundle(Bad);Bad=MakeRigBundle(AnglerChangedRigs);--Bad.Revisions.Last();ServerApplyRigBundle(Bad);
-        Bad=MakeRigBundle(AnglerChangedRigs);Bad.Rigs[0].Bait=Bad.Rigs[0].Program=2;Bad.Rigs.Last().Depth=125;ServerApplyRigBundle(Bad);Smoke.AnglerAt=Real;Smoke.AnglerStage=2;
+        auto Bad=MakeRigBundle(AnglerChangedRigs);--Bad.Day;RodCommands->ServerApplyRigBundle(Bad);Bad=MakeRigBundle(AnglerChangedRigs);Bad.Casts[0]=FGuid::NewGuid();RodCommands->ServerApplyRigBundle(Bad);Bad=MakeRigBundle(AnglerChangedRigs);--Bad.Revisions.Last();RodCommands->ServerApplyRigBundle(Bad);
+        Bad=MakeRigBundle(AnglerChangedRigs);Bad.Rigs[0].Bait=Bad.Rigs[0].Program=2;Bad.Rigs.Last().Depth=125;RodCommands->ServerApplyRigBundle(Bad);Smoke.AnglerAt=Real;Smoke.AnglerStage=2;
     }
     else if(Smoke.AnglerStage==2 && Real-Smoke.AnglerAt>=2)
     { if(!Equal(AnglerChangedRigs,true)) { Fail(TEXT("rejected_bundle_partially_changed_rigs"));return; }Key(EKeys::F8);Smoke.AnglerAt=Real;Smoke.AnglerStage=3; }
@@ -81,7 +81,7 @@ void AFiskBoardingController::RunAnglerSmoke()
     { if(!Equal(AnglerOriginalRigs,false)) { Fail(TEXT("whole_loadout_not_restored"));return; }Shot(TEXT("angler-loadout-restored"));Smoke.AnglerAt=Real;Smoke.AnglerStage=4; }
     else if(Smoke.AnglerStage==4 && Real-Smoke.AnglerAt>=1) { Key(EKeys::Q);Smoke.AnglerStage=5; }
     if(Smoke.AnglerStage>=5 && !Smoke.bAnglerActiveProbe && GetRodAt(0)->GetState()==EFiskRodState::Fishing)
-    { AnglerFishingRigs=Rigs();ServerApplyRigBundle(MakeRigBundle(AnglerFishingRigs));Smoke.bAnglerActiveProbe=true;Smoke.AnglerAt=Real; }
+    { AnglerFishingRigs=Rigs();RodCommands->ServerApplyRigBundle(MakeRigBundle(AnglerFishingRigs));Smoke.bAnglerActiveProbe=true;Smoke.AnglerAt=Real; }
     if(Smoke.bAnglerActiveProbe && !Smoke.bAnglerActiveChecked && Real-Smoke.AnglerAt>=2)
     { if(!Equal(AnglerFishingRigs,true)) { Fail(TEXT("active_rod_bundle_changed_rigs"));return; }Smoke.bAnglerActiveChecked=true; }
     if(Smoke.AnglerStage==5 && D->GetDayNumber()==2 && Now>=45)

@@ -39,7 +39,7 @@ void AFiskBoardingController::RunCargoSmoke()
         if(Smoke.CargoMode==TEXT("tow") && B->GetCrewCount()!=2) { return; }
         if(B->GetGroundId()!=2) { if(B->GetCaptainId()==PlayerState->GetPlayerId()) { BoatCommands->ServerSelectSeaPoint(B->GetRouteRevision(),Full?FVector(80000,-30000,0):FiskGrounds::Find(2)->Position); }return; }
         if(GetRod()->GetRig().Depth!=40 || GetRod()->GetRig().Bait!=1 || GetRod()->GetRig().Program!=1)
-        { TArray<FFiskRigSettings> R;for(int32 I=0;I<GetRodCapacity();++I) { auto V=GetRodAt(I)->GetRig();V.Bait=1;V.Depth=40;V.Program=1;R.Add(V); }ServerApplyRigBundle(MakeRigBundle(R));return; }
+        { TArray<FFiskRigSettings> R;for(int32 I=0;I<GetRodCapacity();++I) { auto V=GetRodAt(I)->GetRig();V.Bait=1;V.Depth=40;V.Program=1;R.Add(V); }RodCommands->ServerApplyRigBundle(MakeRigBundle(R));return; }
         Smoke.CargoPaidCash=GI->Career.Cash;Key(EKeys::F11);Shot(TEXT("cargo-empty-hidden"));Smoke.CargoAt=Real;Smoke.CargoStage=1;
     }
     else if(Smoke.CargoStage==1 && Real-Smoke.CargoAt>=1) { Key(EKeys::F11);Key(EKeys::F9);Shot(TEXT("marine-deck-preview"));Smoke.CargoAt=Real;Smoke.CargoStage=15; }

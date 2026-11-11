@@ -2,6 +2,8 @@
 
 Status: godkjent av prosjekteieren 8. november 2026 i [PR #122](https://github.com/hansarne-lang/fiskespillet/pull/122#issuecomment-6719895702) for revisjon ec611e0, med forslagene slik de står: komponenter i `Boats/Controller/` først, og hvert steg integreres for seg. Steg 1 er levert i samme PR. Hvert av stegene 2–9 er en egen PR som bygges og LAN-testes på Windows før neste steg. Steg 2 starter når steg 1 er bygget og testet.
 
+Tilstand 11. november 2026: alle ni stegene er levert (steg 6–8 samlet i #160). LAN-økten med to PC-er gjenstår for stegene, og komponentene ligger fortsatt i `Boats/Controller/`.
+
 ## Utgangspunkt
 
 `AFiskBoardingController` (`Source/FiskGame/Private/Boats/`) er spillerens `APlayerController` og har vokst til å eie nesten all spillerlogikk:
@@ -37,7 +39,7 @@ Ingen spillregler, protokollregler eller lagringsformater endres. Navnene på ne
 | 6 ✅ | `UFiskFleetSync` (`Boats/Controller/FiskFleetSync.*`): valg, henting og forlating av båt. Valgt båt (`SelectedFleetBoat`) er fortsatt replikert fra kontrolleren; flåtepanelet (Tab) ble i kontrolleren. Antall include-unntak er uendret (412): to nye i komponenten, to borte i `.Fleet.cpp` | `ServerFleetSelect`, `ServerFleetLeave` | Middels |
 | 7 ✅ | `UFiskExpeditionCommands` (`Boats/Controller/FiskExpeditionCommands.*`): dagens ekspedisjon, med meldingssperren på 2 s. Sjekken av spillmodus bruker `AGameModeBase`, så komponenten ikke trenger Bootstrap-headeren. Antall include-unntak er uendret (412) | `ServerExpeditionChoose`, `ServerExpeditionReady`, `ServerExpeditionSay` | Lav |
 | 8 ✅ | `UFiskBoatCommands` (`Boats/Controller/FiskBoatCommands.*`): ombordstigning, reise, retur, rute, reisevisning og kaptein. `.Voyage.cpp` og `.Return.cpp` er borte; svarene til klienten vises av kontrollerens paneler (`ShowCaptainReply`, `ShowGroundReply`). Antall include-unntak er uendret (412) | `ServerStartBoatTrip`, `ServerReturnToMarina`, `ServerTravelVote`, `ServerSelectSeaPoint`, `ServerSelectGround`, `ClientGroundReply`, `ServerVoyageReplace`, `ServerVoyageNext`, `ServerTransferCaptain`, `ClientCaptainReply`, `ServerBoardStarterBoat` | Høy: kjernen i spillflyten |
-| 9 | `UFiskRodCommands`: stenger, rigg og kamp (`.Angler.cpp` og stangdelen av `.cpp`) | `ServerSelectRod`, `ClientRodSelection`, `ServerCastSelectedRod`, `ServerActOnSelectedRod`, `ServerConfigureSelectedRod`, `ClientRigReply`, `ServerApplyRigBundle`, `ClientRigBundleReply` | Høy: fiskekamp og nappetider |
+| 9 ✅ | `UFiskRodCommands` (`Boats/Controller/FiskRodCommands.*`): stangvalg, rigg, kast, kamphandlinger og stangsett. Stengene og valgt stang (`Selection`) blir i kontrolleren og endres gjennom `ApplyRodSelection`, `ReceiveRodSelection` og `SetRodRig`. `.Angler.cpp` er flyttet til komponenten; `EFiskRodAction` ligger i komponentens header. Kontrollerens header har ikke lenger egne include-unntak (412 totalt, uendret) | `ServerSelectRod`, `ClientRodSelection`, `ServerCastSelectedRod`, `ServerActOnSelectedRod`, `ServerConfigureSelectedRod`, `ClientRigReply`, `ServerApplyRigBundle`, `ClientRigBundleReply` | Høy: fiskekamp og nappetider |
 
 `ServerNextDay` og `ClientActionFeedback` blir værende i kontrolleren, fordi de hører til økten og den felles meldingslinjen.
 

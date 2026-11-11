@@ -21,10 +21,10 @@ void UFiskRodCommands::ClientRodSelection_Implementation(bool bAccepted,FFiskRod
 void UFiskRodCommands::ServerConfigureSelectedRod_Implementation(FFiskRodSelection Expected,FGuid ExpectedCast,int32 ExpectedRevision,int32 Bait,int32 Depth,int32 Program)
 {
     AFiskBoardingController& PC=Controller();
-    const bool bAccepted = PC.GetRodSelection().Matches(Expected) && PC.CanOpenRig() && PC.GetSelectedRod()->Configure(ExpectedCast, ExpectedRevision, Bait, Depth, Program);
+    const bool bAccepted = PC.GetRodSelection().Matches(Expected) && PC.CanOpenRig() && PC.GetActiveRodForCommand()->Configure(ExpectedCast, ExpectedRevision, Bait, Depth, Program);
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_RIG_%s player=%d revision=%d bait=%d depth=%d program=%d"),
         bAccepted ? TEXT("ACCEPTED") : TEXT("REJECTED"), PC.PlayerState ? PC.PlayerState->GetPlayerId() : INDEX_NONE,
-        PC.GetSelectedRod()->GetRig().Revision, PC.GetSelectedRod()->GetRig().Bait, PC.GetSelectedRod()->GetRig().Depth, PC.GetSelectedRod()->GetRig().Program);
+        PC.GetActiveRodForCommand()->GetRig().Revision, PC.GetActiveRodForCommand()->GetRig().Bait, PC.GetActiveRodForCommand()->GetRig().Depth, PC.GetActiveRodForCommand()->GetRig().Program);
     ClientRigReply(bAccepted);
 }
 void UFiskRodCommands::ServerCastSelectedRod_Implementation(FFiskRodSelection Expected,FGuid ExpectedId)
@@ -34,10 +34,10 @@ void UFiskRodCommands::ServerCastSelectedRod_Implementation(FFiskRodSelection Ex
     { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MULTI_ROD_REJECTED command=cast player=%d"),PC.PlayerState?PC.PlayerState->GetPlayerId():-1);return; }
     if (PC.GetRodSelection().Matches(Expected) && PC.CanUseRod())
     {
-        if (!PC.GetSelectedRod()->Cast(ExpectedId))
+        if (!PC.GetActiveRodForCommand()->Cast(ExpectedId))
         {
             UE_LOG(LogTemp, Display, TEXT("FISKELAGET_CAST_REJECTED player=%d expected=%s current=%s"),
-                PC.PlayerState->GetPlayerId(), *ExpectedId.ToString(EGuidFormats::Digits), *PC.GetSelectedRod()->GetCastId().ToString(EGuidFormats::Digits));
+                PC.PlayerState->GetPlayerId(), *ExpectedId.ToString(EGuidFormats::Digits), *PC.GetActiveRodForCommand()->GetCastId().ToString(EGuidFormats::Digits));
         }
     }
 }
@@ -50,30 +50,30 @@ void UFiskRodCommands::ServerActOnSelectedRod_Implementation(EFiskRodAction Acti
         return;
     }
 
-    if (!PC.GetSelectedRod()->IsCurrentCommand(ExpectedId))
+    if (!PC.GetActiveRodForCommand()->IsCurrentCommand(ExpectedId))
     {
         UE_LOG(LogTemp, Display, TEXT("FISKELAGET_ROD_COMMAND_REJECTED player=%d action=%d expected=%s current=%s"),
             PC.PlayerState->GetPlayerId(), static_cast<int32>(Action), *ExpectedId.ToString(EGuidFormats::Digits),
-            *PC.GetSelectedRod()->GetCastId().ToString(EGuidFormats::Digits));
+            *PC.GetActiveRodForCommand()->GetCastId().ToString(EGuidFormats::Digits));
         return;
     }
     switch (Action)
     {
     case EFiskRodAction::Lift:
-        PC.GetSelectedRod()->Lift();
+        PC.GetActiveRodForCommand()->Lift();
         break;
     case EFiskRodAction::Lower:
-        PC.GetSelectedRod()->Lower();
+        PC.GetActiveRodForCommand()->Lower();
         break;
     case EFiskRodAction::Reel:
-        PC.GetSelectedRod()->Reel();
+        PC.GetActiveRodForCommand()->Reel();
         break;
-    case EFiskRodAction::StopReel: PC.GetSelectedRod()->StopReel(); break;
-    case EFiskRodAction::DragUp: PC.GetSelectedRod()->AdjustDrag(1); break;
-    case EFiskRodAction::DragDown: PC.GetSelectedRod()->AdjustDrag(-1); break;
-    case EFiskRodAction::Withdraw: PC.GetSelectedRod()->Withdraw(); break;
+    case EFiskRodAction::StopReel: PC.GetActiveRodForCommand()->StopReel(); break;
+    case EFiskRodAction::DragUp: PC.GetActiveRodForCommand()->AdjustDrag(1); break;
+    case EFiskRodAction::DragDown: PC.GetActiveRodForCommand()->AdjustDrag(-1); break;
+    case EFiskRodAction::Withdraw: PC.GetActiveRodForCommand()->Withdraw(); break;
     case EFiskRodAction::Land:
-        PC.GetSelectedRod()->Land();
+        PC.GetActiveRodForCommand()->Land();
         break;
     }
 }

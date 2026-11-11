@@ -98,3 +98,12 @@ Prosjekteieren sa ja til begge punktene i B i [forslaget i #18](https://github.c
 - **Gange utenfor marinaen:** en strandpromenade fra baren vestover og en platting ut over sanden. Gangplanet holdes i bryggehøyde, så promenaden er en brygge over stranda; solsenger står på sanden ved siden av. Ingen gange på selve sanden eller utenfor marinaområdet ellers.
 - **Drinker i baren:** gratis og kun til pynt. Spilleren bestiller med 8, 9 eller 0, og bestillingen vises som en melding i baren. Ingen pris, saldo, effekt eller lagring.
 
+## 2026-11-11 — Flytte båten til nye fiskesteder underveis
+
+Prosjekteieren valgte begge endringene:
+
+1. **Nytt mål på vei ut:** kapteinen kan velge et nytt punkt på sjøkartet (eller neste stopp i turplanen) mens båten er på vei ut, ikke bare når den ligger på fiskeplassen. Båten svinger fra der den er. På vei hjem og ved brygga gjelder de gamle reglene.
+2. **Ledige stenger trekkes inn:** stenger som bare står ute og venter på napp, trekkes inn for alle om bord når kapteinen flytter. En stang med fisk på (napp, kamp eller klar til landing) stopper fortsatt flyttingen, og det gjør også en tvungen hjemtur fra lasten.
+
+Tidsrommet 02:00–17:00 og kravet om oppdatert båtstatus er uendret.
+

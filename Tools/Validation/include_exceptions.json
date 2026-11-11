@@ -58,9 +58,14 @@
       "Expedition/FiskExpeditionModel.h",
       "UI/FiskJournalModel.h"
     ],
-    "Source/FiskGame/Private/Boats/FiskBoardingController.Angler.cpp": [
+    "Source/FiskGame/Private/Boats/Controller/FiskRodCommands.cpp": [
       "DayCycle/FiskDayState.h",
       "Fishing/FiskPrototypeRod.h"
+    ],
+    "Source/FiskGame/Private/Boats/Controller/FiskRodCommands.h": [
+      "Angler/FiskAnglerModel.h",
+      "Fishing/FiskRigSettings.h",
+      "Fishing/FiskRodSelection.h"
     ],
     "Source/FiskGame/Private/Boats/FiskBoardingController.Fleet.cpp": [
       "DayCycle/FiskDayState.h",
@@ -100,11 +105,6 @@
       "World/FiskMarinaHub.h",
       "World/FiskOceanScene.h",
       "World/FiskPierWalk.h"
-    ],
-    "Source/FiskGame/Private/Boats/FiskBoardingController.h": [
-      "Angler/FiskAnglerModel.h",
-      "Fishing/FiskRigSettings.h",
-      "Fishing/FiskRodSelection.h"
     ],
     "Source/FiskGame/Private/Boats/FiskBoatPresentation.cpp": [
       "DayCycle/FiskDayState.h",

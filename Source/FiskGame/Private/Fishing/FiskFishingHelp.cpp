@@ -139,7 +139,7 @@ void UFiskFishingHelp::TickComponent(float Delta,ELevelTick Type,FActorComponent
         StopAssist();return;
     }
     if(Now<NextControlAt || Rod->GetState()==EFiskRodState::InitialRun) { return; }NextControlAt=Now+.09;
-    auto Act=[&](EFiskRodAction Action){PC->ServerActOnSelectedRod(Action,PC->Selection,TargetCast);};
+    auto Act=[&](EFiskRodAction Action){PC->GetRodCommands()->ServerActOnSelectedRod(Action,PC->Selection,TargetCast);};
     if(Rod->GetState()==EFiskRodState::ReadyToLand) { Act(EFiskRodAction::Land);return; }
     const auto Intent=Pilot.Step(Delta,Rod->IsSurging(),Rod->GetLoadPercent(),Rod->GetDragPercent());
     if(Rod->IsRaised()!=Intent.bRaise) { Act(Intent.bRaise?EFiskRodAction::Lift:EFiskRodAction::Lower); }

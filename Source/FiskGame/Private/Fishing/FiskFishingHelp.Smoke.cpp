@@ -112,7 +112,7 @@ void UFiskFishingHelp::RunSmoke()
         PC->SetMouseLocation(FMath::RoundToInt(1080*Scale),FMath::RoundToInt(270*Scale));Key(EKeys::LeftMouseButton);
         if(!bAssisting) { Fail(TEXT("help_button_restart_failed"));return; }
         // An earlier cast cannot control the current fight through the ordinary RPC.
-        PC->ServerActOnSelectedRod(EFiskRodAction::Land,PC->Selection,FGuid::NewGuid());
+        PC->GetRodCommands()->ServerActOnSelectedRod(EFiskRodAction::Land,PC->Selection,FGuid::NewGuid());
         Shot(TEXT("ai-help-active"));SmokeAt=Now;SmokeStage=6;return;
     }
     if(SmokeStage==6)

@@ -31,8 +31,8 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
         if(Smoke.FishingReleaseStage==0 && Day->GetDayNumber()==1 && Now>=40 && Smoke.ContentStage>=6)
         {
             if(GetRodCapacity()!=1) { Fail(TEXT("shared_capacity_wrong"));return; }
-            Key(EKeys::Two);ServerSelectRod(Selection.Revision,Selection.Day,1);
-            FFiskRodSelection Forged=Selection;Forged.Slot=1;ServerCastSelectedRod(Forged,Second->GetCastId());
+            Key(EKeys::Two);RodCommands->ServerSelectRod(Selection.Revision,Selection.Day,1);
+            FFiskRodSelection Forged=Selection;Forged.Slot=1;RodCommands->ServerCastSelectedRod(Forged,Second->GetCastId());
             FishingReleaseOldSelection=Selection;Smoke.FishingReleaseOldCast=First->GetCastId();
             Capture(TEXT("shared-rod-capacity"));Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=1;
         }
@@ -53,7 +53,7 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
         {
             if(Selection.Day!=2 || Selection.Slot!=0 || Second->GetState()!=EFiskRodState::Ready || Second->GetRig().Depth!=30)
             { Fail(TEXT("extra_rod_day_reset"));return; }
-            ServerActOnSelectedRod(EFiskRodAction::Withdraw,FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
+            RodCommands->ServerActOnSelectedRod(EFiskRodAction::Withdraw,FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
             Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=5;
         }
         else if(Smoke.FishingReleaseStage==5 && Now-Smoke.FishingReleaseAt>=1)
@@ -103,8 +103,8 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
     {
         if(First->GetState()!=EFiskRodState::Fishing || First->GetCastId()==Second->GetCastId()) { Fail(TEXT("two_passive_rods_failed"));return; }
         Smoke.FishingReleaseOldCast=Second->GetCastId();
-        ServerCastSelectedRod(FishingReleaseOldSelection,First->GetCastId());
-        ServerConfigureSelectedRod(FishingReleaseOldSelection,First->GetCastId(),First->GetRig().Revision,2,10,2);
+        RodCommands->ServerCastSelectedRod(FishingReleaseOldSelection,First->GetCastId());
+        RodCommands->ServerConfigureSelectedRod(FishingReleaseOldSelection,First->GetCastId(),First->GetRig().Revision,2,10,2);
         Capture(TEXT("two-passive-rods"));Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=12;
     }
     else if(Smoke.FishingReleaseStage==12 && Now-Smoke.FishingReleaseAt>=2)
@@ -133,7 +133,7 @@ void AFiskBoardingController::RunFishingReleaseSmoke()
     else if(Smoke.FishingReleaseStage==17 && GetSelectedRod()==1 && Now-Smoke.FishingReleaseAt>=1)
     {
         if(First->IsRaised() || First->IsReeling()) { Fail(TEXT("old_input_held_after_switch"));return; }
-        ServerActOnSelectedRod(EFiskRodAction::Lift,FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
+        RodCommands->ServerActOnSelectedRod(EFiskRodAction::Lift,FishingReleaseOldSelection,Smoke.FishingReleaseOldCast);
         Capture(TEXT("fight-input-released"));Smoke.FishingReleaseAt=Now;Smoke.FishingReleaseStage=18;
     }
     else if(Smoke.FishingReleaseStage==18 && Now-Smoke.FishingReleaseAt>=1)

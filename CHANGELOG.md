@@ -2,11 +2,15 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
-## Veddemål i strandbaren – under arbeid
+## v0.23 Testversjon – 11. november 2026
+
+Samler alt siden v0.22 i én spillbar versjon for SpilLan og LAN-test: veddemål i strandbaren, musstyrt stang, testbudsjett og Windows-bygg på byggemaskinen. Spillerkontrolleren er delt i komponenter per område (#113); nettverkskallene har samme navn, men ligger nå på komponentene, så nettverksprotokollen er økt til 23. Versjoner før 0.23 kan derfor ikke spille sammen med 0.23. Røyktestene måler reisetid fra serverens etappe (#162). Ingen spillregler er endret utover veddemål og musstyring.
+
+## Veddemål i strandbaren – 10. november 2026
 
 Når du er i land, kan du i strandbaren (B) satse $50, $100 eller $250 på en fisker som fortsatt er ute. Innsatsen trekkes med en egen kvittering, og oppgjøret kommer ved 17:00 sammen med dagens oppgjør. Største fisk levert innen fristen vinner; bare fiskere som var ute da veddemålene ble satt, sammenlignes. Reglene er eierens beslutninger 8. og 10. november 2026. Issue #22.
 
-## Musstyrt stang – under arbeid
+## Musstyrt stang – 10. november 2026
 
 I fiskekampen styres stanga med musa, uten å holde knapper. Musa opp pumper, musa ned sveiver inn av seg selv, og musehjulet er bremsen. Piltastene virker også. Det er standard og kan slås av under Innstillinger, sammen med musfølsomhet. Fiskekampens regler og nettverksprotokollen er uendret. Innstillingsfila får versjon 2. Issue #132.
 

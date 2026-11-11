@@ -2,7 +2,11 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
-## Strandbaren og brygga – under arbeid
+## v0.24 Testversjon – 11. november 2026
+
+Strandbaren og brygga (#18) og spoleknapp for test. Nettverksprotokollen er 24, så 0.23 og 0.24 kan ikke spille sammen.
+
+### Strandbaren og brygga
 
 Navn i stedet for spillernummer på bartavla, i ekspedisjons- og dekkpanelet og på resultatskjermen. Etter 17:00 viser bartavla dagens veddemålsresultat: potten, hvem vinnerne satset på og med hvilken fisk. Figurer som går på brygga holder en kroppsbredde avstand og viker til siden når de møtes. To nye hilsener i baren: 6 «Skål!» og 7 «Gratulerer med fangsten!». En strandpromenade går fra baren vestover til en platting over sanden med solsenger. Gratis drinker til pynt bestilles med 8, 9 og 0. I testversjoner kan verten spole klokka til neste milepæl med F12. Nye nettverkskall krever ny protokollversjon (24) i neste testversjon. Issue #18.
 

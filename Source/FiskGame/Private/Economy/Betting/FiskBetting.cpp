@@ -75,3 +75,19 @@ TArray<FFiskBetCatch> FFiskBetBook::CountingCatches(const TArray<FFiskDayResult>
     for (const TPair<FGuid, int32>& Pair : Largest) { FFiskBetCatch Catch; Catch.Fisher = Pair.Key; Catch.Grams = Pair.Value; Out.Add(Catch); }
     return Out;
 }
+
+FFiskBetSummary FFiskBetBook::Summarize(const TArray<FFiskBet>& Bets, const TArray<FFiskBetPayout>& Payouts, const TArray<FFiskBetCatch>& Counting)
+{
+    FFiskBetSummary S; S.Bets = Bets.Num();
+    for (const FFiskBet& Bet : Bets) { S.Pot += Bet.Stake; }
+    for (const FFiskBetPayout& Payout : Payouts)
+    {
+        S.bRefund |= Payout.bRefund;
+        if (Payout.bRefund || Payout.Amount <= 0) { continue; }
+        ++S.Winners;
+        const FFiskBet* Bet = Bets.FindByPredicate([&](const FFiskBet& B) { return FFiskCareerProfile::BetPayoutId(B.Id) == Payout.Receipt; });
+        if (Bet) { S.WinningFishers.AddUnique(Bet->Fisher); }
+    }
+    for (const FFiskBetCatch& Catch : Counting) { if (S.WinningFishers.Contains(Catch.Fisher)) { S.WinningGrams = FMath::Max(S.WinningGrams, Catch.Grams); } }
+    return S;
+}

@@ -49,4 +49,18 @@ bool FFiskDayClockScaleTest::RunTest(const FString& Parameters)
 #endif
     return true;
 }
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskDayMilestoneTest, "Fiskelaget.DayCycle.TestClockMilestones",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FFiskDayMilestoneTest::RunTest(const FString& Parameters)
+{
+    TestEqual(TEXT("Start skips to departure 02:00"), AFiskDayState::NextMilestone(0), AFiskDayState::PreparationEnd);
+    TestEqual(TEXT("Departure skips to 15:00"), AFiskDayState::NextMilestone(AFiskDayState::PreparationEnd), 900);
+    TestEqual(TEXT("Fishing skips to 15:00"), AFiskDayState::NextMilestone(500), 900);
+    TestEqual(TEXT("15:00 skips to the 17:00 settlement"), AFiskDayState::NextMilestone(900), AFiskDayState::SettlementStart);
+    TestEqual(TEXT("Settlement skips to 20:00"), AFiskDayState::NextMilestone(AFiskDayState::SettlementStart), AFiskDayState::DayEnd);
+    TestEqual(TEXT("No skip after 20:00"), AFiskDayState::NextMilestone(AFiskDayState::DayEnd), -1);
+    return true;
+}
 #endif

@@ -4,7 +4,8 @@
 namespace FiskPier
 {
     struct FArea { double X0,Y0,X1,Y1; };
-    inline constexpr FArea Areas[]={ {-1800,-3200,-900,10300},{-9000,3600,-1200,4100},{-9000,5900,-1200,6400},{-9000,8200,-1200,8700},{-5500,-3200,-1200,-2800},{-5400,-3000,-3000,-2050},{-1200,-350,-450,350} };
+    inline constexpr FArea Areas[]={ {-1800,-3200,-900,10300},{-9000,3600,-1200,4100},{-9000,5900,-1200,6400},{-9000,8200,-1200,8700},{-5500,-3200,-1200,-2800},{-5400,-3000,-3000,-2050},{-1200,-350,-450,350},
+        {-7600,-3000,-5000,-2600},{-7600,-3600,-6400,-1900} };   // Beach boardwalk west of the bar and its platform over the sand (#18)
     inline FVector Spawn() { return FVector(-1300,0,130); }
     inline bool Inside(FVector P) { if(P.ContainsNaN() || !FMath::IsFinite(P.X) || !FMath::IsFinite(P.Y) || FMath::Abs(P.Z-130)>1 || !FurnitureClear(P)) { return false; }for(const auto& A:Areas) { if(P.X>=A.X0+BodyRadius && P.X<=A.X1-BodyRadius && P.Y>=A.Y0+BodyRadius && P.Y<=A.Y1-BodyRadius) { return true; } }return false; }
     inline bool ValidAxis(FVector2D A) { return FMath::IsFinite(A.X) && FMath::IsFinite(A.Y) && A.SizeSquared()<=2.001; }
@@ -17,6 +18,23 @@ namespace FiskPier
         // Short swept substeps prevent thin furniture from being crossed by a large frame.
         const int32 N=FMath::Max(1,FMath::CeilToInt(D/10));const FVector V(A.X*D/N,A.Y*D/N,0);
         for(int32 I=0;I<N;++I) { FVector Q=P+V;if(Inside(Q)) { P=Q;continue; }Q=P+FVector(V.X,0,0);if(Inside(Q)) { P=Q; }Q=P+FVector(0,V.Y,0);if(Inside(Q)) { P=Q; } }return P;
+    }
+    // Walkers keep a body's width apart (#18). A move that ends closer to another walker than the gap,
+    // and closer than before, is refused; moving away is always allowed, so walkers that start on the same
+    // spot can separate. A blocked walker tries to step 60 degrees aside, so two people meeting on a narrow
+    // pier pass each other instead of locking up.
+    inline constexpr double PersonGap=2*BodyRadius;
+    inline bool PersonClear(FVector From,FVector To,const TArray<FVector>& Others)
+    {
+        for(const FVector& O:Others) { const double D=FVector::Dist2D(To,O);if(D<PersonGap && D<FVector::Dist2D(From,O)-.01) { return false; } }
+        return true;
+    }
+    inline FVector StepAmong(FVector P,FVector2D Axis,double Delta,bool Sprint,const TArray<FVector>& Others)
+    {
+        const FVector Q=Step(P,Axis,Delta,Sprint);if(PersonClear(P,Q,Others)) { return Q; }
+        const double Turns[]={-60.,60.};
+        for(const double Turn:Turns) { const FVector S=Step(P,Axis.GetRotated(Turn),Delta,Sprint);if(PersonClear(P,S,Others)) { return S; } }
+        return P;
     }
     inline FVector HouseDoor(int32 I) { return FVector(-3000-1700*(FMath::Clamp(I,0,11)%4),3850+2300*(FMath::Clamp(I,0,11)/4),130); }
     inline bool NearBar(FVector P) { return FVector::Dist2D(P,FVector(-4200,-2700,130))<650; }

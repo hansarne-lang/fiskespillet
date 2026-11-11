@@ -44,8 +44,9 @@ void AFiskBootstrapGameMode::SettleBets()
     if(bBetsSettled || !Settlement || !Settlement->GetView().bRevealed) { return; }
     BetBook.Close();bBetsSettled=true;
     const TArray<FFiskBetCatch> Counting=FFiskBetBook::CountingCatches(Settlement->GetView().Results,DayProfiles,BetFishers);
-    int32 Winners=0;bool Refund=false;
-    for(const FFiskBetPayout& Payout:BetBook.Settle(Counting))
+    int32 Winners=0;bool Refund=false;const TArray<FFiskBetPayout> Payouts=BetBook.Settle(Counting);
+    BetSummary=FFiskBetBook::Summarize(BetBook.GetBets(),Payouts,Counting);
+    for(const FFiskBetPayout& Payout:Payouts)
     { UnclaimedBets.Add(Payout.Receipt,Payout);BetResults.Add(Payout.Bettor,Payout.Amount);Winners+=Payout.Amount>0 && !Payout.bRefund?1:0;Refund|=Payout.bRefund; }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_BETS_SETTLED bets=%d pot=%lld counting=%d winners=%d refund=%d"),BetBook.GetBets().Num(),static_cast<long long>(BetBook.Pot()),Counting.Num(),Winners,Refund);
 }
@@ -64,4 +65,4 @@ void AFiskBootstrapGameMode::BetBoard(const FGuid& Bettor,FGuid& Fisher,int64& S
     if(const int64* Paid=BetResults.Find(Bettor)) { Payout=*Paid; }
 }
 void AFiskBootstrapGameMode::ResetBetsForDay()
-{ BetBook=FFiskBetBook();BetFishers.Reset();BetResults.Reset();bBetsSettled=false; }
+{ BetBook=FFiskBetBook();BetFishers.Reset();BetResults.Reset();bBetsSettled=false;BetSummary=FFiskBetSummary(); }

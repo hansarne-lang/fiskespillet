@@ -25,5 +25,15 @@ void FiskPierScenery::Build(AActor* O,UStaticMesh* Cube,UStaticMesh* Cylinder,UM
     auto Sign=[&](const TCHAR* Label,FVector P){Part(Cylinder,P+FVector(0,0,130),FVector(.1,.1,2.6),Dark);Part(Cube,P+FVector(0,0,270),FVector(2.7,.14,.7),Wood);auto* S=NewObject<UTextRenderComponent>(O,*FString::Printf(TEXT("PierSign%d"),N++));O->AddInstanceComponent(S);S->SetupAttachment(O->GetRootComponent());S->SetRelativeLocation(P+FVector(0,-9,280));S->SetRelativeRotation(FRotator(0,-90,0));S->SetHorizontalAlignment(EHTA_Center);S->SetWorldSize(24);S->SetText(FText::FromString(Label));S->RegisterComponent();};
     Sign(TEXT("OMBORD / E"),FVector(-1050,300,130));Sign(TEXT("STRANDBAR"),FVector(-1550,-2700,130));
     for(int32 I=0;I<3;++I) { Sign(*FString::Printf(TEXT("NAUST %d–%d"),I*4+1,I*4+4),FVector(-1550,3500+I*2300,130)); }
+    // Beach by the boardwalk (#18): sun loungers with umbrellas on the sand north of the platform. They stand
+    // outside the walkable deck, so they need no clearance.
+    Sign(TEXT("STRANDA"),FVector(-5200,-2500,130));
+    for(int32 I=0;I<4;++I)
+    {
+        const FVector P(-7300+I*260,-1650,30);
+        Part(Cube,P+FVector(0,0,18),FVector(.7,1.9,.12),FLinearColor(.93f,.9f,.82f));
+        Part(Cube,P+FVector(0,-80,40),FVector(.7,.35,.4),FLinearColor(.93f,.9f,.82f));
+        if(I%2==0) { Part(Cylinder,P+FVector(130,40,110),FVector(.05,.05,2.2),Dark);Part(Cylinder,P+FVector(130,40,220),FVector(2.2,2.2,.06),I==0?FLinearColor(.86f,.24f,.2f):FLinearColor(.16f,.5f,.72f)); }
+    }
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PIER_SCENERY parts=%d"),N);
 }

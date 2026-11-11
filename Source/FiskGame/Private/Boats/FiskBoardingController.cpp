@@ -75,6 +75,11 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     // Naming a favorite is modal: letters such as L (sea passport) must reach the name field
     // before any global shortcut (#125).
     if(SeaChart && SeaChart->IsRenaming() && SeaChart->HandleKey(Params)) { return true; }
+#if !UE_BUILD_SHIPPING
+    // Test-only clock skip to the next milestone (F12, host only). The skipper panel uses F12 for its own
+    // picture while it is open, so it keeps the key then.
+    if(Press && Params.Key==EKeys::F12 && !SkipperPanel->IsVisible()) { RequestClockSkip();return true; }
+#endif
     if(HandleFleetKey(Params)) { return true; }
     if(CollectionPanel->IsVisible()) { return CollectionPanel->HandleKey(Params); }
     if(Press && Params.Key==EKeys::Z && !AnglerPanel->IsVisible() && !SkipperPanel->IsVisible() && !MarinaPanel->IsVisible() && !ExpeditionPanel->IsVisible() && !JournalPanel->IsVisible() && !SeaChart->IsVisible() && !RigPanel->IsVisible() && !CrewPanel->IsVisible() && !DeckPanel->IsVisible() && !IsCareerVisible() && !bHelpVisible && !bResultsVisible && !bHistoryVisible) { CollectionPanel->Open();return true; }
@@ -598,4 +603,14 @@ FFiskRigBundle AFiskBoardingController::MakeRigBundle(const TArray<FFiskRigSetti
 {
     FFiskRigBundle B;const auto* D=GetWorld()->GetGameState<AFiskDayState>();B.Day=D?D->GetDayNumber():0;B.Rigs=Rigs;
     for(int32 I=0;I<GetRodCapacity();++I) { B.Casts.Add(GetRodAt(I)->GetCastId());B.Revisions.Add(GetRodAt(I)->GetRig().Revision); }return B;
+}
+void AFiskBoardingController::RequestClockSkip()
+{
+#if !UE_BUILD_SHIPPING
+    AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();int32 Seconds=-1;
+    if(!HasAuthority() || !IsLocalController()) { ClientActionFeedback_Implementation(TEXT("Bare verten kan spole klokka (testfunksjon).")); return; }
+    if(!Day || !Day->SkipToNextMilestone(Seconds)) { ClientActionFeedback_Implementation(TEXT("Ingen milepæl å spole til. Dagen er slutt eller ikke startet."));return; }
+    const FString Message=FString::Printf(TEXT("TEST: verten spolte klokka til %02d:00."),Seconds/60);
+    for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It) { if(auto* PC=Cast<AFiskBoardingController>(It->Get())) { PC->ClientActionFeedback(Message); } }
+#endif
 }

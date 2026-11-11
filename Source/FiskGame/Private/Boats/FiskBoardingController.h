@@ -170,6 +170,7 @@ private:
 
 
     void RequestDeparture();
+    void RequestClockSkip();   // F12, test builds only: host skips the day clock to the next milestone
 
 
     void RequestCast();

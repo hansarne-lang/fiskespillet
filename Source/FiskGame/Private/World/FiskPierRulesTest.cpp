@@ -27,4 +27,44 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskGreetingDays,"Fiskelaget.Pier.GreetingDoes
 bool FFiskGreetingDays::RunTest(const FString&) { FFiskGreetingClock C;C.Observe(1,TEXT("A"),267);TestTrue(TEXT("Fresh wave"),C.IsWaving(TEXT("A"),268));TestFalse(TEXT("Expires"),C.IsWaving(TEXT("A"),272));C.Observe(1,TEXT("A"),1467);TestFalse(TEXT("Old message does not retrigger"),C.IsWaving(TEXT("A"),1468));return true; }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskGreetingOwners,"Fiskelaget.Pier.GreetingsSeparatePeople",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FFiskGreetingOwners::RunTest(const FString&) { FFiskGreetingClock C;C.Observe(1,TEXT("A"),1);C.Observe(2,TEXT("B"),3);TestFalse(TEXT("A expired"),C.IsWaving(TEXT("A"),5));TestTrue(TEXT("B active"),C.IsWaving(TEXT("B"),5));TestFalse(TEXT("Other name"),C.IsWaving(TEXT("C"),5));return true; }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPierPeople,"Fiskelaget.Pier.WalkersKeepApartAndPass",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FFiskPierPeople::RunTest(const FString&)
+{
+    // Two walkers meet head-on on the main pier. They keep a body's width apart and still get past each other.
+    FVector A(-1300,0,130),B(-1300,300,130);bool Passed=false;double Closest=FVector::Dist2D(A,B);
+    for(int32 I=0;I<400 && !Passed;++I)
+    {
+        A=FiskPier::StepAmong(A,{0,1},.1,false,{B});B=FiskPier::StepAmong(B,{0,-1},.1,false,{A});
+        Closest=FMath::Min(Closest,FVector::Dist2D(A,B));Passed=A.Y>B.Y+FiskPier::PersonGap;
+        if(!FiskPier::Inside(A) || !FiskPier::Inside(B)) { AddError(TEXT("Sidestep left the pier"));return false; }
+    }
+    TestTrue(TEXT("Head-on walkers pass each other"),Passed);
+    TestTrue(TEXT("Never closer than the gap"),Closest>=FiskPier::PersonGap-.01);
+    // Walkers that start on the same spot can always separate.
+    const FVector Same=FiskPier::Spawn();TestTrue(TEXT("Same spot can separate"),FVector::Dist2D(Same,FiskPier::StepAmong(Same,{1,0},.1,false,{Same}))>1);
+    // Nobody else around: the same step as before.
+    TestEqual(TEXT("Unchanged alone"),FiskPier::StepAmong(Same,{0,1},.1,false,{}),FiskPier::Step(Same,{0,1},.1,false));
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPierBeach,"Fiskelaget.Pier.BeachBoardwalkReachableFromBar",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FFiskPierBeach::RunTest(const FString&)
+{
+    // Flood fill on a 25 cm grid from the bar path: the beach platform must be reachable by walking (#18).
+    const int32 X0=-7700,Y0=-3700,Step=25,W=(-1100-X0)/Step,H=(-1800-Y0)/Step;TArray<uint8> Seen;Seen.Init(0,W*H);
+    auto Cell=[&](int32 I,int32 J){return FVector(X0+I*Step,Y0+J*Step,130);};
+    TArray<FIntPoint> Open;const FIntPoint Start((-1300-X0)/Step,(-2900-Y0)/Step);
+    if(!FiskPier::Inside(Cell(Start.X,Start.Y))) { AddError(TEXT("Start is not on the bar path"));return false; }
+    Seen[Start.Y*W+Start.X]=1;Open.Add(Start);
+    while(!Open.IsEmpty())
+    {
+        const FIntPoint C=Open.Pop();const FIntPoint Next[]={{C.X+1,C.Y},{C.X-1,C.Y},{C.X,C.Y+1},{C.X,C.Y-1}};
+        for(const FIntPoint& N:Next) { if(N.X<0 || N.Y<0 || N.X>=W || N.Y>=H || Seen[N.Y*W+N.X] || !FiskPier::Inside(Cell(N.X,N.Y))) { continue; }Seen[N.Y*W+N.X]=1;Open.Add(N); }
+    }
+    const FIntPoint Platform((-7000-X0)/Step,(-2700-Y0)/Step);
+    TestTrue(TEXT("Platform is on the pier"),FiskPier::Inside(Cell(Platform.X,Platform.Y)));
+    TestTrue(TEXT("Platform reachable from the bar path"),Seen[Platform.Y*W+Platform.X]!=0);
+    TestFalse(TEXT("Sand beyond the platform is not walkable"),FiskPier::Inside(FVector(-8200,-2700,130)));
+    TestFalse(TEXT("Loungers on the sand are off the deck"),FiskPier::Inside(FVector(-7000,-1650,130)));
+    return true;
+}
 #endif

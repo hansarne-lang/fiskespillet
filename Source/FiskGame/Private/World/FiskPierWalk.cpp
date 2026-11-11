@@ -54,7 +54,9 @@ void UFiskPierWalk::TickComponent(float Delta,ELevelTick Type,FActorComponentTic
     if(P->HasAuthority() && bEnabled)
     {
         const auto* B=P->FindStarterBoat();if(!P->IsCareerReady() || !P->PlayerState || (B && B->IsAboard(P->PlayerState->GetPlayerId()))) { bEnabled=false;++Generation;ServerAxis=FVector2D::ZeroVector;Speed=0;if(auto* H=P->GetMarinaPanel()->FindHub();H && P->PlayerState) { H->SetWalking(P->PlayerState->GetPlayerId(),false,Position,Facing,0); }ClientPierMode(false,Position,Generation);P->ForceNetUpdate();UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PIER_AUTO_STOP"));return; }
-        const FVector Old=Position;const FVector2D A=Now-LastInputAt<=.4?ServerAxis:FVector2D::ZeroVector;Position=FiskPier::Step(Position,A,Delta,bServerSprint);Speed=Delta>0?FVector::Dist2D(Old,Position)/Delta:0;
+        const FVector Old=Position;const FVector2D A=Now-LastInputAt<=.4?ServerAxis:FVector2D::ZeroVector;TArray<FVector> Others;
+        for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It) { const auto* Other=Cast<AFiskBoardingController>(It->Get());if(Other && Other!=P && Other->GetPierWalk() && Other->GetPierWalk()->IsEnabled()) { Others.Add(Other->GetPierWalk()->GetPosition()); } }
+        Position=FiskPier::StepAmong(Position,A,Delta,bServerSprint,Others);Speed=Delta>0?FVector::Dist2D(Old,Position)/Delta:0;
         if(Speed>1) { Facing=FMath::RadiansToDegrees(FMath::Atan2(Position.Y-Old.Y,Position.X-Old.X)); }
         if(auto* H=P->GetMarinaPanel()->FindHub()) { H->SetWalking(P->PlayerState->GetPlayerId(),true,Position,Facing,Speed); }
     }

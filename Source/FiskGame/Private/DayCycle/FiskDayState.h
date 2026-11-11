@@ -26,6 +26,10 @@ public:
     static constexpr int32 MaxTestClockScale = 20;
     static int32 ParseTestClockScale(const TCHAR* CommandLine);
     static int32 ScaledElapsedMilliseconds(double WallSeconds, int32 Scale);
+    // Test-only clock skip (F12 for the host, not in Shipping): 02:00 departure, 15:00 two hours before the
+    // deadline, 17:00 settlement and 20:00 end of day. Returns the next one after ElapsedSeconds, or -1.
+    static int32 NextMilestone(int32 ElapsedSeconds);
+    bool SkipToNextMilestone(int32& OutSeconds);   // Server; false in Shipping or when the day is over
 
     AFiskDayState();
     void StartDay();

@@ -31,8 +31,9 @@ void AFiskMarinaHub::BeginPlay() { Super::BeginPlay();Rebuild(); }
 void AFiskMarinaHub::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const { Super::GetLifetimeReplicatedProps(OutLifetimeProps);DOREPLIFETIME(AFiskMarinaHub,Residents);DOREPLIFETIME(AFiskMarinaHub,Messages); }
 const TCHAR* AFiskMarinaHub::Phrase(int32 Code)
 {
-    static const TCHAR* Lines[]={TEXT("God tur og skitt fiske!"),TEXT("Jeg er klar ved brygga."),TEXT("Besøk gjerne naustet mitt!"),TEXT("Bra fangst – vi ses ved oppgjøret!"),TEXT("Jeg tar en pause i strandbaren.")};
-    return Code>=0 && Code<5?Lines[Code]:TEXT("");
+    static const TCHAR* Lines[]={TEXT("God tur og skitt fiske!"),TEXT("Jeg er klar ved brygga."),TEXT("Besøk gjerne naustet mitt!"),TEXT("Bra fangst – vi ses ved oppgjøret!"),TEXT("Jeg tar en pause i strandbaren."),TEXT("Skål!"),TEXT("Gratulerer med fangsten!"),TEXT("Én tropisk punsj, takk!"),TEXT("Ett glass kokosvann, takk!"),TEXT("Én iste med is, takk!")};
+    static_assert(UE_ARRAY_COUNT(Lines)==PhraseCount,"One line per phrase code");
+    return Code>=0 && Code<PhraseCount?Lines[Code]:TEXT("");
 }
 bool AFiskMarinaHub::Upsert(const FGuid& Profile,int32 Player,const FFiskMarinaIdentity& Identity,const TArray<FFiskMarinaTrophy>& Trophies)
 {
@@ -50,7 +51,7 @@ bool AFiskMarinaHub::Upsert(const FGuid& Profile,int32 Player,const FFiskMarinaI
 bool AFiskMarinaHub::Say(int32 Player,int32 Code,int32 AtMs)
 {
     const FFiskMarinaResident* R=Residents.FindByPredicate([&](const FFiskMarinaResident& V){return V.PlayerId==Player;});
-    if(!HasAuthority() || !R || Code<0 || Code>=5) { return false; }
+    if(!HasAuthority() || !R || Code<0 || Code>=PhraseCount) { return false; }
     FFiskMarinaMessage M;M.Serial=++MessageSerial;M.Name=R->Identity.DisplayName;M.Code=Code;M.AtMs=AtMs;Messages.Add(M);if(Messages.Num()>12) { Messages.RemoveAt(0); }ForceNetUpdate();return true;
 }
 void AFiskMarinaHub::Tick(float DeltaSeconds)

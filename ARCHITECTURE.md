@@ -45,6 +45,23 @@ Brudd som fantes da kontrollen ble innført (420 includes i 114 filer, november 
 
 v0.17 bruker motorens innebygde `ProceduralMeshComponent` i FiskGame for formet skrog, havflate og slepefisk. Pluginen aktiveres eksplisitt i prosjektfilen og er en privat renderingsavhengighet i FiskGame. FiskCore beholder bare Core/CoreUObject; ingen ny spillmodul, kjøpt ressurs eller tjeneste er innført. Bootstrapkontrollen håndhever den utvidede, eksplisitte avhengighetslisten.
 
+### Spillerkontrolleren og komponentene
+
+`AFiskBoardingController` (`Boats/`) er spillerens `APlayerController`. Den leser input, ruter den til riktig del, eier panelene, kameraet og den korte meldingslinjen, og holder spillerens stenger og valgt stang. Nettverkskallene for hvert område ligger i egne `UActorComponent`-er som er replikert og eid av kontrolleren, så `Server`- og `Client`-kallene går over spillerens egen tilkobling (#113, [plan](Docs/Development/CONTROLLER_SPLIT_PLAN.md)):
+
+| Komponent | Ansvar |
+|---|---|
+| `UFiskPierWalk` (`World/`) | Gange på brygga |
+| `UFiskMarinaSync` | Naust, strandbar og havn |
+| `UFiskRecoverySync` | Gjenhenting av journal og ekspedisjonsposter etter tilkobling |
+| `UFiskCareerSync` | Karriere, butikk, båtvalg, 17:00-oppgjøret og strandbarens veddemål |
+| `UFiskFleetSync` | Valg, henting og forlating av båt i flåten |
+| `UFiskExpeditionCommands` | Dagens ekspedisjonsmål, klarmarkering og meldinger |
+| `UFiskBoatCommands` | Ombordstigning, avreise, retur, rute, reisevisning og kaptein |
+| `UFiskRodCommands` | Stangvalg, rigg, kast, kamphandlinger og stangsett |
+
+Komponentene uten egen mappe ligger i `Boats/Controller/`. De leser og endrer kontrollerens felles tilstand bare gjennom dens offentlige funksjoner. Røyktestenes tilstand ligger i `FFiskBoardingSmokeState`, ikke i kontrollerens header. Når avhengighetene går gjennom FiskCore, kan komponentene flyttes til sitt logiske område.
+
 ## Kommunikasjon og serverautoritet
 
 Multiplayer oversetter en autentisert spillers forespørsel til en validert kommando hos eiermodulen. Eiermodulen godkjenner selv rettigheter og tilstand. Serveren eier spillutfallet; klienten viser repliserte lesemodeller. UI skriver aldri direkte i økonomi, båt eller profil.

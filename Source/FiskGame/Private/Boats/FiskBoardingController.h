@@ -12,6 +12,7 @@
 #include "Boats/Controller/FiskRecoverySync.h"
 #include "Boats/Controller/FiskCareerSync.h"
 #include "Boats/Controller/FiskFleetSync.h"
+#include "Boats/Controller/FiskExpeditionCommands.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -73,9 +74,7 @@ public:
     UFiskMarinaSync* GetMarinaSync() const { return MarinaSync; }   // Boathouse, bar and harbour calls (#113 step 3)
     UFiskRecoverySync* GetRecoverySync() const { return RecoverySync; }   // Journal and medal recovery (#113 step 4)
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
-    UFUNCTION(Server,Reliable) void ServerExpeditionChoose(int32 Revision,int32 Goal);
-    UFUNCTION(Server,Reliable) void ServerExpeditionReady(int32 Revision,bool Ready);
-    UFUNCTION(Server,Reliable) void ServerExpeditionSay(int32 Code);
+    UFiskExpeditionCommands* GetExpeditionCommands() const { return ExpeditionCommands; }   // Goal, ready and crew messages (#113 step 7)
     // The career itself lives in UFiskCareerSync (#113 step 5); these forward to it.
     UFiskCareerSync* GetCareerSync() const { return CareerSync; }
     bool IsCareerReady() const { return CareerSync->IsReady(); }
@@ -170,7 +169,7 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskRecoverySync> RecoverySync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskCareerSync> CareerSync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskFleetSync> FleetSync;
-    double LastExpeditionMessage=-10;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskExpeditionCommands> ExpeditionCommands;
     int32 ShopRow=0;
     bool bCareerVisible=false;
     FTimerHandle CareerTimer;

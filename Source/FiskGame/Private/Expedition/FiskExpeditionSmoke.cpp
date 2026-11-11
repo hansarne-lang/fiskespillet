@@ -47,7 +47,7 @@ void AFiskBoardingController::RunExpeditionSmoke()
     if(Smoke.ExpeditionSmokeStage==0 && Smoke.CareerSmokeStage==13 && B->GetTripProgress()==AFiskStarterBoat::AtDock && Now>=70)
     {
         Key(EKeys::J);if(!ExpeditionPanel->IsVisible()) { Fail(TEXT("plan_not_open"));return; }
-        if(Captain) { Key(Solo?EKeys::Five:EKeys::Three); }else { ServerExpeditionChoose(P.Revision,4); }
+        if(Captain) { Key(Solo?EKeys::Five:EKeys::Three); }else { ExpeditionCommands->ServerExpeditionChoose(P.Revision,4); }
         Smoke.ExpeditionSmokeAt=Real;Smoke.ExpeditionSmokeStage=1;
     }
     else if(Smoke.ExpeditionSmokeStage==1 && Real-Smoke.ExpeditionSmokeAt>=2)

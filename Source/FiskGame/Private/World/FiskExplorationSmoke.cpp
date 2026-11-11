@@ -32,7 +32,7 @@ void AFiskBoardingController::RunExplorationSmoke()
     auto Done=[&](){UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPLORATION_PASSED mode=%s journal=%d medals=%d cash=%lld"),*Smoke.ExplorationMode,GI->GetJournal().GetEntries().Num(),GI->Expeditions.Num(),static_cast<long long>(GI->Career.Cash));GetWorldTimerManager().ClearTimer(Smoke.ExplorationTimer);};
     if(Smoke.ExplorationStage==0 && Smoke.CareerSmokeStage==13 && Now>=70 && Now<120)
     {
-        if(Host) { TActorIterator<AFiskExpeditionState> E(GetWorld());if(E) { ServerExpeditionChoose(E->GetPlan().Revision,2); } }
+        if(Host) { TActorIterator<AFiskExpeditionState> E(GetWorld());if(E) { ExpeditionCommands->ServerExpeditionChoose(E->GetPlan().Revision,2); } }
         if(!GI->SaveRigPreset(0,GetRod()->GetRig()) || !GI->RenameRigPreset(0,TEXT("REVFISKE 9"))) { Fail(TEXT("preset_storage"));return; }
         Key(EKeys::M);Key(EKeys::A);if(!SeaChart->IsAtlas()) { Fail(TEXT("atlas_not_open"));return; }if(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))) { Key(EKeys::End); }Shot(TEXT("ocean-atlas"));Smoke.ExplorationAt=Real;Smoke.ExplorationStage=1;
     }

@@ -1,7 +1,6 @@
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
 #include "Bootstrap/FiskBootstrapGameMode.h"
-#include "Expedition/FiskExpeditionState.h"
 #include "DayCycle/FiskDayState.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskSeaChart.h"
@@ -76,25 +75,6 @@ void AFiskBoardingController::DrawFleet(AHUD& H,UCanvas& C)
     }
     T(GetActionFeedback(),48,603,.9f,Gold);T(TEXT("Bytt mannskap ved startbrygga. Hver båt har egen rute, kaptein, last og returfrist."),48,637,.92f,Teal);
     T(TEXT("Vekt og verdi er skjult til 17:00. Den enkelte fangstens båt avgjør om den kommer frem i tide."),48,659,.85f,Teal);
-}
-// Expedition commands stay on the controller until #113 step 7 (UFiskExpeditionCommands).
-void AFiskBoardingController::ServerExpeditionChoose_Implementation(int32 Revision,int32 Goal)
-{
-    auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!IsCareerReady() || !PlayerState || !M || !FindExpedition() || !FindExpedition()->Choose(PlayerState->GetPlayerId(),Revision,Goal))
-    { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPEDITION_CHOOSE_REJECTED"));ClientActionFeedback(TEXT("Bare kapteinen kan velge dagens mål ved brygga. Åpne J på nytt.")); }
-}
-void AFiskBoardingController::ServerExpeditionReady_Implementation(int32 Revision,bool Ready)
-{
-    auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!IsCareerReady() || !PlayerState || !M || !FindExpedition() || !FindExpedition()->SetReady(PlayerState->GetPlayerId(),Revision,Ready))
-    { ClientActionFeedback(TEXT("Gå om bord ved brygga for å markere deg klar.")); }
-}
-void AFiskBoardingController::ServerExpeditionSay_Implementation(int32 Code)
-{
-    auto* M=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();const double Now=GetWorld()->GetRealTimeSeconds();
-    if(!IsCareerReady() || !PlayerState || !M || !FindExpedition() || Now-LastExpeditionMessage<2) { return; }
-    if(FindExpedition()->Say(PlayerState->GetPlayerId(),Code)) { LastExpeditionMessage=Now; }
 }
 // Sea point and travel vote stay on the controller until #113 step 8 (UFiskBoatCommands).
 void AFiskBoardingController::ServerSelectSeaPoint_Implementation(int32 Revision,FVector_NetQuantize Point)

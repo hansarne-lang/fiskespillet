@@ -60,6 +60,7 @@ AFiskBoardingController::AFiskBoardingController()
     RecoverySync=CreateDefaultSubobject<UFiskRecoverySync>(TEXT("RecoverySync"));
     CareerSync=CreateDefaultSubobject<UFiskCareerSync>(TEXT("CareerSync"));
     FleetSync=CreateDefaultSubobject<UFiskFleetSync>(TEXT("FleetSync"));
+    ExpeditionCommands=CreateDefaultSubobject<UFiskExpeditionCommands>(TEXT("ExpeditionCommands"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
     CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));

@@ -28,6 +28,9 @@
       "UI/FiskGameInstance.h",
       "UI/FiskUserSettings.h"
     ],
+    "Source/FiskGame/Private/Boats/Controller/FiskExpeditionCommands.cpp": [
+      "Expedition/FiskExpeditionState.h"
+    ],
     "Source/FiskGame/Private/Boats/Controller/FiskFleetSync.cpp": [
       "Bootstrap/FiskBootstrapGameMode.h",
       "DayCycle/FiskDayState.h"
@@ -56,7 +59,6 @@
     "Source/FiskGame/Private/Boats/FiskBoardingController.Fleet.cpp": [
       "Bootstrap/FiskBootstrapGameMode.h",
       "DayCycle/FiskDayState.h",
-      "Expedition/FiskExpeditionState.h",
       "UI/FiskAnglerPanel.h",
       "UI/FiskCollectionPanel.h",
       "UI/FiskCrewPanel.h",

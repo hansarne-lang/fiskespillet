@@ -81,7 +81,7 @@ void AFiskBoardingController::RunFleetSmoke()
             const FVector Point=Smoke.FleetRole==2?FVector(80000,-30000,0):FVector(100000,-75000,0);
             if(B->GetDestination()!=Point) { ServerSelectSeaPoint(B->GetRouteRevision(),Point);return; }
             auto* E=FindExpedition();const int32 Goal=Smoke.FleetRole==0?3:Smoke.FleetRole==2?2:4;
-            if(!E || E->GetPlan().Goal!=Goal) { if(E) { ServerExpeditionChoose(E->GetPlan().Revision,Goal); }return; }
+            if(!E || E->GetPlan().Goal!=Goal) { if(E) { ExpeditionCommands->ServerExpeditionChoose(E->GetPlan().Revision,Goal); }return; }
             // A route is independently owned by the boat even when points coincide.
             auto* V=FindVoyage();if(!V) { return; }if(V->GetRoute().Points.IsEmpty()) { ServerVoyageReplace(V->GetRoute().Day,V->GetRoute().Revision,{Point});return; }
         }

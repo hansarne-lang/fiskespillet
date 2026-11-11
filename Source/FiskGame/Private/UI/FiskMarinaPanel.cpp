@@ -1,4 +1,5 @@
 #include "UI/FiskMarinaPanel.h"
+#include "UI/FiskPlayerNames.h"
 #include "Boats/FiskBoardingController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Boats/FiskStarterBoat.h"
@@ -266,7 +267,7 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
         }
         DrawBets(HUD,S);
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
-        if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("Spiller %d | %d levert | $%lld"),R.PlayerId,R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,450+(I%4)*21,.75f,Gold);++I; } }
+        if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("%s | %d levert | $%lld"),*FiskPlayerNames::Name(GetWorld(),R.PlayerId).Left(14),R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,450+(I%4)*21,.75f,Gold);++I; } }
         else { T(TEXT("Dagens tavle åpner ved 17:00. Tab viser flåten utenfor baren."),46,452,.85f,Gold); }
         for(int32 I=0;I<5;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46,535+20*I,.73f); }T(FString::Printf(TEXT("V: %s | PgUp/PgDn: båt | M: musikk %s"),HarbourView==0?TEXT("BAR"):HarbourView==1?TEXT("HAVN"):TEXT("FØLG BÅT"),bHarbourMusic?TEXT("PÅ"):TEXT("AV")),46,628,.76f,Gold);T(TEXT("F/S/Enter: veddemål | 2 s mellom meldinger | B / Escape: tilbake"),46,652,.78f,Teal);return;
     }

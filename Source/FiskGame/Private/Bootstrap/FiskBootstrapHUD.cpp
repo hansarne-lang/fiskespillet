@@ -1,4 +1,5 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
+#include "UI/FiskPlayerNames.h"
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskPierWalk.h"
 #include "UI/FiskExpeditionPanel.h"
@@ -72,7 +73,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
                 for(const FFiskHistoryRow& Row:Days[D].Rows)
                 {
                     const FFiskSpecies* Species=FiskCatches::Find(Row.BestSpecies);
-                    const FString Who=Row.PlayerId==Self?TEXT("Deg"):FString::Printf(TEXT("Spiller %d"),Row.PlayerId);
+                    const FString Who=Row.PlayerId==Self?TEXT("Deg"):FiskPlayerNames::Name(GetWorld(),Row.PlayerId);
                     Lines.Add(FString::Printf(TEXT("  %s: levert %d / tapt %d | %.1f kg levert | %d fiskepenger"),*Who,Row.Delivered,Row.Lost,Row.DeliveredGrams/1000.0,Row.Income));
                     Lines.Add(FString::Printf(TEXT("  Største landet: %s %.1f kg"),Species?Species->Name:TEXT("Ingen"),Row.BestGrams/1000.0));
                     if(Row.PlayerId==Self) { Income+=Row.Income;Delivered+=Row.Delivered;Lost+=Row.Lost;Best=FMath::Max(Best,Row.BestGrams); }
@@ -103,7 +104,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
         const int32 Self=PC.PlayerState?PC.PlayerState->GetPlayerId():INDEX_NONE;
         for(const FFiskDayResult& Row:Settlement->GetView().Results)
         {
-            const FString Who=Row.PlayerId==Self?TEXT("Deg"):FString::Printf(TEXT("Spiller %d"),Row.PlayerId);
+            const FString Who=Row.PlayerId==Self?TEXT("Deg"):FiskPlayerNames::Name(GetWorld(),Row.PlayerId);
             Lines.Add(FString::Printf(TEXT("%s: levert %d / tapt %d | levert vekt %.1f kg | %d fiskepenger"),
                 *Who,Row.DeliveredFish,Row.LostFish,Row.DeliveredWeightGrams/1000.0,Row.SessionBalance));
             for(const FFiskCatchResult& Catch:Row.Catches)

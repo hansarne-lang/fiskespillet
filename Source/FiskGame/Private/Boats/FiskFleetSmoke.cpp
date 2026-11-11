@@ -46,7 +46,7 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         const auto Identity=GetMarinaPanel()->GetIdentity();const FString Name=FString::Printf(TEXT("FLEET%02d"),Smoke.FleetRole);
         if(Identity.DisplayName!=Name || PlayerState->GetPlayerName()!=Name) { auto Changed=Identity;Changed.DisplayName=Name;MarinaSync->ServerMarinaIdentity(GI->Career.Id,Changed);return; }
-        if(Smoke.bFleetResume && Smoke.FleetRole==1) { Smoke.FleetBaseCash=GI->Career.Cash;ServerFleetSelect(-1,true);Key(EKeys::E);Smoke.FleetAt=Real;Smoke.FleetStage=60; }
+        if(Smoke.bFleetResume && Smoke.FleetRole==1) { Smoke.FleetBaseCash=GI->Career.Cash;FleetSync->ServerFleetSelect(-1,true);Key(EKeys::E);Smoke.FleetAt=Real;Smoke.FleetStage=60; }
         else { Key(EKeys::Tab);Key(EKeys::C);Key(EKeys::Tab);Smoke.FleetAt=Real;Smoke.FleetStage=1; }
     }
     else if(Smoke.FleetStage==60 && Real-Smoke.FleetAt>=3)
@@ -61,14 +61,14 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(Real-Smoke.FleetAt>180 && (FleetBoats().Num()!=12 || D->PlayerArray.Num()!=12)) { Fail(TEXT("twelve_players_and_boats_missing"));return; }
         if(!OwnedBy(Smoke.FleetRole) || !OwnedBy(Smoke.FleetRole)->IsAboard(SelfId) || FleetBoats().Num()!=12 || D->PlayerArray.Num()!=12 || Now<75) { return; }
-        if(Smoke.FleetRole==1) { ServerFleetSelect(OwnedBy(0)->GetFleetIndex(),false); }
+        if(Smoke.FleetRole==1) { FleetSync->ServerFleetSelect(OwnedBy(0)->GetFleetIndex(),false); }
         else if(Smoke.FleetRole>=3 && Smoke.FleetRole<=5)
         {
             if(OwnedBy(2)->GetKind()!=1) { if(Real-Smoke.FleetAt<.5) { return; }return; }
-            ServerFleetSelect(OwnedBy(2)->GetFleetIndex(),false);
+            FleetSync->ServerFleetSelect(OwnedBy(2)->GetFleetIndex(),false);
         }
-        else if(Smoke.FleetRole==7) { ServerFleetSelect(OwnedBy(6)->GetFleetIndex(),false); }
-        else if(Smoke.FleetRole>=8) { ServerFleetLeave(); }
+        else if(Smoke.FleetRole==7) { FleetSync->ServerFleetSelect(OwnedBy(6)->GetFleetIndex(),false); }
+        else if(Smoke.FleetRole>=8) { FleetSync->ServerFleetLeave(); }
         Smoke.FleetStage=2;Smoke.FleetAt=Real;
     }
     if(Smoke.FleetStage==2)
@@ -120,7 +120,7 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(Smoke.FleetRole==1 && Now>220 && !Smoke.bFleetAttackSent)
         {
-            const auto* Other=OwnedBy(6);if(!Other) { return; }ServerFleetSelect(Other->GetFleetIndex(),false);CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);
+            const auto* Other=OwnedBy(6);if(!Other) { return; }FleetSync->ServerFleetSelect(Other->GetFleetIndex(),false);CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);
             ServerSelectGround(Other->GetRouteRevision(),0);Smoke.bFleetAttackSent=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_ATTACK_SENT"));
         }
         if(Smoke.FleetRole==8 && Now>=220 && !Smoke.bFleetPrivacyLogged)
@@ -144,7 +144,7 @@ void AFiskBoardingController::RunFleetSmoke()
     if(Smoke.FleetStage==43 && D->GetDayNumber()==2 && D->GetElapsedRealSeconds()>=5)
     {
         for(auto* Boat:FleetBoats()) { if(Boat->GetTripProgress()!=AFiskStarterBoat::AtDock || Boat->GetCargoView().Mode!=0 || Boat->GetCargoView().RevealedGrams!=-1 || Boat->GetVoyage()->GetRoute().Day!=2 || Boat->GetExpedition()->GetPlan().bLocked) { Fail(TEXT("per_boat_day_reset_failed"));return; } }
-        if(Smoke.bFleetResume && Smoke.FleetRole==1 && !B->IsAboard(SelfId)) { if(auto* Original=OwnedBy(0)) { ServerFleetSelect(Original->GetFleetIndex(),false); }return; }
+        if(Smoke.bFleetResume && Smoke.FleetRole==1 && !B->IsAboard(SelfId)) { if(auto* Original=OwnedBy(0)) { FleetSync->ServerFleetSelect(Original->GetFleetIndex(),false); }return; }
         if(Smoke.FleetRole==1 && (!B->IsAboard(SelfId) || B->GetOwnerId()==SelfId)) { Fail(TEXT("crew_moved_by_rejected_request"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_PASSED role=%d boats=%d players=%d day=%d"),Smoke.FleetRole,FleetBoats().Num(),D->PlayerArray.Num(),D->GetDayNumber());GetWorldTimerManager().ClearTimer(Smoke.FleetTimer);
     }

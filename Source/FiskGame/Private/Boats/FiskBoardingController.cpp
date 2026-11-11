@@ -59,6 +59,7 @@ AFiskBoardingController::AFiskBoardingController()
     MarinaSync=CreateDefaultSubobject<UFiskMarinaSync>(TEXT("MarinaSync"));
     RecoverySync=CreateDefaultSubobject<UFiskRecoverySync>(TEXT("RecoverySync"));
     CareerSync=CreateDefaultSubobject<UFiskCareerSync>(TEXT("CareerSync"));
+    FleetSync=CreateDefaultSubobject<UFiskFleetSync>(TEXT("FleetSync"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
     CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));
@@ -703,3 +704,6 @@ void AFiskBoardingController::DrawCareer(AHUD& HUD,UCanvas& C)
     T(TEXT("Piler / klikk: velg | Enter: kjøp eller bruk båt | F5: lagre igjen | P / Escape: lukk"),52,622,.95f,Teal);
     T(TEXT("Testøkonomi: ny karriere starter med $30 000 én gang. Egen fangst gir egen inntekt."),52,648,.85f);
 }
+bool AFiskBoardingController::AreRodsIdle() const
+{ for(int32 Slot=0;Slot<3;++Slot) { if(!GetRodAt(Slot)->CanConfigure()) { return false; } }return true; }
+void AFiskBoardingController::SetSelectedFleetBoat(AFiskStarterBoat* Boat) { SelectedFleetBoat=Boat; }

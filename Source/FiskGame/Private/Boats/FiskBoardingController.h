@@ -11,6 +11,7 @@
 #include "Boats/Controller/FiskMarinaSync.h"
 #include "Boats/Controller/FiskRecoverySync.h"
 #include "Boats/Controller/FiskCareerSync.h"
+#include "Boats/Controller/FiskFleetSync.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -134,8 +135,9 @@ public:
     AFiskVoyagePlan* FindVoyage() const;
     AFiskExpeditionState* FindExpedition() const;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
-    UFUNCTION(Server,Reliable) void ServerFleetSelect(int32 Index,bool CreateOwn);
-    UFUNCTION(Server,Reliable) void ServerFleetLeave();
+    UFiskFleetSync* GetFleetSync() const { return FleetSync; }   // Boat choice at the start pier (#113 step 6)
+    void SetSelectedFleetBoat(AFiskStarterBoat* Boat);
+    bool AreRodsIdle() const;   // No rod is cast or fighting, so the player may change boat
     bool HandleFleetKey(const FInputKeyEventArgs& Args);
     bool IsFleetVisible() const { return bFleetVisible; }
     void DrawFleet(class AHUD& HUD,class UCanvas& Canvas);
@@ -167,6 +169,7 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskMarinaSync> MarinaSync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskRecoverySync> RecoverySync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskCareerSync> CareerSync;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskFleetSync> FleetSync;
     double LastExpeditionMessage=-10;
     int32 ShopRow=0;
     bool bCareerVisible=false;

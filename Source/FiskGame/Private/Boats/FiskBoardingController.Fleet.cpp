@@ -1,6 +1,5 @@
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
-#include "Bootstrap/FiskBootstrapGameMode.h"
 #include "DayCycle/FiskDayState.h"
 #include "UI/FiskFrontEnd.h"
 #include "UI/FiskSeaChart.h"
@@ -75,18 +74,4 @@ void AFiskBoardingController::DrawFleet(AHUD& H,UCanvas& C)
     }
     T(GetActionFeedback(),48,603,.9f,Gold);T(TEXT("Bytt mannskap ved startbrygga. Hver båt har egen rute, kaptein, last og returfrist."),48,637,.92f,Teal);
     T(TEXT("Vekt og verdi er skjult til 17:00. Den enkelte fangstens båt avgjør om den kommer frem i tide."),48,659,.85f,Teal);
-}
-// Sea point and travel vote stay on the controller until #113 step 8 (UFiskBoatCommands).
-void AFiskBoardingController::ServerSelectSeaPoint_Implementation(int32 Revision,FVector_NetQuantize Point)
-{
-    AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();FString Message;
-    if(Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState) { Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->SelectPoint(PlayerState->GetPlayerId(),Revision,Point,Message); }
-    ClientGroundReply(Message);
-}
-void AFiskBoardingController::ServerTravelVote_Implementation(int32 Leg,bool Vote)
-{
-    auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const bool Accepted=IsCareerReady() && PlayerState && Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->VoteTravel(PlayerState->GetPlayerId(),Leg,Vote);
-    if(!Accepted) { ClientActionFeedback(TEXT("Reisevisning kan velges av dem om bord mens båten er underveis.")); }
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_TRAVEL_VOTE_REPLY accepted=%d"),Accepted);
 }

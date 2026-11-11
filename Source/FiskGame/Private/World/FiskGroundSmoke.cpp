@@ -43,8 +43,8 @@ void UFiskSeaChart::Smoke()
     {
         if(!Boat->IsAboard(Id)) { Key(EKeys::E);return; }
         if(Boat->GetCrewCount()!=2) { return; }
-        if(bCaptain) { PC->ServerSelectGround(Boat->GetRouteRevision(),999);PC->ServerSelectGround(Boat->GetRouteRevision()+99,1); }
-        else { PC->ServerSelectGround(Boat->GetRouteRevision(),2); }
+        if(bCaptain) { PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),999);PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision()+99,1); }
+        else { PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),2); }
         PC->RequestRig(0,90,0); // Invalid at the initial reef; no settings must change.
         Key(EKeys::M);Capture(TEXT("chart-initial"));Key(EKeys::F);Key(EKeys::R);MarkAt=Now;Stage=1;
     }
@@ -78,7 +78,7 @@ void UFiskSeaChart::Smoke()
         if(Progress==AFiskStarterBoat::AtDock && bCaptain && Day->GetElapsedSeconds()>=120) { TravelAt=Now;Key(EKeys::R); }
         if(Boat->GetTripProgress()<0 || Boat->GetTripProgress()>=100) { return; }
         if(!bCaptain) { TravelAt=Now; }
-        PC->ServerSelectGround(Boat->GetRouteRevision(),0);Key(EKeys::M);MarkAt=Now;Stage=6;
+        PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),0);Key(EKeys::M);MarkAt=Now;Stage=6;
     }
     else if(Stage==6)
     {
@@ -89,7 +89,7 @@ void UFiskSeaChart::Smoke()
         if(Duration<39 || Duration>43) { Fail(TEXT("travel_time"));return; }
         if(FVector::Dist(Boat->GetActorLocation(),FiskGrounds::Find(1)->Position)>5) { return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CHART_TRAVEL_PASSED player=%d seconds=%.3f ground=%d"),Id,Duration,Boat->GetGroundId());
-        Key(EKeys::M);PC->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::F);Stage=7;
+        Key(EKeys::M);PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::F);Stage=7;
     }
     else if(Stage==7)
     {
@@ -130,7 +130,7 @@ void UFiskSeaChart::Smoke()
         }
         if(Boat->GetTripProgress()<=100) { return; }
         if(ReturnAt<0) { ReturnAt=bCaptain?TravelAt:Now;ExpectedReturn=Boat->GetLegTravelMs()/1000.0; }
-        PC->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::M);Capture(TEXT("chart-return"));Stage=12;
+        PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),2);Key(EKeys::M);Capture(TEXT("chart-return"));Stage=12;
     }
     else if(Stage==12)
     {

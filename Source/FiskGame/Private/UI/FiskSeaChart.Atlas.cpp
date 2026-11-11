@@ -26,7 +26,7 @@ bool UFiskSeaChart::HandleAtlas(const FInputKeyEventArgs& A)
         { for(int32 I=0;I<Buttons.Num();++I) { if(Buttons[I].IsInside(M)) { AtlasRow=(AtlasRow/8)*8+I;Choose=true;break; } }
           for(int32 I=0;I<Points.Num();++I) { if(Points[I].IsInside(M)) { AtlasRow=I;Choose=true;break; } } }
     }
-    if(Choose) { if(const auto* B=PC->FindStarterBoat()) { Message=TEXT("Venter på vertens rutevalg ...");PC->ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(AtlasRow)->Point); } }
+    if(Choose) { if(const auto* B=PC->FindStarterBoat()) { Message=TEXT("Venter på vertens rutevalg ...");PC->GetBoatCommands()->ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(AtlasRow)->Point); } }
     return true;
 }
 void UFiskSeaChart::DrawAtlas(AHUD& HUD,UCanvas& C)

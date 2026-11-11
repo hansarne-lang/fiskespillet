@@ -33,7 +33,6 @@ struct FFiskBoardingSmokeState
     FTimerHandle SkipperTimer;
     int32 SkipperStage=0;
     double SkipperAt=0;
-    int32 RejectedCaptainRequests=0;
     FString ExplorationMode,ExplorationDir;
     FTimerHandle ExplorationTimer;
     int32 ExplorationStage=0,ExplorationLeg=0,ExplorationRevision=0;

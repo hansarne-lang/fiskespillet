@@ -79,11 +79,11 @@ void AFiskBoardingController::RunFleetSmoke()
         {
             for(int32 Item=0;Item<3;++Item) { if(!GI->Career.Has(Item)) { CareerSync->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }
             const FVector Point=Smoke.FleetRole==2?FVector(80000,-30000,0):FVector(100000,-75000,0);
-            if(B->GetDestination()!=Point) { ServerSelectSeaPoint(B->GetRouteRevision(),Point);return; }
+            if(B->GetDestination()!=Point) { BoatCommands->ServerSelectSeaPoint(B->GetRouteRevision(),Point);return; }
             auto* E=FindExpedition();const int32 Goal=Smoke.FleetRole==0?3:Smoke.FleetRole==2?2:4;
             if(!E || E->GetPlan().Goal!=Goal) { if(E) { ExpeditionCommands->ServerExpeditionChoose(E->GetPlan().Revision,Goal); }return; }
             // A route is independently owned by the boat even when points coincide.
-            auto* V=FindVoyage();if(!V) { return; }if(V->GetRoute().Points.IsEmpty()) { ServerVoyageReplace(V->GetRoute().Day,V->GetRoute().Revision,{Point});return; }
+            auto* V=FindVoyage();if(!V) { return; }if(V->GetRoute().Points.IsEmpty()) { BoatCommands->ServerVoyageReplace(V->GetRoute().Day,V->GetRoute().Revision,{Point});return; }
         }
         Smoke.FleetBaseCash=GI->Career.Cash;Smoke.FleetStage=3;Smoke.FleetAt=Real;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_READY role=%d player=%d boat=%d boats=%d players=%d naust=%d cash=%lld"),Smoke.FleetRole,SelfId,B->GetFleetIndex(),FleetBoats().Num(),D->PlayerArray.Num(),Hub->GetResidents().Num(),static_cast<long long>(Smoke.FleetBaseCash));
@@ -121,7 +121,7 @@ void AFiskBoardingController::RunFleetSmoke()
         if(Smoke.FleetRole==1 && Now>220 && !Smoke.bFleetAttackSent)
         {
             const auto* Other=OwnedBy(6);if(!Other) { return; }FleetSync->ServerFleetSelect(Other->GetFleetIndex(),false);CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);
-            ServerSelectGround(Other->GetRouteRevision(),0);Smoke.bFleetAttackSent=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_ATTACK_SENT"));
+            BoatCommands->ServerSelectGround(Other->GetRouteRevision(),0);Smoke.bFleetAttackSent=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_ATTACK_SENT"));
         }
         if(Smoke.FleetRole==8 && Now>=220 && !Smoke.bFleetPrivacyLogged)
         { if(B->IsAboard(SelfId)) { Fail(TEXT("shore_player_dragged_to_sea"));return; }Key(EKeys::B);Shot(TEXT("shore-bar-during-voyages"));Smoke.bFleetPrivacyLogged=true;Smoke.FleetAt=Real; }

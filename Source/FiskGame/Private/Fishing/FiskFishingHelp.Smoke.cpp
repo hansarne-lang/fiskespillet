@@ -48,7 +48,7 @@ void UFiskFishingHelp::RunSmoke()
     {
         SmokeCash=GI->Career.Cash;if(SmokeCash!=3000000 || !Bell) { Fail(TEXT("fresh_profile_or_bell_missing"));return; }
         if(bSmokeMute) { GI->bSound=false; }
-        PC->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial());
+        PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial());
         Key(Aa);if(bAssisting) { Fail(TEXT("assist_started_without_bite"));return; }
         Key(EKeys::E);SmokeAt=Now;SmokeStage=1;return;
     }
@@ -66,7 +66,7 @@ void UFiskFishingHelp::RunSmoke()
         if(PC->IsRodSelectionPending() || PC->GetSelectedRod()!=SmokeSlot) { return; }
         if(Host && Progress==AFiskStarterBoat::AtDock && Day->GetElapsedSeconds()>=120) { Key(EKeys::R); }
         if(Progress!=100) { return; }
-        if(!Host) { PC->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial()); }
+        if(!Host) { PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial()); }
         Key(EKeys::F);SmokeAt=Now;SmokeStage=3;return;
     }
     if(SmokeStage==3)
@@ -135,9 +135,9 @@ void UFiskFishingHelp::RunSmoke()
             int32 Landed=0;for(TActorIterator<AFiskBoardingController> Other(GetWorld());Other;++Other) { if(Other->GetRodAt(0)->GetState()==EFiskRodState::Landed) { ++Landed; } }
             if(Landed!=2) { return; }
         }
-        PC->ServerReturnToMarina(Boat->GetRouteRevision()-1,Day->GetDayNumber(),Boat->GetLegSerial());
-        PC->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber()-1,Boat->GetLegSerial());
-        PC->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial()-1);
+        PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision()-1,Day->GetDayNumber(),Boat->GetLegSerial());
+        PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber()-1,Boat->GetLegSerial());
+        PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial()-1);
         SmokeAt=Now;SmokeStage=8;return;
     }
     if(SmokeStage==8 && Now-SmokeAt>=1)
@@ -154,7 +154,7 @@ void UFiskFishingHelp::RunSmoke()
         if(Progress!=AFiskStarterBoat::AtMarina) { return; }
         if(Host && Now-SmokeReturnAt<Boat->GetLegTravelMs()/1000.0-1) { Fail(TEXT("return_skipped_physical_travel"));return; }
         if(bAssisting || GI->Career.Cash!=SmokeCash || !GI->GetJournal().GetEntries().IsEmpty()) { Fail(TEXT("return_changed_unsold_income_or_left_help_on"));return; }
-        PC->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial());Key(EKeys::R);
+        PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial());Key(EKeys::R);
         Shot(TEXT("return-button-home"));SmokeAt=Now;SmokeStage=10;return;
     }
     if(SmokeStage==10 && Now-SmokeAt>=1)

@@ -45,7 +45,7 @@ void AFiskBoardingController::RunNavigationSmoke()
         if(Smoke.NavigationStage==0)
         {
             if(Smoke.NavigationMode==TEXT("save"))
-            { ServerSelectGround(Boat->GetRouteRevision(),1);Smoke.NavigationStage=1;return; }
+            { BoatCommands->ServerSelectGround(Boat->GetRouteRevision(),1);Smoke.NavigationStage=1;return; }
             Key(EKeys::M);Key(EKeys::Tab);Key(EKeys::One);
             if(Smoke.NavigationMode==TEXT("load"))
             {
@@ -83,7 +83,7 @@ void AFiskBoardingController::RunNavigationSmoke()
         if(!Host)
         {
             Key(EKeys::Enter); // Local captain check must reject guest favorite use.
-            ServerSelectGround(Boat->GetRouteRevision(),2); // A forged alternate route must also fail on server.
+            BoatCommands->ServerSelectGround(Boat->GetRouteRevision(),2); // A forged alternate route must also fail on server.
         }
         Capture(TEXT("favorite-live"));Smoke.NavigationAt=Real;Smoke.NavigationStage=1;
     }

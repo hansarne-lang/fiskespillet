@@ -54,7 +54,7 @@ void UFiskCrewPanel::Choose()
     if(Boat->GetCaptainId()!=PC->PlayerState->GetPlayerId()) { Message=TEXT("Bare kapteinen kan overføre rollen.");return; }
     const int32 Target=Boat->GetCrewMemberId(Row);
     if(Target==PC->PlayerState->GetPlayerId()) { Message=TEXT("Du er allerede kaptein. Velg medspilleren.");return; }
-    Message=TEXT("Venter på vertens bekreftelse ...");PC->ServerTransferCaptain(Boat->GetRouteRevision(),Target);
+    Message=TEXT("Venter på vertens bekreftelse ...");PC->GetBoatCommands()->ServerTransferCaptain(Boat->GetRouteRevision(),Target);
 }
 bool UFiskCrewPanel::HandleKey(const FInputKeyEventArgs& Args)
 {

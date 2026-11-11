@@ -69,8 +69,8 @@ void AFiskBoardingController::RunSkipperSmoke()
     }
     if(Smoke.SkipperStage==0 && Smoke.CareerSmokeStage==13 && Now>=40 && Now<70)
     {
-        const auto R=P->GetRoute();ServerVoyageReplace(R.Day-1,R.Revision,{});ServerVoyageReplace(R.Day,R.Revision-1,{});
-        if(Host) { ServerVoyageReplace(R.Day,R.Revision,{B->GetDestination(),FiskAtlas::Find(5)->Point,FiskAtlas::Find(7)->Point}); }
+        const auto R=P->GetRoute();BoatCommands->ServerVoyageReplace(R.Day-1,R.Revision,{});BoatCommands->ServerVoyageReplace(R.Day,R.Revision-1,{});
+        if(Host) { BoatCommands->ServerVoyageReplace(R.Day,R.Revision,{B->GetDestination(),FiskAtlas::Find(5)->Point,FiskAtlas::Find(7)->Point}); }
         Key(EKeys::O);Smoke.SkipperAt=Real;Smoke.SkipperStage=1;
     }
     else if(Smoke.SkipperStage==1 && Real-Smoke.SkipperAt>=2)
@@ -81,7 +81,7 @@ void AFiskBoardingController::RunSkipperSmoke()
     }
     else if(Smoke.SkipperStage==2 && Real-Smoke.SkipperAt>=2)
     {
-        if(Host) { const auto R=P->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); }
+        if(Host) { const auto R=P->GetRoute();BoatCommands->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); }
         Key(EKeys::O);Key(EKeys::Y);if(!FiskTripBook::Days(GI->GetJournal()).IsEmpty()) { Fail(TEXT("unconfirmed_day_in_book"));return; }Shot(TEXT("trip-book-empty"));Smoke.SkipperAt=Real;Smoke.SkipperStage=3;
     }
     else if(Smoke.SkipperStage==3 && Real-Smoke.SkipperAt>=1)

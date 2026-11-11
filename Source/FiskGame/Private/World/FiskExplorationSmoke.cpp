@@ -32,7 +32,7 @@ void AFiskBoardingController::RunExplorationSmoke()
     auto Done=[&](){UE_LOG(LogTemp,Display,TEXT("FISKELAGET_EXPLORATION_PASSED mode=%s journal=%d medals=%d cash=%lld"),*Smoke.ExplorationMode,GI->GetJournal().GetEntries().Num(),GI->Expeditions.Num(),static_cast<long long>(GI->Career.Cash));GetWorldTimerManager().ClearTimer(Smoke.ExplorationTimer);};
     if(Smoke.ExplorationStage==0 && Smoke.CareerSmokeStage==13 && Now>=70 && Now<120)
     {
-        if(Host) { TActorIterator<AFiskExpeditionState> E(GetWorld());if(E) { ServerExpeditionChoose(E->GetPlan().Revision,2); } }
+        if(Host) { TActorIterator<AFiskExpeditionState> E(GetWorld());if(E) { ExpeditionCommands->ServerExpeditionChoose(E->GetPlan().Revision,2); } }
         if(!GI->SaveRigPreset(0,GetRod()->GetRig()) || !GI->RenameRigPreset(0,TEXT("REVFISKE 9"))) { Fail(TEXT("preset_storage"));return; }
         Key(EKeys::M);Key(EKeys::A);if(!SeaChart->IsAtlas()) { Fail(TEXT("atlas_not_open"));return; }if(FParse::Param(FCommandLine::Get(),TEXT("FiskDeep"))) { Key(EKeys::End); }Shot(TEXT("ocean-atlas"));Smoke.ExplorationAt=Real;Smoke.ExplorationStage=1;
     }
@@ -57,8 +57,8 @@ void AFiskBoardingController::RunExplorationSmoke()
         if(B->UsesTravelCard()) { Fail(TEXT("travel_card_survived_arrival"));return; }
         if(!Smoke.bExplorationRejected && GetRodAt(0)->GetState()==EFiskRodState::Fishing)
         {
-            Smoke.ExplorationRevision=B->GetRouteRevision();ServerSelectSeaPoint(Smoke.ExplorationRevision,FiskAtlas::Find(5)->Point);ServerTravelVote(Smoke.ExplorationLeg-1,true);
-            if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+            Smoke.ExplorationRevision=B->GetRouteRevision();BoatCommands->ServerSelectSeaPoint(Smoke.ExplorationRevision,FiskAtlas::Find(5)->Point);BoatCommands->ServerTravelVote(Smoke.ExplorationLeg-1,true);
+            if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();BoatCommands->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
             Smoke.bExplorationRejected=true;Smoke.ExplorationAt=Real;
         }
         if(Smoke.bExplorationRejected && Real-Smoke.ExplorationAt>=2)
@@ -72,8 +72,8 @@ void AFiskBoardingController::RunExplorationSmoke()
             { const auto* P=Cast<AFiskBoardingController>(It->Get());if(P && P->PlayerState && B->IsAboard(P->PlayerState->GetPlayerId()) && P->GetRodAt(0)->GetTestLandingCount()!=1) { All=false; } }
             if(All)
             {
-                if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
-                else { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(5)->Point); }
+                if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();BoatCommands->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+                else { BoatCommands->ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(5)->Point); }
             }
         }
         if(B->GetLegSerial()>Smoke.ExplorationLeg && B->IsTravelling())
@@ -89,8 +89,8 @@ void AFiskBoardingController::RunExplorationSmoke()
         // Leave enough time for remote half-second probes to observe arrival before the next leg.
         if(Host)
         {
-            if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
-            else { ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point); }
+            if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();BoatCommands->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+            else { BoatCommands->ServerSelectSeaPoint(B->GetRouteRevision(),FiskAtlas::Find(7)->Point); }
             if(B->GetLegSerial()<=Smoke.ExplorationLeg || B->GetDestination()!=FiskAtlas::Find(7)->Point) { Fail(TEXT("second_transfer_not_started"));return; }
         }
         Smoke.ExplorationAt=Real;Smoke.ExplorationStage=70;

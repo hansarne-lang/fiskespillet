@@ -46,7 +46,7 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         const auto Identity=GetMarinaPanel()->GetIdentity();const FString Name=FString::Printf(TEXT("FLEET%02d"),Smoke.FleetRole);
         if(Identity.DisplayName!=Name || PlayerState->GetPlayerName()!=Name) { auto Changed=Identity;Changed.DisplayName=Name;MarinaSync->ServerMarinaIdentity(GI->Career.Id,Changed);return; }
-        if(Smoke.bFleetResume && Smoke.FleetRole==1) { Smoke.FleetBaseCash=GI->Career.Cash;ServerFleetSelect(-1,true);Key(EKeys::E);Smoke.FleetAt=Real;Smoke.FleetStage=60; }
+        if(Smoke.bFleetResume && Smoke.FleetRole==1) { Smoke.FleetBaseCash=GI->Career.Cash;FleetSync->ServerFleetSelect(-1,true);Key(EKeys::E);Smoke.FleetAt=Real;Smoke.FleetStage=60; }
         else { Key(EKeys::Tab);Key(EKeys::C);Key(EKeys::Tab);Smoke.FleetAt=Real;Smoke.FleetStage=1; }
     }
     else if(Smoke.FleetStage==60 && Real-Smoke.FleetAt>=3)
@@ -61,14 +61,14 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(Real-Smoke.FleetAt>180 && (FleetBoats().Num()!=12 || D->PlayerArray.Num()!=12)) { Fail(TEXT("twelve_players_and_boats_missing"));return; }
         if(!OwnedBy(Smoke.FleetRole) || !OwnedBy(Smoke.FleetRole)->IsAboard(SelfId) || FleetBoats().Num()!=12 || D->PlayerArray.Num()!=12 || Now<75) { return; }
-        if(Smoke.FleetRole==1) { ServerFleetSelect(OwnedBy(0)->GetFleetIndex(),false); }
+        if(Smoke.FleetRole==1) { FleetSync->ServerFleetSelect(OwnedBy(0)->GetFleetIndex(),false); }
         else if(Smoke.FleetRole>=3 && Smoke.FleetRole<=5)
         {
             if(OwnedBy(2)->GetKind()!=1) { if(Real-Smoke.FleetAt<.5) { return; }return; }
-            ServerFleetSelect(OwnedBy(2)->GetFleetIndex(),false);
+            FleetSync->ServerFleetSelect(OwnedBy(2)->GetFleetIndex(),false);
         }
-        else if(Smoke.FleetRole==7) { ServerFleetSelect(OwnedBy(6)->GetFleetIndex(),false); }
-        else if(Smoke.FleetRole>=8) { ServerFleetLeave(); }
+        else if(Smoke.FleetRole==7) { FleetSync->ServerFleetSelect(OwnedBy(6)->GetFleetIndex(),false); }
+        else if(Smoke.FleetRole>=8) { FleetSync->ServerFleetLeave(); }
         Smoke.FleetStage=2;Smoke.FleetAt=Real;
     }
     if(Smoke.FleetStage==2)
@@ -79,11 +79,11 @@ void AFiskBoardingController::RunFleetSmoke()
         {
             for(int32 Item=0;Item<3;++Item) { if(!GI->Career.Has(Item)) { CareerSync->ServerBuyCareer(FGuid::NewGuid(),GI->Career.Revision,Item);return; } }
             const FVector Point=Smoke.FleetRole==2?FVector(80000,-30000,0):FVector(100000,-75000,0);
-            if(B->GetDestination()!=Point) { ServerSelectSeaPoint(B->GetRouteRevision(),Point);return; }
+            if(B->GetDestination()!=Point) { BoatCommands->ServerSelectSeaPoint(B->GetRouteRevision(),Point);return; }
             auto* E=FindExpedition();const int32 Goal=Smoke.FleetRole==0?3:Smoke.FleetRole==2?2:4;
-            if(!E || E->GetPlan().Goal!=Goal) { if(E) { ServerExpeditionChoose(E->GetPlan().Revision,Goal); }return; }
+            if(!E || E->GetPlan().Goal!=Goal) { if(E) { ExpeditionCommands->ServerExpeditionChoose(E->GetPlan().Revision,Goal); }return; }
             // A route is independently owned by the boat even when points coincide.
-            auto* V=FindVoyage();if(!V) { return; }if(V->GetRoute().Points.IsEmpty()) { ServerVoyageReplace(V->GetRoute().Day,V->GetRoute().Revision,{Point});return; }
+            auto* V=FindVoyage();if(!V) { return; }if(V->GetRoute().Points.IsEmpty()) { BoatCommands->ServerVoyageReplace(V->GetRoute().Day,V->GetRoute().Revision,{Point});return; }
         }
         Smoke.FleetBaseCash=GI->Career.Cash;Smoke.FleetStage=3;Smoke.FleetAt=Real;
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_READY role=%d player=%d boat=%d boats=%d players=%d naust=%d cash=%lld"),Smoke.FleetRole,SelfId,B->GetFleetIndex(),FleetBoats().Num(),D->PlayerArray.Num(),Hub->GetResidents().Num(),static_cast<long long>(Smoke.FleetBaseCash));
@@ -120,8 +120,8 @@ void AFiskBoardingController::RunFleetSmoke()
     {
         if(Smoke.FleetRole==1 && Now>220 && !Smoke.bFleetAttackSent)
         {
-            const auto* Other=OwnedBy(6);if(!Other) { return; }ServerFleetSelect(Other->GetFleetIndex(),false);CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);
-            ServerSelectGround(Other->GetRouteRevision(),0);Smoke.bFleetAttackSent=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_ATTACK_SENT"));
+            const auto* Other=OwnedBy(6);if(!Other) { return; }FleetSync->ServerFleetSelect(Other->GetFleetIndex(),false);CareerSync->ServerChooseBoat(B->GetRouteRevision(),1);
+            BoatCommands->ServerSelectGround(Other->GetRouteRevision(),0);Smoke.bFleetAttackSent=true;UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_ATTACK_SENT"));
         }
         if(Smoke.FleetRole==8 && Now>=220 && !Smoke.bFleetPrivacyLogged)
         { if(B->IsAboard(SelfId)) { Fail(TEXT("shore_player_dragged_to_sea"));return; }Key(EKeys::B);Shot(TEXT("shore-bar-during-voyages"));Smoke.bFleetPrivacyLogged=true;Smoke.FleetAt=Real; }
@@ -144,7 +144,7 @@ void AFiskBoardingController::RunFleetSmoke()
     if(Smoke.FleetStage==43 && D->GetDayNumber()==2 && D->GetElapsedRealSeconds()>=5)
     {
         for(auto* Boat:FleetBoats()) { if(Boat->GetTripProgress()!=AFiskStarterBoat::AtDock || Boat->GetCargoView().Mode!=0 || Boat->GetCargoView().RevealedGrams!=-1 || Boat->GetVoyage()->GetRoute().Day!=2 || Boat->GetExpedition()->GetPlan().bLocked) { Fail(TEXT("per_boat_day_reset_failed"));return; } }
-        if(Smoke.bFleetResume && Smoke.FleetRole==1 && !B->IsAboard(SelfId)) { if(auto* Original=OwnedBy(0)) { ServerFleetSelect(Original->GetFleetIndex(),false); }return; }
+        if(Smoke.bFleetResume && Smoke.FleetRole==1 && !B->IsAboard(SelfId)) { if(auto* Original=OwnedBy(0)) { FleetSync->ServerFleetSelect(Original->GetFleetIndex(),false); }return; }
         if(Smoke.FleetRole==1 && (!B->IsAboard(SelfId) || B->GetOwnerId()==SelfId)) { Fail(TEXT("crew_moved_by_rejected_request"));return; }
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_PASSED role=%d boats=%d players=%d day=%d"),Smoke.FleetRole,FleetBoats().Num(),D->PlayerArray.Num(),D->GetDayNumber());GetWorldTimerManager().ClearTimer(Smoke.FleetTimer);
     }

@@ -34,7 +34,7 @@ void AFiskBoardingController::RunCareerReleaseSmoke()
     if(!IsCareerReady() || !Day->HasStarted()) { return; }
     if(!Solo && !Host && Progress==AFiskStarterBoat::AtDock && Boat->GetCaptainId()==Self)
     {
-        ServerTransferCaptain(Boat->GetRouteRevision(),Boat->GetOwnerId());
+        BoatCommands->ServerTransferCaptain(Boat->GetRouteRevision(),Boat->GetOwnerId());
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAREER_CAPTAIN_RETURNED player=%d"),Self);
     }
     if(Smoke.CareerSmokeMode==TEXT("verify"))

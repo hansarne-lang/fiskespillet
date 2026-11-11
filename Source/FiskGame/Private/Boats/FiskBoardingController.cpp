@@ -59,6 +59,9 @@ AFiskBoardingController::AFiskBoardingController()
     MarinaSync=CreateDefaultSubobject<UFiskMarinaSync>(TEXT("MarinaSync"));
     RecoverySync=CreateDefaultSubobject<UFiskRecoverySync>(TEXT("RecoverySync"));
     CareerSync=CreateDefaultSubobject<UFiskCareerSync>(TEXT("CareerSync"));
+    FleetSync=CreateDefaultSubobject<UFiskFleetSync>(TEXT("FleetSync"));
+    BoatCommands=CreateDefaultSubobject<UFiskBoatCommands>(TEXT("BoatCommands"));
+    ExpeditionCommands=CreateDefaultSubobject<UFiskExpeditionCommands>(TEXT("ExpeditionCommands"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
     SkipperPanel=CreateDefaultSubobject<UFiskSkipperPanel>(TEXT("SkipperPanel"));
     CollectionPanel=CreateDefaultSubobject<UFiskCollectionPanel>(TEXT("CollectionPanel"));
@@ -132,7 +135,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if(FishingHelp->HandleKey(Params)) { return true; }
     if(Press && Params.Key==EKeys::V)
     {
-        const auto* B=FindStarterBoat();if(B && PlayerState) { ServerTravelVote(B->GetLegSerial(),!B->HasTravelVote(PlayerState->GetPlayerId())); }return true;
+        const auto* B=FindStarterBoat();if(B && PlayerState) { BoatCommands->ServerTravelVote(B->GetLegSerial(),!B->HasTravelVote(PlayerState->GetPlayerId())); }return true;
     }
     // Handle rod commands before a later key can change the selected holder.
     // Deferred input bindings otherwise make X followed by 1 act on rod 1.
@@ -310,53 +313,15 @@ void AFiskBoardingController::SetupInputComponent()
 
 void AFiskBoardingController::RequestBoarding()
 {
-    ServerBoardStarterBoat();
-}
-
-void AFiskBoardingController::ServerBoardStarterBoat_Implementation()
-{
-    const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
-    {
-        if(!IsCareerReady() || !Mode->CanJoinFleet(GetServerCareer().Id)) { ClientActionFeedback(TEXT("Karrieren må være klar. Har profilen reist i dag, venter ombordstigning til neste døgn – også etter gjenoppkobling."));UE_LOG(LogTemp,Display,TEXT("FISKELAGET_FLEET_BOARD_LOCKED player=%d"),PlayerState->GetPlayerId());return; }
-        auto* B=Mode->GetBoatForPlayer(PlayerState->GetPlayerId());B->Board(PlayerState->GetPlayerId());
-        if(!B->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Denne båten er full eller har reist. Tab åpner flåten; C henter din egen båt ved brygga.")); }
-    }
+    BoatCommands->ServerBoardStarterBoat();
 }
 
 void AFiskBoardingController::RequestDeparture()
 {
     const AFiskStarterBoat* Boat=FindStarterBoat();
-    if(Boat) { ServerStartBoatTrip(Boat->GetRouteRevision()); }
+    if(Boat) { BoatCommands->ServerStartBoatTrip(Boat->GetRouteRevision()); }
 }
 
-void AFiskBoardingController::ServerStartBoatTrip_Implementation(int32 ExpectedRevision)
-{
-    const AFiskBootstrapGameMode* Mode = GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if (Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState)
-    {
-        AFiskStarterBoat* Boat=Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE);
-        const bool bAuthorized=Boat->CanCaptainCommand(PlayerState->GetPlayerId(),ExpectedRevision);
-        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRIP_%s player=%d expected=%d current=%d"),
-            bAuthorized?TEXT("AUTHORIZED"):TEXT("REJECTED"),PlayerState->GetPlayerId(),ExpectedRevision,Boat->GetRouteRevision());
-        if(!Boat->IsAboard(PlayerState->GetPlayerId())) { ClientActionFeedback(TEXT("Trykk E for å gå om bord først."));return; }
-        if(!bAuthorized) { ClientActionFeedback(Boat->GetCaptainId()==PlayerState->GetPlayerId()
-            ?TEXT("Båtstatusen ble oppdatert. Prøv R igjen."):TEXT("Bare kapteinen kan starte avreise og retur. K viser mannskapet."));return; }
-        const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();
-        if(!Day || !Day->HasStarted()) { ClientActionFeedback(TEXT("Fiskedagen starter. Prøv igjen om et øyeblikk."));return; }
-        const int32 Progress=Boat->GetTripProgress();
-        if(Progress==AFiskStarterBoat::AtDock && Day->GetElapsedSeconds()<120)
-        { ClientActionFeedback(FString::Printf(TEXT("Avreise fra 02:00. Vent %d sekunder."),120-Day->GetElapsedSeconds()));return; }
-        if(Progress==AFiskStarterBoat::AtDock && Day->GetElapsedSeconds()>=1020)
-        { ClientActionFeedback(TEXT("Sjøfasen er ferdig. Start en ny dag fra hovedmenyen."));return; }
-        if(Progress==AFiskStarterBoat::AtMarina)
-        { ClientActionFeedback(TEXT("Turen er avsluttet. Velg Til hovedmeny og Spill for en ny dag."));return; }
-        if(Progress!=AFiskStarterBoat::AtDock && Progress!=AFiskStarterBoat::AtFishingSpot && !(Progress>=0 && Progress<100))
-        { ClientActionFeedback(TEXT("Båten er allerede på vei."));return; }
-        Boat->StartTrip(PlayerState->GetPlayerId(),ExpectedRevision);
-        ClientActionFeedback(Progress!=AFiskStarterBoat::AtDock?TEXT("Retur til marinaen er startet."):TEXT("Avreise er startet. F setter ut stanga ved ankomst."));
-    }
-}
 void AFiskBoardingController::ClientActionFeedback_Implementation(const FString& Message)
 {
     ActionFeedback=Message;ActionFeedbackUntil=FPlatformTime::Seconds()+5.0;
@@ -367,37 +332,12 @@ FString AFiskBoardingController::GetActionFeedback() const
 }
 void AFiskBoardingController::ClientRigReply_Implementation(bool bAccepted) { RigPanel->RigReply(bAccepted); }
 
-void AFiskBoardingController::ServerTransferCaptain_Implementation(int32 ExpectedRevision,int32 Target)
-{
-    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    const bool bAccepted=Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState
-        && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->TransferCaptain(PlayerState->GetPlayerId(),ExpectedRevision,Target);
-#if WITH_DEV_AUTOMATION_TESTS
-    if(!bAccepted) { ++Smoke.RejectedCaptainRequests; }
-#endif
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_TRANSFER_%s player=%d target=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,Target);
-    ClientCaptainReply(bAccepted);
-}
-void AFiskBoardingController::ClientCaptainReply_Implementation(bool bAccepted)
-{
-    CrewPanel->SetMessage(bAccepted?TEXT("Kapteinsrollen er overført."):TEXT("Overføring avvist. Bare gjeldende kaptein kan velge en annen om bord. Prøv igjen med oppdatert status."));
-}
 const AFiskStarterBoat* AFiskBoardingController::FindStarterBoat() const
 {
     if(PlayerState) { for(TActorIterator<AFiskStarterBoat> B(GetWorld());B;++B) { if(B->IsAboard(PlayerState->GetPlayerId())) { return *B; } } }
     if(SelectedFleetBoat) { return SelectedFleetBoat; }
     TActorIterator<AFiskStarterBoat> Boat(GetWorld());return Boat?*Boat:nullptr;
 }
-void AFiskBoardingController::ServerSelectGround_Implementation(int32 ExpectedRevision,int32 GroundId)
-{
-    const AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    FString Message=TEXT("Båten er ikke klar.");
-    const bool bAccepted=Mode && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE) && PlayerState
-        && Mode->GetBoatForPlayer(PlayerState?PlayerState->GetPlayerId():INDEX_NONE)->SelectGround(PlayerState->GetPlayerId(),ExpectedRevision,GroundId,Message);
-    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CHART_%s player=%d requested=%d"),bAccepted?TEXT("ACCEPTED"):TEXT("REJECTED"),PlayerState?PlayerState->GetPlayerId():INDEX_NONE,GroundId);
-    ClientGroundReply(Message);
-}
-void AFiskBoardingController::ClientGroundReply_Implementation(const FString& Message) { SeaChart->SetMessage(Message); }
 bool AFiskBoardingController::CanOpenRig() const
 {
     const AFiskDayState* Day = GetWorld()->GetGameState<AFiskDayState>();
@@ -703,3 +643,11 @@ void AFiskBoardingController::DrawCareer(AHUD& HUD,UCanvas& C)
     T(TEXT("Piler / klikk: velg | Enter: kjøp eller bruk båt | F5: lagre igjen | P / Escape: lukk"),52,622,.95f,Teal);
     T(TEXT("Testøkonomi: ny karriere starter med $30 000 én gang. Egen fangst gir egen inntekt."),52,648,.85f);
 }
+bool AFiskBoardingController::AreRodsIdle() const
+{ for(int32 Slot=0;Slot<3;++Slot) { if(!GetRodAt(Slot)->CanConfigure()) { return false; } }return true; }
+void AFiskBoardingController::SetSelectedFleetBoat(AFiskStarterBoat* Boat) { SelectedFleetBoat=Boat; }
+void AFiskBoardingController::ShowCaptainReply(bool bAccepted)
+{
+    CrewPanel->SetMessage(bAccepted?TEXT("Kapteinsrollen er overført."):TEXT("Overføring avvist. Bare gjeldende kaptein kan velge en annen om bord. Prøv igjen med oppdatert status."));
+}
+void AFiskBoardingController::ShowGroundReply(const FString& Message) { SeaChart->SetMessage(Message); }

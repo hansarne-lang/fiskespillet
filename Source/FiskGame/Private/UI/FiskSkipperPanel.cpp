@@ -105,13 +105,13 @@ bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
     if(K==EKeys::One || K==EKeys::Two || K==EKeys::Three) { Slot=K==EKeys::One?0:K==EKeys::Two?1:2; }
     if(A.Event!=IE_Pressed) { return true; }
     if(K==EKeys::T) { TemplateRow=(TemplateRow+1)%FiskSkipperTools::TemplateCount; }
-    if(K==EKeys::L) { PC->ServerVoyageReplace(R.Day,R.Revision,FiskSkipperTools::Template(TemplateRow)); }
-    if(K==EKeys::G) { PC->ServerVoyageReplace(R.Day,R.Revision,FiskSkipperTools::Optimize(R.Points)); }
+    if(K==EKeys::L) { PC->GetBoatCommands()->ServerVoyageReplace(R.Day,R.Revision,FiskSkipperTools::Template(TemplateRow)); }
+    if(K==EKeys::G) { PC->GetBoatCommands()->ServerVoyageReplace(R.Day,R.Revision,FiskSkipperTools::Optimize(R.Points)); }
     if(K==EKeys::B) { const int32 Times[]={0,180,300,480};int32 I=0;for(int32 N=0;N<4;++N) { if(StopSeconds==Times[N]) { I=N; } }StopSeconds=Times[(I+1)%4]; }
-    if(K==EKeys::A) { auto Points=R.Points;Points.Add(FiskAtlas::Find(Mark)->Point);PC->ServerVoyageReplace(R.Day,R.Revision,Points); }
-    if(K==EKeys::BackSpace && !R.Points.IsEmpty()) { auto Points=R.Points;Points.Pop();PC->ServerVoyageReplace(R.Day,R.Revision,Points); }
-    if(K==EKeys::Delete) { PC->ServerVoyageReplace(R.Day,R.Revision,{}); }
-    if(K==EKeys::Enter) { if(const auto* B=PC->FindStarterBoat()) { PC->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+    if(K==EKeys::A) { auto Points=R.Points;Points.Add(FiskAtlas::Find(Mark)->Point);PC->GetBoatCommands()->ServerVoyageReplace(R.Day,R.Revision,Points); }
+    if(K==EKeys::BackSpace && !R.Points.IsEmpty()) { auto Points=R.Points;Points.Pop();PC->GetBoatCommands()->ServerVoyageReplace(R.Day,R.Revision,Points); }
+    if(K==EKeys::Delete) { PC->GetBoatCommands()->ServerVoyageReplace(R.Day,R.Revision,{}); }
+    if(K==EKeys::Enter) { if(const auto* B=PC->FindStarterBoat()) { PC->GetBoatCommands()->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
     if(K==EKeys::F2) { bRenaming=true;EditName=Presets.Slots[Slot].Name; }
     if(K==EKeys::F5)
     {
@@ -119,7 +119,7 @@ bool UFiskSkipperPanel::HandleKey(const FInputKeyEventArgs& A)
         if(Candidate.Save(PresetFile(),LoadedProfile)) { Presets=Candidate;Message=TEXT("Felles plan er lagret som ditt eget ruteoppsett."); }
         else { Message=TEXT("Ruten kunne ikke lagres. Tidligere filer er bevart."); }
     }
-    if(K==EKeys::F8) { if(Presets.Slots[Slot].Points.IsEmpty()) { Message=TEXT("Det valgte oppsettet har ingen stopp."); }else { PC->ServerVoyageReplace(R.Day,R.Revision,Presets.Slots[Slot].Points); } }
+    if(K==EKeys::F8) { if(Presets.Slots[Slot].Points.IsEmpty()) { Message=TEXT("Det valgte oppsettet har ingen stopp."); }else { PC->GetBoatCommands()->ServerVoyageReplace(R.Day,R.Revision,Presets.Slots[Slot].Points); } }
     return true;
 }
 void UFiskSkipperPanel::Draw(AHUD& HUD,UCanvas& C)

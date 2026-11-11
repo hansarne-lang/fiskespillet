@@ -85,7 +85,7 @@ void AFiskBoardingController::RunSessionSmoke()
             || Rod->GetState()!=EFiskRodState::Ready || !Rod->GetCastId().IsValid() || Rod->GetCastId()==Smoke.SessionOldCast
             || Rod->GetRig().Depth!=(Host?80:90) || History.Num()!=1 || History[0].Number!=1 || Day->GetElapsedMilliseconds()>10000)
         { Fail(TEXT("bad_day_reset"));return; }
-        if(Host) { ServerStartBoatTrip(Smoke.SessionOldRoute); }
+        if(Host) { BoatCommands->ServerStartBoatTrip(Smoke.SessionOldRoute); }
         ServerConfigureRig(Smoke.SessionOldCast,Rod->GetRig().Revision,2,10,2);
         Capture(TEXT("day2-start"));Smoke.SessionAt=RealNow;Smoke.SessionStage=4;
     }

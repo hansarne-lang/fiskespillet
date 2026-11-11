@@ -34,17 +34,17 @@ bool UFiskExpeditionPanel::HandleKey(const FInputKeyEventArgs& A)
     if(A.Key==EKeys::Escape || A.Key==EKeys::J) { bVisible=false;PC->bShowMouseCursor=false;PC->SetInputMode(FInputModeGameOnly());return true; }
     auto* E=PC->FindExpedition();if(!E || !PC->PlayerState) { return true; }const auto& P=E->GetPlan();
     const FKey Numbers[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five};
-    for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->ServerExpeditionChoose(P.Revision,I); } }
-    if(A.Key==EKeys::T) { PC->ServerExpeditionReady(P.Revision,!P.Ready.Contains(PC->PlayerState->GetPlayerId())); }
-    const FKey Messages[]={EKeys::Six,EKeys::Seven,EKeys::Eight};for(int32 I=0;I<3;++I) { if(A.Key==Messages[I]) { PC->ServerExpeditionSay(I); } }
+    for(int32 I=0;I<5;++I) { if(A.Key==Numbers[I]) { PC->GetExpeditionCommands()->ServerExpeditionChoose(P.Revision,I); } }
+    if(A.Key==EKeys::T) { PC->GetExpeditionCommands()->ServerExpeditionReady(P.Revision,!P.Ready.Contains(PC->PlayerState->GetPlayerId())); }
+    const FKey Messages[]={EKeys::Six,EKeys::Seven,EKeys::Eight};for(int32 I=0;I<3;++I) { if(A.Key==Messages[I]) { PC->GetExpeditionCommands()->ServerExpeditionSay(I); } }
     if(A.Key==EKeys::PageDown) { ++Page; }if(A.Key==EKeys::PageUp) { Page=FMath::Max(0,Page-1); }
     if(A.Key==EKeys::LeftMouseButton)
     {
         FVector2D M;int32 W=0,H=0;PC->GetViewportSize(W,H);const double S=FMath::Min(W/1280.0,H/720.0);
         if(S>0 && GetWorld()->GetGameViewport()->GetMousePosition(M))
         {
-            for(int32 I=0;I<5;++I) { if(FBox2D(FVector2D(46*S,(179+43*I)*S),FVector2D(584*S,(217+43*I)*S)).IsInside(M)) { PC->ServerExpeditionChoose(P.Revision,I); } }
-            if(FBox2D(FVector2D(650*S,371*S),FVector2D(1195*S,410*S)).IsInside(M)) { PC->ServerExpeditionReady(P.Revision,!P.Ready.Contains(PC->PlayerState->GetPlayerId())); }
+            for(int32 I=0;I<5;++I) { if(FBox2D(FVector2D(46*S,(179+43*I)*S),FVector2D(584*S,(217+43*I)*S)).IsInside(M)) { PC->GetExpeditionCommands()->ServerExpeditionChoose(P.Revision,I); } }
+            if(FBox2D(FVector2D(650*S,371*S),FVector2D(1195*S,410*S)).IsInside(M)) { PC->GetExpeditionCommands()->ServerExpeditionReady(P.Revision,!P.Ready.Contains(PC->PlayerState->GetPlayerId())); }
         }
     }return true;
 }

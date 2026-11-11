@@ -55,7 +55,7 @@ bool UFiskSeaChart::HandleFavorites(const FInputKeyEventArgs& Args)
     else if(K==EKeys::Delete) { GI->ClearPlace(FavoriteSlot);Message=GI->PlacesMessage; }
     else if(K==EKeys::Enter)
     {
-        if(const FFiskSavedPlace* Saved=GI->Places.Get(FavoriteSlot)) { if(const AFiskStarterBoat* B=PC->FindStarterBoat()) { PC->ServerSelectSeaPoint(B->GetRouteRevision(),Saved->Point); } }
+        if(const FFiskSavedPlace* Saved=GI->Places.Get(FavoriteSlot)) { if(const AFiskStarterBoat* B=PC->FindStarterBoat()) { PC->GetBoatCommands()->ServerSelectSeaPoint(B->GetRouteRevision(),Saved->Point); } }
         else { Message=TEXT("Denne favorittplassen er tom. F5 lagrer båtens valgte rute."); }
     }
     else if(K==EKeys::LeftMouseButton)

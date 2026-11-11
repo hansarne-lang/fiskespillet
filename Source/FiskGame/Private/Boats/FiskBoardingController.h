@@ -11,6 +11,9 @@
 #include "Boats/Controller/FiskMarinaSync.h"
 #include "Boats/Controller/FiskRecoverySync.h"
 #include "Boats/Controller/FiskCareerSync.h"
+#include "Boats/Controller/FiskFleetSync.h"
+#include "Boats/Controller/FiskExpeditionCommands.h"
+#include "Boats/Controller/FiskBoatCommands.h"
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Boats/FiskBoardingSmokeState.h"
 #endif
@@ -58,7 +61,6 @@ public:
     // Mouse-steered rod (#132): the rod follows mouse movement once it moves during a fight.
     const FFiskRodStick& GetRodStick() const { return RodStick; }
     bool IsRodSteering() const { return bRodSteering; }
-    UFUNCTION(Server,Reliable) void ServerReturnToMarina(int32 Revision,int32 Day,int32 Leg);
     UFiskPierWalk* GetPierWalk() const { return PierWalk; }
     UFiskSkipperPanel* GetSkipperPanel() const { return SkipperPanel; }
     UFiskCollectionPanel* GetCollectionPanel() const { return CollectionPanel; }
@@ -66,15 +68,14 @@ public:
     FFiskRigBundle MakeRigBundle(const TArray<FFiskRigSettings>& Rigs) const;
     UFUNCTION(Server,Reliable) void ServerApplyRigBundle(FFiskRigBundle Bundle);
     UFUNCTION(Client,Reliable) void ClientRigBundleReply(bool Accepted);
-    UFUNCTION(Server,Reliable) void ServerVoyageReplace(int32 Day,int32 Revision,const TArray<FVector>& Points);
-    UFUNCTION(Server,Reliable) void ServerVoyageNext(int32 Day,int32 Revision,int32 BoatRevision);
     UFiskMarinaPanel* GetMarinaPanel() const { return MarinaPanel; }
     UFiskMarinaSync* GetMarinaSync() const { return MarinaSync; }   // Boathouse, bar and harbour calls (#113 step 3)
     UFiskRecoverySync* GetRecoverySync() const { return RecoverySync; }   // Journal and medal recovery (#113 step 4)
     UFiskExpeditionPanel* GetExpeditionPanel() const { return ExpeditionPanel; }
-    UFUNCTION(Server,Reliable) void ServerExpeditionChoose(int32 Revision,int32 Goal);
-    UFUNCTION(Server,Reliable) void ServerExpeditionReady(int32 Revision,bool Ready);
-    UFUNCTION(Server,Reliable) void ServerExpeditionSay(int32 Code);
+    UFiskExpeditionCommands* GetExpeditionCommands() const { return ExpeditionCommands; }   // Goal, ready and crew messages (#113 step 7)
+    UFiskBoatCommands* GetBoatCommands() const { return BoatCommands; }   // Boarding, trip, route, travel votes and captain (#113 step 8)
+    void ShowCaptainReply(bool bAccepted);       // Client: crew panel message for UFiskBoatCommands::ClientCaptainReply
+    void ShowGroundReply(const FString& Message); // Client: sea chart message for UFiskBoatCommands::ClientGroundReply
     // The career itself lives in UFiskCareerSync (#113 step 5); these forward to it.
     UFiskCareerSync* GetCareerSync() const { return CareerSync; }
     bool IsCareerReady() const { return CareerSync->IsReady(); }
@@ -85,8 +86,6 @@ public:
     void DrawCareer(class AHUD& HUD,class UCanvas& Canvas);
     bool IsCareerVisible() const { return bCareerVisible; }
     void TickCareer();
-    UFUNCTION(Server,Reliable) void ServerSelectSeaPoint(int32 Revision,FVector_NetQuantize Point);
-    UFUNCTION(Server,Reliable) void ServerTravelVote(int32 Leg,bool Vote);
     virtual bool InputKey(const struct FInputKeyEventArgs& Params) override;
     void ReleaseRodInputsForMenu();
     UFiskFrontEnd* GetFrontEnd() const { return FrontEnd; }
@@ -107,7 +106,7 @@ public:
     void RunCollectionSmoke();
     void RunAnglerSmoke();
     void RunSkipperSmoke();
-    int32 GetRejectedCaptainRequests() const { return Smoke.RejectedCaptainRequests; }
+    int32 GetRejectedCaptainRequests() const { return BoatCommands->GetRejectedCaptainRequests(); }
 #endif
     void RequestRodSelection(int32 Slot);
     UFUNCTION(Server,Reliable) void ServerSelectRod(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot);
@@ -126,22 +125,18 @@ public:
     FString GetActionFeedback() const;
     UFUNCTION(Client,Reliable) void ClientActionFeedback(const FString& Message);
     UFUNCTION(Client,Reliable) void ClientRigReply(bool bAccepted);
-    UFUNCTION(Server,Reliable) void ServerTransferCaptain(int32 ExpectedRevision,int32 Target);
-    UFUNCTION(Client,Reliable) void ClientCaptainReply(bool bAccepted);
-    UFUNCTION(Server,Reliable) void ServerStartBoatTrip(int32 ExpectedRevision);
     const AFiskStarterBoat* FindStarterBoat() const;
     AFiskStarterBoat* GetSelectedFleetBoat() const { return SelectedFleetBoat; }
     AFiskVoyagePlan* FindVoyage() const;
     AFiskExpeditionState* FindExpedition() const;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
-    UFUNCTION(Server,Reliable) void ServerFleetSelect(int32 Index,bool CreateOwn);
-    UFUNCTION(Server,Reliable) void ServerFleetLeave();
+    UFiskFleetSync* GetFleetSync() const { return FleetSync; }   // Boat choice at the start pier (#113 step 6)
+    void SetSelectedFleetBoat(AFiskStarterBoat* Boat);
+    bool AreRodsIdle() const;   // No rod is cast or fighting, so the player may change boat
     bool HandleFleetKey(const FInputKeyEventArgs& Args);
     bool IsFleetVisible() const { return bFleetVisible; }
     void DrawFleet(class AHUD& HUD,class UCanvas& Canvas);
     TArray<AFiskStarterBoat*> FleetBoats() const;
-    UFUNCTION(Server,Reliable) void ServerSelectGround(int32 ExpectedRevision,int32 GroundId);
-    UFUNCTION(Client,Reliable) void ClientGroundReply(const FString& Message);
     bool CanOpenRig() const;
     void RequestRig(int32 Bait, int32 Depth, int32 Program);
     void ServerConfigureRig(FGuid ExpectedCast, int32 ExpectedRevision, int32 Bait, int32 Depth, int32 Program);
@@ -167,7 +162,9 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskMarinaSync> MarinaSync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskRecoverySync> RecoverySync;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskCareerSync> CareerSync;
-    double LastExpeditionMessage=-10;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskFleetSync> FleetSync;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskExpeditionCommands> ExpeditionCommands;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UFiskBoatCommands> BoatCommands;
     int32 ShopRow=0;
     bool bCareerVisible=false;
     FTimerHandle CareerTimer;
@@ -182,8 +179,6 @@ private:
     double ActionFeedbackUntil=0;
     void RequestBoarding();
 
-    UFUNCTION(Server, Reliable)
-    void ServerBoardStarterBoat();
 
     void RequestDeparture();
 

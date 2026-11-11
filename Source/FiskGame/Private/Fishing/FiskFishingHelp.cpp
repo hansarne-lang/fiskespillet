@@ -72,7 +72,7 @@ void UFiskFishingHelp::RequestReturn()
     if(Boat->GetTripProgress()>100) { PC->ClientActionFeedback_Implementation(TEXT("Båten er allerede på vei hjem eller tilbake ved marinaen."));return; }
     if(Boat->GetTripProgress()<0) { PC->ClientActionFeedback_Implementation(TEXT("Båten er allerede ved brygga."));return; }
     StopAssist();PC->ReleaseRodInputsForMenu();
-    PC->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial());
+    PC->GetBoatCommands()->ServerReturnToMarina(Boat->GetRouteRevision(),Day->GetDayNumber(),Boat->GetLegSerial());
 }
 bool UFiskFishingHelp::HandleKey(const FInputKeyEventArgs& Args)
 {

@@ -46,8 +46,8 @@ void UFiskCrewPanel::Smoke()
         if(!Boat->IsAboard(Self)) { Key(EKeys::E);return; }
         if(Boat->GetCrewCount()!=2) { return; }
         InitialRevision=Rev;
-        if(Host) { PC->ServerTransferCaptain(Rev,999);PC->ServerTransferCaptain(Rev+1,Other);PC->ServerTransferCaptain(Rev,Self); }
-        else { PC->ServerTransferCaptain(Rev,Other); }
+        if(Host) { PC->GetBoatCommands()->ServerTransferCaptain(Rev,999);PC->GetBoatCommands()->ServerTransferCaptain(Rev+1,Other);PC->GetBoatCommands()->ServerTransferCaptain(Rev,Self); }
+        else { PC->GetBoatCommands()->ServerTransferCaptain(Rev,Other); }
         Key(EKeys::K);Capture(TEXT("crew-initial"));Key(EKeys::F);Key(EKeys::R);Key(EKeys::M);Key(EKeys::G);MarkAt=Now;Stage=1;
     }
     else if(Stage==1)
@@ -69,7 +69,7 @@ void UFiskCrewPanel::Smoke()
         else
         {
             ChooseOther();if(!Message.Contains(TEXT("kapteinen"))) { Fail(TEXT("passenger_message"));return; }
-            PC->ServerTransferCaptain(InitialRevision,999);
+            PC->GetBoatCommands()->ServerTransferCaptain(InitialRevision,999);
         }
         Stage=2;
     }
@@ -115,7 +115,7 @@ void UFiskCrewPanel::Smoke()
         if(Host)
         {
             if(Boat->GetCaptainId()!=Owner) { Fail(TEXT("owner_handoff"));return; }
-            PC->ServerStartBoatTrip(InitialRevision);PC->ServerSelectGround(InitialRevision,2);
+            PC->GetBoatCommands()->ServerStartBoatTrip(InitialRevision);PC->GetBoatCommands()->ServerSelectGround(InitialRevision,2);
             Key(EKeys::K);Capture(TEXT("crew-owner-midtrip"));MarkAt=Now;Stage=71;
         }
         else { Stage=8; }
@@ -138,8 +138,8 @@ void UFiskCrewPanel::Smoke()
     else if(Stage==10)
     {
         if(Rod.GetState()!=EFiskRodState::Fishing) { return; }
-        if(Host) { Key(EKeys::R);PC->ServerTransferCaptain(Rev,Self); }
-        else { PC->ServerTransferCaptain(Rev,999); }
+        if(Host) { Key(EKeys::R);PC->GetBoatCommands()->ServerTransferCaptain(Rev,Self); }
+        else { PC->GetBoatCommands()->ServerTransferCaptain(Rev,999); }
         Key(EKeys::K);Capture(TEXT("crew-fishing"));Key(EKeys::R);Key(EKeys::F);Key(EKeys::M);Key(EKeys::G);MarkAt=Now;Stage=11;
     }
     else if(Stage==11)

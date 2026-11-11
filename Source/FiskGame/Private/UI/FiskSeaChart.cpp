@@ -59,7 +59,7 @@ void UFiskSeaChart::Choose()
     if(!Boat || !PC->PlayerState) { return; }
     if(Boat->GetCaptainId()!=PC->PlayerState->GetPlayerId()) { Message=TEXT("Bare kapteinen kan velge plass.");return; }
     if(Boat->GetTripProgress()!=AFiskStarterBoat::AtDock) { Message=TEXT("Ruten er låst til båtturen er avsluttet.");return; }
-    Message=TEXT("Venter på bekreftelse ...");PC->ServerSelectGround(Boat->GetRouteRevision(),Row);
+    Message=TEXT("Venter på bekreftelse ...");PC->GetBoatCommands()->ServerSelectGround(Boat->GetRouteRevision(),Row);
 }
 bool UFiskSeaChart::HandleKey(const FInputKeyEventArgs& Args)
 {
@@ -92,7 +92,7 @@ bool UFiskSeaChart::HandleKey(const FInputKeyEventArgs& Args)
             {
                 AFiskBoardingController* MutablePC=CastChecked<AFiskBoardingController>(GetOwner());const AFiskStarterBoat* Boat=PC->FindStarterBoat();
                 const FVector SeaPoint(FMath::RoundToDouble((Mouse.X/S-638)/560*150000),FMath::RoundToDouble((355-Mouse.Y/S)/180*100000),0);
-                if(Boat) { MutablePC->ServerSelectSeaPoint(Boat->GetRouteRevision(),SeaPoint); }return true;
+                if(Boat) { MutablePC->GetBoatCommands()->ServerSelectSeaPoint(Boat->GetRouteRevision(),SeaPoint); }return true;
             }
         }
     }

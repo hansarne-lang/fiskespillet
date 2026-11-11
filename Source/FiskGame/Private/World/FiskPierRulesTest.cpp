@@ -46,4 +46,25 @@ bool FFiskPierPeople::RunTest(const FString&)
     TestEqual(TEXT("Unchanged alone"),FiskPier::StepAmong(Same,{0,1},.1,false,{}),FiskPier::Step(Same,{0,1},.1,false));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPierBeach,"Fiskelaget.Pier.BeachBoardwalkReachableFromBar",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FFiskPierBeach::RunTest(const FString&)
+{
+    // Flood fill on a 25 cm grid from the bar path: the beach platform must be reachable by walking (#18).
+    const int32 X0=-7700,Y0=-3700,Step=25,W=(-1100-X0)/Step,H=(-1800-Y0)/Step;TArray<uint8> Seen;Seen.Init(0,W*H);
+    auto Cell=[&](int32 I,int32 J){return FVector(X0+I*Step,Y0+J*Step,130);};
+    TArray<FIntPoint> Open;const FIntPoint Start((-1300-X0)/Step,(-2900-Y0)/Step);
+    if(!FiskPier::Inside(Cell(Start.X,Start.Y))) { AddError(TEXT("Start is not on the bar path"));return false; }
+    Seen[Start.Y*W+Start.X]=1;Open.Add(Start);
+    while(!Open.IsEmpty())
+    {
+        const FIntPoint C=Open.Pop();const FIntPoint Next[]={{C.X+1,C.Y},{C.X-1,C.Y},{C.X,C.Y+1},{C.X,C.Y-1}};
+        for(const FIntPoint& N:Next) { if(N.X<0 || N.Y<0 || N.X>=W || N.Y>=H || Seen[N.Y*W+N.X] || !FiskPier::Inside(Cell(N.X,N.Y))) { continue; }Seen[N.Y*W+N.X]=1;Open.Add(N); }
+    }
+    const FIntPoint Platform((-7000-X0)/Step,(-2700-Y0)/Step);
+    TestTrue(TEXT("Platform is on the pier"),FiskPier::Inside(Cell(Platform.X,Platform.Y)));
+    TestTrue(TEXT("Platform reachable from the bar path"),Seen[Platform.Y*W+Platform.X]!=0);
+    TestFalse(TEXT("Sand beyond the platform is not walkable"),FiskPier::Inside(FVector(-8200,-2700,130)));
+    TestFalse(TEXT("Loungers on the sand are off the deck"),FiskPier::Inside(FVector(-7000,-1650,130)));
+    return true;
+}
 #endif

@@ -4,7 +4,8 @@
 namespace FiskPier
 {
     struct FArea { double X0,Y0,X1,Y1; };
-    inline constexpr FArea Areas[]={ {-1800,-3200,-900,10300},{-9000,3600,-1200,4100},{-9000,5900,-1200,6400},{-9000,8200,-1200,8700},{-5500,-3200,-1200,-2800},{-5400,-3000,-3000,-2050},{-1200,-350,-450,350} };
+    inline constexpr FArea Areas[]={ {-1800,-3200,-900,10300},{-9000,3600,-1200,4100},{-9000,5900,-1200,6400},{-9000,8200,-1200,8700},{-5500,-3200,-1200,-2800},{-5400,-3000,-3000,-2050},{-1200,-350,-450,350},
+        {-7600,-3000,-5000,-2600},{-7600,-3600,-6400,-1900} };   // Beach boardwalk west of the bar and its platform over the sand (#18)
     inline FVector Spawn() { return FVector(-1300,0,130); }
     inline bool Inside(FVector P) { if(P.ContainsNaN() || !FMath::IsFinite(P.X) || !FMath::IsFinite(P.Y) || FMath::Abs(P.Z-130)>1 || !FurnitureClear(P)) { return false; }for(const auto& A:Areas) { if(P.X>=A.X0+BodyRadius && P.X<=A.X1-BodyRadius && P.Y>=A.Y0+BodyRadius && P.Y<=A.Y1-BodyRadius) { return true; } }return false; }
     inline bool ValidAxis(FVector2D A) { return FMath::IsFinite(A.X) && FMath::IsFinite(A.Y) && A.SizeSquared()<=2.001; }

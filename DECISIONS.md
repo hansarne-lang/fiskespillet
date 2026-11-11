@@ -90,3 +90,11 @@ Innsatsgrensen begrenser også virkningen av saldo fra andre verter, som ikke ka
 ## 2026-11-10 — Veddemål: hvilke fiskere som sammenlignes
 
 Prosjekteieren godkjente forslaget fra #143: Ved kåring av største fisk sammenlignes bare tellende fangster (levert innen fristen, fisken tilhører stangeieren) fra fiskere som var ute på sjøen da veddemålene kunne registreres. Spillere som allerede var i land, er ikke med i sammenligningen, selv om de har levert fisk. Gjelder #22 steg 2.
+
+## 2026-11-11 — Strandbaren: strandpromenade og drinker
+
+Prosjekteieren sa ja til begge punktene i B i [forslaget i #18](https://github.com/hansarne-lang/fiskespillet/issues/18#issuecomment-6803816061):
+
+- **Gange utenfor marinaen:** en strandpromenade fra baren vestover og en platting ut over sanden. Gangplanet holdes i bryggehøyde, så promenaden er en brygge over stranda; solsenger står på sanden ved siden av. Ingen gange på selve sanden eller utenfor marinaområdet ellers.
+- **Drinker i baren:** gratis og kun til pynt. Spilleren bestiller med 8, 9 eller 0, og bestillingen vises som en melding i baren. Ingen pris, saldo, effekt eller lagring.
+

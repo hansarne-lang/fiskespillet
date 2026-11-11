@@ -4,7 +4,7 @@ Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PL
 
 ## Strandbaren og brygga – under arbeid
 
-Navn i stedet for spillernummer på bartavla, i ekspedisjons- og dekkpanelet og på resultatskjermen. Etter 17:00 viser bartavla dagens veddemålsresultat: potten, hvem vinnerne satset på og med hvilken fisk. Figurer som går på brygga holder en kroppsbredde avstand og viker til siden når de møtes. To nye hilsener i baren: 6 «Skål!» og 7 «Gratulerer med fangsten!». Nye nettverkskall krever ny protokollversjon (24) i neste testversjon. Issue #18.
+Navn i stedet for spillernummer på bartavla, i ekspedisjons- og dekkpanelet og på resultatskjermen. Etter 17:00 viser bartavla dagens veddemålsresultat: potten, hvem vinnerne satset på og med hvilken fisk. Figurer som går på brygga holder en kroppsbredde avstand og viker til siden når de møtes. To nye hilsener i baren: 6 «Skål!» og 7 «Gratulerer med fangsten!». En strandpromenade går fra baren vestover til en platting over sanden med solsenger. Gratis drinker til pynt bestilles med 8, 9 og 0. Nye nettverkskall krever ny protokollversjon (24) i neste testversjon. Issue #18.
 
 ## v0.23 Testversjon – 11. november 2026
 

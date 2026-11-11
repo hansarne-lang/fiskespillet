@@ -199,7 +199,7 @@ bool UFiskMarinaPanel::HandleKey(const FInputKeyEventArgs& A)
         if(A.Key==EKeys::MouseScrollUp) { GalleryZoom=FMath::Clamp(GalleryZoom-.1f,.7f,1.8f); }if(A.Key==EKeys::MouseScrollDown) { GalleryZoom=FMath::Clamp(GalleryZoom+.1f,.7f,1.8f); }
         if(A.Key==EKeys::Home) { GalleryYaw=0;GalleryZoom=1; }return true;
     }
-    const FKey Numbers[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five,EKeys::Six,EKeys::Seven};
+    const FKey Numbers[]={EKeys::One,EKeys::Two,EKeys::Three,EKeys::Four,EKeys::Five,EKeys::Six,EKeys::Seven,EKeys::Eight,EKeys::Nine,EKeys::Zero};
     if(Page==2)
     {
         if(A.Key==EKeys::V && A.Event==IE_Pressed) { HarbourView=(HarbourView+1)%3; }
@@ -279,7 +279,8 @@ void UFiskMarinaPanel::Draw(AHUD& HUD,UCanvas& C)
         TActorIterator<AFiskDaySettlement> Settlement(GetWorld());
         if(Settlement && Settlement->GetView().bRevealed) { int32 I=0;for(const FFiskDayResult& R:Settlement->GetView().Results) { T(FString::Printf(TEXT("%s | %d levert | $%lld"),*FiskPlayerNames::Name(GetWorld(),R.PlayerId).Left(14),R.DeliveredFish,static_cast<long long>(R.SessionBalance)),46+(I/4)*285,450+(I%4)*21,.75f,Gold);++I; } }
         else { T(TEXT("Dagens tavle åpner ved 17:00. Tab viser flåten utenfor baren."),46,452,.85f,Gold); }
-        for(int32 I=0;I<AFiskMarinaHub::PhraseCount;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46+(I/4)*290,535+20*(I%4),.73f); }T(FString::Printf(TEXT("V: %s | PgUp/PgDn: båt | M: musikk %s"),HarbourView==0?TEXT("BAR"):HarbourView==1?TEXT("HAVN"):TEXT("FØLG BÅT"),bHarbourMusic?TEXT("PÅ"):TEXT("AV")),46,628,.76f,Gold);T(TEXT("F/S/Enter: veddemål | 2 s mellom meldinger | B / Escape: tilbake"),46,652,.78f,Teal);return;
+        for(int32 I=0;I<AFiskMarinaHub::FirstDrink;++I) { T(FString::Printf(TEXT("%d: %s"),I+1,AFiskMarinaHub::Phrase(I)),46+(I/4)*290,535+20*(I%4),.73f); }
+        T(TEXT("Drinker, gratis: 8 tropisk punsj | 9 kokosvann | 0 iste"),46,614,.72f,Gold);T(FString::Printf(TEXT("V: %s | PgUp/PgDn: båt | M: musikk %s"),HarbourView==0?TEXT("BAR"):HarbourView==1?TEXT("HAVN"):TEXT("FØLG BÅT"),bHarbourMusic?TEXT("PÅ"):TEXT("AV")),46,628,.76f,Gold);T(TEXT("F/S/Enter: veddemål | 2 s mellom meldinger | B / Escape: tilbake"),46,652,.78f,Teal);return;
     }
     T(TEXT("NAUST OG TROFÉVEGG"),46,55,1.65f);T(TEXT("PgUp/PgDn: alle 12 | 1–4: besøk | N: naustbutikk"),46,105,.85f,Teal);
     const FFiskMarinaResident* R=Hub && Hub->GetResidents().IsValidIndex(HouseIndex)?&Hub->GetResidents()[HouseIndex]:nullptr;

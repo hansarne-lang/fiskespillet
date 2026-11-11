@@ -31,7 +31,7 @@ void AFiskMarinaHub::BeginPlay() { Super::BeginPlay();Rebuild(); }
 void AFiskMarinaHub::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const { Super::GetLifetimeReplicatedProps(OutLifetimeProps);DOREPLIFETIME(AFiskMarinaHub,Residents);DOREPLIFETIME(AFiskMarinaHub,Messages); }
 const TCHAR* AFiskMarinaHub::Phrase(int32 Code)
 {
-    static const TCHAR* Lines[]={TEXT("God tur og skitt fiske!"),TEXT("Jeg er klar ved brygga."),TEXT("Besøk gjerne naustet mitt!"),TEXT("Bra fangst – vi ses ved oppgjøret!"),TEXT("Jeg tar en pause i strandbaren."),TEXT("Skål!"),TEXT("Gratulerer med fangsten!")};
+    static const TCHAR* Lines[]={TEXT("God tur og skitt fiske!"),TEXT("Jeg er klar ved brygga."),TEXT("Besøk gjerne naustet mitt!"),TEXT("Bra fangst – vi ses ved oppgjøret!"),TEXT("Jeg tar en pause i strandbaren."),TEXT("Skål!"),TEXT("Gratulerer med fangsten!"),TEXT("Én tropisk punsj, takk!"),TEXT("Ett glass kokosvann, takk!"),TEXT("Én iste med is, takk!")};
     static_assert(UE_ARRAY_COUNT(Lines)==PhraseCount,"One line per phrase code");
     return Code>=0 && Code<PhraseCount?Lines[Code]:TEXT("");
 }

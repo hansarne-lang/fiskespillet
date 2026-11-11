@@ -2,6 +2,10 @@
 
 Status: kontraktgrunnlag med dataskjema v1.0, samordnet med godkjent kravspesifikasjon v1.1. Dette er dokumenterte datakontrakter, ikke implementert spillkode.
 
+## Gjeldende nettverkskall i prototypen
+
+Kontraktene under er dataskjemaer. I prototypen går spillerens kommandoer som `Server`-kall på komponenter som eies av spillerens kontroller (ARCHITECTURE.md, «Spillerkontrolleren og komponentene»). Hvert kall har et fast navn og faste parametre; serveren kontrollerer eier, dag og revisjon før noe endres, og svarer med et `Client`-kall der klienten trenger svar. Kallene ble flyttet fra kontrolleren til komponentene i #113 uten endret navn, parametre eller protokoll.
+
 ## Typer og felles regler
 
 `Id` = UUID/FGuid, `Int32` = fortegnet 32-bit heltall, `Int64` = fortegnet 64-bit heltall, `Bool` = boolsk, `String` = begrenset UTF-8-tekst, `Enum` = lukket navngitt sett, `List<T>` = liste, `Optional<T>` = eksplisitt valgfri verdi. Vekt/last uttrykkes som `Int64` gram, lengde og avstand som `Int64` millimeter og pengesummer som `Int64` minste valutaenhet. Enhetsvalg er teknisk forslag og krever ingen endring av spillbalansen. Ingen flyttallsbasert pengeføring.

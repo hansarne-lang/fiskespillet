@@ -61,7 +61,7 @@ public:
     const FFiskRodSelection& GetRodSelection() const { return Selection; }
     bool ApplyRodSelection(int32 ExpectedRevision,int32 ExpectedDay,int32 Slot);   // Server: select and calm all rods
     void ReceiveRodSelection(bool bAccepted,const FFiskRodSelection& Snapshot);  // Owning client
-    UFiskPrototypeRod* GetSelectedRod() const { return MutableRod(); }
+    UFiskPrototypeRod* GetActiveRodForCommand() const { return MutableRod(); }   // The rod Selection points at
     void SetRodRig(int32 Slot,const FFiskRigSettings& NewRig);                 // Server: rig set from the tackle shop
     void ShowRigReply(bool bAccepted);                                            // Client: rig panel answer
     bool CanUseRod() const;

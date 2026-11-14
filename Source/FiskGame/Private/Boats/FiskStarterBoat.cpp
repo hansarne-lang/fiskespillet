@@ -81,6 +81,7 @@ void AFiskStarterBoat::ResetForDay()
     if (!HasAuthority()) { return; }
     Cargo=FFiskCargoModel();CargoView=FFiskCargoView();OnRep_CargoView();bCargoReturnPending=false;
     SetActorTickEnabled(false); LegStartedMs = ReturnStartedMs = MarinaArrivalMs = -1;
+    bHelm=false;HelmSpeed=0;Helm=FiskHelm::FState();HelmThrottle=HelmRudder=0;HelmInputAt=-1;HelmLastMs=-1;bHelmLeftMarina=false;
     TripProgress = AtDock; ++Route.Revision;++LegSerial;TravelVotes.Reset();LegOrigin=FVector::ZeroVector;LegDestination=Route.Destination;LegTravelMs=GetTravelMs();
     PortRodActivity = StarboardRodActivity = 0;
     PortFish = FFiskFishVisualState(); StarboardFish = FFiskFishVisualState();
@@ -138,6 +139,7 @@ void AFiskStarterBoat::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(AFiskStarterBoat, OwnerId);
     DOREPLIFETIME(AFiskStarterBoat,FleetIndex);DOREPLIFETIME(AFiskStarterBoat,Voyage);DOREPLIFETIME(AFiskStarterBoat,Expedition);
     DOREPLIFETIME(AFiskStarterBoat, Route);
+    DOREPLIFETIME(AFiskStarterBoat,bHelm);DOREPLIFETIME(AFiskStarterBoat,HelmSpeed);
     DOREPLIFETIME(AFiskStarterBoat, Crew);
     DOREPLIFETIME(AFiskStarterBoat, TripProgress);
     DOREPLIFETIME(AFiskStarterBoat, MarinaArrivalMs);
@@ -170,14 +172,17 @@ void AFiskStarterBoat::OnRep_Route()
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CAPTAIN_STATE player=%d revision=%d"),Route.CaptainId,Route.Revision);
 }
 TArray<FVector> AFiskStarterBoat::GetActivePath() const
-{ return IsTravelling()?FiskRouteGeometry::Between(LegOrigin,LegDestination):FiskRouteGeometry::Path(Route.Destination); }
+{ if(bHelm) { return {GetActorLocation()}; }return IsTravelling()?FiskRouteGeometry::Between(LegOrigin,LegDestination):FiskRouteGeometry::Path(Route.Destination); }
 FVector AFiskStarterBoat::PositionAt(int32 NowMs) const
 {
-    if(!IsTravelling()) { return GetActorLocation(); }
+    if(!IsTravelling() || bHelm) { return GetActorLocation(); }
     return FiskRouteGeometry::Position(GetActivePath(),FMath::Clamp((NowMs-LegStartedMs)/static_cast<double>(FMath::Max(1,LegTravelMs)),0.0,1.0));
 }
 void AFiskStarterBoat::BeginLeg(FVector Origin,FVector Destination,int32 Duration,int32 NowMs,bool Returning)
 {
+    bHelm=false;HelmSpeed=0;HelmThrottle=HelmRudder=0;   // The chart's autopilot or R takes over from the hand
+    // Unreliable helm input still on its way from before R or the chart must not take the boat back at once.
+    HelmBlockedUntil=GetWorld()->GetRealTimeSeconds()+.5;
     LegOrigin=Origin;LegDestination=Destination;LegStartedMs=NowMs;LegTravelMs=FMath::Max(1,Duration);++LegSerial;TravelVotes.Reset();
     ReturnStartedMs=Returning?NowMs:-1;TripProgress=Returning?101:0;bReportedDeparture=bReportedReturn=false;
     SetActorLocationAndRotation(Origin,(Destination-Origin).Rotation());OnRep_TripProgress();SetActorTickEnabled(true);ForceNetUpdate();
@@ -201,7 +206,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
 void AFiskStarterBoat::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);const auto* Day=GetWorld()->GetGameState<AFiskDayState>();if(!HasAuthority() || !Day) { return; }
-    const int32 Now=Day->GetElapsedMilliseconds();if(bCargoReturnPending) { ForceCargoReturn(Now); }if(!IsTravelling()) { SetActorTickEnabled(false);return; }const auto Path=GetActivePath();if(Path.IsEmpty()) { return; }
+    const int32 Now=Day->GetElapsedMilliseconds();if(bCargoReturnPending) { ForceCargoReturn(Now); }if(bHelm) { TickHelm(Now);return; }if(!IsTravelling()) { SetActorTickEnabled(false);return; }const auto Path=GetActivePath();if(Path.IsEmpty()) { return; }
     const double Fraction=FMath::Clamp((Now-LegStartedMs)/static_cast<double>(FMath::Max(1,LegTravelMs)),0.0,1.0);
     if(MarinaArrivalMs<0) { MarinaArrivalMs=GetMarinaArrivalMs(Now);if(MarinaArrivalMs>=0) { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_CROSSED ms=%d"),MarinaArrivalMs); } }
     const FVector Position=FiskRouteGeometry::Position(Path,Fraction),Next=FiskRouteGeometry::Position(Path,FMath::Min(1.0,Fraction+.001));
@@ -210,7 +215,7 @@ void AFiskStarterBoat::Tick(float DeltaSeconds)
     TripProgress=Returning?100+FMath::Max(1,Percent):Percent;
     if(TripProgress==AtFishingSpot || TripProgress==AtMarina) { if(TripProgress==AtMarina) { SetActorLocation(DockPosition()); }SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate(); }
 }
-bool AFiskStarterBoat::UsesTravelCard() const { return IsTravelling() && FiskVoyage::Unanimous(Crew,TravelVotes); }
+bool AFiskStarterBoat::UsesTravelCard() const { return IsTravelling() && !bHelm && FiskVoyage::Unanimous(Crew,TravelVotes); }
 bool AFiskStarterBoat::VoteTravel(int32 Player,int32 ExpectedLeg,bool Vote)
 {
     if(!HasAuthority() || !IsTravelling() || ExpectedLeg!=LegSerial || !Crew.Contains(Player)) { return false; }
@@ -223,17 +228,7 @@ bool AFiskStarterBoat::Relocate(int32 Player,int32 Revision,FVector Point,FStrin
     const auto* Day=GetWorld()->GetGameState<AFiskDayState>();bool Safe=!Cargo.bMustReturn;
     // A rod with a fish on (bite, fight or ready to land) stops the move. Lines that are only out waiting
     // are pulled in for everyone when the move is accepted (owner decision 2026-11-11).
-    TArray<UFiskPrototypeRod*> Waiting;
-    for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
-    {
-        const auto* PC=Cast<AFiskBoardingController>(It->Get());if(!PC || !PC->PlayerState || !IsAboard(PC->PlayerState->GetPlayerId())) { continue; }
-        for(int32 Slot=0;Slot<3;++Slot)
-        {
-            const auto State=PC->GetRodAt(Slot)->GetState();
-            if(State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand) { Safe=false; }
-            else if(State==EFiskRodState::Fishing) { Waiting.Add(const_cast<UFiskPrototypeRod*>(PC->GetRodAt(Slot))); }
-        }
-    }
+    TArray<UFiskPrototypeRod*> Waiting;Safe&=CollectRods(Waiting);
     if(!HasAuthority() || !Day || !FiskVoyage::CanRelocate(CanCaptainCommand(Player,Revision),Revision==Route.Revision,FiskVoyage::CanSteer(TripProgress),Day->GetElapsedMilliseconds(),Safe,Valid)
         || FVector::Dist2D(Point,Route.Destination)<500 || Route.Revision==MAX_int32)
     { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_RELOCATION_REJECTED player=%d safe=%d fresh=%d"),Player,Safe,Revision==Route.Revision);Message=TEXT("Flytting avvist. Kapteinen velger en ny plass før 17:00, på fiskeplassen eller på vei ut, når ingen har fisk på kroken.");return false; }
@@ -325,7 +320,8 @@ bool AFiskStarterBoat::SelectPoint(int32 Requester,int32 Revision,FVector Point,
 int32 AFiskStarterBoat::ReturnMarginMs(int32 NowMs) const
 {
     int64 Home=NowMs;const int64 Travel=GetReturnTravelMs();
-    if(TripProgress==AtDock) { Home=FMath::Max(NowMs,120000)+2*Travel; }
+    if(bHelm) { Home+=FiskHelm::TravelMs(FiskRouteGeometry::Length(FiskRouteGeometry::Between(GetActorLocation(),FVector::ZeroVector)),Kind,CargoView.Mode==static_cast<uint8>(EFiskCargoMode::Towing)); }
+    else if(TripProgress==AtDock) { Home=FMath::Max(NowMs,120000)+2*Travel; }
     else if(TripProgress<100) { Home+=FMath::DivideAndRoundUp<int64>((100LL-TripProgress)*LegTravelMs,100)+Travel; }
     else if(TripProgress==AtFishingSpot) { Home+=Travel; }
     else if(TripProgress<200) { Home+=FMath::DivideAndRoundUp<int64>((TripProgress==101?100LL:200LL-TripProgress)*LegTravelMs,100); }
@@ -349,7 +345,8 @@ bool AFiskStarterBoat::ReturnHome(int32 Now)
 {
     const FVector Origin=PositionAt(Now);const auto Path=FiskRouteGeometry::Between(Origin,FVector::ZeroVector);if(Path.IsEmpty()) { return false; }
     const double HomeLength=FiskRouteGeometry::Length(FiskRouteGeometry::Path(Route.Destination));
-    const int32 Duration=TripProgress==AtFishingSpot?GetReturnTravelMs():FMath::Max(1,FMath::RoundToInt(GetReturnTravelMs()*FiskRouteGeometry::Length(Path)/FMath::Max(1.0,HomeLength)));
+    const bool bTowing=CargoView.Mode==static_cast<uint8>(EFiskCargoMode::Towing);
+    const int32 Duration=bHelm?FiskHelm::TravelMs(FiskRouteGeometry::Length(Path),Kind,bTowing):TripProgress==AtFishingSpot?GetReturnTravelMs():FMath::Max(1,FMath::RoundToInt(GetReturnTravelMs()*FiskRouteGeometry::Length(Path)/FMath::Max(1.0,HomeLength)));
     BeginLeg(Origin,FVector::ZeroVector,Duration,Now,true);return true;
 }
 void AFiskStarterBoat::ForceCargoReturn(int32 Now)
@@ -366,3 +363,84 @@ void AFiskStarterBoat::ForceCargoReturn(int32 Now)
 
 void AFiskStarterBoat::OnRep_CargoView()
 { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_CARGO_VIEW mode=%d revealed=%d"),CargoView.Mode,CargoView.RevealedGrams>=0); }
+
+// Hand steering (#176 step 2) ---------------------------------------------------------------------------
+bool AFiskStarterBoat::CollectRods(TArray<UFiskPrototypeRod*>& Waiting) const
+{
+    // A rod with a fish on (bite, fight or ready to land) stops the move. Lines that are only out waiting
+    // are returned so the caller can pull them in (owner decision 2026-11-11).
+    bool Safe=true;
+    for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
+    {
+        const auto* PC=Cast<AFiskBoardingController>(It->Get());if(!PC || !PC->PlayerState || !IsAboard(PC->PlayerState->GetPlayerId())) { continue; }
+        for(int32 Slot=0;Slot<3;++Slot)
+        {
+            const auto State=PC->GetRodAt(Slot)->GetState();
+            if(State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand) { Safe=false; }
+            else if(State==EFiskRodState::Fishing) { Waiting.Add(const_cast<UFiskPrototypeRod*>(PC->GetRodAt(Slot))); }
+        }
+    }
+    return Safe;
+}
+void AFiskStarterBoat::TakeHelm(FVector Position,double Speed,int32 NowMs)
+{
+    Helm=FiskHelm::FState();Helm.Position=FVector(Position.X,Position.Y,0);Helm.Heading=FMath::DegreesToRadians(GetActorRotation().Yaw);Helm.Speed=Speed;
+    bHelm=true;HelmSpeed=Speed;HelmLastMs=NowMs;bHelmLeftMarina=Helm.Position.Size2D()>FiskHelm::MarinaLeftRadius;
+    TripProgress=UnderHelm;ReturnStartedMs=-1;LegStartedMs=NowMs;++LegSerial;TravelVotes.Reset();
+    OnRep_TripProgress();SetActorTickEnabled(true);ForceNetUpdate();
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HELM_TAKEN x=%.0f y=%.0f speed=%.0f ms=%d"),Helm.Position.X,Helm.Position.Y,Speed,NowMs);
+}
+bool AFiskStarterBoat::SteerHelm(int32 Player,int32 Serial,float Throttle,float Rudder,FString& Message)
+{
+    const auto* Day=GetWorld()->GetGameState<AFiskDayState>();
+    if(!HasAuthority() || !Day || !Day->HasStarted() || Serial<=HelmSerial) { return false; }
+    const int32 Now=Day->GetElapsedMilliseconds();
+    if(!FiskHelm::CanTakeHelm(Player!=INDEX_NONE && Player==GetCaptainId(),TripProgress,Now))
+    { Message=Player==GetCaptainId()?TEXT("Roret er låst: avreise fra 02:00 til 17:00, og båten blir i marinaen etter turen."):TEXT("Bare kapteinen styrer båten. K viser mannskapet.");return false; }
+    HelmSerial=Serial;HelmThrottle=FiskHelm::Clean(Throttle);HelmRudder=FiskHelm::Clean(Rudder);HelmInputAt=GetWorld()->GetRealTimeSeconds();
+    if(bHelm) { return true; }
+    if(HelmThrottle==0.0 && HelmRudder==0.0) { return true; }   // Released keys never start anything
+    if(TripProgress==AtDock)
+    {
+        if(HelmThrottle==0.0) { return true; }
+        auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
+        if(!Mode || !Expedition || !Expedition->Depart()) { Message=TEXT("Avreise avvist. Alle om bord må ha klar karriere.");HelmThrottle=0;return false; }
+        Mode->LockBoatCrew(this);MarinaArrivalMs=-1;SetActorRotation(FRotator::ZeroRotator);TakeHelm(GetActorLocation(),0,Now);
+        Message=TEXT("Du har roret. Stopp og slipp gassen der du vil fiske.");return true;
+    }
+    if(TripProgress==AtFishingSpot)
+    {
+        if(HelmThrottle==0.0) { return true; }
+        TArray<UFiskPrototypeRod*> Waiting;
+        if(!CollectRods(Waiting)) { Message=TEXT("Noen har fisk på kroken. Land eller mist fisken før båten flytter seg.");HelmThrottle=0;return false; }
+        for(UFiskPrototypeRod* Rod:Waiting) { Rod->Lower();Rod->StopReel();Rod->Withdraw(); }
+        TakeHelm(GetActorLocation(),0,Now);
+        Message=Waiting.IsEmpty()?TEXT("Båten går."):TEXT("Båten går. Ledige stenger er trukket inn.");return true;
+    }
+    // Taking over a chart leg or the way home keeps the boat's current full speed.
+    if(GetWorld()->GetRealTimeSeconds()<HelmBlockedUntil) { HelmThrottle=HelmRudder=0;return true; }
+    const bool bTowing=CargoView.Mode==static_cast<uint8>(EFiskCargoMode::Towing);
+    TakeHelm(PositionAt(Now),FiskHelm::MaxSpeed(Kind,bTowing),Now);
+    Message=TEXT("Du har tatt roret. Kartet eller R gir autopiloten tilbake.");return true;
+}
+void AFiskStarterBoat::TickHelm(int32 NowMs)
+{
+    if(GetWorld()->GetRealTimeSeconds()-HelmInputAt>FiskHelm::InputTimeout) { HelmThrottle=HelmRudder=0; }
+    const double Seconds=HelmLastMs<0?0.0:(NowMs-HelmLastMs)/1000.0;HelmLastMs=NowMs;
+    FiskHelm::Advance(Helm,HelmThrottle,HelmRudder,Kind,CargoView.Mode==static_cast<uint8>(EFiskCargoMode::Towing),Seconds);
+    SetActorLocationAndRotation(Helm.Position,FRotator(0,FMath::RadiansToDegrees(Helm.Heading),0));HelmSpeed=Helm.Speed;
+    bHelmLeftMarina|=Helm.Position.Size2D()>FiskHelm::MarinaLeftRadius;
+    if(FiskHelm::Arrived(Helm.Position,bHelmLeftMarina))
+    {
+        bHelm=false;HelmSpeed=0;MarinaArrivalMs=NowMs;TripProgress=AtMarina;SetActorLocationAndRotation(DockPosition(),FRotator::ZeroRotator);
+        SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate();
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_CROSSED ms=%d helm=1"),MarinaArrivalMs);return;
+    }
+    if(!FiskHelm::Settles(Helm,HelmThrottle)) { return; }
+    int32 Habitat=0,HomeMs=0;
+    if(!FiskRouteGeometry::Sea(Helm.Position) || !FiskGrounds::MakeSeaPoint(Helm.Position,Habitat,HomeMs)) { return; }   // Stopped, but no fishing here
+    bHelm=false;HelmSpeed=0;Helm.Speed=0;
+    Route.GroundId=Habitat;Route.Destination=Helm.Position;Route.BaseTravelMs=HomeMs;++Route.Revision;OnRep_Route();
+    TripProgress=AtFishingSpot;SetActorTickEnabled(false);OnRep_TripProgress();ForceNetUpdate();
+    UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HELM_STOPPED x=%.0f y=%.0f habitat=%d home=%d ms=%d"),Helm.Position.X,Helm.Position.Y,Habitat,HomeMs,NowMs);
+}

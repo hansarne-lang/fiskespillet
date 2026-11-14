@@ -42,7 +42,7 @@ EVERYTHING = (
 )
 
 FISHING = ['FishCombat', 'RepeatedFishing', 'RigSetup', 'FishingRelease', 'ContentRelease', 'AnglerRelease']
-NAVIGATION = ['SeaChart', 'NavigationRelease', 'CaptainTransfer', 'SkipperRelease']
+NAVIGATION = ['SeaChart', 'NavigationRelease', 'CaptainTransfer', 'SkipperRelease', 'HelmRelease']
 OFFSHORE = ['ExplorationRelease', 'MangroveRelease', 'ExpeditionRelease', 'SkipperRelease', 'AnglerRelease']
 CAREER = ['CareerRelease', 'JournalRelease', 'MarinaRelease', 'ExpeditionRelease']
 DAY = ['FullDay', 'SessionRelease', 'ContentRelease', 'FishingRelease']
@@ -72,6 +72,7 @@ RULES: tuple[tuple[str, list[str]], ...] = (
     ('Source/FiskGame/Private/Boats/Controller/FiskCareerSync*', CAREER + ['FullDay', 'SessionRelease']),
     ('Source/FiskGame/Private/Boats/Controller/FiskFleetSync*', NAVIGATION + ['FullDay', 'HarbourGuide', 'MarinaRelease']),
     ('Source/FiskGame/Private/Boats/Controller/FiskExpeditionCommands*', ['ExpeditionRelease', 'ExplorationRelease', 'MangroveRelease']),
+    ('Source/FiskGame/Private/Boats/Controller/FiskHelmControl*', ['HelmRelease']),
     ('Source/FiskGame/Private/Boats/Controller/FiskBoatCommands*', NAVIGATION + ['FullDay', 'SessionRelease', 'FishingRelease', 'ExplorationRelease', 'HarbourGuide']),
     ('Source/FiskGame/Private/Boats/Controller/FiskRodCommands*', FISHING + ['FullDay', 'CareerRelease']),
     ('Source/FiskGame/Private/Fishing/*', FISHING),

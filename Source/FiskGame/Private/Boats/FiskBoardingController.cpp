@@ -26,6 +26,7 @@
 #include "EngineUtils.h"
 #include "World/FiskOceanScene.h"
 #include "World/FiskPierWalk.h"
+#include "Boats/Controller/FiskHelmControl.h"
 #include "FiskFishingGround.h"
 #include "DayCycle/FiskSessionRules.h"
 #include "UI/FiskJournalPanel.h"
@@ -61,6 +62,7 @@ AFiskBoardingController::AFiskBoardingController()
     CareerSync=CreateDefaultSubobject<UFiskCareerSync>(TEXT("CareerSync"));
     FleetSync=CreateDefaultSubobject<UFiskFleetSync>(TEXT("FleetSync"));
     BoatCommands=CreateDefaultSubobject<UFiskBoatCommands>(TEXT("BoatCommands"));
+    CreateDefaultSubobject<UFiskHelmControl>(TEXT("HelmControl"));   // W/A/S/D helm for the captain (#176)
     RodCommands=CreateDefaultSubobject<UFiskRodCommands>(TEXT("RodCommands"));
     ExpeditionCommands=CreateDefaultSubobject<UFiskExpeditionCommands>(TEXT("ExpeditionCommands"));
     ExpeditionPanel=CreateDefaultSubobject<UFiskExpeditionPanel>(TEXT("ExpeditionPanel"));
@@ -139,6 +141,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
     if(AnglerPanel->HandleKey(Params)) { return true; }
     if(SkipperPanel->HandleKey(Params)) { return true; }
     if(FishingHelp->HandleKey(Params)) { return true; }
+    if(auto* Helm=FindComponentByClass<UFiskHelmControl>(); Helm && Helm->HandleKey(Params)) { return true; }
     if(Press && Params.Key==EKeys::V)
     {
         const auto* B=FindStarterBoat();if(B && PlayerState) { BoatCommands->ServerTravelVote(B->GetLegSerial(),!B->HasTravelVote(PlayerState->GetPlayerId())); }return true;
@@ -326,6 +329,7 @@ void AFiskBoardingController::RequestBoarding()
 void AFiskBoardingController::RequestDeparture()
 {
     const AFiskStarterBoat* Boat=FindStarterBoat();
+    if(auto* Helm=FindComponentByClass<UFiskHelmControl>()) { Helm->ReleaseLever(); }
     if(Boat) { BoatCommands->ServerStartBoatTrip(Boat->GetRouteRevision()); }
 }
 

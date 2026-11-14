@@ -4,6 +4,7 @@
 #include "GameFramework/Info.h"
 #include "Fishing/FiskFishVisualState.h"
 #include "FiskBoatLayout.h"
+#include "FiskHelm.h"
 #include "Boats/FiskCargoModel.h"
 #include "FiskStarterBoat.generated.h"
 
@@ -33,6 +34,7 @@ public:
     static constexpr int32 AtDock = -1;
     static constexpr int32 AtFishingSpot = 100;
     static constexpr int32 AtMarina = 200;
+    static constexpr int32 UnderHelm = FiskHelm::TripUnderHelm;   // Moving under the captain's hand (#176)
 
     AFiskStarterBoat();
     void InitializeFleet(int32 Index,AFiskExpeditionState* Expedition,AFiskVoyagePlan* Voyage);
@@ -61,6 +63,12 @@ public:
     int32 GetTravelVoteCount() const { return TravelVotes.Num(); }
     bool VoteTravel(int32 Player,int32 ExpectedLeg,bool Vote);
     bool Relocate(int32 Player,int32 Revision,FVector Point,FString& Message);
+    // Hand steering (#176 step 2). The captain's throttle and rudder (-1..1) move the boat on the server.
+    // Serial must increase (unreliable input). Stopping with the throttle released at sea makes the spot a
+    // fishing place; steering into the marina ends the trip. The chart's autopilot and R still work.
+    bool SteerHelm(int32 Player,int32 Serial,float Throttle,float Rudder,FString& Message);
+    bool IsUnderHelm() const { return bHelm; }
+    float GetHelmSpeed() const { return HelmSpeed; }   // cm/s, negative when reversing (replicated)
     TArray<FVector> GetActivePath() const;
     FVector PositionAt(int32 NowMs) const;
     FVector GetDestination() const { return Route.Destination; }
@@ -149,6 +157,15 @@ private:
     UPROPERTY(Replicated) FVector LegDestination=FVector(20000,0,0);
     UPROPERTY(Replicated) TArray<int32> TravelVotes;
     void BeginLeg(FVector Origin,FVector Destination,int32 Duration,int32 NowMs,bool Returning);
+    UPROPERTY(Replicated) bool bHelm=false;
+    UPROPERTY(Replicated) float HelmSpeed=0;
+    FiskHelm::FState Helm;
+    double HelmThrottle=0,HelmRudder=0,HelmInputAt=-1,HelmBlockedUntil=0;
+    int32 HelmSerial=0,HelmLastMs=-1;
+    bool bHelmLeftMarina=false;
+    void TakeHelm(FVector Position,double Speed,int32 NowMs);
+    void TickHelm(int32 NowMs);
+    bool CollectRods(TArray<class UFiskPrototypeRod*>& Waiting) const;   // false when a rod has a fish on
     int32 ReturnStartedMs = -1;
     UPROPERTY(Replicated)
     int32 MarinaArrivalMs = -1;

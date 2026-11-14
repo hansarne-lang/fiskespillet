@@ -2,9 +2,13 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
-## v0.24 Testversjon – 11. november 2026
+## v0.24 Testversjon – 14. november 2026
 
-Strandbaren og brygga (#18) og spoleknapp for test. Nettverksprotokollen er 24, så 0.23 og 0.24 kan ikke spille sammen.
+Strandbaren og brygga (#18), flytting av båten underveis og spoleknapp for test. Nettverksprotokollen er 24, så 0.23 og 0.24 kan ikke spille sammen.
+
+### Flytting underveis
+
+Kapteinen kan velge et nytt fiskested på sjøkartet også mens båten er på vei ut, og stenger som bare står ute og venter, trekkes inn automatisk når båten flyttes. En stang med fisk på kroken stopper fortsatt flyttingen. Eierbeslutning 11. november 2026.
 
 ### Strandbaren og brygga
 

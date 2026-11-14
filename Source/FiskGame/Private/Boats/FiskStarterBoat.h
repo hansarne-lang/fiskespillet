@@ -160,7 +160,7 @@ private:
     UPROPERTY(Replicated) bool bHelm=false;
     UPROPERTY(Replicated) float HelmSpeed=0;
     FiskHelm::FState Helm;
-    double HelmThrottle=0,HelmRudder=0,HelmInputAt=-1;
+    double HelmThrottle=0,HelmRudder=0,HelmInputAt=-1,HelmBlockedUntil=0;
     int32 HelmSerial=0,HelmLastMs=-1;
     bool bHelmLeftMarina=false;
     void TakeHelm(FVector Position,double Speed,int32 NowMs);

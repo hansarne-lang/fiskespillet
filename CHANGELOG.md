@@ -2,6 +2,10 @@
 
 Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PLAYER_GUIDE.md). Detaljer, grenser og testgrunnlag står i versjonsguidene i [Docs/Development](Docs/Development). Datoene er når versjonen ble integrert i `main`. v0.2–v0.8.1 ble integrert samlet 6. november 2026.
 
+## Båtkjøring – under arbeid
+
+- Kapteinen styrer båten selv med W/S (gass, S under null rygger) og A/D (ror), også ut fra kaia etter 02:00 ([oppgave 176](https://github.com/hansarne-lang/fiskespillet/issues/176), steg 1–3 av 7). Slipp gassen ute på sjøen, så blir stedet en fiskeplass. Kartet og R virker som autopilot. Felles start, stimer og ekkolodd kommer i senere steg.
+
 ## v0.24 Testversjon – 14. november 2026
 
 Strandbaren og brygga (#18), flytting av båten underveis og spoleknapp for test. Nettverksprotokollen er 24, så 0.23 og 0.24 kan ikke spille sammen. To-spiller-testene bruker nå faste fisker, så lastreglene ikke lenger gir tilfeldig tapt fangst i testen (#171).

@@ -1,5 +1,8 @@
 #include "Bootstrap/FiskBootstrapGameMode.h"
 #include "Bootstrap/FiskBootstrapHUD.h"
+#include "Bootstrap/FiskHelmSmoke.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "DayCycle/FiskDayState.h"
 #include "Boats/FiskBoardingController.h"
 #include "Boats/FiskStarterBoat.h"
@@ -46,6 +49,10 @@ void AFiskBootstrapGameMode::InitGameState()
 void AFiskBootstrapGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
+#if WITH_DEV_AUTOMATION_TESTS
+    if(NewPlayer->IsLocalController() && FParse::Param(FCommandLine::Get(),TEXT("FiskHelmSmoke")))
+    { auto* Smoke=NewObject<UFiskHelmSmoke>(NewPlayer,TEXT("HelmSmoke"));Smoke->RegisterComponent(); }
+#endif
 
     if (StarterBoat && NewPlayer->IsLocalController() && NewPlayer->PlayerState)
     {

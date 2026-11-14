@@ -181,6 +181,8 @@ FVector AFiskStarterBoat::PositionAt(int32 NowMs) const
 void AFiskStarterBoat::BeginLeg(FVector Origin,FVector Destination,int32 Duration,int32 NowMs,bool Returning)
 {
     bHelm=false;HelmSpeed=0;HelmThrottle=HelmRudder=0;   // The chart's autopilot or R takes over from the hand
+    // Unreliable helm input still on its way from before R or the chart must not take the boat back at once.
+    HelmBlockedUntil=GetWorld()->GetRealTimeSeconds()+.5;
     LegOrigin=Origin;LegDestination=Destination;LegStartedMs=NowMs;LegTravelMs=FMath::Max(1,Duration);++LegSerial;TravelVotes.Reset();
     ReturnStartedMs=Returning?NowMs:-1;TripProgress=Returning?101:0;bReportedDeparture=bReportedReturn=false;
     SetActorLocationAndRotation(Origin,(Destination-Origin).Rotation());OnRep_TripProgress();SetActorTickEnabled(true);ForceNetUpdate();
@@ -416,6 +418,7 @@ bool AFiskStarterBoat::SteerHelm(int32 Player,int32 Serial,float Throttle,float 
         Message=Waiting.IsEmpty()?TEXT("Båten går."):TEXT("Båten går. Ledige stenger er trukket inn.");return true;
     }
     // Taking over a chart leg or the way home keeps the boat's current full speed.
+    if(GetWorld()->GetRealTimeSeconds()<HelmBlockedUntil) { HelmThrottle=HelmRudder=0;return true; }
     const bool bTowing=CargoView.Mode==static_cast<uint8>(EFiskCargoMode::Towing);
     TakeHelm(PositionAt(Now),FiskHelm::MaxSpeed(Kind,bTowing),Now);
     Message=TEXT("Du har tatt roret. Kartet eller R gir autopiloten tilbake.");return true;

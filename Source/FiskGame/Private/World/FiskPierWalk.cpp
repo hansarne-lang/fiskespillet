@@ -60,6 +60,14 @@ void UFiskPierWalk::TickComponent(float Delta,ELevelTick Type,FActorComponentTic
         if(Speed>1) { Facing=FMath::RadiansToDegrees(FMath::Atan2(Position.Y-Old.Y,Position.X-Old.X)); }
         if(auto* H=P->GetMarinaPanel()->FindHub()) { H->SetWalking(P->PlayerState->GetPlayerId(),true,Position,Facing,Speed); }
     }
+    if(P->IsLocalController() && bAutoStart)
+    {
+        const auto* B=P->FindStarterBoat();
+        const bool Ashore=P->IsCareerReady() && P->PlayerState && B && !B->IsAboard(P->PlayerState->GetPlayerId()) && !P->GetFrontEnd()->IsVisible();
+        if(FiskPier::ShouldAutoStart(Ashore,bWasAshore,bEnabled,bPending))
+        { bPending=true;ServerPierMode(CastChecked<UFiskGameInstance>(GetWorld()->GetGameInstance())->Career.Id,true);UE_LOG(LogTemp,Display,TEXT("FISKELAGET_PIER_AUTOSTART")); }
+        bWasAshore=Ashore;
+    }
     if(P->IsLocalController() && bEnabled && Now>=NextSend)
     {
         if(const auto* H=P->GetMarinaPanel()->FindHub();H && !H->GetMessages().IsEmpty() && H->GetMessages().Last().Serial>GreetingSerial) { GreetingSerial=H->GetMessages().Last().Serial;GreetingUntil=Now+10; }

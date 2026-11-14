@@ -11,6 +11,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
+#include "Misc/App.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
@@ -19,6 +20,9 @@
 void UFiskPierWalk::BeginPlay()
 {
     Super::BeginPlay();
+    // Players start on the pier (#178). Unattended test runs keep the old start, because their scripts press
+    // keys for the plain view; -FiskPierStart turns the pier start on for a test.
+    bAutoStart=!FApp::IsUnattended() || FParse::Param(FCommandLine::Get(),TEXT("FiskPierStart"));
 #if WITH_DEV_AUTOMATION_TESTS
     if(CastChecked<AFiskBoardingController>(GetOwner())->IsLocalController() && FParse::Value(FCommandLine::Get(),TEXT("FiskPierSmoke="),SmokeMode))
     { FParse::Value(FCommandLine::Get(),TEXT("FiskScreenshotDir="),SmokeDir);GetWorld()->GetTimerManager().SetTimer(SmokeTimer,this,&UFiskPierWalk::RunSmoke,.25f,true,3.5f); }

@@ -9,7 +9,8 @@ Gjelder v0.22. Detaljene for hver versjon står i [versjonsguidene](#versjonsgui
    - **Spill** starter en dag. Du kan spille alene, og venner kan koble seg til underveis.
    - **Bli med venner** kobler til vertens LAN-adresse. Standardporten er 7777. På samme PC brukes `127.0.0.1`.
    - **Innstillinger** og **Avslutt**.
-3. Alle på LAN må bruke samme versjon. Inntil tolv spillere kan være med.
+3. Spillet åpner på brygga med figuren din. W/A/S/D går, og E bruker naust, strandbar eller ombordstigning i nærheten. T eller Escape bytter til den vanlige spillvisningen.
+4. Alle på LAN må bruke samme versjon. Inntil tolv spillere kan være med.
 
 Lagringer (karriere, journal, naust, favoritter, oppsett) ligger lokalt på hver PC. GitHub synkroniserer dem ikke. Fra SpilLan ligger de i `%LOCALAPPDATA%\FiskELaget\Saved`. Slik flytter du lagringer fra en eldre pakke: se [SpilLan-oppskriften](Development/SPILLAN.md#lagring).
 
@@ -83,11 +84,11 @@ Napp kommer etter noen minutter og varsles med en tydelig lyd. Pump ved å føre
 |---|---|
 | H | Ditt naust. N åpner naustbutikken, der V forhåndsviser hele naustet. U viser lagrede stangoppsett |
 | B | Strandbaren. 1–7 sender hilsener (6: «Skål!», 7: «Gratulerer med fangsten!»), 8/9/0 bestiller en gratis drink (bare til pynt), V bytter mellom bar, havn og følg båt. Veddemål når du er i land: F velger fisker på sjøen, S innsats ($50/$100/$250), Enter setter. Ett per dag, avgjøres ved 17:00; tavla viser da potten og vinneren |
-| T | Bryggeliv i land: W/A/S/D går, Shift løper, piltaster dreier kameraet, musehjul zoomer, Home nullstiller. Strandpromenaden går vestover fra strandbaren |
+| T | Bryggeliv i land (åpnes av seg selv når du er i land): W/A/S/D går, Shift løper, piltaster dreier kameraet, musehjul zoomer, Home nullstiller. Strandpromenaden går vestover fra strandbaren |
 | F10 | I bryggeliv (trykk T først): havneguide til båt, strandbar eller ett av tolv naust |
 | F12 | Bare testversjoner, bare verten: spoler klokka til neste milepæl (02:00 avreise, 15:00, 17:00 oppgjør, 20:00 dagslutt). Alle får beskjed |
 
-Fra en båt ved marinaen går du i land med Tab, L, Tab.
+Fra en båt ved marinaen går du i land med Tab, L, Tab. Figuren står da på brygga igjen.
 
 ## Generelt
 

@@ -67,4 +67,15 @@ bool FFiskPierBeach::RunTest(const FString&)
     TestFalse(TEXT("Loungers on the sand are off the deck"),FiskPier::Inside(FVector(-7000,-1650,130)));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskPierAutoStart,"Fiskelaget.Pier.GameOpensOnThePierOncePerShoreVisit",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FFiskPierAutoStart::RunTest(const FString&)
+{
+    TestTrue(TEXT("Becoming free ashore opens the pier"),FiskPier::ShouldAutoStart(true,false,false,false));
+    TestFalse(TEXT("Not while aboard, in the menu or before the career is ready"),FiskPier::ShouldAutoStart(false,false,false,false));
+    TestFalse(TEXT("Leaving the pier view by hand is respected"),FiskPier::ShouldAutoStart(true,true,false,false));
+    TestFalse(TEXT("Already walking"),FiskPier::ShouldAutoStart(true,false,true,false));
+    TestFalse(TEXT("One request at a time"),FiskPier::ShouldAutoStart(true,false,false,true));
+    TestFalse(TEXT("Going aboard never opens it"),FiskPier::ShouldAutoStart(false,true,false,false));
+    return true;
+}
 #endif

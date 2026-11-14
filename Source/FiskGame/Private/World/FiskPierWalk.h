@@ -45,6 +45,7 @@ private:
     double GuideMovedAt=0;
     int32 GreetingSerial=0;
     double GreetingUntil=0;
+    bool bAutoStart=false,bWasAshore=false;   // Open on the pier when ashore (#178)
     bool bPending=false,bDispatching=false,bUp=false,bDown=false,bLeft=false,bRight=false,bSprint=false,bServerSprint=false;
     FVector2D ServerAxis=FVector2D::ZeroVector;
     int32 Generation=0,LastSerial=0,Serial=0;

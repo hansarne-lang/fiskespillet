@@ -98,3 +98,13 @@ Prosjekteieren sa ja til begge punktene i B i [forslaget i #18](https://github.c
 - **Gange utenfor marinaen:** en strandpromenade fra baren vestover og en platting ut over sanden. Gangplanet holdes i bryggehøyde, så promenaden er en brygge over stranda; solsenger står på sanden ved siden av. Ingen gange på selve sanden eller utenfor marinaområdet ellers.
 - **Drinker i baren:** gratis og kun til pynt. Spilleren bestiller med 8, 9 eller 0, og bestillingen vises som en melding i baren. Ingen pris, saldo, effekt eller lagring.
 
+## 2026-11-14 — Start på brygga, rom og butikker
+
+Bestilt av prosjekteieren 14. november 2026, [oppgave 178](https://github.com/hansarne-lang/fiskespillet/issues/178): spillet starter på brygga der man beveger seg med en figur. Man går innom hus og butikker eller går inn i en båt, og alle har et eget naust.
+
+- **Husene:** figuren går gjennom døra og inn i et eget rom der man kan gå rundt.
+- **Butikker som egne bygg:** utstyrsbutikk, båtforhandler, agnbutikk og naustbutikk.
+- **Agn er gratis:** agnbutikken er stedet der man velger agn. Den tar ikke betalt.
+- **Må gå overalt:** hurtigtastene for naust, bar og butikk fjernes i land når rommene er på plass. Man går også til den båten man vil om bord i. Havneguiden kan fortsatt løpe figuren dit.
+
+Kjøpsregler, priser, naustets lagring og tolv naustplasser er uendret. Rommene bygges i samme enkle, kodebygde stil som resten. Arbeidet leveres i sju steg som står i oppgaven.

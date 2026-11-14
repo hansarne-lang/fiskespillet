@@ -1,6 +1,6 @@
 # FISKELAGET – spillerguide
 
-Gjelder v0.22. Detaljene for hver versjon står i [versjonsguidene](#versjonsguider). Hva som er nytt i hver versjon, står i [endringsloggen](../CHANGELOG.md).
+Gjelder v0.25. Detaljene for hver versjon står i [versjonsguidene](#versjonsguider). Hva som er nytt i hver versjon, står i [endringsloggen](../CHANGELOG.md).
 
 ## Starte spillet
 

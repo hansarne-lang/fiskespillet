@@ -95,4 +95,28 @@ bool FFiskHelmInputTest::RunTest(const FString&)
     TestTrue(TEXT("Same result at 30 and 120 frames per second"),Slow.Position.Equals(Fast.Position,1.0) && FMath::IsNearlyEqual(Slow.Heading,Fast.Heading,1.e-3));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskHelmTripTest,"Fiskelaget.Helm.TakeHelmStopAndArrive",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskHelmTripTest::RunTest(const FString&)
+{
+    using namespace FiskHelm;
+    TestFalse(TEXT("Only the captain"),CanTakeHelm(false,TripStopped,300000));
+    TestFalse(TEXT("Not from the dock before 02:00"),CanTakeHelm(true,TripDock,119999));
+    TestTrue(TEXT("From the dock at 02:00"),CanTakeHelm(true,TripDock,120000));
+    TestFalse(TEXT("Not from the dock after 17:00"),CanTakeHelm(true,TripDock,1020000));
+    TestTrue(TEXT("At sea also after 17:00, to come home"),CanTakeHelm(true,TripUnderHelm,1100000));
+    TestTrue(TEXT("Take over an autopilot leg"),CanTakeHelm(true,40,300000) && CanTakeHelm(true,150,300000));
+    TestFalse(TEXT("Home in the marina stays home"),CanTakeHelm(true,TripMarina,300000));
+    auto S=AtSea();Run(S,1,0,6);
+    TestFalse(TEXT("Moving boat does not settle"),Settles(S,0));
+    Run(S,0,0,8);
+    TestTrue(TEXT("Stopped with the throttle released settles"),Settles(S,0));
+    TestFalse(TEXT("Throttle held does not settle"),Settles(S,.2));
+    TestFalse(TEXT("No arrival straight from the dock"),Arrived(FVector(0,1250,0),false));
+    TestTrue(TEXT("Arrival after being out"),Arrived(FVector(1000,-1000,0),true));
+    TestFalse(TEXT("Outside the marina"),Arrived(FVector(3000,0,0),true));
+    TestEqual(TEXT("200 m at full speed take 12 s"),TravelMs(20000,0,false),12000);
+    TestTrue(TEXT("Towing takes longer"),TravelMs(20000,0,true)>TravelMs(20000,0,false));
+    TestEqual(TEXT("Bad length"),TravelMs(std::numeric_limits<double>::quiet_NaN(),0,false),1);
+    return true;
+}
 #endif

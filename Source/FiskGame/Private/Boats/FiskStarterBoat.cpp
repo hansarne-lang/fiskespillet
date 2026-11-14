@@ -221,19 +221,28 @@ bool AFiskStarterBoat::Relocate(int32 Player,int32 Revision,FVector Point,FStrin
 {
     int32 Habitat=0,HomeMs=0;const bool Valid=FiskGrounds::MakeSeaPoint(Point,Habitat,HomeMs);
     const auto* Day=GetWorld()->GetGameState<AFiskDayState>();bool Safe=!Cargo.bMustReturn;
+    // A rod with a fish on (bite, fight or ready to land) stops the move. Lines that are only out waiting
+    // are pulled in for everyone when the move is accepted (owner decision 2026-11-11).
+    TArray<UFiskPrototypeRod*> Waiting;
     for(auto It=GetWorld()->GetPlayerControllerIterator();It;++It)
     {
         const auto* PC=Cast<AFiskBoardingController>(It->Get());if(!PC || !PC->PlayerState || !IsAboard(PC->PlayerState->GetPlayerId())) { continue; }
-        for(int32 Slot=0;Slot<3;++Slot) { const auto State=PC->GetRodAt(Slot)->GetState();if(State==EFiskRodState::Fishing || State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand) { Safe=false; } }
+        for(int32 Slot=0;Slot<3;++Slot)
+        {
+            const auto State=PC->GetRodAt(Slot)->GetState();
+            if(State==EFiskRodState::InitialRun || State==EFiskRodState::Fighting || State==EFiskRodState::ReadyToLand) { Safe=false; }
+            else if(State==EFiskRodState::Fishing) { Waiting.Add(const_cast<UFiskPrototypeRod*>(PC->GetRodAt(Slot))); }
+        }
     }
-    if(!HasAuthority() || !Day || !FiskVoyage::CanRelocate(CanCaptainCommand(Player,Revision),Revision==Route.Revision,TripProgress==AtFishingSpot,Day->GetElapsedMilliseconds(),Safe,Valid)
+    if(!HasAuthority() || !Day || !FiskVoyage::CanRelocate(CanCaptainCommand(Player,Revision),Revision==Route.Revision,FiskVoyage::CanSteer(TripProgress),Day->GetElapsedMilliseconds(),Safe,Valid)
         || FVector::Dist2D(Point,Route.Destination)<500 || Route.Revision==MAX_int32)
-    { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_RELOCATION_REJECTED player=%d safe=%d fresh=%d"),Player,Safe,Revision==Route.Revision);Message=TEXT("Flytting avvist. Kapteinen velger en ny plass før 17:00 når alle stenger er trukket inn eller ferdige.");return false; }
-    const FVector Origin=GetActorLocation();const auto Path=FiskRouteGeometry::Between(Origin,Point);if(Path.IsEmpty()) { Message=TEXT("Fant ingen farbar sjørute.");return false; }
+    { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_RELOCATION_REJECTED player=%d safe=%d fresh=%d"),Player,Safe,Revision==Route.Revision);Message=TEXT("Flytting avvist. Kapteinen velger en ny plass før 17:00, på fiskeplassen eller på vei ut, når ingen har fisk på kroken.");return false; }
+    const FVector Origin=TripProgress==AtFishingSpot?GetActorLocation():PositionAt(Day->GetElapsedMilliseconds());const auto Path=FiskRouteGeometry::Between(Origin,Point);if(Path.IsEmpty()) { Message=TEXT("Fant ingen farbar sjørute.");return false; }
+    for(UFiskPrototypeRod* Rod:Waiting) { Rod->Lower();Rod->StopReel();Rod->Withdraw(); }
     const auto& G=*FiskGrounds::Find(Habitat);const int32 Base=FMath::Clamp(FMath::RoundToInt(G.TravelMs*FiskRouteGeometry::Length(Path)/G.Position.Size()),4000,150000);
     Route.GroundId=Habitat;Route.Destination=Point;Route.BaseTravelMs=HomeMs;++Route.Revision;OnRep_Route();
     BeginLeg(Origin,Point,GetKind()==1?FMath::Max(1,Base*4/5):Base,Day->GetElapsedMilliseconds(),false);
-    Message=TEXT("Flytting startet. Klokken går; R vender hjem underveis.");UE_LOG(LogTemp,Display,TEXT("FISKELAGET_RELOCATION_ACCEPTED player=%d"),Player);return true;
+    Message=Waiting.IsEmpty()?TEXT("Flytting startet. Klokken går; R vender hjem underveis."):TEXT("Flytting startet. Ledige stenger er trukket inn; sett dem ut igjen på den nye plassen.");UE_LOG(LogTemp,Display,TEXT("FISKELAGET_RELOCATION_ACCEPTED player=%d withdrawn=%d"),Player,Waiting.Num());return true;
 }
 
 void AFiskStarterBoat::OnRep_TripProgress()
@@ -306,7 +315,7 @@ bool AFiskStarterBoat::ChooseKind(int32 Requester,int32 Revision,int32 NewKind)
 }
 bool AFiskStarterBoat::SelectPoint(int32 Requester,int32 Revision,FVector Point,FString& Message)
 {
-    if(TripProgress==AtFishingSpot) { return Relocate(Requester,Revision,Point,Message); }
+    if(FiskVoyage::CanSteer(TripProgress)) { return Relocate(Requester,Revision,Point,Message); }
     int32 Habitat=0,Duration=0;
     if(!FiskGrounds::MakeSeaPoint(Point,Habitat,Duration)) { Message=TEXT("Velg sjø innenfor kartet, utenfor øyer og marina.");return false; }
     if(!SelectGround(Requester,Revision,Habitat,Message)) { return false; }

@@ -4,7 +4,7 @@ Nyeste først. Spillerguide med gjeldende taster: [Docs/PLAYER_GUIDE.md](Docs/PL
 
 ## v0.24 Testversjon – 14. november 2026
 
-Strandbaren og brygga (#18), flytting av båten underveis og spoleknapp for test. Nettverksprotokollen er 24, så 0.23 og 0.24 kan ikke spille sammen.
+Strandbaren og brygga (#18), flytting av båten underveis og spoleknapp for test. Nettverksprotokollen er 24, så 0.23 og 0.24 kan ikke spille sammen. To-spiller-testene bruker nå faste fisker, så lastreglene ikke lenger gir tilfeldig tapt fangst i testen (#171).
 
 ### Flytting underveis
 

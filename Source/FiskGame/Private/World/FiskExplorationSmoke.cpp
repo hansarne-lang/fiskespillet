@@ -57,8 +57,14 @@ void AFiskBoardingController::RunExplorationSmoke()
         if(B->UsesTravelCard()) { Fail(TEXT("travel_card_survived_arrival"));return; }
         if(!Smoke.bExplorationRejected && GetRodAt(0)->GetState()==EFiskRodState::Fishing)
         {
-            Smoke.ExplorationRevision=B->GetRouteRevision();BoatCommands->ServerSelectSeaPoint(Smoke.ExplorationRevision,FiskAtlas::Find(5)->Point);BoatCommands->ServerTravelVote(Smoke.ExplorationLeg-1,true);
-            if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();BoatCommands->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+            // Only crew who are not captain try to move the boat here; that must be refused. Since 2026-11-11 the
+            // captain may move while lines are only out waiting (they are pulled in), so the captain does not try.
+            Smoke.ExplorationRevision=B->GetRouteRevision();BoatCommands->ServerTravelVote(Smoke.ExplorationLeg-1,true);
+            if(B->GetCaptainId()!=PlayerState->GetPlayerId())
+            {
+                BoatCommands->ServerSelectSeaPoint(Smoke.ExplorationRevision,FiskAtlas::Find(5)->Point);
+                if(!Smoke.SkipperMode.IsEmpty()) { TActorIterator<AFiskVoyagePlan> V(GetWorld());if(V) { const auto R=V->GetRoute();BoatCommands->ServerVoyageNext(R.Day,R.Revision,B->GetRouteRevision()); } }
+            }
             Smoke.bExplorationRejected=true;Smoke.ExplorationAt=Real;
         }
         if(Smoke.bExplorationRejected && Real-Smoke.ExplorationAt>=2)

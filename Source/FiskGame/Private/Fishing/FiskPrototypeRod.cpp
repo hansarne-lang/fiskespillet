@@ -52,6 +52,16 @@ bool UFiskPrototypeRod::Cast(const FGuid& ExpectedId)
     { CatchData.Species=0;CatchData.WeightGrams=8000;const auto& S=*FiskCatches::Find(0);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
 #endif
 #if WITH_DEV_AUTOMATION_TESTS
+    // The two-player day smokes require exactly one delivered and no lost fish per player at 17:00. Random
+    // ground-1 fish (tuna up to 120 kg, marlin up to 250 kg) can fill the 100 kg starter hold, so the second
+    // landing was discarded or rejected and the cargo rules sent the boat home early (#171). Fixed catalog fish
+    // (8 kg snapper for the host, 12 kg grouper for the client) keep both landings far below the hold limit.
+    // Bite clocks, fights, landing and settlement still run normally.
+    FString ContentSmoke;
+    if(FParse::Value(FCommandLine::Get(),TEXT("FiskContentSmoke="),ContentSmoke) && ContentSmoke==TEXT("day"))
+    { CatchData.Species=RodOwner->IsLocalController()?0:3;CatchData.WeightGrams=RodOwner->IsLocalController()?8000:12000;const auto& S=*FiskCatches::Find(CatchData.Species);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
+#endif
+#if WITH_DEV_AUTOMATION_TESTS
     if(FParse::Param(FCommandLine::Get(),TEXT("FiskFleetHarness")) && RodOwner->PlayerState && RodOwner->PlayerState->GetPlayerName().StartsWith(TEXT("FLEET")))
     { CatchData.Species=6;CatchData.WeightGrams=150000;const auto& S=*FiskCatches::Find(6);CatchData.LengthMm=FiskCatches::LengthForWeight(S,CatchData.WeightGrams);CatchData.Value=FiskCatches::ValueForWeight(S,CatchData.WeightGrams); }
 #endif

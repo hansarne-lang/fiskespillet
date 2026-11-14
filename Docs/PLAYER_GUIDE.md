@@ -33,7 +33,7 @@ Fangstresultater (art, vekt, verdi, rekorder) er skjult for alle, også for deg 
 | E | Gå om bord, eller bruk naust, bar eller båt i nærheten |
 | Tab | Flåten: velg båt med piler/klikk og Enter. C henter din egen båt, L går i land |
 | K | Mannskap. Kapteinen kan gi rollen til en annen om bord |
-| M | Sjøkart. A åpner hav-atlaset med 16 merker, Tab viser favoritter, F2 gir en favoritt navn |
+| M | Sjøkart. A åpner hav-atlaset med 16 merker, Tab viser favoritter, F2 gir en favoritt navn. Kapteinen kan klikke et nytt punkt og flytte båten på fiskeplassen eller mens den er på vei ut; ledige stenger trekkes da inn, men ikke hvis noen har fisk på kroken |
 | O | Turplan med inntil fem stopp. A legger til, Backspace fjerner siste, Delete tømmer, Enter velger neste stopp. T viser turforslag, L bruker forslaget, G finner korteste rundtur |
 | R | Kapteinen: reis ut fra 02:00, eller dra hjem fra fiskeplassen. Knappen «Tilbake til marina» gjør det samme |
 | J | Dagens ekspedisjon. 1–5 velger mål ved brygga, T markerer deg klar, 6–8 sender faste meldinger |

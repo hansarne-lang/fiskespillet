@@ -17,7 +17,7 @@ FISKELAGET kan installeres, oppdateres og startes fra launcheren SpilLan (`hansa
 
 ## Bygge og publisere
 
-Enklest: dobbeltklikk `Tools/Build/Bygg-SpilLan.bat`. Den sjekker Git, Python, Unreal og SpilLan (0.2.8 eller nyere), henter grenen `release/0.24.0-spillan` (eller grenen du gir som argument), bygger og publiserer, og går tilbake til grenen du sto på. Fila kan også lastes ned alene og legges i `fiskespillet`-mappa.
+Enklest: dobbeltklikk `Tools/Build/Bygg-SpilLan.bat`. Den sjekker Git, Python, Unreal og SpilLan (0.2.8 eller nyere), henter grenen `release/0.25.0-spillan` (eller grenen du gir som argument), bygger og publiserer, og går tilbake til grenen du sto på. Fila kan også lastes ned alene og legges i `fiskespillet`-mappa.
 
 Eller for hånd:
 

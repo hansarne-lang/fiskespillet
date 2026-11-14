@@ -2,6 +2,7 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 #include "Misc/AutomationTest.h"
+#include <limits>
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskDayBoundaryTest, "Fiskelaget.DayCycle.Boundaries",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
@@ -61,6 +62,21 @@ bool FFiskDayMilestoneTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("15:00 skips to the 17:00 settlement"), AFiskDayState::NextMilestone(900), AFiskDayState::SettlementStart);
     TestEqual(TEXT("Settlement skips to 20:00"), AFiskDayState::NextMilestone(AFiskDayState::SettlementStart), AFiskDayState::DayEnd);
     TestEqual(TEXT("No skip after 20:00"), AFiskDayState::NextMilestone(AFiskDayState::DayEnd), -1);
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskIdleSkipRuleTest,"Fiskelaget.DayCycle.IdleSkipOnlyBetweenHomeAndSettlement",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskIdleSkipRuleTest::RunTest(const FString&)
+{
+    const double Grace=AFiskDayState::IdleSkipGraceSeconds;
+    TestTrue(TEXT("Everyone home after 02:00"),AFiskDayState::ShouldSkipIdle(400,false,true,Grace));
+    TestTrue(TEXT("Also just before 17:00"),AFiskDayState::ShouldSkipIdle(1019,false,true,Grace));
+    TestFalse(TEXT("Waits for the grace period"),AFiskDayState::ShouldSkipIdle(400,false,true,Grace-.1));
+    TestFalse(TEXT("A boat still at sea"),AFiskDayState::ShouldSkipIdle(400,true,true,Grace));
+    TestFalse(TEXT("Nobody has been out"),AFiskDayState::ShouldSkipIdle(400,false,false,Grace));
+    TestFalse(TEXT("Not before departure"),AFiskDayState::ShouldSkipIdle(60,false,true,Grace));
+    TestFalse(TEXT("Not after 17:00"),AFiskDayState::ShouldSkipIdle(1020,false,true,Grace));
+    TestFalse(TEXT("Not after the day"),AFiskDayState::ShouldSkipIdle(1200,false,true,Grace));
+    TestFalse(TEXT("Bad timer"),AFiskDayState::ShouldSkipIdle(400,false,true,std::numeric_limits<double>::quiet_NaN()));
     return true;
 }
 #endif

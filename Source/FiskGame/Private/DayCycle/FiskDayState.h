@@ -30,6 +30,13 @@ public:
     // deadline, 17:00 settlement and 20:00 end of day. Returns the next one after ElapsedSeconds, or -1.
     static int32 NextMilestone(int32 ElapsedSeconds);
     bool SkipToNextMilestone(int32& OutSeconds);   // Server; false in Shipping or when the day is over
+    // Test-only idle skip (environment FISK_SKIP_IDLE=1, PR test runs; never in Shipping). When every boat
+    // that went out is back in the marina and none is at sea, nothing can happen before 17:00 except
+    // waiting. After IdleSkipGraceSeconds of real time in that state the clock jumps to the next F12
+    // milestone (15:00, then 17:00 after another grace period).
+    static constexpr double IdleSkipGraceSeconds = 10.0;
+    static bool ShouldSkipIdle(int32 ElapsedSeconds,bool bAnyAway,bool bAnyHome,double IdleRealSeconds);
+    static bool IsIdleSkipEnabled();
 
     AFiskDayState();
     void StartDay();

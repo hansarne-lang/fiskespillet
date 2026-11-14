@@ -82,9 +82,9 @@ try{
    if(@(Select-String -LiteralPath $log -Pattern $tag).Count -ne 1){throw "Wrong event count $tag"}
   }
   $second=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SESSION_DAY number=2' | Select-Object -First 1
-  if(!$second -or (FiskGameSeconds ((Stamp $second)-(Stamp $start)).TotalSeconds) -lt 1200){throw 'Day 2 started before full day 1'}
+  if(!$second -or (FiskGameSpan (Stamp $start) (Stamp $second)) -lt 1200){throw 'Day 2 started before full day 1'}
   $reveal=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SETTLEMENT rows=2' | Select-Object -First 1
-  if(!$reveal -or (FiskGameSeconds ((Stamp $reveal)-(Stamp $start)).TotalSeconds) -lt 1020){throw 'Early day 1 reveal'}
+  if(!$reveal -or (FiskGameSpan (Stamp $start) (Stamp $reveal)) -lt 1020){throw 'Early day 1 reveal'}
   if(@(Select-String -LiteralPath $log -Pattern 'FISKELAGET_SETTLEMENT rows=').Count -ne 1){throw 'Unexpected second settlement'}
   if(Select-String -LiteralPath $log -Pattern 'FISKELAGET_MENU_NETWORK_FAILURE|FISKELAGET_MENU_TRAVEL_FAILURE' -Quiet){throw 'Connection broke across day transition'}
  }

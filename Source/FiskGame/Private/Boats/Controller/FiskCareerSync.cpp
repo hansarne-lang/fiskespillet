@@ -84,7 +84,7 @@ void UFiskCareerSync::TickSync()
     Owner.GetRecoverySync()->TickJournalRecovery();
     AFiskBootstrapGameMode* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
     const AFiskDayState* Day=GetWorld()->GetGameState<AFiskDayState>();const AFiskDaySettlement* Settlement=Mode?Mode->GetSettlement():nullptr;
-    if(Day && Settlement && Day->GetElapsedMilliseconds()>=1020000 && Settlement->GetView().bRevealed)
+    if(Day && Settlement && Settlement->GetView().bRevealed)
     {
         const FGuid Id=Settlement->GetView().DayId;
         if(!ServerCareer.Receipts.ContainsByPredicate([&](const FFiskCareerReceipt& R){return R.Id==Id;}))
@@ -95,7 +95,7 @@ void UFiskCareerSync::TickSync()
             else { Owner.ClientActionFeedback(TEXT("Karriereoppgjør venter på lagring eller ledig kvitteringskapasitet. Neste dag er sperret."));CareerAck=0; }
         }
     }
-    if(Mode && Day && Day->GetElapsedMilliseconds()>=1020000) { Mode->SettleBets(); }
+    if(Mode && Day) { Mode->SettleBets(); }   // SettleBets waits for the end of the weigh-in (#183)
     ClaimBetPayouts();
     if(CareerAck<ServerCareer.Revision) { ClientCareerSnapshot(ServerCareer,TEXT("Venter på lokal lagringsbekreftelse.")); }
 }

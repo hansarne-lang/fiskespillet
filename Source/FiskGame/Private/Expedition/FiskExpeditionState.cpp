@@ -77,7 +77,7 @@ bool AFiskExpeditionState::Depart()
 }
 bool AFiskExpeditionState::Archive(const FFiskSettlementView& View,int32 NowMs)
 {
-    Refresh();if(!HasAuthority() || NowMs<1020000 || !View.bRevealed || View.DayId!=Plan.DayId) { return false; }
+    Refresh();if(!HasAuthority() || NowMs<0 || !View.bRevealed || View.DayId!=Plan.DayId) { return false; }
     const auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();if(!Mode) { return false; }
     if(!Plan.bEvaluated)
     {

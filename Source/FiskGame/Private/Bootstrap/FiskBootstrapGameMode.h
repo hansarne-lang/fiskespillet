@@ -30,6 +30,7 @@ public:
     void LockBoatCrew(const AFiskStarterBoat* Boat);
     const TArray<TObjectPtr<AFiskStarterBoat>>& GetFleet() const { return Fleet; }
     AFiskDaySettlement* GetSettlement() const { return Settlement; }
+    bool IsWeighInStarted() const;   // The shared weigh-in (#183) closes departures and bets for the day
     AFiskExpeditionState* GetExpedition() const { return Expedition; }
     bool StartNextDay(APlayerController* Requester, int32 ExpectedDay);
     void BindCareer(int32 Player,const FGuid& Profile) { DayProfiles.Add(Player,Profile); }

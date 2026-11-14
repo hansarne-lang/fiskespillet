@@ -19,9 +19,9 @@ bool FFiskDayLedger::Settle(int32 NowMs, int32 ArrivalMs)
 {
     TMap<FGuid,int32> Arrivals;for(const auto& C:Catches) { Arrivals.Add(C.Key,ArrivalMs); }return SettleFleet(NowMs,Arrivals);
 }
-bool FFiskDayLedger::SettleFleet(int32 NowMs,const TMap<FGuid,int32>& Arrivals)
+bool FFiskDayLedger::SettleFleet(int32 NowMs,const TMap<FGuid,int32>& Arrivals,bool bEveryoneHome)
 {
-    if(bSettled || NowMs<DeadlineMs) { return false; }
+    if(bSettled || NowMs<0 || (NowMs<DeadlineMs && !bEveryoneHome)) { return false; }
     for(const auto& Catch:Catches)
     {
         FFiskDayResult* Row = Results.FindByPredicate([&Catch](const FFiskDayResult& Item) { return Item.PlayerId == Catch.Value.PlayerId; });

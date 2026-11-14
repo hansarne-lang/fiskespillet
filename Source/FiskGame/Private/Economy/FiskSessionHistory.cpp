@@ -1,7 +1,7 @@
 #include "Economy/FiskSessionHistory.h"
 bool FFiskSessionHistory::Append(int32 Day, int32 NowMs, const FFiskDayLedger& Ledger)
 {
-    if (Day <= 0 || NowMs < FFiskDayLedger::DeadlineMs || !Ledger.IsSettled()
+    if (Day <= 0 || NowMs < 0 || !Ledger.IsSettled()
         || (!Days.IsEmpty() && Day <= Days.Last().Number)) { return false; }
     FFiskHistoryDay Entry; Entry.Number = Day;
     for (const FFiskDayResult& Result : Ledger.GetResults())

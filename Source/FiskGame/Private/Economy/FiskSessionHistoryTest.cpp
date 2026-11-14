@@ -9,7 +9,7 @@ bool FFiskHistoryPrivacyTest::RunTest(const FString& Parameters)
     Ledger.Record(FGuid::NewGuid(),7,1000,Fish);
     TestFalse(TEXT("No unpublished ledger"),History.Append(1,1020000,Ledger));
     TestTrue(TEXT("Settle at deadline"),Ledger.Settle(1020000,900000));
-    TestFalse(TEXT("No early history even with settled input"),History.Append(1,1019999,Ledger));
+    TestFalse(TEXT("Invalid time refused even with settled input"),History.Append(1,-1,Ledger));
     TestTrue(TEXT("Publish once at deadline"),History.Append(1,1020000,Ledger));
     TestFalse(TEXT("Duplicate day cannot double income"),History.Append(1,1200000,Ledger));
     const FFiskHistoryRow& Row=History.GetDays()[0].Rows[0];

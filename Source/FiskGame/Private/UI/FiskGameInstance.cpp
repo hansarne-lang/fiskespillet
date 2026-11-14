@@ -107,7 +107,7 @@ bool UFiskGameInstance::RetryJournalSave()
 }
 void UFiskGameInstance::ObserveJournal(const FFiskSettlementView& View,int32 OwnPlayerId,int32 NowMs)
 {
-    if(!View.bRevealed || NowMs<1020000 || !View.DayId.IsValid() || OwnPlayerId<0 || ObservedJournalDays.Contains(View.DayId)) { return; }
+    if(!View.bRevealed || NowMs<0 || !View.DayId.IsValid() || OwnPlayerId<0 || ObservedJournalDays.Contains(View.DayId)) { return; }
     const FFiskDayResult* Own=View.Results.FindByPredicate([&](const FFiskDayResult& Row){return Row.PlayerId==OwnPlayerId;});
     ObservedJournalDays.Add(View.DayId);
     if(!Own) { return; }

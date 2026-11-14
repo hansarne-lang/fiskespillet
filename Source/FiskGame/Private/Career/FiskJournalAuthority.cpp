@@ -48,7 +48,7 @@ bool FiskJournalAuthority::RecoverIncome(const FString& Directory,FFiskCareerPro
 }
 bool FiskJournalAuthority::Commit(const FString& Directory,const FFiskSettlementView& View,int32 NowMs,const TMap<int32,FGuid>& Profiles)
 {
-    if(!View.bRevealed || !View.DayId.IsValid() || View.DayNumber<1 || NowMs<1020000) { return false; }
+    if(!View.bRevealed || !View.DayId.IsValid() || View.DayNumber<1 || NowMs<0) { return false; }
     for(const FFiskDayResult& Row:View.Results)
     { const FGuid* Owner=Profiles.Find(Row.PlayerId);if(!Row.Catches.IsEmpty() && (!Owner || !Owner->IsValid())) { return false; } }
     TSet<FGuid> Unique;for(const auto& Pair:Profiles) { if(Pair.Value.IsValid()) { Unique.Add(Pair.Value); } }

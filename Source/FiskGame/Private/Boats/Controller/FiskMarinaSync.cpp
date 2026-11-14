@@ -37,7 +37,7 @@ void UFiskMarinaSync::ServerMarinaRecords_Implementation(FGuid Profile,const TAr
     {
         const FFiskSpecies* Species=FiskCatches::Find(T.Species);
         if(!Species || !T.DayId.IsValid() || T.Grams<Species->MinGrams || T.Grams>Species->MaxGrams || T.LengthMm!=FiskCatches::LengthForWeight(*Species,T.Grams) || Seen.Contains(T.Species)
-            || (Settlement && T.DayId==Settlement->GetView().DayId && Day->GetElapsedMilliseconds()<1020000))
+            || (Settlement && T.DayId==Settlement->GetView().DayId && !Settlement->GetView().bRevealed))
         { UE_LOG(LogTemp,Display,TEXT("FISKELAGET_MARINA_RECORDS_REJECTED player=%d"),PlayerState->GetPlayerId());return; }
         Seen.Add(T.Species);FFiskMarinaTrophy* Previous=Combined.FindByPredicate([&](const FFiskMarinaTrophy& R){return R.Species==T.Species;});
         if(!Previous) { Combined.Add(T); }else if(T.Grams>Previous->Grams) { *Previous=T; }

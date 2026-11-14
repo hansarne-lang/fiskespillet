@@ -109,3 +109,4 @@ bool AFiskBootstrapGameMode::ArchiveConfirmedDay()
     ArchivedDay=Settlement->GetView().DayId;++ArchiveRevision;
     UE_LOG(LogTemp,Display,TEXT("FISKELAGET_AUTHORITY_ARCHIVED day=%d profiles=%d"),Day->GetDayNumber(),DayProfiles.Num());return true;
 }
+bool AFiskBootstrapGameMode::IsWeighInStarted() const { return Settlement && Settlement->IsWeighInStarted(); }

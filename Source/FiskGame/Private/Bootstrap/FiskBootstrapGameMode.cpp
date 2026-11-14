@@ -31,6 +31,11 @@ AFiskBootstrapGameMode::AFiskBootstrapGameMode()
 void AFiskBootstrapGameMode::StartPlay()
 {
     Super::StartPlay();
+    if(AFiskDayState::IsIdleSkipEnabled())
+    {
+        GetWorldTimerManager().SetTimer(IdleSkipTimer,this,&AFiskBootstrapGameMode::CheckIdleSkip,.5f,true);
+        UE_LOG(LogTemp,Warning,TEXT("FISKELAGET_IDLE_SKIP enabled (test only)"));
+    }
     UE_LOG(LogTemp, Display, TEXT("FISKELAGET_BOOTSTRAP_READY"));
 }
 

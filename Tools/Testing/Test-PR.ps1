@@ -25,7 +25,7 @@ param(
     [Parameter(Mandatory)][string]$ArchiveDirectory,
     [Parameter(Mandatory)][string]$LogDirectory,
     [string]$Base = 'origin/main',
-    [ValidateRange(1,8)][int]$Parallel = 2,
+    [ValidateRange(1,8)][int]$Parallel = 3,
     [switch]$Force,
     [string]$SpilLanExport = ''
 )

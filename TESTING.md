@@ -31,11 +31,12 @@ Verktøyene er lagt til 8. november 2026. Ingen av dem er kjørt på Windows enn
 | `Tools/Testing/known_failures.json` | Kjente feil med åpen issue. Rapporten merker dem «kjent (#nr)» og resten «NY». Fjern linjen når issuen er løst. |
 | `Tools/Testing/run_cache.py` | Husker skript som har bestått med samme spillbinær, testskript, testoppsett og klokkefaktor. `Run-All.ps1` hopper over dem (vises som `Cached`). `-Force` kjører alt, og `-Release` hopper aldri over noe. |
 | `-FiskClockScale=N` / `FISK_CLOCK_SCALE` | Testklokke 1–20 ganger raskere. Dag, avreise, reisetid, napp og kamp følger den samme klokken. Kompileres bort i Shipping. |
+| `FISK_SKIP_IDLE=1` | Bare i testkjøringer utenom `-Release`: når alle båter som var ute er hjemme og ingen er på sjøen, hopper vertens klokke etter 10 sekunder fram til neste milepæl (15:00, og etter nye 10 sekunder 17:00) og logger `FISKELAGET_CLOCK_SKIPPED skipped_ms=N`. Skriptene legger hoppet til igjen når de sjekker daglengden (`FiskGameSpan`). Av med `Run-All.ps1 -NoIdleSkip`. Aldri i Shipping. |
 
 Lagdelt kjøring:
 
 1. **Hver endring:** `check_repository.py`, `check_bootstrap.py`, Python-testene og `Test-Automation.ps1`.
-2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 4 som standard).
+2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 4, hopp over ventetid og tre skript om gangen som standard).
 3. **Utgivelse:** `Run-All.ps1 -Release`. Normal 20-minuttersdag (faktor 1) og alle skript. Bare dette gjelder som utgivelsesbevis for dagslengde, 17:00-frist og reisetid.
 
 ## Testbudsjett

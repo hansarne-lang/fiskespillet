@@ -107,6 +107,17 @@ Prosjekteieren valgte begge endringene:
 
 Tidsrommet 02:00–17:00 og kravet om oppdatert båtstatus er uendret.
 
+
+## 2026-11-14 — Båtkjøring som del av spillet
+
+Bestilt av prosjekteieren 14. november 2026, [oppgave 176](https://github.com/hansarne-lang/fiskespillet/issues/176): båtkjøringen skal være en del av spillet. Man drar ut, stopper og fisker ut fra ekkoloddet eller andre tegn, prøver litt og drar kanskje videre, og drar hjem når man er ferdig. Alle må være hjemme før tiden er ute.
+
+- **Styring:** kapteinen kjører båten selv med gass og ror og kan stoppe hvor som helst. Kartet beholdes som autopilot, for eksempel for hjemturen.
+- **Lik start:** alle båter legger ut fra marinaen samtidig når dagen starter, enten det er én eller flere om bord. Startbåt og havbåt er fortsatt forskjellige.
+- **Finne fisk:** fisken står i stimer på bestemte steder og flytter seg i løpet av dagen. Ekkoloddet viser en stim når båten er over den, og fugler eller hoppende fisk røper den på avstand. Det napper fortere over en stim.
+
+Uendret: returfristen 17:00 og tap av fangst som ikke er hjemme i tide, lastreglene, kaptein og mannskap, og at stenger må være inne når båten flytter seg. Farten ved fullt pådrag er den samme som på kartturene (havbåten 25 prosent raskere, slep 65 prosent). Arbeidet leveres i sju steg som står i oppgaven.
+
 ## 2026-11-14 — Felles veiing når alle er i land
 
 Bestilt av prosjekteieren 14. november 2026, [oppgave 183](https://github.com/hansarne-lang/fiskespillet/issues/183): når alle er i land, veies all fisk, minste først og største til slutt. Da får man også vite prisen. Alle deltakere ser hvem som har fisket hvor mange, og hvor mange som er veid.

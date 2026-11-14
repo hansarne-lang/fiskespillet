@@ -36,8 +36,10 @@ bool FFiskVoyageGuardTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Captain may relocate safely"),FiskVoyage::CanRelocate(true,true,true,120000,true,true));
     TestFalse(TEXT("Passenger rejected"),FiskVoyage::CanRelocate(false,true,true,120000,true,true));
     TestFalse(TEXT("Stale route rejected"),FiskVoyage::CanRelocate(true,false,true,120000,true,true));
-    TestFalse(TEXT("Only at fishing spot"),FiskVoyage::CanRelocate(true,true,false,120000,true,true));
-    TestFalse(TEXT("An active rod prevents relocation"),FiskVoyage::CanRelocate(true,true,true,200000,false,true));
+    TestFalse(TEXT("Not at the dock or on the way home"),FiskVoyage::CanRelocate(true,true,false,120000,true,true));
+    TestTrue(TEXT("At the fishing spot"),FiskVoyage::CanSteer(100));TestTrue(TEXT("On the way out"),FiskVoyage::CanSteer(0) && FiskVoyage::CanSteer(57));
+    TestFalse(TEXT("Not at the dock"),FiskVoyage::CanSteer(-1));TestFalse(TEXT("Not on the way home"),FiskVoyage::CanSteer(101) || FiskVoyage::CanSteer(150) || FiskVoyage::CanSteer(200));
+    TestFalse(TEXT("A rod with a fish on prevents relocation"),FiskVoyage::CanRelocate(true,true,true,200000,false,true));
     TestFalse(TEXT("Invalid sea point rejected"),FiskVoyage::CanRelocate(true,true,true,200000,true,false));
     TestFalse(TEXT("Preparation is not fishing time"),FiskVoyage::CanRelocate(true,true,true,119999,true,true));
     TestFalse(TEXT("Deadline cannot be extended"),FiskVoyage::CanRelocate(true,true,true,1020000,true,true));return true;

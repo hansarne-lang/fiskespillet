@@ -2,10 +2,10 @@
 setlocal EnableExtensions
 title FISKELAGET - bygg og publiser til SpilLan
 rem Dobbeltklikk for aa bygge FISKELAGET og publisere det til SpilLan.
-rem Valgfritt: gren som argument, f.eks.  Bygg-SpilLan.bat release/0.23.0-spillan
+rem Valgfritt: gren som argument, f.eks.  Bygg-SpilLan.bat release/0.24.0-spillan
 rem Stier kan overstyres med miljoevariablene FISK_REPO, UE_ROOT og SPILLAN.
 
-set "BRANCH=release/0.23.0-spillan"
+set "BRANCH=release/0.24.0-spillan"
 if not "%~1"=="" set "BRANCH=%~1"
 if not defined UE_ROOT set "UE_ROOT=C:\Program Files\Epic Games\UE_5.8"
 if not defined SPILLAN set "SPILLAN=C:\SpilLan\SpilLan.exe"

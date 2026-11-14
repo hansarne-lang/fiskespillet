@@ -117,3 +117,13 @@ Bestilt av prosjekteieren 14. november 2026, [oppgave 176](https://github.com/ha
 - **Finne fisk:** fisken står i stimer på bestemte steder og flytter seg i løpet av dagen. Ekkoloddet viser en stim når båten er over den, og fugler eller hoppende fisk røper den på avstand. Det napper fortere over en stim.
 
 Uendret: returfristen 17:00 og tap av fangst som ikke er hjemme i tide, lastreglene, kaptein og mannskap, og at stenger må være inne når båten flytter seg. Farten ved fullt pådrag er den samme som på kartturene (havbåten 25 prosent raskere, slep 65 prosent). Arbeidet leveres i sju steg som står i oppgaven.
+
+## 2026-11-14 — Felles veiing når alle er i land
+
+Bestilt av prosjekteieren 14. november 2026, [oppgave 183](https://github.com/hansarne-lang/fiskespillet/issues/183): når alle er i land, veies all fisk, minste først og største til slutt. Da får man også vite prisen. Alle deltakere ser hvem som har fisket hvor mange, og hvor mange som er veid.
+
+- **Når:** veiingen starter så snart alle båter som dro ut er tilbake i marinaen, også før 17:00. Er noen fortsatt ute kl. 17:00, starter den da, og fangsten deres går tapt som før.
+- **Tempo:** av seg selv. Tre sekunder per fisk, fem sekunder for nummer to til fire fra toppen og åtte sekunder for dagens største. En lang dag veies raskere, slik at veiingen tar høyst omtrent to minutter.
+- **Per fisk:** alle ser fisker, art, vekt og pris. En tavle viser antall fisket og antall veid per deltaker.
+
+Dette erstatter regelen om at fangst og penger holdes skjult til felles avsløring ved minutt 17. Fangsten er fortsatt skjult til den er på vekta, og oppgjør, utbetaling, journal og veddemål kommer når siste fisk er veid. Båter som ikke har dratt ut, teller ikke som ute. Starter veiingen før 17:00, kan ingen båt dra ut igjen den dagen.

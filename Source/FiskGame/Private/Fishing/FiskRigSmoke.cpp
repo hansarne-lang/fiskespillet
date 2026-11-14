@@ -130,7 +130,9 @@ void UFiskRigPanel::Smoke()
     }
     else if(Stage==11)
     {
-        if(Now-MarkAt<4) { return; }
+        // Wait until the rod is free again (its replicated AvailableAtMs), not a fixed time: under load
+        // (three scripts at once, PR #180) four seconds were not always enough on the client.
+        if(Now-MarkAt<4 || !PC->CanOpenRig()) { if(Now-MarkAt>30) { Fail(TEXT("rod_not_free_after_landing")); }return; }
         Key(EKeys::G);
         if(!IsVisible() || !Matches()) { Fail(TEXT("post_landing_panel"));return; }
         Capture(TEXT("rig-after-landing"));

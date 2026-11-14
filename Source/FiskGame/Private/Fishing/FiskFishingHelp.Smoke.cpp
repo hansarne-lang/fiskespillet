@@ -103,10 +103,18 @@ void UFiskFishingHelp::RunSmoke()
         UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HELP_CHART_CURSOR_PASSED mode=%s"),*SmokeMode);
         Key(Aa);SmokeAt=Now;SmokeStage=5;return;
     }
-    if(SmokeStage==5 && Now-SmokeAt>=1)
+    if(SmokeStage==5 && Now-SmokeAt>=1 && PC->GetRodAt(SmokeSlot)->GetState()==EFiskRodState::Fighting)
     {
         if(!bAssisting || PC->GetSelectedRod()!=SmokeSlot || PC->IsRodSelectionPending()) { Fail(TEXT("Aa_did_not_select_bitten_own_rod"));return; }
         Key(Aa);if(bAssisting) { Fail(TEXT("Aa_did_not_stop"));return; }
+        // Arrow keys steer the same rod as the mouse and must also interrupt assistance (#136).
+        for(const FKey Arrow:{EKeys::Up,EKeys::Down})
+        {
+            Key(Aa);if(!bAssisting) { Fail(TEXT("arrow_assist_restart_failed"));return; }
+            Key(Arrow);if(bAssisting) { Fail(TEXT("arrow_did_not_take_over"));return; }
+            if(!PC->IsRodSteering()) { Fail(TEXT("arrow_did_not_steer"));return; }
+        }
+        UE_LOG(LogTemp,Display,TEXT("FISKELAGET_HELP_ARROW_TAKEOVER_PASSED mode=%s"),*SmokeMode);
         Key(Aa);Key(EKeys::RightMouseButton);if(bAssisting) { Fail(TEXT("manual_input_did_not_take_over"));return; }
         int32 Width=0,Height=0;PC->GetViewportSize(Width,Height);const float Scale=FMath::Min(Width/1280.f,Height/720.f);
         PC->SetMouseLocation(FMath::RoundToInt(1080*Scale),FMath::RoundToInt(270*Scale));Key(EKeys::LeftMouseButton);

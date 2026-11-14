@@ -152,6 +152,7 @@ bool AFiskBoardingController::InputKey(const FInputKeyEventArgs& Params)
         && CastChecked<UFiskGameInstance>(GetGameInstance())->bMouseRod && GetRod() && GetRod()->GetState()==EFiskRodState::Fighting)
     {
         // Arrow keys step the mouse-steered rod, so a fight also works without the mouse.
+        FishingHelp->StopAssist(true);
         RodStick.Move(Params.Key==EKeys::Up?FFiskRodStick::KeyStep:-FFiskRodStick::KeyStep);bRodSteering=true;return true;
     }
     if(RodKey)

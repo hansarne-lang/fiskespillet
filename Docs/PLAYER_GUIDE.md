@@ -36,12 +36,16 @@ Fangstresultater (art, vekt, verdi, rekorder) er skjult for alle, også for deg 
 | M | Sjøkart. A åpner hav-atlaset med 16 merker, Tab viser favoritter, F2 gir en favoritt navn. Kapteinen kan klikke et nytt punkt og flytte båten på fiskeplassen eller mens den er på vei ut; ledige stenger trekkes da inn, men ikke hvis noen har fisk på kroken |
 | O | Turplan med inntil fem stopp. A legger til, Backspace fjerner siste, Delete tømmer, Enter velger neste stopp. T viser turforslag, L bruker forslaget, G finner korteste rundtur |
 | R | Kapteinen: reis ut fra 02:00, eller dra hjem fra fiskeplassen. Knappen «Tilbake til marina» gjør det samme |
+| W / S | Kapteinen: gass i kvarte steg. S under null rygger. Fra 02:00 kan du kjøre ut fra kaia selv |
+| A / D | Kapteinen: ror babord / styrbord (hold). Roret virker bare når båten har fart |
 | J | Dagens ekspedisjon. 1–5 velger mål ved brygga, T markerer deg klar, 6–8 sender faste meldinger |
 | F7 | Ekkolodd ved fiskeplassen |
 | F11 | Fangstlageret. Full båt eller slep tvinger mannskapet hjem |
 | F9 / F12 | Fotomodus / ta bilde |
 
 Lukk kart og paneler før du trykker R.
+
+Når du styrer selv, viser feltet nede til venstre gass, fart, kurs og hvor langt det er hjem. Slipp gassen (S til 0 %) ute på åpent hav, så stopper båten og stedet blir en fiskeplass. Gir du gass igjen, trekkes ledige stenger inn; har noen fisk på kroken, går ikke båten. Kartet og R tar over som autopilot når som helst. Styrer du inn i marinaen, er turen over.
 
 ## Fiske
 

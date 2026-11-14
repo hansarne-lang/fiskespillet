@@ -2,6 +2,7 @@
 #include "UI/FiskPlayerNames.h"
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskPierWalk.h"
+#include "Boats/Controller/FiskHelmControl.h"
 #include "UI/FiskExpeditionPanel.h"
 #include "Engine/Canvas.h"
 #include "UI/FiskFrontEnd.h"
@@ -48,7 +49,7 @@ void DrawContentPanel(AHUD& HUD,UCanvas& Canvas,const AFiskBoardingController& P
 #else
             TEXT("Musehjul: brems. Slipp under utras. Mellomrom lander når klart."),
 #endif
-            TEXT("R / Tilbake til marina: kapteinens retur. Klikk knappen i spillvisningen. K: mannskap."),
+            TEXT("R: kapteinens retur. Kapteinen styrer med W/S (gass, S under null rygger) og A/D (ror). K: mannskap."),
             TEXT("Senest 17:00: kryss marinasonen. Resultater og utbetaling vises først da."),
             TEXT("F2/F3: oppgjør/historikk. F4: journal. F7: ekkolodd. F8: LAN-tavle. N: neste dag."),
             TEXT("H/U/B/I: naust, utstyrsrom, strandbar og artsbok. J: ekspedisjon. L: sjøpass."),
@@ -184,5 +185,8 @@ void AFiskBootstrapHUD::DrawHUD()
         }
     }
     if(const AFiskBoardingController* PC=Cast<AFiskBoardingController>(GetOwningPlayerController()))
-    { UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetFishingHelp()->Draw(*this,*Canvas);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas); }
+    {
+        UFiskDeckPanel::DrawOverlay(*this,*Canvas,*PC);PC->GetFishingHelp()->Draw(*this,*Canvas);PC->GetAnglerPanel()->DrawNotice(*this,*Canvas);
+        if(const auto* Helm=PC->FindComponentByClass<UFiskHelmControl>()) { Helm->Draw(*this,*Canvas); }
+    }
 }

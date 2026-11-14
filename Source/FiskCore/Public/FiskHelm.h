@@ -47,6 +47,23 @@ namespace FiskHelm
         else { S.Speed=0.0; }   // Aground on an island or at the chart edge: back off or turn away
     }
 
+    // Trip states, mirrored from AFiskStarterBoat: at the dock, under the captain's hand, stopped at sea
+    // (fishing allowed) and home in the marina.
+    inline constexpr int32 TripDock=-1,TripUnderHelm=99,TripStopped=100,TripMarina=200;
+    inline constexpr double InputTimeout=0.5;          // Real seconds without input count as released
+    inline constexpr double MarinaArrivalRadius=2500.0; // Steering into the marina ends the trip
+    inline constexpr double MarinaLeftRadius=6000.0;   // ...but only after the boat has been out of it
+    // The captain may take the helm from 02:00 at the dock (before 17:00), and at any time at sea. A boat
+    // that is home in the marina stays there until the next day.
+    inline bool CanTakeHelm(bool bCaptain,int32 Trip,int32 NowMs)
+    { return bCaptain && Trip!=TripMarina && (Trip!=TripDock || (NowMs>=120000 && NowMs<1020000)); }
+    // A boat under the helm becomes a fishing spot when it is stopped with the throttle released.
+    inline bool Settles(const FState& S,double Throttle) { return Still(S) && Clean(Throttle)==0.0; }
+    inline bool Arrived(FVector Position,bool bLeftMarina) { return bLeftMarina && Position.Size2D()<=MarinaArrivalRadius; }
+    // Game milliseconds to cover a distance at full speed (autopilot home from a hand-steered position).
+    inline int32 TravelMs(double Length,int32 Kind,bool bTowing)
+    { return FMath::IsFinite(Length) && Length>0?static_cast<int32>(FMath::Clamp(FMath::CeilToDouble(Length/MaxSpeed(Kind,bTowing)*1000.0),1.0,1.0e9)):1; }
+
     inline void Advance(FState& S,double Throttle,double Rudder,int32 Kind,bool bTowing,double Seconds)
     {
         if(!FMath::IsFinite(Seconds) || Seconds<=0.0) { return; }

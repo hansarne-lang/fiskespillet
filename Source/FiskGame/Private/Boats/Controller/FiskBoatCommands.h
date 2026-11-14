@@ -25,11 +25,15 @@ public:
     UFUNCTION(Server,Reliable) void ServerVoyageNext(int32 Day,int32 Revision,int32 BoatRevision);
     UFUNCTION(Server,Reliable) void ServerTransferCaptain(int32 ExpectedRevision,int32 Target);
     UFUNCTION(Client,Reliable) void ClientCaptainReply(bool bAccepted);
+    // Hand steering (#176 step 2): the captain's throttle and rudder, -1..1, about ten times a second.
+    // Unreliable; Serial must increase. The server treats half a second without input as released.
+    UFUNCTION(Server,Unreliable) void ServerHelm(int32 Serial,float Throttle,float Rudder);
 #if WITH_DEV_AUTOMATION_TESTS
     int32 GetRejectedCaptainRequests() const { return RejectedCaptainRequests; }
 #endif
 private:
     AFiskBoardingController& Controller() const;
+    FString LastHelmMessage;double LastHelmMessageAt=-100;   // Server: one reply per message, not ten a second
 #if WITH_DEV_AUTOMATION_TESTS
     int32 RejectedCaptainRequests=0;   // Server: read by the captain smoke test
 #endif

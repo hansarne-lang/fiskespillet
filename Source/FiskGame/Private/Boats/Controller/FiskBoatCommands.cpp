@@ -117,3 +117,13 @@ void UFiskBoatCommands::ServerTransferCaptain_Implementation(int32 ExpectedRevis
     ClientCaptainReply(bAccepted);
 }
 void UFiskBoatCommands::ClientCaptainReply_Implementation(bool bAccepted) { Controller().ShowCaptainReply(bAccepted); }
+void UFiskBoatCommands::ServerHelm_Implementation(int32 Serial,float Throttle,float Rudder)
+{
+    AFiskBoardingController& PC=Controller();
+    auto* Boat=const_cast<AFiskStarterBoat*>(PC.FindStarterBoat());
+    const int32 Self=PC.PlayerState?PC.PlayerState->GetPlayerId():INDEX_NONE;
+    if(!Boat || !PC.IsCareerReady() || !Boat->IsAboard(Self)) { return; }
+    FString Message;Boat->SteerHelm(Self,Serial,Throttle,Rudder,Message);
+    const double Now=GetWorld()->GetRealTimeSeconds();
+    if(!Message.IsEmpty() && (Message!=LastHelmMessage || Now-LastHelmMessageAt>=3)) { LastHelmMessage=Message;LastHelmMessageAt=Now;PC.ClientActionFeedback(Message); }
+}

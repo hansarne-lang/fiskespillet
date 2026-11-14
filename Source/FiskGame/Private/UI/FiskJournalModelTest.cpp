@@ -23,7 +23,7 @@ bool FFiskJournalPrivacyTest::RunTest(const FString& Parameters)
     const FFiskDayResult Row=Ledger.GetResults()[0];FFiskJournalModel Journal;
     TestTrue(TEXT("Metadata unchanged through settlement"),Row.Catches[0].Context==Detail);
     TestTrue(TEXT("Closed reveal gate"),Journal.Apply(Day,1,1020000,false,Row)==EFiskJournalApply::Rejected);
-    TestTrue(TEXT("Last ms before reveal"),Journal.Apply(Day,1,1019999,true,Row)==EFiskJournalApply::Rejected);
+    TestTrue(TEXT("Invalid time refused"),Journal.Apply(Day,1,-1,true,Row)==EFiskJournalApply::Rejected);
     TestTrue(TEXT("One accepted publication"),Journal.Apply(Day,1,1020000,true,Row)==EFiskJournalApply::Added);
     TestTrue(TEXT("Retry is unchanged"),Journal.Apply(Day,1,1200000,true,Row)==EFiskJournalApply::Unchanged);
     TestEqual(TEXT("Retry does not duplicate"),Journal.GetEntries().Num(),1);

@@ -32,7 +32,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskArchivePrivacyTest,"Fiskelaget.Recovery.Co
 bool FFiskArchivePrivacyTest::RunTest(const FString& Parameters)
 {
     AuthorityTest::FFixture F;F.View.bRevealed=false;TestFalse(TEXT("Unrevealed result never archived"),FiskJournalAuthority::Commit(F.Directory,F.View,1020000,F.Profiles));
-    F.View.bRevealed=true;TestFalse(TEXT("Deadline is mandatory"),FiskJournalAuthority::Commit(F.Directory,F.View,1019999,F.Profiles));
+    F.View.bRevealed=true;TestFalse(TEXT("Invalid time refused"),FiskJournalAuthority::Commit(F.Directory,F.View,-1,F.Profiles));
     FFiskJournalModel Read;TestTrue(TEXT("Missing archive is empty"),FiskJournalAuthority::Load(F.Directory,F.A.Id,Read));TestEqual(TEXT("No leaked fish"),Read.GetEntries().Num(),0);
     F.Profiles.Remove(256);TestFalse(TEXT("Unbound catch owner is rejected"),FiskJournalAuthority::Commit(F.Directory,F.View,1020000,F.Profiles));return true;
 }

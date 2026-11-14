@@ -31,4 +31,18 @@ bool FFiskFleetSlips::RunTest(const FString&)
 {
     for(int32 I=0;I<12;++I) { for(int32 J=0;J<I;++J) { TestTrue(TEXT("Separate houses"),FVector::Dist(AFiskMarinaHub::HousePosition(I),AFiskMarinaHub::HousePosition(J))>=1700); } }return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskEarlyWeighInLedgerTest,"Fiskelaget.WeighIn.LedgerSettlesWhenEveryoneIsHome",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FFiskEarlyWeighInLedgerTest::RunTest(const FString&)
+{
+    // #183: the weigh-in may settle the day before 17:00 once every boat that went out is home.
+    const FFiskCatchData Fish=FiskCatches::Roll(42,0);const FGuid A=FGuid::NewGuid();
+    FFiskDayLedger L;L.Record(A,1,300000,Fish);TMap<FGuid,int32> Home;Home.Add(A,350000);const TMap<FGuid,int32> None;
+    TestFalse(TEXT("Not early while someone is out"),L.SettleFleet(400000,Home));
+    TestTrue(TEXT("Early when everyone is home"),L.SettleFleet(400000,Home,true));
+    TestEqual(TEXT("Delivered"),L.GetResults()[0].DeliveredFish,1);
+    TestFalse(TEXT("No catch after the weigh-in has settled the day"),L.Record(FGuid::NewGuid(),1,500000,Fish));
+    TestFalse(TEXT("Settled once"),L.SettleFleet(1020000,Home));
+    FFiskDayLedger Bad;TestFalse(TEXT("Invalid time"),Bad.SettleFleet(-1,None,true));
+    return true;
+}
 #endif

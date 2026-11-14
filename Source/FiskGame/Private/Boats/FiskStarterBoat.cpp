@@ -194,7 +194,7 @@ void AFiskStarterBoat::StartTrip(int32 PlayerId,int32 ExpectedRevision)
     }
     if(TripProgress!=AtDock || Day->GetPhase(Day->GetElapsedSeconds())!=EFiskDayPhase::FishingAndReturn) { return; }
     auto* Mode=GetWorld()->GetAuthGameMode<AFiskBootstrapGameMode>();
-    if(!Mode || !Expedition || !Expedition->Depart()) { return; }
+    if(!Mode || Mode->IsWeighInStarted() || !Expedition || !Expedition->Depart()) { return; }   // No trips after the weigh-in has started (#183)
     Mode->LockBoatCrew(this);
     BeginLeg(FVector::ZeroVector,Route.Destination,GetTravelMs(),Now,false);
 }

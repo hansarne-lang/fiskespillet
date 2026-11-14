@@ -22,7 +22,7 @@ bool FFiskBoardPrivacyTest::RunTest(const FString& Parameters)
 {
     FFiskSettlementView View;View.DayNumber=2;View.bRevealed=true;
     for(int32 I=0;I<3;++I) { FFiskDayResult R;R.PlayerId=10-I;R.SessionBalance=I==2?20:80;View.Results.Add(R); }
-    TestTrue(TEXT("No early standings"),FiskNavigation::Standings(View,2,1019999).IsEmpty());
+    TestEqual(TEXT("Standings after the weigh-in, also before 17:00 (#183)"),FiskNavigation::Standings(View,2,1019999).Num(),3);
     TestTrue(TEXT("Wrong day hidden"),FiskNavigation::Standings(View,3,1020000).IsEmpty());
     View.bRevealed=false;TestTrue(TEXT("Unconfirmed hidden"),FiskNavigation::Standings(View,2,1020000).IsEmpty());View.bRevealed=true;
     const auto Rows=FiskNavigation::Standings(View,2,1020000);

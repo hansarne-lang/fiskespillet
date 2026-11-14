@@ -32,7 +32,7 @@ bool FFiskJournalModel::Merge(const FFiskJournalModel& Other)
 }
 EFiskJournalApply FFiskJournalModel::Apply(const FGuid& DayId,int32 DayNumber,int32 NowMs,bool bRevealed,const FFiskDayResult& Row)
 {
-    if(!bRevealed || NowMs<1020000 || !DayId.IsValid() || DayNumber<1 || DayNumber>9999 || Row.PlayerId<0
+    if(!bRevealed || NowMs<0 || !DayId.IsValid() || DayNumber<1 || DayNumber>9999 || Row.PlayerId<0
         || Row.Catches.Num()>Capacity) { return EFiskJournalApply::Rejected; }
     FFiskJournalModel Incoming;int64 Delivered=0,Lost=0,Income=0,Weight=0;
     for(const FFiskCatchResult& Catch:Row.Catches)

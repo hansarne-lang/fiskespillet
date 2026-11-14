@@ -15,7 +15,7 @@ bool AFiskBootstrapGameMode::IsAtSea(int32 Player) const
 bool AFiskBootstrapGameMode::AreBetsOpen() const
 {
     const AFiskDayState* Day=GetGameState<AFiskDayState>();
-    return Day && Day->HasStarted() && Day->GetElapsedMilliseconds()<FFiskDayLedger::DeadlineMs && !bBetsSettled && !BetBook.IsClosed();
+    return Day && Day->HasStarted() && Day->GetElapsedMilliseconds()<FFiskDayLedger::DeadlineMs && !bBetsSettled && !BetBook.IsClosed() && !IsWeighInStarted();
 }
 EFiskBetResult AFiskBootstrapGameMode::PlaceBet(int32 Player,const FGuid& Bettor,const FGuid& Bet,const FGuid& Fisher,int64 Stake,TFunctionRef<bool()> Charge)
 {

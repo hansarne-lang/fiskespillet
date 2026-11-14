@@ -44,6 +44,8 @@ void UFiskBoatCommands::ServerStartBoatTrip_Implementation(int32 ExpectedRevisio
         { PC.ClientActionFeedback(TEXT("Sjøfasen er ferdig. Start en ny dag fra hovedmenyen."));return; }
         if(Progress==AFiskStarterBoat::AtMarina)
         { PC.ClientActionFeedback(TEXT("Turen er avsluttet. Velg Til hovedmeny og Spill for en ny dag."));return; }
+        if(Progress==AFiskStarterBoat::AtDock && Mode->IsWeighInStarted())
+        { PC.ClientActionFeedback(TEXT("Veiingen har startet. Ingen flere turer i dag."));return; }
         if(Progress!=AFiskStarterBoat::AtDock && Progress!=AFiskStarterBoat::AtFishingSpot && !(Progress>=0 && Progress<100))
         { PC.ClientActionFeedback(TEXT("Båten er allerede på vei."));return; }
         Boat->StartTrip(PC.PlayerState->GetPlayerId(),ExpectedRevision);

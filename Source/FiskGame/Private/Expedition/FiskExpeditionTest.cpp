@@ -40,7 +40,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFiskGoalDeadlineTest,"Fiskelaget.Expedition.De
 bool FFiskGoalDeadlineTest::RunTest(const FString& Parameters)
 {
     ExpeditionTest::FFixture F;F.Plan.Goal=0;F.Catch(256);
-    TestFalse(TEXT("No result before deadline"),FiskExpeditions::Evaluate(F.Plan,F.View,1019999,F.Profiles,F.Crew,F.Records));
+    TestFalse(TEXT("Invalid time refused"),FiskExpeditions::Evaluate(F.Plan,F.View,-1,F.Profiles,F.Crew,F.Records));
     F.View.bRevealed=false;TestFalse(TEXT("No unrevealed result"),F.Evaluate());F.View.bRevealed=true;TestTrue(TEXT("Delivered habitat catch qualifies"),F.Evaluate());
     F.View.Results[0].Catches[0].bDelivered=false;TestFalse(TEXT("Late return never qualifies"),F.Evaluate());F.View.Results[0].Catches[0].bDelivered=true;
     F.Plan.DayId=FGuid::NewGuid();TestFalse(TEXT("Stale day refused"),F.Evaluate());return true;

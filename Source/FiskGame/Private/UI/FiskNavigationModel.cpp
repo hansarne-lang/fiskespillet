@@ -13,7 +13,7 @@ FFiskSonarView FiskNavigation::Sonar(int32 Ground,int32 Progress,bool bAboard,in
     return View;
 }
 bool FiskNavigation::Revealed(const FFiskSettlementView& View,int32 Day,int32 NowMs)
-{ return Day>0 && View.DayNumber==Day && View.bRevealed && NowMs>=1020000; }
+{ return Day>0 && View.DayNumber==Day && View.bRevealed && NowMs>=0; }
 TArray<FFiskBoardRow> FiskNavigation::Standings(const FFiskSettlementView& View,int32 Day,int32 NowMs)
 {
     TArray<FFiskBoardRow> Rows;

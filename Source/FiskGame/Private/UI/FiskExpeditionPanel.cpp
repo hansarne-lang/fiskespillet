@@ -74,7 +74,7 @@ void UFiskExpeditionPanel::Draw(AHUD& HUD,UCanvas& C)
         default:Detail=TEXT("Lever fisk landet innen 5 m fra dagens valgte sjøpunkt.");break;
     }
     T(Detail,48,417,.85f,Gold);T(TEXT("Bare levert fangst teller. Ingen ekstra pengebonus."),48,449,.9f,Teal);
-    const bool Revealed=P.bEvaluated && Ms>=1020000;
+    const bool Revealed=P.bEvaluated && Ms>=0;
     T(Revealed?(P.bCompleted?TEXT("FULLFØRT – medalje til avreisemannskapet!"):TEXT("IKKE FULLFØRT – sent levert fisk teller ikke.")):TEXT("Resultatet åpnes kl. 17:00."),48,485,1.1f,Gold);
     T(FString::Printf(TEXT("Sjøpunkt: %.0f, %.0f m | Reise %d s"),P.Point.X/100,P.Point.Y/100,B->GetTravelMs()/1000),650,178,.98f,Teal);
     const int32 Margin=B->ReturnMarginMs(Ms)/1000;T(B->GetTripProgress()==AFiskStarterBoat::AtMarina?TEXT("Båten er tilbake i marinaen."):FString::Printf(TEXT("Returmargin ca. %s%d:%02d | Frist 17:00"),Margin<0?TEXT("-"):TEXT(""),FMath::Abs(Margin)/60,FMath::Abs(Margin)%60),650,213,1.f,Gold);

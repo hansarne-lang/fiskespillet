@@ -18,7 +18,7 @@ FString FiskExpeditions::RecordKey(const FGuid& Profile,int32 Species)
 bool FiskExpeditions::Evaluate(const FFiskExpeditionPlan& P,const FFiskSettlementView& V,int32 NowMs,
     const TMap<int32,FGuid>& Profiles,const TArray<FGuid>& Participants,const TMap<FString,int32>& Records)
 {
-    if(NowMs<1020000 || !V.bRevealed || !P.bLocked || !P.DayId.IsValid() || P.DayId!=V.DayId || P.DayNumber!=V.DayNumber
+    if(NowMs<0 || !V.bRevealed || !P.bLocked || !P.DayId.IsValid() || P.DayId!=V.DayId || P.DayNumber!=V.DayNumber
         || P.Goal<0 || P.Goal>=5 || P.RequiredCrew<1 || P.RequiredCrew>2 || Participants.IsEmpty() || Participants.Num()>4
         || !FiskGrounds::Find(P.Ground) || !FiskCatches::Find(P.Species) || !FiskRouteGeometry::Sea(P.Point)) { return false; }
     TSet<int32> Species;TSet<FGuid> Fishers;bool Habitat=false,Record=false,Point=false;

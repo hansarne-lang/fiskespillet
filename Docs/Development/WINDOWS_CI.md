@@ -12,7 +12,7 @@ Issue [#5](https://github.com/hansarne-lang/fiskespillet/issues/5). Prosjekteier
 | Push til `release/**` | `Build` | **Ja**, publiseres |
 | Manuell kjøring (Actions → Windows build and test → Run workflow) | Valgfritt: Build, PR eller Release | Valgfritt |
 
-Den korte testrapporten vises i jobbens sammendrag og lagres som artefakten `testrapport`. Jobben er grønn når det ikke finnes nye feil (se [testbudsjettet](../../TESTING.md#testbudsjett)). Står PC-en av eller runneren er stoppet, venter jobben i kø, men GitHub avbryter den etter et døgn. Da må den startes på nytt. PR-kjøringene bruker klokkefaktor 8, hopper over ventetiden fra alle båter er hjemme til 17:00 og kjører tre skript om gangen. Nattkjøringen bruker normal klokke uten hopp. `windows-build` er ikke en påkrevd sjekk for fletting, så main stoppes ikke når PC-en er av.
+Den korte testrapporten vises i jobbens sammendrag og lagres som artefakten `testrapport`. Jobben er grønn når det ikke finnes nye feil (se [testbudsjettet](../../TESTING.md#testbudsjett)). Står PC-en av eller runneren er stoppet, venter jobben i kø, men GitHub avbryter den etter et døgn. Da må den startes på nytt. PR-kjøringene bruker klokkefaktor 4, hopper over ventetiden fra alle båter er hjemme til 17:00 og kjører tre skript om gangen. Nattkjøringen bruker normal klokke uten hopp. `windows-build` er ikke en påkrevd sjekk for fletting, så main stoppes ikke når PC-en er av.
 
 ## Sikkerhet
 

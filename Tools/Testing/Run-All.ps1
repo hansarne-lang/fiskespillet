@@ -7,7 +7,7 @@
  its own log folder. Scripts whose ports are fixed inside the game (main menu, solo menu) run
  alone afterwards on the normal ports. summary.csv in the log folder lists result and duration.
 
- -ClockScale sets the test-only day clock acceleration (FISK_CLOCK_SCALE, default 8). -Release forces
+ -ClockScale sets the test-only day clock acceleration (FISK_CLOCK_SCALE, default 4). -Release forces
  the normal 20-minute day (scale 1) and every script, which is what release evidence needs.
 
  Outside -Release the game's host also jumps over the wait from the moment every boat is home to
@@ -22,7 +22,7 @@
  and left to the nightly Release run. Scripts it names directly always run.
 
 .EXAMPLE
- # Quick check of what a branch changed, eight times faster clock, three scripts at a time
+ # Quick check of what a branch changed, four times faster clock, three scripts at a time
  .\Tools\Testing\Run-All.ps1 -Package C:\Fiskespillet\pakke -LogDirectory C:\Fiskespillet\logs -ChangedSince origin/main
 
 .EXAMPLE
@@ -35,7 +35,9 @@ param(
     [string[]]$Scripts = @(),
     [string]$ChangedSince = '',
     [ValidateRange(1,8)][int]$Parallel = 3,
-    [ValidateRange(1,20)][int]$ClockScale = 8,
+    # 8 was tried on 14 November 2026 (PR #180): eight of fourteen scripts failed. Fights and some waits run
+    # in real time, so FiskTimeout (seconds / scale + 120, at least 300) became shorter than the scripts need.
+    [ValidateRange(1,20)][int]$ClockScale = 4,
     [switch]$Release,
     [switch]$NoIdleSkip,
     [switch]$Force,

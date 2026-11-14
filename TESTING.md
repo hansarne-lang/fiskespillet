@@ -36,7 +36,7 @@ Verktøyene er lagt til 8. november 2026. Ingen av dem er kjørt på Windows enn
 Lagdelt kjøring:
 
 1. **Hver endring:** `check_repository.py`, `check_bootstrap.py`, Python-testene og `Test-Automation.ps1`.
-2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 8, hopp over ventetid og tre skript om gangen som standard).
+2. **PR med kode:** `Run-All.ps1 -ChangedSince origin/main` (klokkefaktor 4, hopp over ventetid og tre skript om gangen som standard).
 3. **Utgivelse:** `Run-All.ps1 -Release`. Normal 20-minuttersdag (faktor 1) og alle skript. Bare dette gjelder som utgivelsesbevis for dagslengde, 17:00-frist og reisetid.
 
 ## Testbudsjett

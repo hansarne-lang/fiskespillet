@@ -20,9 +20,9 @@ void AFiskBootstrapGameMode::CheckIdleSkip()
     if(bAway || !bHome) { IdleSince=-1;return; }
     if(IdleSince<0) { IdleSince=Now; }
     if(!AFiskDayState::ShouldSkipIdle(Day->GetElapsedSeconds(),bAway,bHome,Now-IdleSince)) { return; }
-    // The F12 milestones include 15:00, so it can take two jumps to reach 17:00.
+    // One F12 milestone per idle period: from home to 15:00, then after another grace period to 17:00.
+    // Tests that act between 15:00 and 17:00 (CareerRelease's career-before17) get their window.
     int32 Seconds=-1;
-    for(int32 Jump=0;Jump<3 && Day->GetElapsedSeconds()<AFiskDayState::SettlementStart && Day->SkipToNextMilestone(Seconds);++Jump) {}
-    UE_LOG(LogTemp,Warning,TEXT("FISKELAGET_IDLE_SKIP to=%d (test only)"),Day->GetElapsedSeconds());
+    if(Day->SkipToNextMilestone(Seconds)) { UE_LOG(LogTemp,Warning,TEXT("FISKELAGET_IDLE_SKIP to=%d (test only)"),Seconds); }
     IdleSince=-1;
 }

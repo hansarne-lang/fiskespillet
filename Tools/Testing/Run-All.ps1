@@ -11,7 +11,7 @@
  the normal 20-minute day (scale 1) and every script, which is what release evidence needs.
 
  Outside -Release the game's host also jumps over the wait from the moment every boat is home to
- 17:00 (FISK_SKIP_IDLE=1). The scripts add the logged jump back when they check day lengths
+ 17:00, via 15:00, with 10 seconds at each step (FISK_SKIP_IDLE=1). The scripts add the logged jump back when they check day lengths
  (FiskGameSpan in FiskTestCommon.ps1). -NoIdleSkip turns it off.
 
  Scripts that already passed with the same game binary, script, test harness and clock scale are

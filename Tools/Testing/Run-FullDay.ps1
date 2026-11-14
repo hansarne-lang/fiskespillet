@@ -55,7 +55,7 @@ try {
     if ($samples.Count -lt 2) { throw 'Insufficient clock samples' }
     foreach ($sample in $samples) {
         $seconds = [int]$sample.Matches[0].Groups[1].Value / 1000.0
-        $actual = (FiskGameSeconds ((Event-Time $sample) - $startTime).TotalSeconds)
+        $actual = (FiskGameSpan $startTime (Event-Time $sample))
         if ([Math]::Abs($actual - $seconds) -gt (1.0*$FiskClockScale)) { throw "Clock drift: game=$seconds wall=$actual" }
     }
     $lastHost = $samples[-1]
@@ -63,7 +63,7 @@ try {
     if ($clientSamples.Count -lt 2) { throw 'Insufficient client clock samples' }
     foreach ($sample in $clientSamples) {
         $seconds = [int]$sample.Matches[0].Groups[1].Value / 1000.0
-        $actual = (FiskGameSeconds ((Event-Time $sample) - $startTime).TotalSeconds)
+        $actual = (FiskGameSpan $startTime (Event-Time $sample))
         if ([Math]::Abs($actual - $seconds) -gt (1.0*$FiskClockScale)) { throw "Client clock drift: game=$seconds wall=$actual" }
     }
     if ($ClockOnlySeconds -gt 0) {
@@ -94,10 +94,10 @@ try {
             if($details.Count -ne 1 -or [int]$details[0].Matches[0].Groups[1].Value -ne [int]$result.Matches[0].Groups[2].Value){throw 'Catch value does not match payment'}
         }
         $revealed = @(Events $log 'FISKELAGET_SETTLEMENT rows=2')[0]
-        if ((FiskGameSeconds ((Event-Time $revealed) - $startTime).TotalSeconds) -lt 1020.0) { throw 'Result revealed before 17:00' }
+        if ((FiskGameSpan $startTime (Event-Time $revealed)) -lt 1020.0) { throw 'Result revealed before 17:00' }
         if (@(Events $log 'FISKELAGET_MARINA_REACHED crew=2').Count -ne 1) { throw 'Both players did not return' }
         $end = @(Events $log 'FISKELAGET_TEST_DAY_END ms=1200000')[0]
-        $duration = (FiskGameSeconds ((Event-Time $end) - $startTime).TotalSeconds)
+        $duration = (FiskGameSpan $startTime (Event-Time $end))
         if ([Math]::Abs($duration - 1200.0) -gt (2.0*$FiskClockScale)) { throw "Incorrect day length: $duration" }
     }
     if (@(Events $clientLog 'FISKELAGET_TEST_GUEST_RETURN player=').Count -ne 1) { throw 'Guest did not try return' }

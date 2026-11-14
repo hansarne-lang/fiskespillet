@@ -7,8 +7,12 @@
  its own log folder. Scripts whose ports are fixed inside the game (main menu, solo menu) run
  alone afterwards on the normal ports. summary.csv in the log folder lists result and duration.
 
- -ClockScale sets the test-only day clock acceleration (FISK_CLOCK_SCALE). -Release forces
+ -ClockScale sets the test-only day clock acceleration (FISK_CLOCK_SCALE, default 8). -Release forces
  the normal 20-minute day (scale 1) and every script, which is what release evidence needs.
+
+ Outside -Release the game's host also jumps over the wait from the moment every boat is home to
+ 17:00 (FISK_SKIP_IDLE=1). The scripts add the logged jump back when they check day lengths
+ (FiskGameSpan in FiskTestCommon.ps1). -NoIdleSkip turns it off.
 
  Scripts that already passed with the same game binary, script, test harness and clock scale are
  not run again (passed-cache.jsonl in the log folder, see run_cache.py). They show as Cached in
@@ -18,7 +22,7 @@
  and left to the nightly Release run. Scripts it names directly always run.
 
 .EXAMPLE
- # Quick check of what a branch changed, four times faster clock, two scripts at a time
+ # Quick check of what a branch changed, eight times faster clock, three scripts at a time
  .\Tools\Testing\Run-All.ps1 -Package C:\Fiskespillet\pakke -LogDirectory C:\Fiskespillet\logs -ChangedSince origin/main
 
 .EXAMPLE
@@ -30,9 +34,10 @@ param(
     [Parameter(Mandatory)][string]$LogDirectory,
     [string[]]$Scripts = @(),
     [string]$ChangedSince = '',
-    [ValidateRange(1,8)][int]$Parallel = 2,
-    [ValidateRange(1,20)][int]$ClockScale = 4,
+    [ValidateRange(1,8)][int]$Parallel = 3,
+    [ValidateRange(1,20)][int]$ClockScale = 8,
     [switch]$Release,
+    [switch]$NoIdleSkip,
     [switch]$Force,
     [switch]$Fast
 )
@@ -107,7 +112,7 @@ foreach ($name in $cached) {
 }
 $selected = @($selected | Where-Object { $cached -notcontains $_ })
 "Scripts: $($selected -join ', ')"
-"Clock scale: $ClockScale  Parallel: $Parallel  Source: $sourceCommit"
+"Clock scale: $ClockScale  Idle skip: $(-not $Release -and -not $NoIdleSkip)  Parallel: $Parallel  Source: $sourceCommit"
 
 function Quote([string]$text) { "'" + $text.Replace("'", "''") + "'" }
 
@@ -144,12 +149,13 @@ exit `$code
     $scale = Get-Scale $name
     $env:FISK_TEST_PORT_BASE = [string](7777 + 100 * $slot)
     $env:FISK_CLOCK_SCALE = [string]$scale
+    if (-not $Release -and -not $NoIdleSkip) { $env:FISK_SKIP_IDLE = '1' }
     try {
         $process = Start-Process -FilePath $shell -ArgumentList $arguments -PassThru -WindowStyle Hidden `
             -RedirectStandardOutput (Join-Path $run "$name.out.txt") -RedirectStandardError (Join-Path $run "$name.err.txt")
         $null = $process.Handle   # also helps Process.ExitCode, which is only a fallback
     } finally {
-        Remove-Item Env:FISK_TEST_PORT_BASE, Env:FISK_CLOCK_SCALE -ErrorAction SilentlyContinue
+        Remove-Item Env:FISK_TEST_PORT_BASE, Env:FISK_CLOCK_SCALE, Env:FISK_SKIP_IDLE -ErrorAction SilentlyContinue
     }
     [pscustomobject]@{ Name = $name; Slot = $slot; Scale = $scale; Process = $process; CodeFile = $codeFile; Clock = [Diagnostics.Stopwatch]::StartNew() }
 }

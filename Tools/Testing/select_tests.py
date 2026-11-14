@@ -32,6 +32,22 @@ IGNORED = (
     'Grafikk/*',  # SpilLan card image: shown by the launcher, never loaded by the game
 )
 
+# Automation test sources (*Test.cpp) only add automation tests, which run at every level except Build.
+# They never change what a graphical script sees, so they select no script, even in shared folders.
+AUTOMATION_TESTS = ('Source/*Test.cpp',)
+
+# FiskCore headers used by one area only. Checked before EVERYTHING; any other FiskCore file still
+# selects every script.
+CORE_RULES: tuple[tuple[str, list[str]], ...] = (
+    ('Source/FiskCore/Public/FiskPier*', ['HarbourGuide', 'MarinaRelease']),
+    ('Source/FiskCore/Public/FiskGreetingClock.h', ['HarbourGuide', 'MarinaRelease']),
+    ('Source/FiskCore/Public/FiskHarbourRules.h', ['HarbourGuide', 'MarinaRelease']),
+    ('Source/FiskCore/*/FiskRodStick*', ['FishCombat', 'RepeatedFishing', 'RigSetup', 'FishingRelease', 'ContentRelease', 'AnglerRelease']),
+    ('Source/FiskCore/Public/FiskVoyageRules.h', ['SeaChart', 'NavigationRelease', 'CaptainTransfer', 'SkipperRelease',
+                                                  'FullDay', 'HarbourGuide', 'ExplorationRelease']),
+    ('Source/FiskCore/Public/FiskHelm.h', ['SeaChart', 'NavigationRelease', 'CaptainTransfer', 'SkipperRelease']),
+)
+
 # Shared foundations: a change here can affect any scenario.
 EVERYTHING = (
     'Source/FiskCore/*', '*.Build.cs', '*.Target.cs', '*.uproject', 'Config/*',
@@ -102,6 +118,12 @@ def select(paths, scripts: list[str] | None = None) -> list[str] | str:
     for raw in paths:
         path = raw.strip().replace('\\', '/')
         if not path:
+            continue
+        if _match(path, AUTOMATION_TESTS):
+            continue
+        core = next((targets for pattern, targets in CORE_RULES if fnmatch.fnmatchcase(path, pattern)), None)
+        if core is not None:
+            chosen.update(core)
             continue
         if _match(path, EVERYTHING):
             return ALL

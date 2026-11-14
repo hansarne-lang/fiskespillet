@@ -69,7 +69,7 @@ try {
         foreach ($action in 0,2,6,7) { Exactly $hostLog "FISKELAGET_ROD_COMMAND_REJECTED player=$id action=$action expected=$old current=(?!$old)[0-9A-Fa-f]{32}$" $(if($action -eq 7){2}else{1}) }
         if (@(Events $hostLog "FISKELAGET_CAST_REJECTED player=$id expected=$old current=(?!$old)[0-9A-Fa-f]{32}$").Count -lt 1) { throw 'Stale cast not rejected' }
         $ready = @(Events $hostLog "FISKELAGET_ROD_CYCLE player=$id cast=[0-9A-Fa-f]{32} state=1$")[-1]
-        if ((FiskGameSeconds ((Time-Of $ready) - (Time-Of $first)).TotalSeconds) -lt 2.9) { throw 'New cast started before landing animation ended' }
+        if ((FiskGameSpan (Time-Of $first) (Time-Of $ready)) -lt 2.9) { throw 'New cast started before landing animation ended' }
     }
     Exactly $hostLog 'FISKELAGET_ROD_CANCELLED player=' 3
     Exactly $hostLog 'FISKELAGET_REPEAT_CANCEL_FIGHT player=' 0
@@ -97,11 +97,11 @@ try {
         $start = @(Events $hostLog 'FISKELAGET_DAY_STARTED')[0]
         $settle = @(Events $log 'FISKELAGET_SETTLEMENT rows=2')[0]
         $end = @(Events $log 'FISKELAGET_TEST_DAY_END ms=1200000')[0]
-        if ([Math]::Abs((FiskGameSeconds ((Time-Of $settle) - (Time-Of $start)).TotalSeconds) - 1020) -gt (2.0*$FiskClockScale)) { throw 'Settlement time drift' }
-        if ([Math]::Abs((FiskGameSeconds ((Time-Of $end) - (Time-Of $start)).TotalSeconds) - 1200) -gt (2.0*$FiskClockScale)) { throw 'Day length drift' }
+        if ([Math]::Abs((FiskGameSpan (Time-Of $start) (Time-Of $settle)) - 1020) -gt (2.0*$FiskClockScale)) { throw 'Settlement time drift' }
+        if ([Math]::Abs((FiskGameSpan (Time-Of $start) (Time-Of $end)) - 1200) -gt (2.0*$FiskClockScale)) { throw 'Day length drift' }
         foreach ($sample in @(Events $log 'FISKELAGET_TEST_CLOCK ms=(\d+)')) {
             $game = [int]$sample.Matches[0].Groups[1].Value / 1000.0
-            if ([Math]::Abs((FiskGameSeconds ((Time-Of $sample) - (Time-Of $start)).TotalSeconds) - $game) -gt (2.0*$FiskClockScale)) { throw 'Clock sample drift' }
+            if ([Math]::Abs((FiskGameSpan (Time-Of $start) (Time-Of $sample)) - $game) -gt (2.0*$FiskClockScale)) { throw 'Clock sample drift' }
         }
     }
     $cap = @(Events $hostLog 'FISKELAGET_REPEAT_CAPTAIN_RETURN player=')

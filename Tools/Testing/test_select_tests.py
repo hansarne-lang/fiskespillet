@@ -58,6 +58,25 @@ class SelectTests(unittest.TestCase):
         # Unclassified files still run everything; this lists them so rules can be added on purpose.
         self.assertEqual([p for p in unclassified if '/UI/' not in p], [])
 
+    def test_automation_tests_select_nothing(self):
+        for path in ('Source/FiskCore/Private/FiskHelmTest.cpp', 'Source/FiskGame/Private/DayCycle/FiskDayStateTest.cpp',
+                     'Source/FiskGame/Private/World/FiskPierRulesTest.cpp'):
+            self.assertEqual(st.select([path]), [], path)
+        self.assertEqual(st.select(['Source/FiskGame/Private/Fishing/FiskTestPilot.h']), sorted(st.FISHING))
+
+    def test_single_area_core_headers(self):
+        self.assertEqual(st.select(['Source/FiskCore/Public/FiskPierRules.h']), ['HarbourGuide', 'MarinaRelease'])
+        self.assertIn('FishCombat', st.select(['Source/FiskCore/Private/FiskRodStick.cpp']))
+        self.assertIn('NavigationRelease', st.select(['Source/FiskCore/Public/FiskVoyageRules.h']))
+        self.assertEqual(st.select(['Source/FiskCore/Public/FiskRouteGeometry.h']), st.ALL)
+        self.assertEqual(st.select(['Source/FiskCore/Public/FiskSomethingNew.h']), st.ALL)
+
+    def test_core_rules_only_name_existing_scripts(self):
+        scripts = set(st.available_scripts())
+        for pattern, targets in st.CORE_RULES:
+            for target in targets:
+                self.assertIn(target, scripts, pattern)
+
     def test_windows_separators(self):
         self.assertEqual(st.select(['Tools\\Testing\\Run-SeaChart.ps1']), ['SeaChart'])
 

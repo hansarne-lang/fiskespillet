@@ -86,8 +86,8 @@ try{
   $log=Join-Path $run "$role.log"
   $reveal=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SETTLEMENT rows=4' | Select-Object -First 1
   $day2=Select-String -LiteralPath $log -Pattern 'FISKELAGET_SESSION_DAY number=2' | Select-Object -First 1
-  if(!$reveal -or (FiskGameSeconds ((Stamp $reveal)-(Stamp $start)).TotalSeconds) -lt 1020){throw "Early or missing reveal: $role"}
-  if(!$day2 -or (FiskGameSeconds ((Stamp $day2)-(Stamp $start)).TotalSeconds) -lt 1200){throw "Day shortened: $role"}
+  if(!$reveal -or (FiskGameSpan (Stamp $start) (Stamp $reveal)) -lt 1020){throw "Early or missing reveal: $role"}
+  if(!$day2 -or (FiskGameSpan (Stamp $start) (Stamp $day2)) -lt 1200){throw "Day shortened: $role"}
   if(@(Select-String -LiteralPath $log -Pattern 'FISKELAGET_CAREER_REVEAL_PASSED').Count -ne 1){throw 'Wrong reveal count'}
   $allocation=Select-String -LiteralPath $log -Pattern 'FISKELAGET_OFFSHORE_ALLOCATION' | Select-Object -First 1
   $allocations += [int][regex]::Match($allocation.Line,'rods=(\d+)').Groups[1].Value

@@ -1,4 +1,5 @@
 #include "DayCycle/FiskDayState.h"
+#include "HAL/PlatformMisc.h"
 #include "HAL/PlatformTime.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
@@ -66,6 +67,24 @@ int32 AFiskDayState::NextMilestone(int32 ElapsedSeconds)
     return -1;
 }
 
+bool AFiskDayState::ShouldSkipIdle(int32 ElapsedSeconds,bool bAnyAway,bool bAnyHome,double IdleRealSeconds)
+{
+    // Only the wait between the last boat coming home and 17:00. Before 02:00 and after 17:00 the tests
+    // still act on the clock, and a boat out at sea must keep its real travel and fishing time.
+    return ElapsedSeconds>=PreparationEnd && ElapsedSeconds<SettlementStart
+        && !bAnyAway && bAnyHome && FMath::IsFinite(IdleRealSeconds) && IdleRealSeconds>=IdleSkipGraceSeconds;
+}
+
+bool AFiskDayState::IsIdleSkipEnabled()
+{
+#if UE_BUILD_SHIPPING
+    return false;
+#else
+    static const bool bEnabled=FPlatformMisc::GetEnvironmentVariable(TEXT("FISK_SKIP_IDLE"))==TEXT("1");
+    return bEnabled;
+#endif
+}
+
 bool AFiskDayState::SkipToNextMilestone(int32& OutSeconds)
 {
     OutSeconds=-1;
@@ -73,12 +92,13 @@ bool AFiskDayState::SkipToNextMilestone(int32& OutSeconds)
     return false;
 #else
     if(!HasAuthority() || !HasStarted()) { return false; }
-    const int32 Target=NextMilestone(GetElapsedSeconds());if(Target<0) { return false; }
+    const int32 Target=NextMilestone(GetElapsedSeconds());if(Target<0) { return false; }const int32 Before=GetElapsedMilliseconds();
     // Move the day's start back so the scaled clock reads the milestone now. Everything that reads the
     // day clock (boats, rods, the 17:00 settlement) sees the jump on its next tick.
     StartedMonotonic=FPlatformTime::Seconds()-(Target+0.001)/static_cast<double>(FMath::Clamp(ClockScale,1,MaxTestClockScale));
     Clock.ElapsedMs=GetElapsedMilliseconds();LastMinute=-1;OutSeconds=Target;
-    UE_LOG(LogTemp,Warning,TEXT("FISKELAGET_CLOCK_SKIPPED day=%d ms=%d (test only)"),Clock.Number,Clock.ElapsedMs);
+    // skipped_ms lets the test scripts add the jump back when they compare log timestamps with game time.
+    UE_LOG(LogTemp,Warning,TEXT("FISKELAGET_CLOCK_SKIPPED day=%d ms=%d skipped_ms=%d (test only)"),Clock.Number,Clock.ElapsedMs,FMath::Max(0,Clock.ElapsedMs-Before));
     OnRep_Clock();ForceNetUpdate();return true;
 #endif
 }

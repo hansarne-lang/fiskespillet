@@ -67,6 +67,10 @@ private:
     bool bBetsSettled=false;
     FFiskBetSummary BetSummary;
     void ResetBetsForDay();
+    // Test-only idle skip (FISK_SKIP_IDLE=1), FiskBootstrapIdleSkip.cpp.
+    FTimerHandle IdleSkipTimer;
+    double IdleSince=-1;
+    void CheckIdleSkip();
     FGuid ArchivedDay;
     int32 ArchiveRevision=0;
     double ArchiveRetryAt=0;

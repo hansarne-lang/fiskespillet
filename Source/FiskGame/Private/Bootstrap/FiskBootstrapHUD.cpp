@@ -1,4 +1,5 @@
 #include "Bootstrap/FiskBootstrapHUD.h"
+#include "Bootstrap/FiskBootstrapWeighIn.h"
 #include "UI/FiskPlayerNames.h"
 #include "UI/FiskMarinaPanel.h"
 #include "World/FiskPierWalk.h"
@@ -151,6 +152,7 @@ void AFiskBootstrapHUD::DrawHUD()
         if(PC->GetSkipperPanel()->IsVisible()) { PC->GetSkipperPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetExpeditionPanel()->IsVisible()) { PC->GetExpeditionPanel()->Draw(*this,*Canvas);return; }
         if(PC->GetMarinaPanel()->IsVisible()) { PC->GetMarinaPanel()->Draw(*this,*Canvas);return; }
+        FiskWeighInScreen::Draw(*this,*Canvas);   // Over the game and the pier, under the open panels (#183)
         if(PC->GetPierWalk()->Draw(*this,*Canvas)) { return; }
         const FString Feedback=PC->GetActionFeedback();
         if(!Feedback.IsEmpty() && !PC->IsCareerVisible())

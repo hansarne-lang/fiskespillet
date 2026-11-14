@@ -10,6 +10,9 @@ namespace FiskPier
     inline bool Inside(FVector P) { if(P.ContainsNaN() || !FMath::IsFinite(P.X) || !FMath::IsFinite(P.Y) || FMath::Abs(P.Z-130)>1 || !FurnitureClear(P)) { return false; }for(const auto& A:Areas) { if(P.X>=A.X0+BodyRadius && P.X<=A.X1-BodyRadius && P.Y>=A.Y0+BodyRadius && P.Y<=A.Y1-BodyRadius) { return true; } }return false; }
     inline bool ValidAxis(FVector2D A) { return FMath::IsFinite(A.X) && FMath::IsFinite(A.Y) && A.SizeSquared()<=2.001; }
     inline bool CanStart(bool Ready,bool Own,bool Dock,bool Aboard) { return Ready && Own && Dock && !Aboard; }
+    // The game opens on the pier (issue #178): the figure appears each time the player becomes free ashore,
+    // once per time. Leaving the pier view by hand (T or Escape) is respected until the player has been aboard again.
+    inline bool ShouldAutoStart(bool Ashore,bool WasAshore,bool Enabled,bool Pending) { return Ashore && !WasAshore && !Enabled && !Pending; }
     inline bool AcceptInput(bool Enabled,bool Own,int32 Generation,int32 Expected,int32 Serial,int32 Last,FVector2D A) { return Enabled && Own && Generation==Expected && Serial>0 && Serial>Last && ValidAxis(A); }
     inline FVector Step(FVector P,FVector2D Axis,double Delta,bool Sprint)
     {
